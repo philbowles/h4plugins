@@ -1,0 +1,63 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: auto;
+}
+form {
+  margin-top: 10px;
+  margin-bottom: 8px;
+  grid-column: 2;
+}
+select {
+  width: 140px;
+}
+input {
+  width: 136px;
+}
+img{
+  margin-left: 5px;
+}
+#main{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 15px;
+  justify-items: center;
+}
+
+#header {
+  grid-row-start: 1;
+  grid-column: 2;
+}
+
+#footer {
+    font-size: x-small;
+    text-align: center;
+    grid-column: 2;
+}
+#creds{
+  grid-column: 2;
+  width: 280px;
+}
+#cmds{
+  grid-column: 3;
+  margin-top: 15px;
+  cursor: pointer;
+}
+.line {
+  display: inline-flex;
+  text-align: left;
+  grid-column: 2;   
+  }
+.fline {
+  display: inline-flex;
+}
+.btn{
+  display: grid;
+  justify-items: center;
+  margin-top: 6px;
+}   
+.title {
+  width: 140px;
+}
+.data{
+  width: 140px;
+}

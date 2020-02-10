@@ -1,0 +1,22 @@
+TODO:
+H4 
+    rebootChain->forward_list? (watch size!)
+LT 
+    heaplogger
+    cmdlogger
+    sql logger
+    rf bridge
+    signal on no spiffs
+    template for hooking?
+    proper condl diags
+    remote client get
+    fix switch.ps1 to use soap etc (revert a la esparto)
+    take akways ignore out of TS
+NOW
+    lots of const string&
+    DOX! 
+
+2019/12/02  0.1.0   added static functions hookLoop / runHooks for fwd compatibilty with
+                    H4P_GPIOManager
+
+                    added this file

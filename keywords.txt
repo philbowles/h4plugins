@@ -1,0 +1,118 @@
+#######################################
+# Syntax Coloring Map For H4Plugins
+#######################################
+
+#######################################
+# Library (	KEYWORD1)
+#######################################
+
+H4P_SerialCmd	KEYWORD1
+H4P_FlasherController	KEYWORD1
+H4P_GPIOManager	KEYWORD1
+H4P_WiFi	KEYWORD1
+H4P_MQTT	KEYWORD1
+H4P_BasicSwitch	KEYWORD1
+H4P_UPNPSwitch	KEYWORD1
+H4P_ThreeFunctionButton	KEYWORD1
+H4P_CmdErrors	KEYWORD1
+H4P_QueueWarn	KEYWORD1
+H4P_TaskSniffer	KEYWORD1
+H4P_ExternalSqWave	KEYWORD1
+
+#######################################
+# Datatypes 
+#######################################
+
+H4P_SerialCmd	KEYWORD1
+H4P_FlasherController	KEYWORD1
+H4P_GPIOManager	KEYWORD1
+H4P_WiFi	KEYWORD1
+H4P_MQTT	KEYWORD1
+H4P_BasicSwitch	KEYWORD1
+H4P_UPNPSwitch	KEYWORD1
+H4P_ThreeFunctionButton	KEYWORD1
+H4P_CmdErrors	KEYWORD1
+H4P_QueueWarn	KEYWORD1
+H4P_TaskSniffer	KEYWORD1
+H4P_AsyncWebServer	KEYWORD1
+H4P_ExternalSqWave	KEYWORD1
+
+#######################################
+# Methods and Functions (	KEYWORD2)
+#######################################
+
+flashLED	KEYWORD2
+flashMorse	KEYWORD2
+flashMorseText	KEYWORD2
+flashPattern	KEYWORD2
+flashPWM	KEYWORD2
+isFlashing	KEYWORD2
+pulseLED	KEYWORD2
+stopLED	KEYWORD2
+logicalRead	KEYWORD2
+logicalWrite	KEYWORD2
+throttle	KEYWORD2
+toggle	KEYWORD2
+Circular	KEYWORD2
+Debounced	KEYWORD2
+Encoder	KEYWORD2
+EncoderAuto	KEYWORD2
+Filtered	KEYWORD2
+Latching	KEYWORD2
+Multistage	KEYWORD2
+Output	KEYWORD2
+Polled	KEYWORD2
+Raw	KEYWORD2
+Repeating	KEYWORD2
+Retriggering	KEYWORD2
+Sequenced	KEYWORD2
+Timed	KEYWORD2
+setValue	KEYWORD2
+setMin	KEYWORD2
+setMax	KEYWORD2
+setPercent	KEYWORD2
+setCenter	KEYWORD2
+change	KEYWORD2
+publishDevice	KEYWORD2
+restart	KEYWORD2
+showGrid	KEYWORD2
+start	KEYWORD2
+stop	KEYWORD2
+subscribeDevice	KEYWORD2
+unsubscribeDevice	KEYWORD2
+turnOff	KEYWORD2
+turnOn	KEYWORD2
+toggle	KEYWORD2
+turn	KEYWORD2
+pcent	KEYWORD2
+invokeCmd	KEYWORD2
+all	KEYWORD2
+config	KEYWORD2
+dumpQ	KEYWORD2
+h4FactoryReset	KEYWORD2
+h4reboot	KEYWORD2
+help	KEYWORD2
+Qstats	KEYWORD2
+tnames	KEYWORD2
+showUnload	KEYWORD2
+unload	KEYWORD2
+h4rebootdumpQ	KEYWORD2
+factoryReset	KEYWORD2
+include	KEYWORD2
+exclude	KEYWORD2
+friendlyName	KEYWORD2
+host	KEYWORD2
+showSPIFFS	KEYWORD2
+
+#######################################
+# Constants (	LITERAL11)
+#######################################
+H4_CMD_OK	LITERAL1
+H4_CMD_UNKNOWN	LITERAL1
+H4_CMD_TOO_FEW_PARAMS	LITERAL1
+H4_CMD_TOO_MANY_PARAMS	LITERAL1
+H4_CMD_NOT_NUMERIC	LITERAL1
+H4_CMD_OUT_OF_BOUNDS	LITERAL1
+H4_CMD_NAME_UNKNOWN	LITERAL1
+H4_CMD_PAYLOAD_FORMAT	LITERAL1
+H4_CMD_PROHIBITED	LITERAL1

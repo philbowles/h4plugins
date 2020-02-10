@@ -1,0 +1,178 @@
+/*
+ MIT License
+
+Copyright (c) 2019 Phil Bowles <h4plugins@gmail.com>
+   github     https://github.com/philbowles/esparto
+   blog       https://8266iot.blogspot.com     
+   groups     https://www.facebook.com/groups/esp8266questions/
+              https://www.facebook.com/Esparto-Esp8266-Firmware-Support-2338535503093896/
+                			  
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+#include<H4Plugins.h>
+
+H4_CMD_MAP_I H4P_SerialCmd::__exactMatch(const string& cmd,uint32_t owner){
+    auto any=commands.equal_range(cmd);
+    for(auto i=any.first;i!=any.second;i++) if(i->second.owner==owner) return i;
+    return commands.end();
+}
+
+void H4P_SerialCmd::removeCmd(const string& s){ if(__exactMatch(s,0)!=commands.end()) commands.erase(s); }
+
+void H4P_SerialCmd::__flatten(function<void(string)> fn){
+    H4_CMD_MAP_I ptr;
+    for(ptr=commands.begin();ptr!=commands.end(); ptr++){
+        if(!(ptr->second.owner)){
+            if(ptr->second.levID) _flattenCmds(fn,ptr->first,ptr->first,ptr->second.levID);    
+            else fn(ptr->first);
+        } 
+    }
+}
+
+uint32_t H4P_SerialCmd::_dispatch(vector<string> vs,uint32_t owner=0){
+    if(vs.size()){
+        H4_CMD_MAP_I i;
+        string cmd=vs[0];
+        i=__exactMatch(cmd,owner);
+        if(i!=commands.end()){
+            if(i->second.fn) return (bind(i->second.fn,CHOP_FRONT(vs)))();
+            else return _dispatch(CHOP_FRONT(vs),i->second.levID);
+        } else return H4_CMD_UNKNOWN;
+    } else return H4_CMD_UNKNOWN;
+}
+
+void H4P_SerialCmd::_flattenCmds(function<void(string)> fn,string cmd,string prefix,uint32_t lev){
+    H4_CMD_MAP_I i=commands.find(cmd);
+    for(i=commands.begin();i!=commands.end();i++){
+        if(i->second.owner==lev){
+			string trim = prefix+"/"+i->first;
+			if(i->second.levID) _flattenCmds(fn,i->first,trim,i->second.levID);
+			else fn(trim);
+        }
+    }
+}
+
+uint32_t H4P_SerialCmd::_simulatePayload(string flat,const char* src){ // refac
+	vector<string> vs=split(flat,"/");
+    if(vs.size()){
+		string pload=CSTR(PAYLOAD);
+		vs.pop_back();
+		string topic=join(vs,"/");
+		return invokeCmd(topic,pload,src);			
+	}
+    else return H4_CMD_TOO_FEW_PARAMS;
+}
+//
+//      cmd responders
+//
+uint32_t H4P_SerialCmd::_unload(vector<string> vs){ 
+    return guardString1(vs,[this](string s){ 
+        unload(CSTR(s));
+        showUnload();
+    }); 
+}
+//
+//      public
+//
+void H4P_SerialCmd::all(){
+    __flatten([this](string s){ 
+        vector<string> candidates=split(s,"/");
+        if(candidates.size()>1 && candidates[1]=="show" && candidates[2]!="all") invokeCmd(s,"",CSTR(_cb["source"])); // snake / tail etc
+    });
+}
+
+uint32_t H4P_SerialCmd::_executeCmd(string topic, string pload){
+	vector<string> vs=split(CSTR(topic),"/");
+    _cb["source"]=vs[0];
+    _cb["target"]=vs[1];
+//    Serial.printf("CMD src=%s tgt=%s  %s[%s]\n",CSTR(_cb["source"]),CSTR(_cb["target"]),CSTR(topic),CSTR(pload));
+	vs.push_back(pload);
+	return _dispatch(vector<string>(vs.begin()+2,vs.end())); // optimise?
+}
+
+void H4P_SerialCmd::help(){ 
+//    reply("Available cmds:\n");
+    vector<string> unsorted={};
+    __flatten([&unsorted](string s){ unsorted.push_back(s); });
+    sort(unsorted.begin(),unsorted.end());
+    for(auto const& s:unsorted) { reply("%s\n",CSTR(s)); }
+}
+
+uint32_t H4P_SerialCmd::invokeCmd(string topic,string payload,const char* src){ 
+    return _executeCmd(string(src)+"/self/"+CSTR(topic),string(CSTR(payload)));
+}
+
+uint32_t H4P_SerialCmd::invokeCmd(string topic,uint32_t payload,const char* src){ 
+    return invokeCmd(topic,stringFromInt(payload),src);
+}
+
+void H4P_SerialCmd::unload(const char* pid){ // move to H4Plugin?
+    if(H4::unloadables.count(pid)) {
+        h4._unHook(H4::unloadables[pid]);
+        H4::unloadables.erase(pid);
+    }
+}	
+//
+//      H4P_SerialCmd
+//
+H4P_SerialCmd::H4P_SerialCmd(){
+    _pid=stag();
+    _hook=[this](){ run(); };
+    _names={ {H4P_TRID_SCMD,uppercase(_pid)} };
+    _cmds={
+        {"h4",         { 0, H4PC_ROOT, nullptr}},
+        {"help",       { 0, 0, CMD(help) }},
+        {"reboot",     { H4PC_ROOT, 0, CMD(h4reboot) }},
+        {"show",       { H4PC_ROOT, H4PC_SHOW, nullptr}},
+        {"all",        { H4PC_SHOW, 0, CMD(all) }},
+        {"config",     { H4PC_SHOW, 0, CMD(config) }},
+//      diag below here        
+        {"q",          { H4PC_SHOW, 0, CMD(dumpQ) }},
+        {"qstats",     { H4PC_SHOW, 0, CMD(Qstats) }},
+        {"tnames",     { H4PC_SHOW, 0, CMD(tnames) }},
+        {"unload",     { H4PC_SHOW, 0, CMD(showUnload) }},
+        {"unload",     { H4PC_ROOT, 0, CMDVS(_unload) }}
+    };
+};
+// diag
+void H4P_SerialCmd::dumpQ(){ h4.dumpQ(); }
+void H4P_SerialCmd::Qstats(){ reply("Q capacity: %u size: %u\n",h4._capacity(),h4._size()); }
+void H4P_SerialCmd::showUnload(){ for(auto const& v:H4::unloadables) reply("U: %s=%d\n",CSTR(v.first),v.second); }
+void H4P_SerialCmd::tnames(){ for(auto const& n:H4::trustedNames) { reply("T: %d=%s\n",n.first,CSTR(n.second)); }}
+//
+void H4P_SerialCmd::run(){ // halting loop optimise
+    static string cmd="";
+	static int	c;
+
+    if((c=Serial.read()) != -1){
+        if (c == '\n') {
+            h4.queueFunction(bind([this](string cmd){
+                uint32_t err=_simulatePayload(cmd);
+                if(err){
+                    string msg;
+                    if(h4._hasName(H4P_TRID_CERR)) msg=h4ce.getErrorMessage(err)+" "+cmd;
+                    else msg="Error: "+stringFromInt(err);
+                    reply("%s\n",CSTR(msg));
+                }
+            },cmd),nullptr,H4P_TRID_SCMD);
+            cmd="";
+        } else cmd+=c;		
+    }	
+}
