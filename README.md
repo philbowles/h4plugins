@@ -66,7 +66,7 @@ Each plugin is also throroughly documented in the links below. *Please make sure
 
 ## Extensive GPIO library
 
-Simple one-line GPIO management of deboucing, retriggering, pulse counting, timing rotary encoders etc
+Simple one-line GPIO management of debouncing, retriggering, pulse counting, timing rotary encoders etc
 
 ![UPNP](/assets/GPIOsmall.jpg)
 
