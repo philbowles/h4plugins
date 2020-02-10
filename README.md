@@ -1,6 +1,10 @@
 ![H4P Logo](/assets/H4PLogo.png)
 
-# Additional modular functionality for H4 Universal Scheduler/Timer providing WiFi, MQTT, GPIO management, diagnostic tools and much more.
+# Additional modular functionality for H4 Universal Scheduler/Timer including WiFi, MQTT, GPIO management and diagnostic tools.
+
+## Arduino IDE library targeting ESP8266, ESP32 and STM32-NUCLEOxx boards
+
+## (WiFi and dependent plugins not available on STM32-NUCLEOxx series)
 
 *All plugins depend upon the presence of the [H4 library](https://github.com/philbowles/H4), which must be installed first.*
 
