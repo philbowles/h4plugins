@@ -1,4 +1,4 @@
-![H4P Logo](/assets/H4Plogo.png)
+![H4P Logo](/assets/H4PLogo.png)
 
 # Additional modular functionality for H4 Universal Scheduler/Timer providing WiFi, MQTT, GPIO management, diagnostic tools and much more.
 
