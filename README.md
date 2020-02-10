@@ -68,7 +68,7 @@ Each plugin is also throroughly documented in the links below. *Please make sure
 
 Simple one-line GPIO management of deboucing, retriggering, pulse counting, timing rotary encoders etc
 
-![UPNP](/assets/gpiosmall.jpg)
+![UPNP](/assets/GPIOsmall.jpg)
 
 ## Cross-platform code
 
