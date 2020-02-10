@@ -1,4 +1,4 @@
-![H4P Logo](/assets/DIAGLogo.jpg)
+![H4P Logo](/assets/DiagLogo.jpg)
 
 # Serial Commands
 
