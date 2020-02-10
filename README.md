@@ -96,7 +96,7 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 * [**H4P_WiFi**](docs/h4wifi.md): Automatic Connection / reconnection manager + AP configuration + OTA + HTTP REST
 * [**H4P_MQTT**](docs/h4mqtt.md): Automatic Connection/ reconnection MQTT client alows remote control of H4
 * [**H4P_BasicSwitch**](docs/h4onof.md): GPIO object that allows control by simple commands that become available to other plugins
-* [**H4P_UPNPSwitch**](docs/h4mqtt.md): Extends [H4P_BasicSwitch](docs/h4onof.md) into full UPNP device with Alexa voice control
+* [**H4P_UPNPSwitch**](docs/h4upnp.md): Extends [H4P_BasicSwitch](docs/h4onof.md) into full UPNP device with Alexa voice control
 * [**H4P_ThreeFunctionButton**](docs/h43fnb.md): Multi-function physical control on/off,reboot,factory reset depending on hold time
 
 ## Diagnostic / Development tools:
