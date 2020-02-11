@@ -107,8 +107,8 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 * [**H4P_CmdErrors**](docs/h4ce.md): Provide text error messages instead of error codes to SerialCmd
 * [**H4P_QueueWarn**](docs/h4qw.md): Call user function on low Queue
 * [**H4P_TaskSniffer**](docs/h4ts.md): Low-level task / queue dumper for H4 + Plugins
-* [**H4P_SerialLogger**](docs/h4logs.md): Event logging to serial monitor
-* [**H4P_LocalLogger**](docs/h4logs.md): Event logging to SPIFFS file
+* [**H4P_SerialLogger**](docs/h4logs.md): Event logging to serial monitor **NEW in v0.2.0**
+* [**H4P_LocalLogger**](docs/h4logs.md): Event logging to SPIFFS file **NEW in v0.2.0**
 * 
 ## Specialist Device Drivers
 

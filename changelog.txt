@@ -5,8 +5,8 @@
 4   various other code changes to support logging
 5   introduce mandatory requirement to follow H4Plugins.h with H4_USE_PLUGINS
     to banish forever the "initialisation hell" that is cause by different static
-    initalisation in differetn compilers. Its hottible, but it works and it easier
-    than a ground-up rewrite
+    initialisation in different compilers. Its horrible, but it works and it's easier
+    than a ground-up rewrite :)
 
 TODO:
 H4 
