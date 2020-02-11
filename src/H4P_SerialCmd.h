@@ -32,11 +32,23 @@ SOFTWARE.
 
 using   namespace std::placeholders;
 
+#include<H4PCommon.h>
+#ifndef ARDUINO_ARCH_STM32 
+    #ifdef ARDUINO_ARCH_ESP8266
+        #include<FS.h>
+    #else
+        #include<SPIFFS.h>
+    #endif
+#endif
+
 class H4Plugin;
 
 constexpr const char* stag(){ return "scmd"; }
 
+using H4P_FN_LOG = function<void(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error)>;
+
 class H4P_SerialCmd: public H4Plugin {
+        vector<H4P_FN_LOG>  _logChain;
   protected:
         VSCMD(_unload);
 
@@ -44,11 +56,17 @@ class H4P_SerialCmd: public H4Plugin {
         void            __flatten(function<void(string)> fn);
 
         uint32_t        _dispatch(vector<string> vs,uint32_t owner);
+        void            _hookIn() override;
         void            _flattenCmds(function<void(string)> fn,string cmd="",string prefix="",uint32_t owner=0);
-
         void            run();
-
     public:
+#ifndef ARDUINO_ARCH_STM32
+        VSCMD(_dump);   // public so logger can use it
+//      spiffs
+        static  string   read(const string& fn);
+        void             showSPIFFS();
+        static  uint32_t write(const string& fn,const string& data,const char* mode="w");
+#endif
         H4P_SerialCmd();
 //      cmds
         void            all();
@@ -62,10 +80,13 @@ class H4P_SerialCmd: public H4Plugin {
         void            addCmd(const string& name,uint32_t owner, uint32_t levID,H4_FN_MSG f=nullptr){ _addCmd(name, {owner,levID,f}); }
         uint32_t        invokeCmd(string,string="",const char* src="user");			
         uint32_t        invokeCmd(string,uint32_t,const char* src="user"); 
+        void            logEvent(const string& msg){ _logEvent(msg,H4P_LOG_USER,"user","self",0); }
         void            removeCmd(const string& name); 
         void            unload(const char* pid);
 //      syscall only
         void            _addCmd(const string& name,struct command cmd){ commands.insert(make_pair(name,cmd)); }
+        void            _hookLogChain(H4P_FN_LOG f){ _logChain.push_back(f); }
+        void            _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error);
         uint32_t        _executeCmd(string topic, string pload);
         uint32_t        _simulatePayload(string flat,const char* src="kybd");
 };

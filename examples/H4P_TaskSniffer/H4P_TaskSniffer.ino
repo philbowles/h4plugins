@@ -1,4 +1,5 @@
-#include <H4Plugins.h>
+#include<H4Plugins.h>
+H4_USE_PLUGINS
 /*
     This i based on the QueueWarn example: you should run that first.
 

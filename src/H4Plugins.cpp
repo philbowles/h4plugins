@@ -35,17 +35,14 @@ void __attribute__((weak)) h4AddAwsHandlers(){}
 void __attribute__((weak)) onFactoryReset(){}
 
 H4P_CONFIG_BLOCK    H4Plugin::_cb;
-vector<H4Plugin*>   H4Plugin::_pending;
+//vector<H4Plugin*>   H4Plugin::_pending;
 H4_CMD_MAP          H4Plugin::commands;
 
 vector<H4_FN_VOID>  H4PluginService::_factoryChain;
 
 void h4StartPlugins(){
-//    Serial.printf("startPlugins n=%d\n",H4Plugin::_pending.size());
     for(auto const& p:H4Plugin::_pending) p->_startup();
-//    Serial.printf("startPlugins hookin n=%d\n",H4Plugin::_pending.size());
     for(auto const& p:H4Plugin::_pending) { p->_hookIn(); }
-//    Serial.printf("startPlugins greenlight n=%d\n",H4Plugin::_pending.size());
     for(auto const& p:H4Plugin::_pending) p->_greenLight();
     H4Plugin::_pending.clear();
     H4PluginService::hookFactory(onFactoryReset);
@@ -121,7 +118,7 @@ void H4Plugin::reply(const char* fmt,...){ // find pub sub size
 }
 
 void H4Plugin::_startup(){
-//    reply("_startup %s nN=%d nC=%d\n",CSTR(_pid),_names.size(),_cmds.size());
+//    reply("H4Plugin::_startup %s nN=%d nC=%d\n",CSTR(_pid),_names.size(),_cmds.size());
     h4._hookLoop(_hook,_names,_pid);
     if(_cmds.size()) commands.insert(_cmds.begin(),_cmds.end());
     _cmds.clear();
@@ -131,7 +128,8 @@ void H4Plugin::_startup(){
 //
 //      H4PluginService
 //
-void  H4PluginService::_startup(){
+void H4PluginService::_startup(){
+//    reply("H4PluginService::_startup %s nN=%d nC=%d\n",CSTR(_pid),_names.size(),_cmds.size());
     _cmds={
             {"restart", { 0, 0, CMD(restart)}},
             {"start",   { 0, 0, CMD(start)}},
@@ -142,4 +140,33 @@ void  H4PluginService::_startup(){
     _cmds.insert(_local.begin(),_local.end());
     _local.clear();
     H4Plugin::_startup();
+}
+void H4PluginService::h4pcConnected(){ 
+    for(auto const& c:_connChain) c();
+    svc(_pid,H4P_LOG_SVC_UP);
+}
+
+void H4PluginService::h4pcDisconnected(){
+    for(auto const& d:_discoChain) d();
+    svc(_pid,H4P_LOG_SVC_DOWN);
+}
+
+void H4PluginService::svc(const string& uid,H4P_LOG_TYPE ud) {
+    #ifdef H4P_SERIAL_LOGGING 
+        if(h4._hasName(H4P_TRID_SCMD)) {
+            h4sc._logEvent(uid,ud,"h4","",0);
+    //    Serial.printf("SVC %s %s\n",CSTR(uid),ud==H4P_LOG_SVC_UP ? "UP":"DOWN");
+            Serial.print("SVC ");Serial.print(CSTR(uid));
+            Serial.print(" ");Serial.println(ud==H4P_LOG_SVC_UP ? "UP":"DOWN");
+        }
+    #endif
+}
+//
+//      H4PlogService
+//
+void H4PLogService::_hookIn(){ 
+    h4sc._hookLogChain(bind(&H4PLogService::_logEvent,this,_1,_2,_3,_4,_5));
+    h4sc.addCmd("msg",subid, 0, CMDNULL);
+
+    start();
 }

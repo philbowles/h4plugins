@@ -9,6 +9,7 @@
 *All plugins depend upon the presence of the [H4 library](https://github.com/philbowles/H4), which must be installed first.*
 
 ---
+Version **0.2.0** [Release Notes](changelog.txt)
 
 ![H4PluginsFF](/assets/h4plugins.jpg)
 
@@ -31,6 +32,8 @@ What follows is the *entire H4Plugins code* - despite the fact it might look lik
 
 ```cpp
 #include<H4Plugins.h>
+H4_USE_PLUGINS
+
 H4 h4(115200);
 H4P_SerialCmd h4sc;
 H4P_GPIOManager h4gm;
@@ -38,15 +41,15 @@ H4P_FlasherController h4fc;
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","h4plugins");
 H4P_MQTT h4mqtt("192.168.1.4",1883);
 H4P_AsyncWebServer h4asws("admin","admin");
-H4P_UPNPSwitch h4upnp("Demo Switch");
-H4P_ThreeFunctionButton h43fb(&h4upnp);
+H4P_UPNPSwitch h4upnp("Demo Switch",RELAY_BUILTIN,ACTIVE_HIGH,OFF);
+H4P_ThreeFunctionButton h43fb(&h4upnp,15,BUTTON_BUILTIN,INPUT,ACTIVE_LOW,LED_BUILTIN,ACTIVE_LOW);
 ```
 
 As you can see, all you need to do is list the modules you want (in the right order) and provide a few necessary values such as ssid / passwords etc and the plugins link up with each other, exchange messages betwen themselves and "stitch" everything together into a seamless piece of stable firmware. If you know of anything easier for both beginners and seasoned developers, please let us know.
 
 The modular design of H4's plugin architecture minimises scarce resources in low-memory MCU targets: You only compile in what you need with a simple `#include`. Detailed diagnostics can be easily included and controlled at runtime via the serial console, HTTP REST or MQTT depending on which options you choose. It is built on top of the very stable [H4](https://github.com/philbowles/H4) timer/scheduler which traces its ancestry back to "Esparto" - of which one user recently said: *"and now have Esparto modules with months of uptime without an issue"*.
 
-There are 29 example sketches demonstrating the features and API of all of the plugins. They should be used both as a template and a learning resource.
+There are 30 example sketches demonstrating the features and API of all of the plugins. They should be used both as a template and a learning resource.
 
 Users are strongly recommended to work through them in the order [listed below](readme.md#current-plugins-februrary-2020)
 
@@ -104,7 +107,9 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 * [**H4P_CmdErrors**](docs/h4ce.md): Provide text error messages instead of error codes to SerialCmd
 * [**H4P_QueueWarn**](docs/h4qw.md): Call user function on low Queue
 * [**H4P_TaskSniffer**](docs/h4ts.md): Low-level task / queue dumper for H4 + Plugins
-
+* [**H4P_SerialLogger**](docs/h4logs.md): Event logging to serial monitor
+* [**H4P_LocalLogger**](docs/h4logs.md): Event logging to SPIFFS file
+* 
 ## Specialist Device Drivers
 
 * [**H4P_ExternalSqWave**](docs/h4esw.md): Serial driver for cheap ebay square wave device
@@ -119,7 +124,6 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 * ESP8285 - any board e.g. Wemos D1 mini Lite
 * ESP32 - any board e.g. DevKit, Lolin D32
 * STM32-NUCLEO - "official" boards from ST - others may work too
-# **WARNING** Latest (1.8.0) STM32 ARDUINO CORE IS SERIOUSLY BROKEN, USE 1.7.0
 
 * SONOFF Basic, S20, SV others may work too if ESP8266 based
 
@@ -127,17 +131,46 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 
 # Installation
 
-First you need to install the  [**H4**](https://github.com/philbowles/H4) library. 
+H4Plugins is tested using
+
+* ArduinoIDE 1.8.10 
+* ESP8266 core 2.6.3
+* ESP32 core 1.0.4
+* STM32-NUCLEO core 1.7.0
+
+Use the ArduinoIDE boards manager to install those versions. Earlier version *may* work, but am only able to offer support on the above.
 
 H4Plugins is a standard Arduino library. The simplest method is to download the zip form the link above and then use the menu command: `Sketch / Include Library / Add .ZIP Library...`
 
-Some plugins require additional libraries, see the specifc documentation for each one.
+First you need to install the  [**H4**](https://github.com/philbowles/H4) library. 
+
+Next install the 3rd-party libraries:
+
+* [Arduino pubsubclient library](https://github.com/knolleary/pubsubclient)
+Either:
+* [ESP8266 ESPAsyncUDP Library](https://github.com/me-no-dev/ESPAsyncUDP)
+* [ESP8266 ESPAsyncTCP Library](https://github.com/me-no-dev/ESPAsyncTCP)
+Or:
+* [ESP32 AsyncUDP Library](https://github.com/espressif/arduino-esp32/tree/master/libraries/AsyncUDP)
+* [ESP32 AsyncTCP Library](https://github.com/me-no-dev/AsyncTCP)
+
+Depending on what target you are compiling for
+And:
+
+* [ESPAsyncWebServer](https://github.com/philbowles/ESPAsyncWebServer) * See note
+* Finally, instll this H4Plugins library
+
+(* The standard ESPAyncWebServer library has a long-standing bug in its basic web authentication. I have raised the issue at least twice, but the last time I looked they sill hadn't fixed it, so until then you need to use the patched version from the link above.)
+
+If using WiFi, you will need to install either the [ESP8266 sketch data uploader](https://github.com/esp8266/arduino-esp8266fs-plugin) or the [ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin) (or both) depending on which platform you compile for. 
+
+*(Many thanks to Kerry Clendinning for his help with this section)*
 
 ## Note for PlatformIO users
 
-Unfortunately PlatformIO has several issues that prevent *some* valid Arduino libraries from being installed correctly. These have been raised more than once, but they have still not been fixed as of 9th Feb 2020. I am happy to provide support for H4Plugins code if you manage to get an installation working, providing that none of the files are changed in any way. Sadly, until PlatformIO get the issues fixed, I am unable to provide any support for the installation / build process.
+Unfortunately PlatformIO has (had?) several issues that prevent *some* valid Arduino libraries from being installed correctly. I am happy to provide support for H4Plugins code if you manage to get an installation working, providing that none of the files are changed in any way. Sadly, until PlatformIO get the issues fixed, I am unable to provide any support for the installation / build process.
 
-I welcome any information regarding any change to this situation, contact details below.
+I would be very interested in hearing from anyone who can get it going on PIO - I'd love to remove this message! See contact details below.
 
 # Tools / Build Guidelines
 

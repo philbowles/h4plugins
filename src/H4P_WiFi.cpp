@@ -31,7 +31,6 @@ SOFTWARE.
 
 #ifndef H4P_NO_WIFI
 void H4P_WiFi::_hookIn(){ 
-    SPIFFS.begin(); 
     WiFi.onEvent(_wifiEvent);
     H4PluginService::hookFactory([this](){ clear(); });
 }
@@ -60,7 +59,7 @@ void H4P_WiFi::_startAP(){
 }
 
 void H4P_WiFi::getPersistentValue(string v,string prefix){
-    string persistent=read("/"+v);
+    string persistent=H4P_SerialCmd::read("/"+v);
     string cat=_cb[v]+persistent;
     if(persistent.size()){
         if(H4P_PREFER_PERSISTENT) _cb[v]=persistent;  
@@ -74,24 +73,9 @@ void H4P_WiFi::setPersistentValue(string n,string v,bool reboot){
     string oldvalue=_cb[n];
 //    Serial.printf("PV %s CURRENT VALUE %s,NEW VALUE %s\n",CSTR(n),CSTR(oldvalue),CSTR(v));
     if(oldvalue!=v){
-        write("/"+n,v);
+        H4P_SerialCmd::write("/"+n,v);
         if(reboot) h4reboot();
     } //else Serial.printf("PV %s UNCHANGED\n",CSTR(n));
-}
-
-//  spiffs
-string H4P_WiFi::read(const string& fn){
-	string rv="";
-        File f=SPIFFS.open(CSTR(fn), "r");
-        if(f && f.size()) {
-            int n=f.size();
-            uint8_t* buff=(uint8_t *) malloc(n+1);
-            f.readBytes((char*) buff,n);
-            rv=stringFromBuff(buff,n);
-            free(buff);
-        }
-        f.close();
-	return rv;	
 }
 
 string H4P_WiFi::replaceParams(const string& s){ // oh for a working regex...
@@ -110,22 +94,6 @@ string H4P_WiFi::replaceParams(const string& s){ // oh for a working regex...
         ++i;
 	}
 	return rv.c_str();	
-}
-
-void H4P_WiFi::write(const string& fn,const string& data){
-    File b=SPIFFS.open(CSTR(fn), "w");
-    b.print(CSTR(data));
-    b.close(); 
-}
-//
-uint32_t H4P_WiFi::_dump(vector<string> vs){
-    return guard<1>(vs,[this](vector<string> vs){
-        return ([this](string h){ 
-            Serial.printf("DUMP FILE %s\n",CSTR(h));
-            Serial.printf("%s\n",CSTR(read("/"+h)));
-            return H4_CMD_OK;
-        })(PAYLOAD);
-    });
 }
 
 uint32_t H4P_WiFi::_host(vector<string> vs){
@@ -161,19 +129,7 @@ void H4P_WiFi::_lostIP(){
 }
 
 #ifdef ARDUINO_ARCH_ESP8266
-
-void H4P_WiFi::showSPIFFS(){
-    uint32_t sigma=0;
-    uint32_t n=0;
-    Dir dir = SPIFFS.openDir("/");
-
-    while (dir.next()) {
-        n++;
-        reply("FILE: %s %u\n",CSTR(dir.fileName()),dir.fileSize());
-        sigma+=dir.fileSize();
-    }
-    reply("\n %d file(s) %u bytes\n",n,sigma);
-}
+string H4P_WiFi::_getChipID(){ return stringFromInt(ESP.getChipId(),"%06X"); }
 
 void H4P_WiFi::clear(){ 
 	stop();
@@ -212,6 +168,7 @@ void H4P_WiFi::start(){
     }
     else if(WiFi.getMode()==WIFI_OFF) _startSTA();
 }
+void H4P_WiFi::_stop(){} // dummy
 
 void H4P_WiFi::stop(){
     h4.cancelSingleton({H4P_TRID_HOTA,H4P_TRID_WFAP});
@@ -241,8 +198,6 @@ void H4P_WiFi::_gotIP(){
   	ArduinoOTA.setHostname(CSTR(host));
 	ArduinoOTA.setRebootOnSuccess(false);	
 	ArduinoOTA.begin();
-
-    Serial.printf("WiFi up ip=%s\n",CSTR(_cb["ip"]));
     h4pcConnected();
 }
 
@@ -277,37 +232,20 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
 	}
 }
 #else
-void H4P_WiFi::showSPIFFS(){
-    uint32_t sigma=0;
-    uint32_t n=0;
-
-    File root = SPIFFS.open("/");
- 
-    File file = root.openNextFile();
- 
-    while(file){
-        n++;
-        reply("FILE: %s %u\n",file.name(),file.size());
-        sigma+=file.size();
-        file = root.openNextFile();
-    }
-    reply("\n %d file(s) %u bytes\n",n,sigma);
+string H4P_WiFi::_getChipID(){
+    uint64_t macAddress = ESP.getEfuseMac();
+    uint64_t macAddressTrunc = macAddress << 40;
+    return stringFromInt(macAddressTrunc >> 40,"%06X");
 }
-
 void H4P_WiFi::clear(){
-//    Serial.printf("clear\n");
     _stop();
 	WiFi.disconnect(true,true);
-//    show();
 }
 
 void H4P_WiFi::_scan(){
-//    WiFi.enableSTA(true);
     int n=WiFi.scanNetworks();
-//    Serial.printf("SCAN finds %d networks\n",n);
 
     for (uint8_t i = 0; i < n; i++){
-        //if(WiFi.SSID(i)==CSTR(_cb[ssidtag()])) sel=i;
         char buf[128];
         snprintf(buf,127,"<option>%s</option>",CSTR(WiFi.SSID(i)));
         _cb["opts"].append(buf); // delete later!!!
@@ -341,7 +279,7 @@ void H4P_WiFi::_startSTA(){
 }
 
 void H4P_WiFi::start(){
-    if(WiFi.begin()){                 
+    if(WiFi.begin()){
 //        Serial.printf("Cannot start status=%d ssid=%s psk=%s\n",WiFi.status(),CSTR(WiFi.SSID()),CSTR(WiFi.psk()));
         if(WiFi.SSID()=="" && WiFi.psk()=="") _startAP();
     }
@@ -370,22 +308,9 @@ void H4P_WiFi::_gotIP(){
     _cb["ip"]=WiFi.localIP().toString().c_str();
     _cb[ssidtag()]=CSTR(WiFi.SSID());
     _cb["psk"]=CSTR(WiFi.psk());
-
     string host=_cb[devicetag()];
-
-    Serial.printf("WiFi up ip=%s\n",CSTR(_cb["ip"]));
     h4pcConnected();
 }
-/*
-void H4P_WiFi::_lostIP(){
-//    Serial.printf("_lostIP\n");
-    if(!_discoDone){
-        h4pcDisconnected();
-        _discoDone=true;
-        Serial.println("WiFi down");
-    }
-}
-*/
 /* ESP32
 * WiFi Events
 0  SYSTEM_EVENT_WIFI_READY               < ESP32 WiFi ready

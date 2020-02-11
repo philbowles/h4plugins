@@ -25,35 +25,23 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
 */
+#ifndef H4P_SerialLogger_HO
+#define H4P_SerialLogger_HO
 
-// comment this out to prevent and logging by EVENT( whatever ) messages
-#define H4P_SERIAL_LOGGING
+#include <H4PCommon.h>
+#include <H4P_SerialCmd.h>
 
-/*
-            TWEAKABLES
-*/
-#ifndef H4PCONFIG_H
-#define H4PCONFIG_H
+class H4P_SerialLogger: public H4PLogService {
+        void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error){
+            if(_running) Serial.println(CSTR(msg));
+        }
+    public:
+        H4P_SerialLogger(): H4PLogService("slog"){
+            subid=H4PC_SLOG;
+            _names={ {H4P_TRID_SLOG,uppercase(_pid)} };
+        }
+};
 
-#define H4P_PREFER_PERSISTENT true
-
-#define H4ESW_MAX_F         150000
-#define H4ESW_MAX_D            100
-#define H4ESW_TIMEOUT           50
-
-#define H4FC_MORSE_SUPPORT  false
-
-#define H4MQ_RETRY            5000
-#define H4MQ_MQTT_RATE        1000
-
-#define H4P_UDP_JITTER         250
-#define H4P_UDP_REFRESH     300000
-#define H4P_UDP_REPEAT           2
-
-#define H43F_MEDIUM            175
-#define H43F_FAST               50
-#define H43F_TIMEBASE          175
-#define H4WF_OTA_RATE         1000
-
-#endif
+#endif // H4P_SerialLogger_H

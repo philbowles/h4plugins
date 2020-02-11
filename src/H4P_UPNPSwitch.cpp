@@ -36,8 +36,8 @@ void H4P_UPNPSwitch::_hookIn(){
     h4sc.addCmd(_pid,H4PC_ROOT, H4PC_UPNP, nullptr);
     h4sc.addCmd(nametag(),H4PC_UPNP,0, CMDVS(_friendly));
 
-    h4asws.hookConnect([this](){ init(); });
-    h4asws.hookDisconnect([this](){ offline(); });
+    h4asws.hookConnect([this](){ start(); });
+    h4asws.hookDisconnect([this](){ stop(); });
     H4PluginService::hookFactory([this](){ SPIFFS.remove(CSTR(string("/"+string(nametag())))); });
 }
 
@@ -77,8 +77,6 @@ if(_udp.listenMulticast(_ubIP, 1900)) {
                 string ST = uhdrs["ST"];
                 if (ST==_pups[1] || ST==_uuid+_cb["udn"]) { // make tag
                     string tail=((ST==_pups[1]) ? ST:"");
-//                    string res = "HTTP/1.1 200 OK\r\nST:" + ST +"\r\n" +__upnpCommon(tail);
-//                    Serial.printf("res=%s\n",CSTR(res));
                     __upnpSend(1000 * atoi(CSTR(uhdrs["MX"])), "HTTP/1.1 200 OK\r\nST:" + ST +"\r\n" +__upnpCommon(tail), ip,port);
                 }
             }
@@ -98,7 +96,7 @@ string H4P_UPNPSwitch::__upnpCommon(const string& usn){
 	return rv+"\r\n\r\n";
 }
 
-void H4P_UPNPSwitch::init(){
+void H4P_UPNPSwitch::start(){
     _cb[nametag()]=_name;
     h4wifi.getPersistentValue(nametag(),"upnp ");
     if(!(WiFi.getMode() & WIFI_AP)){
@@ -114,7 +112,7 @@ void H4P_UPNPSwitch::init(){
 
         _xml=H4P_WiFi::replaceParamsFile("/up.xml");
         _ucom=H4P_WiFi::replaceParamsFile("/ucom.txt");
-        _soap=H4P_WiFi::read("/soap.xml");
+        _soap=H4P_SerialCmd::read("/soap.xml");
 // erase redundant _cb?
         _cb.erase("age");
         _cb.erase("updt");
@@ -134,8 +132,8 @@ void H4P_UPNPSwitch::init(){
         _listenUDP();
         _notify("alive"); // TAG
         h4.every(H4P_UDP_REFRESH / 3,[this](){ _notify("alive"); },nullptr,H4P_TRID_NTFY,true); // TAG
-        Serial.printf("UPNPS up\n");
-    } //else Serial.printf("UPNPS not running in AP mode\n");
+        H4PluginService::svc(upnptag(),H4P_LOG_SVC_UP); // simulate service
+    }
 }
 
 void H4P_UPNPSwitch::_upnp(AsyncWebServerRequest *request){ // redo
@@ -148,11 +146,11 @@ void H4P_UPNPSwitch::_upnp(AsyncWebServerRequest *request){ // redo
     },request),nullptr, H4P_TRID_SOAP); // TRID_SOAP
 }
 
-void H4P_UPNPSwitch::offline(){
+void H4P_UPNPSwitch::stop(){
     _notify("byebye");
     h4.cancelSingleton(H4P_TRID_NTFY);
     _udp.close();
-    Serial.printf("UPNPS down\n");
+    H4PluginService::svc(upnptag(),H4P_LOG_SVC_DOWN); // simulate service
 }
 
 void H4P_UPNPSwitch::_notify(const string& phase){ // chunker it up

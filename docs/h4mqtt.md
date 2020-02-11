@@ -36,7 +36,8 @@ Most often you will use the last form to address one specific device.
 # Usage
 
 ```cpp
-#include <H4Plugins.h>
+#include<H4Plugins.h>
+H4_USE_PLUGINS
 
 H4P_WiFi h4wifi(...
 H4P_MQTT h4mqtt(...
@@ -44,7 +45,6 @@ H4P_MQTT h4mqtt(...
 
 ## Dependencies
 
-* [Arduino pubsubclient library](https://github.com/knolleary/pubsubclient)
 
 * [H4P_WiFi](h4wifi.md) Plugin
 

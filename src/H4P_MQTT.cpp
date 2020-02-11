@@ -130,7 +130,6 @@ void H4P_MQTT::unsubscribeDevice(string topic){
 */
 void H4P_MQTT::start(){
     if(!(WiFi.getMode() & WIFI_AP)){
-        static uint32_t prev=0;
         device=_cb[devicetag()];
         if(connect( CSTR(device),
                     CSTR(_cb["muser"]),
@@ -146,15 +145,12 @@ void H4P_MQTT::start(){
                 _forceDisconnect();
                 }
             },nullptr,H4P_TRID_MQTT,true);
-
             subscribe(CSTR(string("all/").append(cmdhash())));
             subscribe(CSTR(string(device+"/"+cmdhash())));
             subscribe(CSTR(string(_cb[chiptag()]+"/"+cmdhash())));
             subscribe(CSTR(string(_cb[boardtag()]+"/"+cmdhash())));
             publish("all/h4/mqtt/online",CSTR(device));
-            Serial.printf("MQTT up\n");
             h4pcConnected();
-            prev=millis();
         } else h4.once(H4MQ_RETRY,[this](){ start(); },nullptr,H4P_TRID_MQRC,true);
     } //else Serial.printf("MQTT IGNORED IN AP MODE");
 }

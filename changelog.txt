@@ -1,22 +1,27 @@
+2020/02/11  0.2.0
+1   SPIFFS functions moved to SerialCmd from WiFi
+2   h4sc.logEvent added
+3   added new plugins LocalLogger and SerialLogger 
+4   various other code changes to support logging
+5   introduce mandatory requirement to follow H4Plugins.h with H4_USE_PLUGINS
+    to banish forever the "initialisation hell" that is cause by different static
+    initalisation in differetn compilers. Its hottible, but it works and it easier
+    than a ground-up rewrite
+
 TODO:
 H4 
     rebootChain->forward_list? (watch size!)
-LT 
+LONGTERM 
     heaplogger
-    cmdlogger
+    remote client get
     sql logger
     rf bridge
     signal on no spiffs
     template for hooking?
     proper condl diags
-    remote client get
+
     fix switch.ps1 to use soap etc (revert a la esparto)
-    take akways ignore out of TS
-NOW
+    take always ignore out of TS
+SOONER
     lots of const string&
-    DOX! 
-
-2019/12/02  0.1.0   added static functions hookLoop / runHooks for fwd compatibilty with
-                    H4P_GPIOManager
-
-                    added this file
+    find easy way to get FS space etc on ESP32

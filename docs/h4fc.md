@@ -25,7 +25,8 @@ LEDs flash independently at different rates using one of four methods:
 # Usage
 
 ```cpp
-#include <H4Plugins.h>
+#include<H4Plugins.h>
+H4_USE_PLUGINS
 H4P_FlasherController h4fc;
 ```
 

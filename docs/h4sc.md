@@ -70,7 +70,8 @@ Has the same effect as typing "h4/show/q" at the console, MQTT publishing a topi
 # Usage
 
 ```cpp
-#include <H4Plugins.h>
+#include<H4Plugins.h>
+H4_USE_PLUGINS
 H4P_SerialCmd h4sc;
 ```
 
@@ -80,11 +81,13 @@ none
 
 ## Commands Added
 
+* h4/dump/x (payload x = SPIFFS file name. Show content of file.) 
 * h4/reboot
 * h4/show/q
 * h4/show/config
 * h4/show/qstats
 * h4/show/all
+* h4/show/spif  (show all SPIFFS files + sizes and ised / free space)
 * h4/show/tnames
 * h4/show/unload
 * h4/unload
@@ -107,11 +110,19 @@ When calling any function, it must be prefixed by `h4sc.` e.g. `h4sc.dumpQ();` u
 ## General purpose functions
 
 ```cpp
-uint32_t        invokeCmd(string,string="",const char* src="user");
-uint32_t        invokeCmd(string,uint32_t,const char* src="user"); // for single integer payloads
-```
-
+uint32_t invokeCmd(string,string="",const char* src="user");
+uint32_t invokeCmd(string,uint32_t,const char* src="user"); // for single integer payloads
 Both variants return the error code - if any - or zero on success. (see below)
+void logEvent(const string& msg); // see Logging documentation https://github.com/philbowles/h4plugins/blob/master/docs/h4slogs.md
+void unload(const char* pid); // see the unload command below
+//          SPIFFS
+string read(const string& fn); // reads contents of SPIFFS file into string
+uint32_t write(const string& fn,const string& data,const char* mode="w"); // "w"rites or "a"ppends string to SPIFFS file, return file size.
+// advanced (separate documentation T.B.A)
+void addCmd(const string& name,uint32_t owner, uint32_t levID,H4_FN_MSG f=nullptr);
+void removeCmd(const string& name); 
+
+```
 
 ## Command functions
 
@@ -124,6 +135,7 @@ void help();
 void Qstats();
 void tnames();
 void showUnload();
+void showSPIFFS();
 void unload(const char* pid);
 void unload(string pid)
 ```

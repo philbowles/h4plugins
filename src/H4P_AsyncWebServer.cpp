@@ -103,7 +103,6 @@ void H4P_AsyncWebServer::start(){
     serveStatic("/", SPIFFS, "/").setCacheControl("max-age=31536000");
     // 404 ?
     begin();
-    Serial.printf("ASWS up %s mode\n",WiFi.getMode() & WIFI_AP ? "AP":"STA");
     h4pcConnected();
 }
 

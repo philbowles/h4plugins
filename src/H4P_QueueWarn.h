@@ -30,6 +30,8 @@ SOFTWARE.
 #ifndef H4P_QueueWarn_HO
 #define H4P_QueueWarn_HO
 
+#include<H4PCommon.h>
+
 class H4P_QueueWarn: public H4Plugin {
     protected:
 //

@@ -19,7 +19,8 @@ It requires detailed knowledge of H4 "internals" which are beyond the scope of t
 # Usage
 
 ```cpp
-#include <H4Plugins.h>
+#include<H4Plugins.h>
+H4_USE_PLUGINS
 H4P_TaskSniffer h4ts;
 ```
 

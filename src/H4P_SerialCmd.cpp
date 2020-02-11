@@ -98,13 +98,20 @@ void H4P_SerialCmd::all(){
     });
 }
 
+void H4P_SerialCmd::_logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error){
+    for(auto const& l:_logChain) l(msg,type,source,target,error); // if 0 serial print
+}
+
 uint32_t H4P_SerialCmd::_executeCmd(string topic, string pload){
 	vector<string> vs=split(CSTR(topic),"/");
     _cb["source"]=vs[0];
     _cb["target"]=vs[1];
 //    Serial.printf("CMD src=%s tgt=%s  %s[%s]\n",CSTR(_cb["source"]),CSTR(_cb["target"]),CSTR(topic),CSTR(pload));
 	vs.push_back(pload);
-	return _dispatch(vector<string>(vs.begin()+2,vs.end())); // optimise?
+    vector<string> cmd(vs.begin()+2,vs.end());
+	uint32_t rv=_dispatch(vector<string>(cmd)); // optimise?
+    _logEvent(join(cmd,"/"),H4P_LOG_CMD,vs[0],vs[1],rv);
+    return rv;
 }
 
 void H4P_SerialCmd::help(){ 
@@ -132,6 +139,12 @@ void H4P_SerialCmd::unload(const char* pid){ // move to H4Plugin?
 //
 //      H4P_SerialCmd
 //
+void H4P_SerialCmd::_hookIn(){
+#ifndef ARDUINO_ARCH_STM32    
+    if(!SPIFFS.begin()) Serial.println("Warning: NO SPIFFS");
+#endif
+}
+
 H4P_SerialCmd::H4P_SerialCmd(){
     _pid=stag();
     _hook=[this](){ run(); };
@@ -143,6 +156,10 @@ H4P_SerialCmd::H4P_SerialCmd(){
         {"show",       { H4PC_ROOT, H4PC_SHOW, nullptr}},
         {"all",        { H4PC_SHOW, 0, CMD(all) }},
         {"config",     { H4PC_SHOW, 0, CMD(config) }},
+#ifndef ARDUINO_ARCH_STM32
+        {"spif",       { H4PC_SHOW, 0, CMD(showSPIFFS)}},
+        {"dump",       { H4PC_ROOT, 0, CMDVS(_dump)}},
+#endif
 //      diag below here        
         {"q",          { H4PC_SHOW, 0, CMD(dumpQ) }},
         {"qstats",     { H4PC_SHOW, 0, CMD(Qstats) }},
@@ -176,3 +193,76 @@ void H4P_SerialCmd::run(){ // halting loop optimise
         } else cmd+=c;		
     }	
 }
+#ifndef ARDUINO_ARCH_STM32
+
+string H4P_SerialCmd::read(const string& fn){
+	string rv="";
+        File f=SPIFFS.open(CSTR(fn), "r");
+        if(f && f.size()) {
+            int n=f.size();
+            uint8_t* buff=(uint8_t *) malloc(n+1);
+            f.readBytes((char*) buff,n);
+            rv=stringFromBuff(buff,n);
+            free(buff);
+        }
+        f.close();
+	return rv;	
+}
+
+uint32_t H4P_SerialCmd::write(const string& fn,const string& data,const char* mode){
+    File b=SPIFFS.open(CSTR(fn), mode);
+    b.print(CSTR(data));
+    uint32_t rv=b.size(); // ESP32 pain
+    b.close();
+    return rv; 
+}
+
+uint32_t H4P_SerialCmd::_dump(vector<string> vs){
+    return guard<1>(vs,[this](vector<string> vs){
+        return ([this](string h){ 
+            Serial.printf("DUMP FILE %s\n",CSTR(h));
+            Serial.printf("%s\n",CSTR(read("/"+h)));
+            return H4_CMD_OK;
+        })(PAYLOAD);
+    });
+}
+
+#ifdef ARDUINO_ARCH_ESP8266
+
+void H4P_SerialCmd::showSPIFFS(){
+    uint32_t sigma=0;
+    uint32_t n=0;
+
+    FSInfo info;
+    SPIFFS.info(info);
+    reply("totalBytes %d\n",info.totalBytes);    
+    reply("usedBytes %d\n",info.usedBytes);    
+    
+    Dir dir = SPIFFS.openDir("/");
+
+    while (dir.next()) {
+        n++;
+        reply("FILE: %s %u\n",CSTR(dir.fileName()),dir.fileSize());
+        sigma+=dir.fileSize();
+    }
+    reply("\n %d file(s) %u bytes\n",n,sigma);
+}
+#else
+void H4P_SerialCmd::showSPIFFS(){
+    uint32_t sigma=0;
+    uint32_t n=0;
+
+    File root = SPIFFS.open("/");
+ 
+    File file = root.openNextFile();
+ 
+    while(file){
+        n++;
+        reply("FILE: %s %u\n",file.name(),file.size());
+        sigma+=file.size();
+        file = root.openNextFile();
+    }
+    reply("\n %d file(s) %u bytes\n",n,sigma);
+}
+#endif
+#endif

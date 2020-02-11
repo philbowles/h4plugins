@@ -19,7 +19,8 @@ It is intended purely for expert debugging and is not normally required or used.
 # Usage
 
 ```cpp
-#include <H4Plugins.h>
+#include<H4Plugins.h>
+H4_USE_PLUGINS
 H4P_QueueWarn h4qw(...
 ```
 

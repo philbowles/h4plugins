@@ -28,7 +28,8 @@ A "long" press - anything over 5 seconds - starts the LED flashing extremely rap
 # Usage
 
 ```cpp
-#include <H4Plugins.h>
+#include<H4Plugins.h>
+H4_USE_PLUGINS
 
 H4P_GPIOManager h4gm;
 // either
@@ -68,14 +69,14 @@ NO
 /* constructor: */
 H4P_ThreeFunctionButton(
     H4P_BasicSwitch* bsp,  //a reference to a previoulsy defined H4P_BasicSwitch or H4P_UPNPSwitch
-    uint32_t dbTimeMs=15, // the switch debounce value in milliseconds: depends on the individual switch
+    uint32_t dbTimeMs, // the switch debounce value in milliseconds: depends on the individual switch
     //          the input button
-    uint8_t pin=BUTTON_BUILTIN,
-    uint8_t mode=INPUT, // or INPUT_PULLUP depending on the hardware
-    H4GM_SENSE b_sense=ACTIVE_LOW, // the "sense" of the button
+    uint8_t pin,
+    uint8_t mode, // or INPUT_PULLUP depending on the hardware
+    H4GM_SENSE b_sense, // the "sense" of the button
 //          the linked LED for message flashing
-    uint8_t led=LED_BUILTIN, // GPIO# of the linked LED
-    H4GM_SENSE l_sense=ACTIVE_LOW // the active "sense" of the linked LED
+    uint8_t led, // GPIO# of the linked LED
+    H4GM_SENSE l_sense // the active "sense" of the linked LED
     );
 ```
 

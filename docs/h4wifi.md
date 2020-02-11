@@ -31,28 +31,24 @@ N.B. The "name" field is only relevant if you are also using the [H4P_UPNPSwitch
 # Usage
 
 ```cpp
-#include <H4Plugins.h>
+#include<H4Plugins.h>
+H4_USE_PLUGINS
 H4P_WiFi h4wifi(...
 ```
 
 ### Dependencies
 
-* [ESPAsyncWebServer](https://github.com/philbowles/ESPAsyncWebServer) * See note
-
 * [H4P_AsyncWebServer](h4asws.md) Plugin
 
 * You must copy the `data` sub-folder to your sketch folder and upload to SPIFSS. To do this you will need to intall either the [ESP8266 sketch data uploader](https://github.com/esp8266/arduino-esp8266fs-plugin) or the [ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin) (or both) depending on which platform you compile for. 
 
-(* The standard ESPAyncWebServer library has a long-standing bug in its basic web authentication. I have raised the issue at least twice, but the last time I looked they sill hadn't fixed it, so until then you need to use the patched version from the link above.)
 
 ### Commands Added
 
 * h4/factory (clear credentials + reboot: forces AP mode)
-* h4/show/spif  (show all SPIFFS files + sizes)
 * h4/show/wifi
-* h4/wifi/change/x,y  (payload x,y = newssid,newpassword)
+* h4/wifi/change/x,y (payload x,y = newssid,newpassword)
 * h4/wifi/clear (use with caution = "factory reset")
-* h4/wifi/dump/x (payload x = SPIFFS file name. Show content of file.) 
 * h4/wifi/host/x (payload x = new device name. Causes a reboot. Remains until factory reset)
 * h4/wifi/restart
 * h4/wifi/start
@@ -90,12 +86,8 @@ void clear(); // erase any previoulsy stored credentials - think: "factory reset
 void host() // change device name. Causes a reboot
 void restart(); // does stop then a start 
 void show(); // Display current settings
-void showSPIFFS();
 void start();
 void stop();
-//          SPIFFS
-string   read(const string& fn); // reads contents of SPIFFS file into string
-void     write(const string& fn,const string& data); // writes string to SPIFFS file
 ```
 
 ## Advanced Topics

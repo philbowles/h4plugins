@@ -25,19 +25,18 @@ N.B. The "name" field is only relevant if you are also using the [H4P_UPNPSwitch
 # Usage
 
 ```cpp
-#include <H4Plugins.h>
+#include<H4Plugins.h>
+H4_USE_PLUGINS
 H4P_WiFi h4asws(...
 ```
 
 ## Dependencies
 
-* [ESPAsyncWebServer](https://github.com/philbowles/ESPAsyncWebServer) * See note
 
 * [H4P_WiFi](h4wifi.md) Plugin
 
 * You must copy the `data` sub-folder to your sketch folder and upload to SPIFSS. To do this you will need to intall either the [ESP8266 sketch data uploader](https://github.com/esp8266/arduino-esp8266fs-plugin) or the [ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin) (or both) depending on which platform you compile for. 
 
-(* The standard ESPAyncWebServer library has a long-standing bug in its basic web authentication. I have raised the issue at least twice, but the last time I looked they sill hadn't fixed it, so until then you need to use the patched version from the link above.)
 
 ## Commands Added
 

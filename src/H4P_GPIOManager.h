@@ -366,7 +366,7 @@ class EncoderAutoPin: public EncoderPin{
 class H4P_GPIOManager: public H4Plugin{//
         H4GM_PINMAP     pins={};
 
-        void                _greenLight() override;
+        void             _greenLight() override;
 
         H4GPIOPin*      isManaged(uint8_t p){ return pins.count(p) ? pins[p]:nullptr; }
         OutputPin*      isOutput(uint8_t p);

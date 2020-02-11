@@ -26,7 +26,8 @@ Provides
 # Usage
 
 ```cpp
-#include <H4Plugins.h>
+#include<H4Plugins.h>
+H4_USE_PLUGINS
 H4P_ExternalSqWave h4esw(...
 ```
 

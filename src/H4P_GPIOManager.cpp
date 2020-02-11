@@ -75,8 +75,6 @@ void H4GPIOPin::_throttle(bool b){
 }
 
 void H4GPIOPin::run(){
-    static uint32_t x=0;
-//    if(!(x%30000)) Serial.printf("T=%u X pin=%d true=%d state=%d sense=%d norm=%d\n",millis(),pin,digitalRead(pin),state,sense,(state ^ sense));
     if(cps < cMax){
         _throttle(false);
         if(digitalRead(pin)==(state ^ sense)){
@@ -84,7 +82,6 @@ void H4GPIOPin::run(){
             _toggleState();
         }
     } else _throttle(true);
-    x++;
 }
 //
 //      H4P_GPIOManager
@@ -94,6 +91,7 @@ void H4GPIOPin::run(){
 void  H4P_GPIOManager::run(){ for(auto const& p:pins) (p.second)->run(); }
 
 void H4P_GPIOManager::_greenLight(){
+//    Serial.println("_greenLight");
     h4.every(1000,[this](){
         for(auto p:pins){
             H4GPIOPin* ptr=p.second;         

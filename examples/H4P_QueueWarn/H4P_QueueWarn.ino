@@ -1,4 +1,5 @@
-#include <H4Plugins.h>
+#include<H4Plugins.h>
+H4_USE_PLUGINS
 
 #define SMALL_Q       10
 #define Q_WARN_PCENT  50

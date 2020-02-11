@@ -68,10 +68,10 @@ class H4P_UPNPSwitch: public H4P_BasicSwitch {
             void            _notify(const string& s);
             void            _upnp(AsyncWebServerRequest *request);
 
-            void            init();
-            void            offline();
+            void            start();
+            void            stop();
     public:
-        H4P_UPNPSwitch(string name="",uint8_t pin=RELAY_BUILTIN,H4GM_SENSE sense=ACTIVE_HIGH, uint8_t initial=OFF,H4BS_FN_SWITCH f=[](bool){}):
+        H4P_UPNPSwitch(string name,uint8_t pin,H4GM_SENSE sense, uint8_t initial,H4BS_FN_SWITCH f=[](bool){}):
             _name(name),
             H4P_BasicSwitch(pin,sense,initial,f){            
                 _pups.push_back(_urn+"device:controllee:1");
@@ -84,7 +84,6 @@ class H4P_UPNPSwitch: public H4P_BasicSwitch {
             }
          
             void        friendlyName(const string& name);
-
 };
     extern __attribute__((weak)) H4P_UPNPSwitch h4upnp;
 #endif

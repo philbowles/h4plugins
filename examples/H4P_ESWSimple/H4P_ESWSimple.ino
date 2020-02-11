@@ -1,4 +1,5 @@
-#include <H4Plugins.h>
+#include<H4Plugins.h>
+H4_USE_PLUGINS
 
 H4 h4(115200);
 

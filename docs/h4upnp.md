@@ -21,7 +21,8 @@ This enables it to appear in the Windows Network Explore and be switched on and 
 # Usage
 
 ```cpp
-#include <H4Plugins.h>
+#include<H4Plugins.h>
+H4_USE_PLUGINS
 
 H4P_WiFi h4wifi(...
 H4P_AsyncWebServer h4asws(...
@@ -30,12 +31,6 @@ H4P_UPNPSwitch h4upnp;
 
 ## Dependencies
 
-Either:
-* [ESP8266 ESPAsyncUDP Library](https://github.com/me-no-dev/ESPAsyncUDP)
-
-Or:
-
-* [ESP32 AsyncUDP Library](https://github.com/espressif/arduino-esp32/tree/master/libraries/AsyncUDP)
 
 And:
 
@@ -95,11 +90,12 @@ The files you will need are in the `src` subfolder
 
 ```cpp
 // Constructor
-H4P_UPNPSwitch(string name="",uint8_t pin=RELAY_BUILTIN,H4GM_SENSE sense=ACTIVE_HIGH, uint8_t initial=OFF,H4BS_FN_SWITCH f=[](bool){});
+H4P_UPNPSwitch(string,uint8_t pin,H4GM_SENSE sense, uint8_t initial,H4BS_FN_SWITCH f=[](bool){});
 // name is the "friendly name" which appears in Windows Network Explorer
 // and is also the name used by Amazon Alexa voce control
-// pin is the GPIO which gets "switched" when the state changes
-// it defaults to the RELAY_BUILTIN found in ITEAD SONOFF devices - a popular choice for this functionality
+// pin is the GPIO pin  which gets "switched" when the state changes
+// sense is ACTIVE_HIGH or ACTIVE_LOW of the gpio pin, depending on the hardware
+// initial is th intial desired logical state ON or OFF
 // f is the name of  a user function that gets called after the state change with b set to the current state
 //
 void friendlyName(const string& name); // sets UPNP friendly name. Causes a reboot

@@ -26,53 +26,35 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include<H4P_QueueWarn.h>
-
-uint32_t H4P_QueueWarn::__setLimit(uint32_t v){ return (h4._capacity()*v)/100; }
+#ifndef ARDUINO_ARCH_STM32
+#include<H4P_LocalLogger.h>
 //
-//      cmd responders
-//
-void H4P_QueueWarn::show(){
-    reply("Qwarn: capacity=%d warn when size > %d\n",h4._capacity(),limit);
-    reply("Qwarn: max used=%d [%d%%]\n",maxq,(maxq*100)/h4._capacity());
-}
-
-void H4P_QueueWarn::pcent(uint32_t pc){
-    limit=constrain(__setLimit(pc),H4_Q_ABS_MIN,(uint32_t) h4._capacity());
-    show();
-}
-
-uint32_t H4P_QueueWarn::_qwPcent(vector<string> vs){ return guardInt1(vs,bind(&H4P_QueueWarn::pcent,this,_1)); }
-//
-//      H4P_QueueWarn
-//
-H4P_QueueWarn::H4P_QueueWarn(function<void(bool)> _f,uint32_t _limit){
-    _pid=qwrntag();
-    _hook=[this](){ run(); };
-    _names={ {H4P_TRID_QWRN,uppercase(_pid)} };
-    _cmds={
+H4P_LocalLogger::H4P_LocalLogger(uint32_t limit): H4PLogService(logtag()), _limit(limit) {
+    subid=H4PC_LLOG;
+    _names={ {H4P_TRID_LLOG,uppercase(_pid)} };
+    _local={
         {_pid,     {H4PC_SHOW, 0, CMD(show)}},
-        {_pid,     {H4PC_ROOT, H4PC_QWRN, nullptr}},
-        {"pcent",  {H4PC_QWRN,   0, CMDVS(_qwPcent)}}
+        {"clear",  {H4PC_LLOG, 0, CMD(clear)}},
+        {"flush",  {H4PC_LLOG, 0, CMD(flush)}}
     };
-    f=_f;  
-    limit=__setLimit(_limit);
 }
 
-void H4P_QueueWarn::run(){ // optimise a la throttle
-    static bool warned=false;
-    uint32_t qsize=h4.size();
-    if(qsize > maxq) maxq=qsize;
-    if(qsize > limit) {
-        if(!warned){
-            f(true);
-            warned=true;
-        }
-    }
-    else {
-        if(warned){
-            f(false);
-            warned=false;            
-        }
+void H4P_LocalLogger::clear(){ SPIFFS.remove(CSTR(string("/").append(logtag()))); }
+
+void H4P_LocalLogger::flush(){
+    show();
+    clear();
+}
+
+void H4P_LocalLogger::show(){ h4sc._dump(vector<string>{logtag()}); }
+//
+//      our raison d'etre
+//
+void H4P_LocalLogger::_logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t e){
+    if(_running){
+        vector<string> msgparts={stringFromInt(millis()),stringFromInt(type),source,target,stringFromInt(e),msg};
+        uint32_t size=h4sc.write("/log",join(msgparts,",").append("\n"),"a");
+        if(size > _limit) flush();
     }
 }
+#endif

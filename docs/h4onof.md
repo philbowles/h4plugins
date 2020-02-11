@@ -16,7 +16,8 @@ H4P_BasicSwitch wraps a GPIO pin in an object that allows control by simple comm
 # Usage
 
 ```cpp
-#include <H4Plugins.h>
+#include<H4Plugins.h>
+H4_USE_PLUGINS
 H4P_GPIOManager h4gm;
 H4P_BasicSwitch h4onof;
 ```

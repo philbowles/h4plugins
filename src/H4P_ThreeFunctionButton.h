@@ -30,9 +30,11 @@ SOFTWARE.
 #ifndef H4P_ThreeFunctionButton_HO
 #define H4P_ThreeFunctionButton_HO
 
+/*
 #ifndef LED_BUILTIN
-    #define LED_BUILTIN    2
+    #define LED_BUILTIN 2
 #endif
+*/
 
 #include<H4PCommon.h>
 #include<H4P_GPIOManager.h>
@@ -62,14 +64,14 @@ class H4P_ThreeFunctionButton: public H4Plugin{
     public:
         H4P_ThreeFunctionButton(
             H4P_BasicSwitch* bsp,  //
-            uint32_t dbTimeMs=15, // arbitrary
+            uint32_t dbTimeMs, // arbitrary
 //          the input button            
-            uint8_t pin=BUTTON_BUILTIN,
-            uint8_t mode=INPUT,
-            H4GM_SENSE b_sense=ACTIVE_LOW,
+            uint8_t pin,
+            uint8_t mode,
+            H4GM_SENSE b_sense,
 //          the linked LED for message flashing
-            uint8_t led=LED_BUILTIN,
-            H4GM_SENSE l_sense=ACTIVE_LOW);
+            uint8_t led,
+            H4GM_SENSE l_sense);
 };
 
 extern __attribute__((weak)) H4P_ThreeFunctionButton h43fb;

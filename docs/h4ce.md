@@ -32,8 +32,8 @@ If required, it can be used manually after a direct call ( see  [**H4P_SerialCmd
 # Usage
 
 ```cpp
-#include <H4Plugins.h>
-#include <H4Plugins.h>
+#include<H4Plugins.h>
+H4_USE_PLUGINS
 H4P_CmdErrors h4ce; // must be created BEFORE H4P_SerialCmd
 H4P_SerialCmd h4sc;
 ```
