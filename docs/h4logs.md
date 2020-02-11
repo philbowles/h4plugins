@@ -197,9 +197,120 @@ The code would look like this:
 
 ```cpp
 
+#include <H4PCommon.h>
+
+class myLogger: public H4PLogService {
+        void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error){
+            if(_running) {
+                Serial.print("myLogger ");
+                Serial.print(millis());
+                Serial.print(" ");
+                Serial.println(msg.c_str()); // or  Serial.println(CSTR(msg));
+            }
+        }
+    public:
+        myLogger(): H4PLogService("mylog"){
+            subid=H4PC_MYLOG; // see note below
+            _names={ {H4P_TRID_MYLOG,uppercase(_pid)} }; // see note below
+        }
+};
+
 ```
 
-## MySQL schema
+**Note** to get the next values for `H4PC_MYLOG` and `H4P_TRID_MYLOG` you need to edit `H4PCommon.h`
+
+```cpp
+...
+  H4P_TRID_NTFY,
+  H4P_TRID_UBSW,
+  H4P_TRID_3FNB,
+  H4P_TRID_CERR,
+  H4P_TRID_SCMD,
+  H4P_TRID_QWRN,
+  H4P_TRID_SNIF,
+  H4P_TRID_LLOG,
+  H4P_TRID_SLOG,
+  H4P_TRID_CURL, // comma added by you
+  H4P_TRID_MYLOG // ADD THIS HERE and put a comma at the end of the line above
+};
+
+enum H4PC_CMD_ID{
+    H4PC_ROOT=1,
+    H4PC_SHOW,
+    H4PC_SNIF,
+    H4PC_QWRN,
+    H4PC_ESW_ROOT,
+    H4PC_ESW_SET,
+    H4PC_ESW_SWEEP,
+    H4PC_WIFI,
+    H4PC_MQTT,
+    H4PC_ASWS,
+    H4PC_SPIF,
+    H4PC_UPNP, 
+    H4PC_LLOG, 
+    H4PC_SLOG,
+    H4PC_CURL, // comma added by you
+    H4PC_MYLOG // ADD THIS HERE and put a comma at the end of the line above
+};
+...
+```
+
+...and that's it! Then add the new logger to your sketch - Everything else is automatic.
+
+[Example Code](../examples/H4P_CustomLogger/H4P_CustomLogger.ino)
+
+## Output form Example sketch
+```cpp
+slog
+SVC slog UP
+mylog
+myLogger 117 mylog
+SVC mylog UP
+normal call
+myLogger 117 normal call
+test1
+myLogger 117 test1
+Ztest2
+myLogger 118 Ztest2
+scmd: h4/dump
+scmd: h4/mylog/msg
+scmd: h4/mylog/restart
+scmd: h4/mylog/start
+scmd: h4/mylog/stop
+scmd: h4/reboot
+scmd: h4/show/all
+scmd: h4/show/config
+scmd: h4/show/q
+scmd: h4/show/qstats
+scmd: h4/show/spif
+scmd: h4/show/tnames
+scmd: h4/show/unload
+scmd: h4/slog/msg
+scmd: h4/slog/restart
+scmd: h4/slog/start
+scmd: h4/slog/stop
+scmd: h4/unload
+scmd: help
+help
+myLogger 40943 help
+
+```
+
+---
+
+## MySQL schema (for future use)
+
+CREATE TABLE `event` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `type` int(11) NOT NULL,
+  `error` int(11) NOT NULL,
+  `source` varchar(16) DEFAULT NULL,
+  `target` varchar(16) DEFAULT NULL,
+  `msg` varchar(64) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 
 ---
 

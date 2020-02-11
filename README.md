@@ -49,7 +49,7 @@ As you can see, all you need to do is list the modules you want (in the right or
 
 The modular design of H4's plugin architecture minimises scarce resources in low-memory MCU targets: You only compile in what you need with a simple `#include`. Detailed diagnostics can be easily included and controlled at runtime via the serial console, HTTP REST or MQTT depending on which options you choose. It is built on top of the very stable [H4](https://github.com/philbowles/H4) timer/scheduler which traces its ancestry back to "Esparto" - of which one user recently said: *"and now have Esparto modules with months of uptime without an issue"*.
 
-There are 30 example sketches demonstrating the features and API of all of the plugins. They should be used both as a template and a learning resource.
+There are 31 example sketches demonstrating the features and API of all of the plugins. They should be used both as a template and a learning resource.
 
 Users are strongly recommended to work through them in the order [listed below](readme.md#current-plugins-februrary-2020)
 
