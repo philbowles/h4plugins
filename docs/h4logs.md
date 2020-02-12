@@ -237,9 +237,9 @@ class myLogger: public H4PLogService {
 enum H4PC_CMD_ID{
     H4PC_ROOT=1,
     H4PC_SHOW,
-    H4PC_SNIF,
+    subid,
     H4PC_QWRN,
-    H4PC_ESW_ROOT,
+    subid,
     H4PC_ESW_SET,
     H4PC_ESW_SWEEP,
     H4PC_WIFI,

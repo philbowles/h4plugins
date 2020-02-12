@@ -39,7 +39,7 @@ class H4P_SerialLogger: public H4PLogService {
         }
     public:
         H4P_SerialLogger(): H4PLogService("slog"){
-            subid=H4PC_SLOG;
+            //subid=H4PC_SLOG;
             _names={ {H4P_TRID_SLOG,uppercase(_pid)} };
         }
 };

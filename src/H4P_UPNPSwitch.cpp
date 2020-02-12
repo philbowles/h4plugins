@@ -33,8 +33,8 @@ void H4P_UPNPSwitch::_hookIn(){
     H4P_BasicSwitch::_hookIn();
     _ubIP=IPAddress(239,255,255,250);
 
-    h4sc.addCmd(_pid,H4PC_ROOT, H4PC_UPNP, nullptr);
-    h4sc.addCmd(nametag(),H4PC_UPNP,0, CMDVS(_friendly));
+    h4sc.addCmd(_pid,H4PC_ROOT, subid, nullptr);
+    h4sc.addCmd(nametag(),subid,0, CMDVS(_friendly));
 
     h4asws.hookConnect([this](){ start(); });
     h4asws.hookDisconnect([this](){ stop(); });

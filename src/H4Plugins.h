@@ -23,5 +23,5 @@
 
 //frig initialisation order
 #define H4_USE_PLUGINS std::vector<H4Plugin*>   H4Plugin::_pending; \
-    uint32_t H4PluginService::nextSubid=2;
+    uint32_t H4Plugin::nextSubid=H4PC_SHOW;
 #endif

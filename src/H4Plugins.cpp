@@ -35,7 +35,6 @@ void __attribute__((weak)) h4AddAwsHandlers(){}
 void __attribute__((weak)) onFactoryReset(){}
 
 H4P_CONFIG_BLOCK    H4Plugin::_cb;
-//vector<H4Plugin*>   H4Plugin::_pending;
 H4_CMD_MAP          H4Plugin::commands;
 
 vector<H4_FN_VOID>  H4PluginService::_factoryChain;
@@ -53,7 +52,10 @@ void h4FactoryReset(){
     h4reboot();
 }
 
-H4Plugin::H4Plugin(){ _pending.push_back(this); }
+H4Plugin::H4Plugin(){
+    subid=++nextSubid;
+    _pending.push_back(this);
+}
 
 vector<uint32_t> H4Plugin::expectInt(string pl,const char* delim){
     vector<uint32_t> results;

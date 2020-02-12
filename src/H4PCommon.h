@@ -165,19 +165,7 @@ enum trustedIds {
 
 enum H4PC_CMD_ID{
     H4PC_ROOT=1,
-    H4PC_SHOW,
-    H4PC_SNIF,
-    H4PC_QWRN,
-    H4PC_ESW_ROOT,
-    H4PC_ESW_SET,
-    H4PC_ESW_SWEEP,
-    H4PC_MQTT,
-    H4PC_ASWS,
-    H4PC_SPIF,
-    H4PC_UPNP, 
-    H4PC_LLOG, 
-    H4PC_SLOG,
-    H4PC_MLOG
+    H4PC_SHOW
 };
 
 class H4Plugin {
@@ -189,6 +177,8 @@ class H4Plugin {
                 H4_FN_VOID      _hook=nullptr;
                 H4_INT_MAP      _names={};
                 H4_CMD_MAP      _cmds={};
+
+        static  uint32_t        nextSubid;
 
         template<size_t N>
         uint32_t guard(vector<string> vs,H4_FN_MSG f){
@@ -241,7 +231,6 @@ class H4PluginService: public H4Plugin {
 
                 void        h4pcConnected();
                 void        h4pcDisconnected();
-        static  uint32_t    nextSubid;
     public:
         static vector<H4_FN_VOID>  _factoryChain;
 
@@ -252,7 +241,6 @@ class H4PluginService: public H4Plugin {
         virtual void        _greenLight() override {}
 
         H4PluginService(H4_FN_VOID onConnect=[](){},H4_FN_VOID onDisconnect=[](){}){
-                subid=++nextSubid;
                 hookConnect(onConnect);
                 hookDisconnect(onDisconnect);
         }

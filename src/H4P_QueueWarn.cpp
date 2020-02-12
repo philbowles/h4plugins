@@ -52,8 +52,8 @@ H4P_QueueWarn::H4P_QueueWarn(function<void(bool)> _f,uint32_t _limit){
     _names={ {H4P_TRID_QWRN,uppercase(_pid)} };
     _cmds={
         {_pid,     {H4PC_SHOW, 0, CMD(show)}},
-        {_pid,     {H4PC_ROOT, H4PC_QWRN, nullptr}},
-        {"pcent",  {H4PC_QWRN,   0, CMDVS(_qwPcent)}}
+        {_pid,     {H4PC_ROOT, subid, nullptr}},
+        {"pcent",  {subid,   0, CMDVS(_qwPcent)}}
     };
     f=_f;  
     limit=__setLimit(_limit);

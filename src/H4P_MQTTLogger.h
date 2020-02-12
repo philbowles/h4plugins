@@ -46,7 +46,7 @@ class H4P_MQTTLogger: public H4PLogService {
         }
     public:
         H4P_MQTTLogger(const string& name,const string& topic,uint32_t filter): _topic(topic), H4PLogService(name,filter){
-            subid=H4PC_MLOG;
+            //subid=H4PC_MLOG;
             _names={ {H4P_TRID_MLOG,uppercase(_pid)} };
         }
 };

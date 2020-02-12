@@ -68,9 +68,9 @@ void H4P_TaskSniffer::_common(){
     _names={ {H4P_TRID_SNIF,uppercase(_pid)} };
     _cmds={
         {_pid,      {H4PC_SHOW, 0, CMD(show)}},
-        {_pid,      {H4PC_ROOT, H4PC_SNIF, nullptr}},
-        {"include", {H4PC_SNIF, 0, CMDVS(_tsInclude)}},
-        {"exclude", {H4PC_SNIF, 0, CMDVS(_tsExclude)}}
+        {_pid,      {H4PC_ROOT, subid, nullptr}},
+        {"include", {subid, 0, CMDVS(_tsInclude)}},
+        {"exclude", {subid, 0, CMDVS(_tsExclude)}}
     };
     h4._hookEvent(bind(&H4P_TaskSniffer::_taskDump,this,_1,_2));    
 }

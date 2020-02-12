@@ -30,12 +30,12 @@ SOFTWARE.
 #include<H4P_LocalLogger.h>
 //
 H4P_LocalLogger::H4P_LocalLogger(uint32_t limit): H4PLogService(logtag()), _limit(limit) {
-    subid=H4PC_LLOG;
+    // subid=H4PC_LLOG;
     _names={ {H4P_TRID_LLOG,uppercase(_pid)} };
     _local={
         {_pid,     {H4PC_SHOW, 0, CMD(show)}},
-        {"clear",  {H4PC_LLOG, 0, CMD(clear)}},
-        {"flush",  {H4PC_LLOG, 0, CMD(flush)}}
+        {"clear",  {subid, 0, CMD(clear)}},
+        {"flush",  {subid, 0, CMD(flush)}}
     };
 }
 

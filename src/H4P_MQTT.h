@@ -63,7 +63,7 @@ class H4P_MQTT: public H4PluginService, public PubSubClient{
             _cb["mpasswd"]=pass;
 
             _pid=mqtttag();
-            subid=H4PC_MQTT;
+            //subid=subid;
 
             _names={ 
                 {H4P_TRID_MQMS,"MQMS"},
@@ -72,11 +72,11 @@ class H4P_MQTT: public H4PluginService, public PubSubClient{
             };
 
             _local={
-                {"change",  { H4PC_MQTT, 0, CMDVS(_change) }},            
-                {"grid",    { H4PC_MQTT, 0, CMD(showGrid) }},            
-                {"offline", { H4PC_MQTT, 0, CMDVS(_offline) }},            
-                {"online",  { H4PC_MQTT, 0, CMDVS(_online) }}           
-//                    {"set",     { H4PC_MQTT, 0, [this](vector<string> vs){ return H4PluginService::_setHandler(vs); }}}            
+                {"change",  { subid, 0, CMDVS(_change) }},            
+                {"grid",    { subid, 0, CMD(showGrid) }},            
+                {"offline", { subid, 0, CMDVS(_offline) }},            
+                {"online",  { subid, 0, CMDVS(_online) }}           
+//                    {"set",     { subid, 0, [this](vector<string> vs){ return H4PluginService::_setHandler(vs); }}}            
             };       
         }
                 void        change(const string& broker,uint16_t port);
