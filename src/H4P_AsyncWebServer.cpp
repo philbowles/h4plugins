@@ -78,9 +78,10 @@ void H4P_AsyncWebServer::start(){
 	reset();
 
     on("/",HTTP_GET, [this](AsyncWebServerRequest *request){ 
+        Serial.printf("WOOT\n");
         string rootweb=WiFi.getMode() & WIFI_AP ? "/ap.htm":"/sta.htm"; // streeamline - even fn change
         request->send(SPIFFS,CSTR(rootweb),String(),false,aswsReplace);
-        _cb.erase("opts");
+//        _cb.erase("opts");
     });
 
     on("/",HTTP_POST, [this](AsyncWebServerRequest *request){ 

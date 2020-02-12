@@ -69,13 +69,11 @@ void H4P_WiFi::getPersistentValue(string v,string prefix){
 }
 
 void H4P_WiFi::setPersistentValue(string n,string v,bool reboot){
-//    string oldvalue=read("/"+n); // PREFER SAVED
     string oldvalue=_cb[n];
-//    Serial.printf("PV %s CURRENT VALUE %s,NEW VALUE %s\n",CSTR(n),CSTR(oldvalue),CSTR(v));
     if(oldvalue!=v){
         H4P_SerialCmd::write("/"+n,v);
         if(reboot) h4reboot();
-    } //else Serial.printf("PV %s UNCHANGED\n",CSTR(n));
+    }
 }
 
 string H4P_WiFi::replaceParams(const string& s){ // oh for a working regex...
@@ -139,9 +137,9 @@ void H4P_WiFi::clear(){
 }
 
 void H4P_WiFi::_scan(){ // check 4 common hoist
-//    Serial.println("SCAN");
     WiFi.enableSTA(true);
     int n=WiFi.scanNetworks();
+    Serial.printf("SCAN finds %d\n",n);
 
     for (uint8_t i = 0; i < n; i++){
         char buf[128];
@@ -198,6 +196,7 @@ void H4P_WiFi::_gotIP(){
   	ArduinoOTA.setHostname(CSTR(host));
 	ArduinoOTA.setRebootOnSuccess(false);	
 	ArduinoOTA.begin();
+    Serial.printf("IP=%s\n",CSTR(_cb["ip"]));
     h4pcConnected();
 }
 
@@ -309,6 +308,7 @@ void H4P_WiFi::_gotIP(){
     _cb[ssidtag()]=CSTR(WiFi.SSID());
     _cb["psk"]=CSTR(WiFi.psk());
     string host=_cb[devicetag()];
+    _cb.erase("opts"); // lose any old AP ssids
     h4pcConnected();
 }
 /* ESP32

@@ -34,7 +34,7 @@ Erickcampos50@gmail.com
 #ifndef H4P_HO
 #define H4P_HO
 
-#define H4P_VERSION "0.2.0"
+#define H4P_VERSION "0.2.1"
 
 #include<H4.h>
 #include<H4Utils.h>
@@ -159,7 +159,7 @@ enum trustedIds {
   H4P_TRID_SNIF,
   H4P_TRID_LLOG,
   H4P_TRID_SLOG,
-  H4P_TRID_CURL
+  H4P_TRID_MLOG,
 };
 
 enum H4PC_CMD_ID{
@@ -177,7 +177,7 @@ enum H4PC_CMD_ID{
     H4PC_UPNP, 
     H4PC_LLOG, 
     H4PC_SLOG,
-    H4PC_CURL
+    H4PC_MLOG
 };
 
 class H4Plugin {
