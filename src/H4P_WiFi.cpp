@@ -309,6 +309,7 @@ void H4P_WiFi::_gotIP(){
     _cb["psk"]=CSTR(WiFi.psk());
     string host=_cb[devicetag()];
     _cb.erase("opts"); // lose any old AP ssids
+    Serial.printf("IP=%s\n",CSTR(_cb["ip"]));
     h4pcConnected();
 }
 /* ESP32
