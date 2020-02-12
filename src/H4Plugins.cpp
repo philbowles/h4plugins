@@ -129,7 +129,7 @@ void H4Plugin::_startup(){
 //      H4PluginService
 //
 void H4PluginService::_startup(){
-//    reply("H4PluginService::_startup %s nN=%d nC=%d\n",CSTR(_pid),_names.size(),_cmds.size());
+    reply("H4PluginService::_startup %s nN=%d nC=%d SUBID=%d\n",CSTR(_pid),_names.size(),_cmds.size(),subid);
     _cmds={
             {"restart", { 0, 0, CMD(restart)}},
             {"start",   { 0, 0, CMD(start)}},
@@ -165,8 +165,7 @@ void H4PluginService::svc(const string& uid,H4P_LOG_TYPE ud) {
 //      H4PlogService
 //
 void H4PLogService::_hookIn(){ 
-    h4sc._hookLogChain(bind(&H4PLogService::_logEvent,this,_1,_2,_3,_4,_5));
+    h4sc._hookLogChain(bind(&H4PLogService::_filterLog,this,_1,_2,_3,_4,_5));
     h4sc.addCmd("msg",subid, 0, CMDNULL);
-
     start();
 }

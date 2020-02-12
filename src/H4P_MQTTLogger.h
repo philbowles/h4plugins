@@ -36,11 +36,16 @@ SOFTWARE.
 class H4P_MQTTLogger: public H4PLogService {
         string _topic;
         void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error){
-            if(_running) h4mqtt.publishDevice(_topic,msg);
+            Serial.printf("MQTT LOGGER TYPE %d %s\n",type,CSTR(msg));
+            h4mqtt.publishDevice(_topic,msg);
         }
-        
+        void _hookIn() override {
+            H4PLogService::_hookIn();
+            h4mqtt.hookConnect([this](){ start(); });
+            h4mqtt.hookDisconnect([this](){ stop(); });
+        }
     public:
-        H4P_MQTTLogger(const string& name,const string& topic): _topic(topic), H4PLogService(name){
+        H4P_MQTTLogger(const string& name,const string& topic,uint32_t filter): _topic(topic), H4PLogService(name,filter){
             subid=H4PC_MLOG;
             _names={ {H4P_TRID_MLOG,uppercase(_pid)} };
         }

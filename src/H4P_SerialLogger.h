@@ -35,7 +35,7 @@ SOFTWARE.
 
 class H4P_SerialLogger: public H4PLogService {
         void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error){
-            if(_running) Serial.println(CSTR(msg));
+            Serial.printf("TYPE %d %s\n",type,CSTR(msg));
         }
     public:
         H4P_SerialLogger(): H4PLogService("slog"){

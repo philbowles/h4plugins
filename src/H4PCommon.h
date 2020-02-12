@@ -34,7 +34,7 @@ Erickcampos50@gmail.com
 #ifndef H4P_HO
 #define H4P_HO
 
-#define H4P_VERSION "0.2.1"
+#define H4P_VERSION "0.3.4"
 
 #include<H4.h>
 #include<H4Utils.h>
@@ -76,10 +76,11 @@ enum H4_CMD_ERROR:uint32_t  {
 };
 
 enum H4P_LOG_TYPE {
-    H4P_LOG_SVC_UP,
-    H4P_LOG_SVC_DOWN,
-    H4P_LOG_CMD,
-    H4P_LOG_USER
+    H4P_LOG_SVC_UP=1,
+    H4P_LOG_SVC_DOWN=2,
+    H4P_LOG_CMD=4,
+    H4P_LOG_USER=8,
+    H4P_LOG_ALL=0xffffffff
 };
 //
 // literal string RAM savers
@@ -170,7 +171,6 @@ enum H4PC_CMD_ID{
     H4PC_ESW_ROOT,
     H4PC_ESW_SET,
     H4PC_ESW_SWEEP,
-    H4PC_WIFI,
     H4PC_MQTT,
     H4PC_ASWS,
     H4PC_SPIF,
@@ -208,6 +208,8 @@ class H4Plugin {
 
             string          _pid; // diag hoist
 
+            uint32_t        subid;
+
     public:
         static vector<H4Plugin*>  _pending;
 
@@ -232,7 +234,6 @@ class H4Plugin {
 
 class H4PluginService: public H4Plugin {
     protected:
-            uint32_t            subid;
             H4_CMD_MAP          _local;           
             vector<H4_FN_VOID>  _connChain;
             vector<H4_FN_VOID>  _discoChain;
@@ -240,6 +241,7 @@ class H4PluginService: public H4Plugin {
 
                 void        h4pcConnected();
                 void        h4pcDisconnected();
+        static  uint32_t    nextSubid;
     public:
         static vector<H4_FN_VOID>  _factoryChain;
 
@@ -250,6 +252,7 @@ class H4PluginService: public H4Plugin {
         virtual void        _greenLight() override {}
 
         H4PluginService(H4_FN_VOID onConnect=[](){},H4_FN_VOID onDisconnect=[](){}){
+                subid=++nextSubid;
                 hookConnect(onConnect);
                 hookDisconnect(onDisconnect);
         }
@@ -264,17 +267,24 @@ class H4PluginService: public H4Plugin {
 };
 
 class H4PLogService: public H4PluginService {
+                bool        _running=true;
+                uint32_t    _filter=0;
+        virtual void        _filterLog(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error=0){
+            if(_running){
+                if(type & _filter) _logEvent(msg,type,source,target,error);
+                else Serial.printf("%s TYPE %d ignored %s\n",CSTR(_pid),type,CSTR(msg));
+            }
+        }
     protected:
-         bool        _running=true;
-
                 void        _hookIn() override;
+
         virtual void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error=0)=0;
     public:
-        H4PLogService(const string& lid){ _pid=lid; }
-
+        H4PLogService(const string& lid,uint32_t filter=0xffffffff): _filter(filter){
+            _pid=lid;
+        }
                 void        start() override { svc(_pid,H4P_LOG_SVC_UP); _running=true; };
                 void        stop() override { _running=false; svc(_pid,H4P_LOG_SVC_DOWN);  };
-
 };
 
 #endif // H4P_HO

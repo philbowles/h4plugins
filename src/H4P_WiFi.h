@@ -78,7 +78,7 @@ class H4P_WiFi: public H4PluginService{
             _cb[devicetag()]=device;
 
             _pid=wifitag();
-            subid=H4PC_WIFI;
+            //subid=H4PC_WIFI;
             _names={ 
                     {H4P_TRID_WIFI,uppercase(_pid)},
                     {H4P_TRID_WFAP,"WFAP"},
@@ -86,10 +86,10 @@ class H4P_WiFi: public H4PluginService{
             };
 
             _local={
-                {"clear",   { H4PC_WIFI, 0, CMD(clear)}},
+                {"clear",   { subid, 0, CMD(clear)}},
                 {"factory", { H4PC_ROOT, 0, CMD(h4FactoryReset) }},
-                {"change",  { H4PC_WIFI, 0, CMDVS(_change)}},             
-                {"host",    { H4PC_WIFI, 0, CMDVS(_host)}},             
+                {"change",  { subid, 0, CMDVS(_change)}},             
+                {"host",    { subid, 0, CMDVS(_host)}},             
                 {_pid,      { H4PC_SHOW, 0, CMD(show) }}
             };
         }                

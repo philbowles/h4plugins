@@ -22,6 +22,6 @@
 #include<H4P_ThreeFunctionButton.h>
 
 //frig initialisation order
-#define H4_USE_PLUGINS std::vector<H4Plugin*>   H4Plugin::_pending;
-
+#define H4_USE_PLUGINS std::vector<H4Plugin*>   H4Plugin::_pending; \
+    uint32_t H4PluginService::nextSubid=2;
 #endif
