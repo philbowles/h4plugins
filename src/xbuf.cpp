@@ -31,6 +31,7 @@ size_t      xbuf::write(String string){
 
 //*******************************************************************************************************************
 size_t      xbuf::write(const uint8_t* buf, const size_t len){
+    Serial.printf(" xbuf::write %s %d\n",buf,len);
     size_t supply = len;
     while(supply){
         if(!_free){

@@ -121,11 +121,16 @@ bool    asyncHTTPrequest::send(String body){
 
 //**************************************************************************************************************
 bool	asyncHTTPrequest::send(const char* body){
-    DEBUG_HTTP("send(char*) %s.16... (%d)\r\n",body, strlen(body));
+    Serial.printf("BODY1 %s [%d]\n",body, strlen(body));
+//    DEBUG_HTTP("send(char*) %s.16... (%d)\r\n",body, strlen(body));
     _addHeader("Content-Length", String(strlen(body)).c_str());
+     Serial.printf("BODY2 %s\n",body);
     if( ! _buildRequest()) return false;
+     Serial.printf("BODY2A %s\n",body);
     _request->write(body);
-    _send();
+     Serial.printf("BODY3 %s\n",body);
+   _send();
+    Serial.printf("BODY4 %s\n",body);
     return true;
 }
 
@@ -280,6 +285,7 @@ bool  asyncHTTPrequest::_parseURL(String url){
     _URL->query = new char[url.length() - queryBeg + 1];
     strcpy(_URL->query, url.substring(queryBeg).c_str());
     DEBUG_HTTP("_parseURL() %s%s:%d%s%.16s\r\n", _URL->scheme, _URL->host, _URL->port, _URL->path, _URL->query);
+    Serial.printf("_parseURL() %s%s:%d%s%.16s\r\n", _URL->scheme, _URL->host, _URL->port, _URL->path, _URL->query);
     return true;
 }
 
@@ -320,9 +326,13 @@ bool   asyncHTTPrequest::_buildRequest(){
 
     if( ! _request) _request = new xbuf;
     _request->write(_HTTPmethod == HTTPmethodGET ? "GET " : "POST ");
-    _request->write(_URL->path);
+    Serial.printf("_buildRequest 1\n");
+     Serial.printf("_buildRequest 2 %s\n",_URL->path);
+   _request->write(_URL->path);
     _request->write(_URL->query);
-    _request->write(" HTTP/1.1\r\n");
+     Serial.printf("_buildRequest 3\n");
+   _request->write(" HTTP/1.1\r\n");
+    Serial.printf("_buildRequest 4\n");
     delete _URL;
     _URL = nullptr;
     header* hdr = _headers;
