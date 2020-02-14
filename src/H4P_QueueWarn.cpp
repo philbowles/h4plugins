@@ -47,9 +47,9 @@ uint32_t H4P_QueueWarn::_qwPcent(vector<string> vs){ return guardInt1(vs,bind(&H
 //      H4P_QueueWarn
 //
 H4P_QueueWarn::H4P_QueueWarn(function<void(bool)> _f,uint32_t _limit){
-    _pid=qwrntag();
+    _pid=qwrnTag();
     _hook=[this](){ run(); };
-    _names={ {H4P_TRID_QWRN,uppercase(_pid)} };
+//    _names={ {H4P_TRID_QWRN,uppercase(_pid)} };
     _cmds={
         {_pid,     {H4PC_SHOW, 0, CMD(show)}},
         {_pid,     {H4PC_ROOT, subid, nullptr}},

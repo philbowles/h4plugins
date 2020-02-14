@@ -30,25 +30,24 @@ SOFTWARE.
 #ifndef H4P_MQTTLogger_HO
 #define H4P_MQTTLogger_HO
 
+#ifndef ARDUINO_ARCH_STM32
 #include <H4PCommon.h>
 #include <H4P_MQTT.h>
 
 class H4P_MQTTLogger: public H4PLogService {
-        string _topic;
         void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error){
-            Serial.printf("MQTT LOGGER TYPE %d %s\n",type,CSTR(msg));
-            h4mqtt.publishDevice(_topic,msg);
+            h4mqtt.publishDevice(_pid,msg);
         }
-        void _hookIn() override {
-            H4PLogService::_hookIn();
-            h4mqtt.hookConnect([this](){ start(); });
-            h4mqtt.hookDisconnect([this](){ stop(); });
+        void _hookIn() override { // protect
+            if(H4Plugin::isLoaded(mqttTag())){
+                H4PLogService::_hookIn();
+                h4mqtt.hookConnect([this](){ start(); });
+                h4mqtt.hookDisconnect([this](){ stop(); });
+            } 
+            else { DEPENDFAIL(mqtt); }
         }
     public:
-        H4P_MQTTLogger(const string& name,const string& topic,uint32_t filter): _topic(topic), H4PLogService(name,filter){
-            //subid=H4PC_MLOG;
-            _names={ {H4P_TRID_MLOG,uppercase(_pid)} };
-        }
+        H4P_MQTTLogger(const string& topic,uint32_t filter=H4P_LOG_ALL): H4PLogService(topic,filter){}
 };
-
+#endif
 #endif // H4P_MQTTLogger_H

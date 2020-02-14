@@ -91,7 +91,6 @@ void H4GPIOPin::run(){
 void  H4P_GPIOManager::run(){ for(auto const& p:pins) (p.second)->run(); }
 
 void H4P_GPIOManager::_greenLight(){
-//    Serial.println("_greenLight");
     h4.every(1000,[this](){
         for(auto p:pins){
             H4GPIOPin* ptr=p.second;         
@@ -100,14 +99,14 @@ void H4P_GPIOManager::_greenLight(){
             ptr->Rpeak=std::max(ptr->Rpeak,ptr->rate);
             ptr->cps=0;
         }
-    },nullptr,H4P_TRID_GPIO,true);
+    },nullptr,H4P_TRID_SYNC,true);
 }
 
 H4P_GPIOManager::H4P_GPIOManager(){
-    _pid=gpiotag();
+    _pid=gpioTag();
     _hook=[this](){ run(); };
     _names={
-        {H4P_TRID_GPIO,uppercase(_pid)},
+        {H4P_TRID_SYNC,"SYNC"},
         {H4P_TRID_DBNC,"DBNC"},
         {H4P_TRID_RPTP,"RPTP"},
         {H4P_TRID_POLL,"POLL"},

@@ -55,7 +55,7 @@ class H4Flasher{
                 void        stop();
 };
 
-constexpr const char* ftag(){ return "wink"; }
+constexpr const char* fTag(){ return "wink"; }
 
 class H4P_FlasherController: public H4Plugin {
         std::unordered_map<uint8_t,H4Flasher*> _flashMap;

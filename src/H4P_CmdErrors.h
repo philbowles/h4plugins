@@ -47,10 +47,7 @@ class H4P_CmdErrors: public H4Plugin {
         };
 //         
     public:
-        H4P_CmdErrors(){
-            _pid=cerrtag();
-            _names={ {H4P_TRID_CERR,uppercase(_pid)} };
-        }
+        H4P_CmdErrors(){ _pid=cerrTag(); }
 
         string      getErrorMessage(uint32_t e){
             return cmdErrors.count(e) ? cmdErrors[e]:string("No such error (")+stringFromInt(e)+")";

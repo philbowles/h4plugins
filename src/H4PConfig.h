@@ -28,8 +28,7 @@ SOFTWARE.
 */
 
 // comment this out to prevent and logging by EVENT( whatever ) messages
-#define H4P_SERIAL_LOGGING
-
+#define H4P_LOG_EVENTS
 /*
             TWEAKABLES
 */

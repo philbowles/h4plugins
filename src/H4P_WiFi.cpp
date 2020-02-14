@@ -36,9 +36,9 @@ void H4P_WiFi::_hookIn(){
 }
 
 void H4P_WiFi::_greenLight() { 
-    _cb[chiptag()]=_getChipID();
-    _cb[boardtag()]=replaceAll(H4_BOARD,"ESP8266_","");
-    getPersistentValue(devicetag(),"H4_");
+    _cb[chipTag()]=_getChipID();
+    _cb[boardTag()]=replaceAll(H4_BOARD,"ESP8266_","");
+    getPersistentValue(deviceTag(),"H4_");
     start();                     
 }
 
@@ -48,7 +48,7 @@ void H4P_WiFi::_startAP(){
 //        WiFi.disconnect();
         WiFi.mode(WIFI_AP);
         WiFi.enableSTA(false); // force AP only
-        WiFi.softAP(CSTR(_cb[devicetag()]));	
+        WiFi.softAP(CSTR(_cb[deviceTag()]));	
         _dnsServer=new DNSServer;
         _dnsServer->start(53, "*", WiFi.softAPIP());
         h4.every(1000,[this](){ _dnsServer->processNextRequest(); },nullptr,H4P_TRID_WFAP,true);
@@ -64,7 +64,7 @@ void H4P_WiFi::getPersistentValue(string v,string prefix){
     if(persistent.size()){
         if(H4P_PREFER_PERSISTENT) _cb[v]=persistent;  
     }
-    if(!cat.size()) _cb[v]=string(prefix)+_cb[chiptag()];
+    if(!cat.size()) _cb[v]=string(prefix)+_cb[chipTag()];
 //    Serial.printf("PV %s IS %s\n",CSTR(v),CSTR(_cb[v]));
 }
 
@@ -113,7 +113,7 @@ uint32_t H4P_WiFi::_change(vector<string> vs){
 
 void H4P_WiFi::change(string ssid,string psk){ // add device / name?
     stop();
-    _cb[ssidtag()]=ssid;
+    _cb[ssidTag()]=ssid;
     _cb["psk"]=psk;
     _startSTA();
 }
@@ -133,7 +133,7 @@ void H4P_WiFi::clear(){
 	stop();
     WiFi.disconnect(true); 
 	ESP.eraseConfig();
-    SPIFFS.remove(CSTR(string("/"+string(devicetag()))));
+    SPIFFS.remove(CSTR(string("/"+string(deviceTag()))));
 }
 
 void H4P_WiFi::_scan(){ // check 4 common hoist
@@ -156,7 +156,7 @@ void H4P_WiFi::_startSTA(){
     WiFi.enableAP(false); 
 	WiFi.setAutoConnect(true);
 	WiFi.setAutoReconnect(true);
-    WiFi.begin(CSTR(_cb[ssidtag()]),CSTR(_cb["psk"]));
+    WiFi.begin(CSTR(_cb[ssidTag()]),CSTR(_cb["psk"]));
 }
 
 void H4P_WiFi::start(){
@@ -186,10 +186,10 @@ void H4P_WiFi::stop(){
 void H4P_WiFi::_gotIP(){
     _discoDone=false;
     _cb["ip"]=WiFi.localIP().toString().c_str();
-    _cb[ssidtag()]=CSTR(WiFi.SSID());
+    _cb[ssidTag()]=CSTR(WiFi.SSID());
     _cb["psk"]=CSTR(WiFi.psk());
 
-    string host=_cb[devicetag()];
+    string host=_cb[deviceTag()];
 
     h4.every(H4WF_OTA_RATE,[](){ ArduinoOTA.handle(); },nullptr,H4P_TRID_HOTA,true);
     WiFi.hostname(CSTR(host));
@@ -259,7 +259,7 @@ void H4P_WiFi::_startAP(){
         _dnsServer= new DNSServer;
         WiFi.mode(WIFI_AP);
         WiFi.enableSTA(false); // force AP only
-        WiFi.softAP(CSTR(_cb[devicetag()]));	
+        WiFi.softAP(CSTR(_cb[deviceTag()]));	
         _dnsServer=new DNSServer;
         _dnsServer->start(53, "*", WiFi.softAPIP());
         h4.every(1000,[this](){ _dnsServer->processNextRequest(); },nullptr,H4P_TRID_WFAP,true);
@@ -274,7 +274,7 @@ void H4P_WiFi::_startSTA(){
     WiFi.setSleep(false);
     WiFi.enableAP(false); 
 	WiFi.setAutoReconnect(true);
-    WiFi.begin(CSTR(_cb[ssidtag()]),CSTR(_cb["psk"]));
+    WiFi.begin(CSTR(_cb[ssidTag()]),CSTR(_cb["psk"]));
 }
 
 void H4P_WiFi::start(){
@@ -287,7 +287,7 @@ void H4P_WiFi::start(){
 void H4P_WiFi::_stop(){
     h4.cancelSingleton({H4P_TRID_HOTA,H4P_TRID_WFAP}); 
     if(_dnsServer){
-//        Serial.printf("AP %s stopping\n",CSTR(_cb[devicetag()]));
+//        Serial.printf("AP %s stopping\n",CSTR(_cb[deviceTag()]));
         _dnsServer->stop();
         delete _dnsServer;
         _dnsServer=nullptr;
@@ -305,9 +305,9 @@ void H4P_WiFi::stop(){
 void H4P_WiFi::_gotIP(){
     _discoDone=false;
     _cb["ip"]=WiFi.localIP().toString().c_str();
-    _cb[ssidtag()]=CSTR(WiFi.SSID());
+    _cb[ssidTag()]=CSTR(WiFi.SSID());
     _cb["psk"]=CSTR(WiFi.psk());
-    string host=_cb[devicetag()];
+    string host=_cb[deviceTag()];
     _cb.erase("opts"); // lose any old AP ssids
     Serial.printf("IP=%s\n",CSTR(_cb["ip"]));
     h4pcConnected();

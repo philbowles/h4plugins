@@ -41,11 +41,11 @@ class H4P_BasicSwitch: public H4Plugin{
             VSCMD(_switch);
 
         void            _publish(bool b){  
-            if(h4._hasName(H4P_TRID_MQTT)) h4mqtt.publishDevice(statetag(),b);
+            if(H4Plugin::isLoaded(mqttTag())) h4mqtt.publishDevice(stateTag(),b);
         }
 
         virtual void    _hookIn() override {
-            if(h4._hasName(H4P_TRID_MQTT)) {
+            if(H4Plugin::isLoaded(mqttTag())) {
                 h4mqtt.hookConnect([this](){ _publish(_pp->state); });
             }
         }            

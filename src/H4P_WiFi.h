@@ -73,14 +73,13 @@ class H4P_WiFi: public H4PluginService{
     public:
 //          included here aginst better wishes due to compiler bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89605
         H4P_WiFi(string ssid,string psk,string device="",H4_FN_VOID onC=[](){},H4_FN_VOID onD=[](){}): H4PluginService(onC,onD){
-            _cb[ssidtag()]=ssid;
+            _cb[ssidTag()]=ssid;
             _cb["psk"]=psk;
-            _cb[devicetag()]=device;
+            _cb[deviceTag()]=device;
 
-            _pid=wifitag();
-            //subid=H4PC_WIFI;
+            _pid=wifiTag();
             _names={ 
-                    {H4P_TRID_WIFI,uppercase(_pid)},
+//                    {H4P_TRID_WIFI,uppercase(_pid)},
                     {H4P_TRID_WFAP,"WFAP"},
                     {H4P_TRID_HOTA,"HOTA"}
             };
@@ -97,7 +96,7 @@ class H4P_WiFi: public H4PluginService{
                 void     clear();
                 void     change(string ssid,string psk);
                 void     getPersistentValue(string v,string prefix);
-                void     host(string h){ setPersistentValue(devicetag(),h,true); }
+                void     host(string h){ setPersistentValue(deviceTag(),h,true); }
                 void     setPersistentValue(string n,string v,bool reboot);
                 void     start() override;
                 void     stop() override;

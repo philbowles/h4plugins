@@ -54,7 +54,7 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4PluginService {
         {
             _cb["auser"]=admin;
             _cb["apasswd"]=passwd;
-            _pid=aswstag();
+            _pid=aswsTag();
             //subid=H4PC_ASWS;
             _names={{H4P_TRID_ASWS,uppercase(_pid)}};
             _cmds={};

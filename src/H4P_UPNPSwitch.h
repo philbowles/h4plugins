@@ -76,7 +76,7 @@ class H4P_UPNPSwitch: public H4P_BasicSwitch {
             H4P_BasicSwitch(pin,sense,initial,f){            
                 _pups.push_back(_urn+"device:controllee:1");
                 _pups.push_back(_urn+"service:basicevent:1");
-                _pid=upnptag();
+                _pid=upnpTag();
                 _names = {
                     {H4P_TRID_SOAP, "SOAP"},
                     {H4P_TRID_NTFY, "NTFY"}

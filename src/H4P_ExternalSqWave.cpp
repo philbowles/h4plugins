@@ -71,7 +71,7 @@ uint32_t H4P_ExternalSqWave::_dsweep(vector<string> vs){ return __sweep(vs,'D',H
 //      H4P_ExternalSqWave
 //
 H4P_ExternalSqWave::H4P_ExternalSqWave(uint8_t rx,uint8_t tx,uint32_t initialF,uint32_t initialD): SoftwareSerial(rx,tx){ 
-    _pid=esqwtag();
+    _pid=esqwTag();
     _names={ {H4P_TRID_SQWV,uppercase(_pid)} };
     uint32_t H4PC_ESW_SET=++nextSubid;
     uint32_t H4PC_ESW_SWEEP=++nextSubid;

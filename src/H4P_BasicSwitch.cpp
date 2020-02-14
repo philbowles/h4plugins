@@ -34,9 +34,8 @@ uint32_t H4P_BasicSwitch::_switch(vector<string> vs){ return guardInt1(vs,bind(&
 void H4P_BasicSwitch::turn(bool b){ if(_pp->state!=b) _pp->logicalWrite(b); }        
 //
 H4P_BasicSwitch::H4P_BasicSwitch(uint8_t pin,H4GM_SENSE sense, uint8_t initial,H4BS_FN_SWITCH f){
-    if(!h4._hasName(H4P_TRID_GPIO)){
-        _pid=onoftag();
-        _names={ {H4P_TRID_UBSW,uppercase(_pid)} };
+    if(H4Plugin::isLoaded(gpioTag())){
+        _pid=onofTag();
         _cmds={
             {"on",     {H4PC_ROOT, 0, CMD(turnOn)}},
             {"off",    {H4PC_ROOT, 0, CMD(turnOff)}},

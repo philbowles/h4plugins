@@ -34,16 +34,12 @@ SOFTWARE.
 void __attribute__((weak)) h4AddAwsHandlers(){}
 void __attribute__((weak)) onFactoryReset(){}
 
-H4P_CONFIG_BLOCK    H4Plugin::_cb;
-H4_CMD_MAP          H4Plugin::commands;
-
 vector<H4_FN_VOID>  H4PluginService::_factoryChain;
 
 void h4StartPlugins(){
-    for(auto const& p:H4Plugin::_pending) p->_startup();
-    for(auto const& p:H4Plugin::_pending) { p->_hookIn(); }
-    for(auto const& p:H4Plugin::_pending) p->_greenLight();
-    H4Plugin::_pending.clear();
+    for(auto const& p:H4Plugin::_plugins) p->_startup();
+    for(auto const& p:H4Plugin::_plugins) { p->_hookIn(); }
+    for(auto const& p:H4Plugin::_plugins) p->_greenLight();
     H4PluginService::hookFactory(onFactoryReset);
 }
 
@@ -54,7 +50,7 @@ void h4FactoryReset(){
 
 H4Plugin::H4Plugin(){
     subid=++nextSubid;
-    _pending.push_back(this);
+    _plugins.push_back(this);
 }
 
 vector<uint32_t> H4Plugin::expectInt(string pl,const char* delim){
@@ -107,9 +103,9 @@ void H4Plugin::reply(const char* fmt,...){ // find pub sub size
     va_end(ap);
     string source=_cb["source"];
     #ifndef H4P_NO_WIFI
-        if(source==aswstag()) h4asws._reply(buff);
+        if(source==aswsTag()) h4asws._reply(buff);
         else { 
-            if(source==mqtttag()) h4mqtt._reply(buff); 
+            if(source==mqttTag()) h4mqtt._reply(buff); 
             else {
     #endif
                 H4Plugin::_reply(buff);
@@ -121,7 +117,7 @@ void H4Plugin::reply(const char* fmt,...){ // find pub sub size
 
 void H4Plugin::_startup(){
 //    reply("H4Plugin::_startup %s nN=%d nC=%d\n",CSTR(_pid),_names.size(),_cmds.size());
-    h4._hookLoop(_hook,_names,_pid);
+    h4._hookLoop(_hook,_names,subid);
     if(_cmds.size()) commands.insert(_cmds.begin(),_cmds.end());
     _cmds.clear();
     _names.clear();
@@ -131,7 +127,7 @@ void H4Plugin::_startup(){
 //      H4PluginService
 //
 void H4PluginService::_startup(){
-    reply("H4PluginService::_startup %s nN=%d nC=%d SUBID=%d\n",CSTR(_pid),_names.size(),_cmds.size(),subid);
+//    reply("H4PluginService::_startup %s nN=%d nC=%d SUBID=%d\n",CSTR(_pid),_names.size(),_cmds.size(),subid);
     _cmds={
             {"restart", { 0, 0, CMD(restart)}},
             {"start",   { 0, 0, CMD(start)}},
@@ -143,6 +139,7 @@ void H4PluginService::_startup(){
     _local.clear();
     H4Plugin::_startup();
 }
+
 void H4PluginService::h4pcConnected(){ 
     for(auto const& c:_connChain) c();
     svc(_pid,H4P_LOG_SVC_UP);
@@ -154,10 +151,9 @@ void H4PluginService::h4pcDisconnected(){
 }
 
 void H4PluginService::svc(const string& uid,H4P_LOG_TYPE ud) {
-    #ifdef H4P_SERIAL_LOGGING 
-        if(h4._hasName(H4P_TRID_SCMD)) {
+    #ifdef H4P_LOG_EVENTS 
+        if(H4Plugin::isLoaded(scmdTag())) {
             h4sc._logEvent(uid,ud,"h4","",0);
-    //    Serial.printf("SVC %s %s\n",CSTR(uid),ud==H4P_LOG_SVC_UP ? "UP":"DOWN");
             Serial.print("SVC ");Serial.print(CSTR(uid));
             Serial.print(" ");Serial.println(ud==H4P_LOG_SVC_UP ? "UP":"DOWN");
         }

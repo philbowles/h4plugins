@@ -26,10 +26,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-beta:
-Erickcampos50@gmail.com
-
-
 */
 #ifndef H4P_HO
 #define H4P_HO
@@ -80,12 +76,14 @@ enum H4P_LOG_TYPE {
     H4P_LOG_SVC_DOWN=2,
     H4P_LOG_CMD=4,
     H4P_LOG_USER=8,
+    H4P_LOG_DEPENDFAIL=16,
+    H4P_LOG_MQTT_HEAP=32,
     H4P_LOG_ALL=0xffffffff
 };
 //
 // literal string RAM savers
 //
-#define STAG(x) constexpr char* x##tag(){ return #x; }
+#define STAG(x) constexpr char* x##Tag(){ return #x; }
 
 constexpr const char* cmdhash(){ return "h4/#"; }
 
@@ -104,6 +102,7 @@ STAG(name);
 STAG(onof);
 STAG(port);
 STAG(qwrn);
+STAG(scmd);
 STAG(snif);
 STAG(ssid);
 STAG(state);
@@ -123,10 +122,16 @@ STAG(wifi);
 #define CMDVS(x) ([this](vector<string> vs)->uint32_t{ return x(vs); })
 
 #define VSCMD(x) uint32_t x(vector<string>)
-#ifdef H4P_SERIAL_LOGGING
-    #define EVENT(x) h4sc.logEvent(x)
+#ifdef H4P_LOG_EVENTS
+    #define EVENT(x,...) h4sc.logEventType(H4P_LOG_USER,x, ##__VA_ARGS__)
+    #define SYSEVENT(e,x,...) h4sc.logEventType(e,x, ##__VA_ARGS__)
+    #define DEPENDFAIL(x) h4sc.logEventType(H4P_LOG_DEPENDFAIL,"%s->%s", CSTR(_pid),x##Tag())
+    #define logEvent(x,...) logEventType(H4P_LOG_USER,x, ##__VA_ARGS__)
 #else
-    #define EVENT(x)
+    #define EVENT(x,...)
+    #define SYSEVENT(e,x,...)
+    #define DEPENDFAIL(x)
+    #define logEvent(x,...) _noOP()
 #endif
 //
 //      PLUGINS
@@ -135,14 +140,13 @@ enum trustedIds {
   H4P_TRID_PATN = 50,
   H4P_TRID_PP1x,
   H4P_TRID_PWM1,
-  H4P_TRID_GPIO,
+  H4P_TRID_SYNC,
   H4P_TRID_DBNC,
   H4P_TRID_RPTP,
   H4P_TRID_POLL,
   H4P_TRID_MULT,
   H4P_TRID_TRIG,
   H4P_TRID_SQWV,
-  H4P_TRID_WIFI,
   H4P_TRID_HOTA,
   H4P_TRID_WFAP,
   H4P_TRID_MQMS,
@@ -152,15 +156,8 @@ enum trustedIds {
   H4P_TRID_SOAP,
   H4P_TRID_UDPM,
   H4P_TRID_NTFY,
-  H4P_TRID_UBSW,
-  H4P_TRID_3FNB,
-  H4P_TRID_CERR,
   H4P_TRID_SCMD,
-  H4P_TRID_QWRN,
-  H4P_TRID_SNIF,
-  H4P_TRID_LLOG,
-  H4P_TRID_SLOG,
-  H4P_TRID_MLOG,
+  H4P_TRID_HLOG
 };
 
 enum H4PC_CMD_ID{
@@ -196,12 +193,21 @@ class H4Plugin {
 
             uint32_t        guardString2(vector<string> vs,function<void(string,string)> f);
 
+    public:
             string          _pid; // diag hoist
 
             uint32_t        subid;
 
-    public:
-        static vector<H4Plugin*>  _pending;
+        static vector<H4Plugin*>  _plugins;
+
+        static  H4Plugin* isLoaded(const string& x){
+            for(auto const& p:H4Plugin::_plugins) if(p->_pid==x) return p;
+            return nullptr;
+        }
+        static  string pidFromSubid(const uint32_t s){
+            for(auto const& p:H4Plugin::_plugins) if(p->subid==s) return p->_pid;
+            return string("WTF? id=").append(stringFromInt(s));
+        }
 
         virtual void        _startup();
 
@@ -236,10 +242,6 @@ class H4PluginService: public H4Plugin {
 
                 void        _startup() override;
 
-        virtual void        _hookIn() override {}
-
-        virtual void        _greenLight() override {}
-
         H4PluginService(H4_FN_VOID onConnect=[](){},H4_FN_VOID onDisconnect=[](){}){
                 hookConnect(onConnect);
                 hookDisconnect(onDisconnect);
@@ -258,10 +260,7 @@ class H4PLogService: public H4PluginService {
                 bool        _running=true;
                 uint32_t    _filter=0;
         virtual void        _filterLog(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error=0){
-            if(_running){
-                if(type & _filter) _logEvent(msg,type,source,target,error);
-                else Serial.printf("%s TYPE %d ignored %s\n",CSTR(_pid),type,CSTR(msg));
-            }
+            if(_running){ if(type & _filter) _logEvent(msg,type,source,target,error); }
         }
     protected:
                 void        _hookIn() override;

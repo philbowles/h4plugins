@@ -29,9 +29,9 @@ SOFTWARE.
 #ifndef ARDUINO_ARCH_STM32
 #include<H4P_LocalLogger.h>
 //
-H4P_LocalLogger::H4P_LocalLogger(uint32_t limit): H4PLogService(logtag()), _limit(limit) {
+H4P_LocalLogger::H4P_LocalLogger(uint32_t limit): H4PLogService(logTag()), _limit(limit) {
     // subid=H4PC_LLOG;
-    _names={ {H4P_TRID_LLOG,uppercase(_pid)} };
+//    _names={ {H4P_TRID_LLOG,uppercase(_pid)} };
     _local={
         {_pid,     {H4PC_SHOW, 0, CMD(show)}},
         {"clear",  {subid, 0, CMD(clear)}},
@@ -39,14 +39,14 @@ H4P_LocalLogger::H4P_LocalLogger(uint32_t limit): H4PLogService(logtag()), _limi
     };
 }
 
-void H4P_LocalLogger::clear(){ SPIFFS.remove(CSTR(string("/").append(logtag()))); }
+void H4P_LocalLogger::clear(){ SPIFFS.remove(CSTR(string("/").append(logTag()))); }
 
 void H4P_LocalLogger::flush(){
     show();
     clear();
 }
 
-void H4P_LocalLogger::show(){ h4sc._dump(vector<string>{logtag()}); }
+void H4P_LocalLogger::show(){ h4sc._dump(vector<string>{logTag()}); }
 //
 //      our raison d'etre
 //

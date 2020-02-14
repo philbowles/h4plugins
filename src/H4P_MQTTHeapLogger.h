@@ -27,22 +27,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_SerialLogger_HO
-#define H4P_SerialLogger_HO
+#ifndef H4P_MQTTHeapLogger_HO
+#define H4P_MQTTHeapLogger_HO
 
+#ifndef ARDUINO_ARCH_STM32
 #include <H4PCommon.h>
-#include <H4P_SerialCmd.h>
+#include <H4P_MQTT.h>
 
-class H4P_SerialLogger: public H4PLogService {
-        void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error){
-            Serial.print("TYPE"); Serial.print(type);
-            Serial.print(" s="); Serial.print(CSTR(source));
-            Serial.print(" t="); Serial.print(CSTR(target));
-            Serial.print(" e="); Serial.print(error);
-            Serial.print(" ");Serial.println(CSTR(msg));
-        }
+class H4P_MQTTHeapLogger: public H4P_MQTTLogger {
+        uint32_t _f;
+        void start() override { h4.every(_f,[](){ SYSEVENT(H4P_LOG_MQTT_HEAP,"%u",ESP.getFreeHeap()); },nullptr,H4P_TRID_HLOG,true); }
+        void stop() override { h4.cancelSingleton(H4P_TRID_HLOG); }
+        void _greenLight() override { h4sc.removeCmd("msg",subid); } // msg is meaningless - we only "see" H4P_LOG_MQTT_HEAP events
     public:
-        H4P_SerialLogger(uint32_t filter=H4P_LOG_ALL): H4PLogService("slog",filter){}
+        H4P_MQTTHeapLogger(uint32_t f): _f(f),H4P_MQTTLogger("heap",H4P_LOG_MQTT_HEAP){ _names={{H4P_TRID_HLOG,"HLOG"}}; }
 };
-
-#endif // H4P_SerialLogger_H
+#endif
+#endif // H4P_MQTTLogger_H

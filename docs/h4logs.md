@@ -21,7 +21,7 @@ The important thing to note is that each logger is called in turn, thus you can 
 
 Also note that the main interface `h4sc.logEvent("some message")` will simply do nothing if no loggers are installed. This allows it to be left in the code and "switched on or off" by commenting out the loggers, which can be flipped back in at a stroke for testing.
 
-Better still. there is a macro EVENT("some message) which simply calls `h4sc.logEvent` but can be "compiled out" by removing the `#define H4P_SERIAL_LOGGING` entry in `H4PConfig.h`, then there is zero overhead.
+Better still. there is a macro EVENT("some message) which simply calls `h4sc.logEvent` but can be "compiled out" by removing the `#define H4P_LOG_EVENTS` entry in `H4PConfig.h`, then there is zero overhead.
 
 ---
 

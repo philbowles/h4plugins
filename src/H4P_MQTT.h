@@ -62,7 +62,7 @@ class H4P_MQTT: public H4PluginService, public PubSubClient{
             _cb["muser"]=user,
             _cb["mpasswd"]=pass;
 
-            _pid=mqtttag();
+            _pid=mqttTag();
             //subid=subid;
 
             _names={ 

@@ -54,18 +54,17 @@ uint32_t H4P_TaskSniffer::__incexc(vector<string> vs,function<void(vector<uint32
 
 void H4P_TaskSniffer::_alwaysExclude(){ // still need this?
     exclude({
-        H4P_TRID_GPIO,
-        H4P_TRID_SQWV,
-        H4P_TRID_WIFI,
-        H4P_TRID_MQTT,
-        H4P_TRID_ASWS,
-        H4P_TRID_UBSW
+ //       H4P_TRID_SQWV,
+//        H4P_TRID_WIFI,
+//        H4P_TRID_MQTT,
+//        H4P_TRID_ASWS,
+//        H4P_TRID_UBSW
     }); 
 }        
 
 void H4P_TaskSniffer::_common(){
-    _pid=sniftag();
-    _names={ {H4P_TRID_SNIF,uppercase(_pid)} };
+    _pid=snifTag();
+//    _names={ {H4P_TRID_SNIF,uppercase(_pid)} };
     _cmds={
         {_pid,      {H4PC_SHOW, 0, CMD(show)}},
         {_pid,      {H4PC_ROOT, subid, nullptr}},

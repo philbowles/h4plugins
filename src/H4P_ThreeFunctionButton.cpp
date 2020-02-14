@@ -45,7 +45,7 @@ void H4P_ThreeFunctionButton::progress(H4GPIOPin* ptr){ // run this as each stag
 
 void H4P_ThreeFunctionButton::_hookIn(){
     _createMS();
-    if(h4._hasName(H4P_TRID_WIFI)){
+    if(H4Plugin::isLoaded(wifiTag()) && H4Plugin::isLoaded(winkTag())){ /// && dlasher
         h4wifi.hookConnect([this](){ 
             if(WiFi.getMode() & WIFI_AP) h4fc.flashPWM(1000,10,_led,_active); 
             else h4fc.stopLED(_led); 
@@ -55,7 +55,7 @@ void H4P_ThreeFunctionButton::_hookIn(){
             else h4fc.flashMorse("... --- ...   ",H43F_TIMEBASE,_led,_active);
         });
     }
-    if(h4._hasName(H4P_TRID_MQTT)){
+    if(H4Plugin::isLoaded(mqttTag())){
         h4mqtt.hookConnect([this](){ h4fc.stopLED(_led); });
         h4mqtt.hookDisconnect([this](){ h4fc.flashPattern("10100000",H43F_TIMEBASE,_led,_active); });
     }
@@ -64,8 +64,8 @@ void H4P_ThreeFunctionButton::_hookIn(){
 H4P_ThreeFunctionButton::H4P_ThreeFunctionButton(H4P_BasicSwitch* bsp,uint32_t dbTimeMs,uint8_t pin,uint8_t mode,H4GM_SENSE b_sense,uint8_t led,H4GM_SENSE l_sense):
         _bsp(bsp),_led(led),_active(l_sense){
 
-    _pid=tfnbtag();
-    _names={{H4P_TRID_3FNB,uppercase(_pid)}};
+    _pid=tfnbTag();
+//    _names={{H4P_TRID_3FNB,uppercase(_pid)}};
 
     H4GM_FN_EVENT cb=bind(&H4P_ThreeFunctionButton::progress,this,_1);
     _createMS=bind(&H4P_GPIOManager::Multistage,&h4gm,pin,mode,b_sense,dbTimeMs,_sm,cb);
