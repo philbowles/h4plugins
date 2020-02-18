@@ -29,10 +29,10 @@ SOFTWARE.
 #include<H4P_MQTT.h>
 #ifndef H4P_NO_WIFI
 uint32_t H4P_MQTT::_change(vector<string> vs){
-    return guard<1>(vs,[this](vector<string> vs){
-        auto vg=split(PAYLOAD,",");
-        if(vg.size()==2 && isNumeric(vg[1])) return ([this](string s,uint16_t p){ change(s,p); return H4_CMD_OK; })(vg[0],atoi(CSTR(vg[1])));
-        else return H4_CMD_PAYLOAD_FORMAT;
+    return guardString2(vs,[this](string a,string b){ 
+        if(isNumeric(b)){
+            change(a,atoi(CSTR(b))); 
+        }
     });
 }
 
@@ -42,28 +42,28 @@ void H4P_MQTT::_forceDisconnect(bool autorestart){
     if(!_discoDone){
         h4pcDisconnected();   
         _discoDone=true;
-        Serial.printf("MQTT down=%d\n",state());
+        EVENT("MQTT down=%d\n",state());
     }
     if(autorestart && WiFi.status()==WL_CONNECTED) start();
 }
 
 void H4P_MQTT::_hookIn() {
-    if(h4._hasName(H4P_TRID_SCMD) && h4._hasName(H4P_TRID_WIFI) ){
+    if(H4Plugin::isLoaded(wifiTag()) ){
         _setup(); 
         h4wifi.hookConnect([this](){ start(); });
         h4wifi.hookDisconnect([this](){ _forceDisconnect(); });
-    }
+    } else { DEPENDFAIL(wifi); }
 }
 
 uint32_t H4P_MQTT::_offline(vector<string> vs){
-    return guard<1>(vs,[this](vector<string> vs){
+    return guard1(vs,[this](vector<string> vs){
         if(PAYLOAD!=device) _grid.erase(PAYLOAD);
         return H4_CMD_OK;
     }); 
 }
 
 uint32_t H4P_MQTT::_online(vector<string> vs){
-    return guard<1>(vs,[this](vector<string> vs){
+    return guard1(vs,[this](vector<string> vs){
         if(PAYLOAD!=device) _grid.insert(PAYLOAD);
         return H4_CMD_OK;
     });    
@@ -71,8 +71,8 @@ uint32_t H4P_MQTT::_online(vector<string> vs){
 
 void H4P_MQTT::_setup(){
     setClient(_wifiClient);
-    string broker=_cb[brokertag()];
-    uint16_t port=atoi(CSTR(_cb[porttag()]));
+    string broker=_cb[brokerTag()];
+    uint16_t port=atoi(CSTR(_cb[portTag()]));
     if(atoi(CSTR(broker))) {
         vector<string> vs=split(broker,".");
         setServer(IPAddress(PARAM_INT(0),PARAM_INT(1),PARAM_INT(2),PARAM_INT(3)),port);
@@ -81,8 +81,7 @@ void H4P_MQTT::_setup(){
     setCallback([](char* topic, byte* payload, unsigned int length){
     h4.queueFunction(
         bind([](string topic, string pload){ 
-//            Serial.printf("H4P_MQTT MESSAGE %s [%s]\n",CSTR(topic),CSTR(pload));               
-            h4sc._executeCmd(CSTR(string(mqtttag()).append("/").append(topic)),pload); 
+            h4sc._executeCmd(CSTR(string(mqttTag()).append("/").append(topic)),pload); 
         },string(topic),stringFromBuff(payload,length)),nullptr,H4P_TRID_MQMS);
     });	
 }
@@ -90,8 +89,8 @@ void H4P_MQTT::_setup(){
 void H4P_MQTT::change(const string& broker,uint16_t port){
     stop();
     _wifiClient.stop();
-    _cb[brokertag()]=broker;
-    _cb[porttag()]=stringFromInt(port);
+    _cb[brokerTag()]=broker;
+    _cb[portTag()]=stringFromInt(port);
     _setup();
     start();
 }
@@ -130,7 +129,7 @@ void H4P_MQTT::unsubscribeDevice(string topic){
 */
 void H4P_MQTT::start(){
     if(!(WiFi.getMode() & WIFI_AP)){
-        device=_cb[devicetag()];
+        device=_cb[deviceTag()];
         if(connect( CSTR(device),
                     CSTR(_cb["muser"]),
                     CSTR(_cb["mpasswd"]),
@@ -147,11 +146,11 @@ void H4P_MQTT::start(){
             },nullptr,H4P_TRID_MQTT,true);
             subscribe(CSTR(string("all/").append(cmdhash())));
             subscribe(CSTR(string(device+"/"+cmdhash())));
-            subscribe(CSTR(string(_cb[chiptag()]+"/"+cmdhash())));
-            subscribe(CSTR(string(_cb[boardtag()]+"/"+cmdhash())));
+            subscribe(CSTR(string(_cb[chipTag()]+"/"+cmdhash())));
+            subscribe(CSTR(string(_cb[boardTag()]+"/"+cmdhash())));
             publish("all/h4/mqtt/online",CSTR(device));
             h4pcConnected();
         } else h4.once(H4MQ_RETRY,[this](){ start(); },nullptr,H4P_TRID_MQRC,true);
-    } //else Serial.printf("MQTT IGNORED IN AP MODE");
+    }
 }
 #endif

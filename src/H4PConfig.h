@@ -28,8 +28,7 @@ SOFTWARE.
 */
 
 // comment this out to prevent and logging by EVENT( whatever ) messages
-#define H4P_SERIAL_LOGGING
-
+#define H4P_LOG_EVENTS
 /*
             TWEAKABLES
 */
@@ -54,6 +53,9 @@ SOFTWARE.
 #define H43F_MEDIUM            175
 #define H43F_FAST               50
 #define H43F_TIMEBASE          175
+#define H43F_REBOOT           2000
+#define H43F_FACTORY          5000
+
 #define H4WF_OTA_RATE         1000
 
 #endif

@@ -1,6 +1,6 @@
 ![H4P Logo](/assets/DriversLogo.jpg)
 
-# External Square Wave Generator
+# External Square Wave Generator (short name "esqw")
 
 ## Adds driver/controller for Square Wave Generator module to H4 Universal Scheduler/Timer
 *All plugins depend upon the presence of the [H4 library](https://github.com/philbowles/H4), which must be installed first.*
@@ -60,10 +60,6 @@ y2 is the "to" y
 ```cpp
 void onChange(uint32_t sweptValue); // called when swept value changes
 ```
-
-## Trusted Name
-
-*ESQW*
 
 ## Unloadable
 

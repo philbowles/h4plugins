@@ -1,9 +1,5 @@
 #include<H4Plugins.h>
 H4_USE_PLUGINS
-
-H4 h4(115200,20); //auto-start Serial @ 115200, Q size=20 
-
-H4P_GPIOManager h4gm;
 /*
 My major testing devices were nodeMCU which has builtin button on GPIO0 which is ACTIVE_LOW
 and STM32NUCLEO-F429ZI whuch has a user button that is ACTIVE_HIGH
@@ -49,6 +45,9 @@ You will probably need to adjust these values for you own device
 */
 #define ENCODER_A D7
 #define ENCODER_B D6
+
+H4 h4(115200,20); //auto-start Serial @ 115200, Q size=20 
+H4P_GPIOManager h4gm;
 
 void h4setup() { // H4 constructor starts Serial
     Serial.println("H4P_GPIOManager Encoder Example v"H4P_VERSION);

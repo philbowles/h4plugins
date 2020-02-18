@@ -1,6 +1,6 @@
 ![H4P Flyer](/assets/MQTTLogo.jpg) 
 
-# MQTT Manager
+# MQTT Manager (short name="mqtt")
 
 ## Adds MQTT management to H4 Universal Scheduler/Timer. Runs on ESP8266/32
 
@@ -45,8 +45,7 @@ H4P_MQTT h4mqtt(...
 
 ## Dependencies
 
-
-* [H4P_WiFi](h4wifi.md) Plugin
+* [H4P_WiFi](h4wifi.md)
 
 ## Commands Added
 
@@ -70,10 +69,6 @@ void onConnect(void);
 void onDisconnect(void);
 uint32_t onMessage(vector<string>); // where "onMessage" is a user-defined topic handling function
 ```
-
-## Trusted Name
-
-*MQTT*
 
 ## Unloadable
 
@@ -129,11 +124,11 @@ Secondly, the message and payload are parsed and split up for you already and pa
 vs[0]=whatever was in the message payload
 ```
 
-You may wonder why you get a `vector<string>` when there is only 1 item: the payload, but this will become obviuous later when we talk about subtopics and wildcards.
+You may wonder why you get a `vector<string>` when there is only 1 item: the payload, but this will become obvious later when we talk about subtopics and wildcards.
 
 No matter how many parts there are to the message, the payload is always the last item. To make life easier H4 has macros `PAYLOAD` if you are expecting a string and `PAYLOAD_INT` if you are expecting a number. 
 
-Also there is a global string called `H4_MQTT::target` which will contain the messge prefix (see above) such as "all" or "mything" or "WEMOS_D1MINI" depending on how/why you received this message. Normally you don't need to know this, but it's there if you want it.
+Also there is a global string called `H4_MQTT::target` which will contain the message prefix (see above) such as "all" or "mything" or "WEMOS_D1MINI" depending on how/why you received this message. Normally you don't need to know this, but it's there if you want it.
 
 Your callback then "does it thing" but *must* return a value showing if it succeeded or not. It can be any of the following:
 
@@ -169,11 +164,11 @@ uint32_t myCallback(vector<string> vs){
 h4mqtt.subscribeDevice("mytopic",myCallback); // MUST be done from inside onConnect callback
 ```
 
-[Example Code](../examples/H4MQTT/MQTT_Simple/MQTT_Simple.ino)
+[Example Code](../examples/H4P_MQTT_Simple/MQTT_Simple.ino)
 
 ## Subtopics
 
-You may need to implement multiple topics in a kind of "tree" hierarchy like the following, after all, H$Plugins does exactly this.
+You may need to implement multiple topics in a kind of "tree" hierarchy like the following, after all, H4Plugins does exactly this.
 * `mytopic/a/b/x`
 * `mytopic/a/b/y`
 * `mytopic/a/c/x`
@@ -194,7 +189,7 @@ void onMQTTConnect(){
 ```
 i.e. you need to subscribe to each part of the path in turn. This implies that you will also get any topic `a`, any topic `a/b` as well as the desired `a/b/c` .
 
-You will be able to tell which is which because of the size of the `vector<string>` input, "`vs`". It never includes the firt part of the topic because in the simple case there is only one part and you know what it its, or your code would never get to the topic handler in the first place if it weren't. 
+You will be able to tell which is which because of the size of the `vector<string>` input, "`vs`". It never includes the first part of the topic because in the simple case there is only one part and you know what it its, or your code would never get to the topic handler in the first place. 
 
 Look at it another way from the code above: all topics starting `a`... get sent to `myCallback` ,so we always know what the first part would be if it were included... so including what we already know just wastes space. Other than this, each subtopic is contained in the next entry in vs, with the payload always being in the final entry.
 
@@ -291,7 +286,7 @@ The number of milliseconds H4P_MQTT will wait between attempst to reconnect if s
 
 The number of milliseconds for each call of `mqttClient.loop()`. Most basic sketches call this on every loop, which amounts to 40000 - 60000 times *per second* which is a massive peformance hit and totally unnecessary.
 
-The larger the value, the less of a performace hit, BUT the longer it takes for published messages to arrive at the server. If you make the value too large, you cause exponetntial queue growth if you also publish a lot of messages. If you only publish say, once a minute then you can crank this up...but do not got past 15000 as pubsubclient will time out on its own and drop the link.
+The larger the value, the less of a performace hit, BUT the longer it takes for published messages to arrive at the server. If you make the value too large, you cause exponential queue growth if you also publish a lot of messages. If you only publish say, once a minute then you can crank this up...but do not got past 15000 as pubsubclient will time out on its own and close the connection.
 
 Making it smaller will clear the queue and make the mesages arrive at the server more quickly, but - of course - will hurt overal performance / throughput
 

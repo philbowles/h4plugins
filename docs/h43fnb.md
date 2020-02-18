@@ -1,6 +1,6 @@
 ![H4P Flyer](/assets/GPIOLogo.jpg) 
 
-## Three Function Button
+## Three Function Button (short name="tfnb")
 
 ### Adds 3-function* GPIO button to H4 Universal Scheduler/Timer
 
@@ -9,19 +9,21 @@
 ---
 ## What does it do?
 
-Allows the user to control a switch plugin, either a [H4P_BasicSwitch](h4onof.md) or a [H4P_UPNPSwitch](h4upnp.md) by pressing and holding a simple non-latching 'tact' button. The button causes 3 different actions to occur depending on how long it held down.
+Allows the user to control a switch plugin, a [H4P_BinarySwitch](things.md) [H4P_BinaryThing](things.md), [H4P_UPNPSwitch](things.md)  or a [H4P_UPNPThing](things.md) by pressing and holding a simple non-latching 'tact' button. The button causes 3 different actions to occur depending on how long it held down.
 
-In essence it links an output GPIO (defined by the swicth plugin) to an input GPIO and uses an LED to signal its changing state.
+In essence it links an output GPIO (defined by the xSwitch or xThing plugin) to an input GPIO connector and uses an LED to signal its changing state the longer the button is held.
 
-A "short" press (less than 2 seconds) simply switches the device to the opposite state as a "normal" press of any button might do. The resulting action depends on the definition of the linked switch plugin.
+A "short" press (less than 2 seconds**) simply switches the device to the opposite state as a "normal" press of any button might do. The resulting action depends on the definition of the linked switch plugin.
 
-A "medium" press over 2 seconds (but less than 5 seconds) starts the associated LED flashing rapidly and when the button is released, the device will reboot.
+A "medium" press over 2 seconds (but less than 5 seconds**) starts the associated LED flashing rapidly and when the button is released, the device will reboot.
 
-A "long" press - anything over 5 seconds - starts the LED flashing extremely rapidly and when the button is released, the device will clear any stored configuration information and then reboot, a process known as a "factory reset".
+A "long" press - anything over 5 seconds** - starts the LED flashing extremely rapidly and when the button is released, the device will clear any stored configuration information and then reboot, a process known as a "factory reset".
 
 **N.B** If the [H4P_WiFi](h4wifi.md) plugin is in use, the factory reset will clear any stored WiFi credentials therefore ensuring the when the device reboots, it will start in AP configuration mode.
 
 (* ***Four** functions if you count the LED flashing* :) )
+
+(** These default values can be changes by the user - see "Tweakables" below)
 
 ---
 
@@ -32,11 +34,12 @@ A "long" press - anything over 5 seconds - starts the LED flashing extremely rap
 H4_USE_PLUGINS
 
 H4P_GPIOManager h4gm;
-// either
-H4P_UPNPSwitch h4upnp(...
-//or
-H4P_BasicSwitch h4upnp(...
-H4P_ThreeFunctionButton h43fb(...
+// one of
+//H4P_UPNPSwitch h4bt(...
+//H4P_UPNPThing h4bt(...
+//H4P_BinarySwitch h4bt(...
+//H4P_BinaryThing h4bt(...
+H4P_ThreeFunctionButton h4bt(...
 ```
 
 # Dependencies
@@ -47,28 +50,18 @@ Requires a GPIO pin to be connected to an LED (default is LED_BUILTIN) and a "ta
 
 none
 
-# Callbacks
-
-```cpp
-void onChange(uint32_t sweptValue); // called when swept value changes
-```
-
-# Trusted Name
-
-*TFNB*
-
 # Unloadable
 
 NO
 
 ---
 
-## API
+# API
 
 ```cpp
 /* constructor: */
 H4P_ThreeFunctionButton(
-    H4P_BasicSwitch* bsp,  //a reference to a previoulsy defined H4P_BasicSwitch or H4P_UPNPSwitch
+    H4P_BinarySwitch* bsp,  //a reference to a previoulsy defined H4P_BinarySwitch or H4P_UPNPSwitch
     uint32_t dbTimeMs, // the switch debounce value in milliseconds: depends on the individual switch
     //          the input button
     uint8_t pin,
@@ -80,7 +73,28 @@ H4P_ThreeFunctionButton(
     );
 ```
 
-[Example code](../examples/H43FNB/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
+[Example code](../examples/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
+
+---
+
+# Tweakables
+
+The following values are defined in `H4PConfig.h` . They are chosen initally to set a good balance between stability, performance and memory / stack usage. *It is not advisable to change them unless you know exactly what you are doing and why*. 
+
+**N.B.** **Support will not be provided if any of these values are changed.**
+
+* H43F_MEDIUM            175
+Millisecond flash rate of a medium press
+
+* H43F_FAST               50
+Millisecond flash rate of a long press
+
+* H43F_TIMEBASE          175
+Timebase of the Morse S-O-S flash when signalling onWiFIDisconnect (if [H4P_WiFi](h4wifi.md) is used)
+* H43F_REBOOT           2000
+Millisecond time defining transition from short->medium
+* H43F_FACTORY          5000
+* Millisecond time defining transition from medium->long
 
 ---
 

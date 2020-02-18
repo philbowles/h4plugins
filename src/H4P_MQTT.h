@@ -12,7 +12,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
+copies of the Software, and to permit persons to whom the Software iss
 furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all
@@ -32,6 +32,7 @@ SOFTWARE.
 
 #include<H4PCommon.h>
 #include<H4P_SerialCmd.h>
+#include<H4P_WiFiSelect.h>
 #include<H4P_WiFi.h>
 #ifndef H4P_NO_WIFI
 
@@ -62,8 +63,8 @@ class H4P_MQTT: public H4PluginService, public PubSubClient{
             _cb["muser"]=user,
             _cb["mpasswd"]=pass;
 
-            _pid=mqtttag();
-            subid=H4PC_MQTT;
+            _pid=mqttTag();
+            //subid=subid;
 
             _names={ 
                 {H4P_TRID_MQMS,"MQMS"},
@@ -72,11 +73,11 @@ class H4P_MQTT: public H4PluginService, public PubSubClient{
             };
 
             _local={
-                {"change",  { H4PC_MQTT, 0, CMDVS(_change) }},            
-                {"grid",    { H4PC_MQTT, 0, CMD(showGrid) }},            
-                {"offline", { H4PC_MQTT, 0, CMDVS(_offline) }},            
-                {"online",  { H4PC_MQTT, 0, CMDVS(_online) }}           
-//                    {"set",     { H4PC_MQTT, 0, [this](vector<string> vs){ return H4PluginService::_setHandler(vs); }}}            
+                {"change",  { subid, 0, CMDVS(_change) }},            
+                {"grid",    { subid, 0, CMD(showGrid) }},            
+                {"offline", { subid, 0, CMDVS(_offline) }},            
+                {"online",  { subid, 0, CMDVS(_online) }}           
+//                    {"set",     { subid, 0, [this](vector<string> vs){ return H4PluginService::_setHandler(vs); }}}            
             };       
         }
                 void        change(const string& broker,uint16_t port);

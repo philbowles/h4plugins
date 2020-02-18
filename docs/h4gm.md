@@ -1,6 +1,6 @@
 ![H4P Flyer](/assets/GPIOLogo.jpg) 
 
-# GPIO Manager
+# GPIO Manager (short name="gpio")
 
 ## Adds sophisticated GPIO management to H4 Universal Scheduler/Timer.
 
@@ -38,10 +38,6 @@ none
 
 h4/show/pins
 
-## Trusted Name
-
-*GPIO*
-
 ## Unloadable
 
 YES: No GPIO activity is futher handled. This cannot be undone.
@@ -69,6 +65,14 @@ GPIOManager currently provides behaviours for:
 * Sequenced - Increments counter for each ON/OFF press
 * Timed - Reports how long button held ON
 
+You should also read [Things vs Switches](things.md) which explains how some of the above strategies can be autmatically tied/bound/linked to predefined output actions. In it you will find how to use these variants of the above, each of which send an ON or OFF command to a linked output handler
+
+* DebouncedThing - binds a Debounced input to a BinarySwitch or UPNPSwitch output
+* EncoderThing - binds a Encoder input to a BinarySwitch or UPNPSwitch output
+* LatchingThing - binds a Latching input to a BinarySwitch or UPNPSwitch output
+* PolledThing - binds a Polled input to a BinarySwitch or UPNPSwitch output 
+* RawThing - binds a Raw input to a BinarySwitch or UPNPSwitch output
+* RetriggeringThing - binds a Retriggering input to a BinarySwitch or UPNPSwitch output
 
 Before we dive into the strategies, let's deal with the sometimes confusing concept of "Active High" and "Active Low" (experts can skip the next section)
 
@@ -407,22 +411,28 @@ void            toggle(uint8_t p); // reverse current logical state
 //
 //      Strategies
 //
-CircularPin*        Circular(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,uint32_t nStages,H4GM_FN_EVENT callback);
-DebouncedPin*       Debounced(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback);
+CircularPin*        Circular(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,uint32_t nStages,H4GM_FN_EVENT callback);//
+DebouncedPin*       Debounced(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback);//
+DebouncedPin*       DebouncedThing(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4P_BinaryThing* btp);//
 EncoderPin*         Encoder(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE sense,H4GM_FN_EVENT);
 EncoderPin*         Encoder(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE sense,int&);
+EncoderPin*         EncoderThing(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE sense,H4P_BinaryThing* btp);
 EncoderAutoPin*     EncoderAuto(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE sense,int vMin,int vMax,int vSet,uint32_t vIncr,H4GM_FN_EVENT);
 EncoderAutoPin*     EncoderAuto(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE sense,int vMin,int vMax,int vSet,uint32_t vIncr,int&);
-FilteredPin*        Filtered(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint8_t filter,H4GM_FN_EVENT callback);
-LatchingPin*        Latching(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback);
-MultistagePin*      Multistage(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_STAGE_MAP stageMap,H4GM_FN_EVENT callback);
-OutputPin*          Output(uint8_t p,H4GM_SENSE sense,uint8_t initial,H4GM_FN_EVENT callback=[](H4GPIOPin*){});
-PolledPin*          Polled(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t frequency,uint32_t isAnalog,H4GM_FN_EVENT callback);
-RawPin*             Raw(uint8_t p,uint8_t mode,H4GM_SENSE sense,H4GM_FN_EVENT callback);
-RepeatingPin*       Repeating(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,uint32_t frequency,H4GM_FN_EVENT callback);
+FilteredPin*        Filtered(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint8_t filter,H4GM_FN_EVENT callback);//
+LatchingPin*        Latching(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback);//
+LatchingPin*        LatchingThing(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4P_BinaryThing* btp);//
+MultistagePin*      Multistage(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_STAGE_MAP stageMap,H4GM_FN_EVENT callback);//
+OutputPin*          Output(uint8_t p,H4GM_SENSE sense,uint8_t initial,H4GM_FN_EVENT callback=nullptr);// FIX ptr type
+PolledPin*          Polled(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t frequency,uint32_t isAnalog,H4GM_FN_EVENT callback);//
+PolledPin*          PolledThing(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t frequency,uint32_t isAnalog,H4P_BinaryThing* btp);//
+RawPin*             Raw(uint8_t p,uint8_t mode,H4GM_SENSE sense,H4GM_FN_EVENT callback);//
+RawPin*             RawThing(uint8_t p,uint8_t mode,H4GM_SENSE sense,H4P_BinaryThing*);//
+RepeatingPin*       Repeating(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,uint32_t frequency,H4GM_FN_EVENT callback);//
 RetriggeringPin*    Retriggering(uint8_t _p, uint8_t _mode,H4GM_SENSE sense,uint32_t timeout, H4GM_FN_EVENT _callback);
-SequencedPin*       Sequenced(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback);
-TimedPin*           Timed(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback);
+RetriggeringPin*    RetriggeringThing(uint8_t _p, uint8_t _mode,H4GM_SENSE sense,uint32_t timeout,H4P_BinaryThing* btp);
+SequencedPin*       Sequenced(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback); //
+TimedPin*           Timed(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback); //
 //
 ```
 

@@ -30,8 +30,6 @@ void h4setup() { // H4 constructor starts Serial
     h4qw.show(); // show limits
 //
 //  we need a lot of things in the queue
-//  initial size is 10 and we warn @ 50% (=5 tasks)
-//  so 6 will definitely bust it
 //
     h4.once(30000,[](){ Serial.println("30 seconds later"); });
     h4.once(40000,[](){ 

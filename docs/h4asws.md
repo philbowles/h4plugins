@@ -1,6 +1,6 @@
 ![H4P Flyer](/assets/HTTPLogo.jpg) 
 
-# Asynchronous Web Server
+# Asynchronous Web Server (short name="asws")
 ## Adds Asynchronous Webserver, AP mode configuration to H4 Universal Scheduler/Timer. Runs on ESP8266/32 only
 
 *All plugins depend upon the presence of the [H4 library](https://github.com/philbowles/H4), which must be installed first.*
@@ -50,10 +50,6 @@ void onDisconnect(void); // webserver is down
 void h4AddAwsHandlers(void) // called after adding its own handlers, adds your in here
 ```
 
-## Trusted Name
-
-*ASWS*
-
 ## Unloadable
 
 No, but can be stopped with `h4/asws/stop` command.
@@ -95,7 +91,7 @@ The REST interface allows the user to enter commands in a similar fashion to the
 
 ![JSONREST](../assets/rest.jpg)
 
-When "prettified" it loks like this:
+When "prettified" it looks like this:
 
 ```json
 

@@ -26,40 +26,51 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include<H4P_UPNPSwitch.h>
+#include<H4P_UPNPCommon.h>
 #ifndef H4P_NO_WIFI
 
-void H4P_UPNPSwitch::_hookIn(){
-    H4P_BasicSwitch::_hookIn();
-    _ubIP=IPAddress(239,255,255,250);
+void H4P_UPNPCommon::_pseudoHookIn(){
+    if(H4Plugin::isLoaded(aswsTag())){
+        _ubIP=IPAddress(239,255,255,250);
 
-    h4sc.addCmd(_pid,H4PC_ROOT, H4PC_UPNP, nullptr);
-    h4sc.addCmd(nametag(),H4PC_UPNP,0, CMDVS(_friendly));
+        h4._hookLoop(nullptr,{ 
+            {H4P_TRID_SOAP, "SOAP"},
+            {H4P_TRID_SOAP, "UDPM"},
+            {H4P_TRID_NTFY, "NTFY"} 
+            },H4PC_UPNP);
 
-    h4asws.hookConnect([this](){ start(); });
-    h4asws.hookDisconnect([this](){ stop(); });
-    H4PluginService::hookFactory([this](){ SPIFFS.remove(CSTR(string("/"+string(nametag())))); });
+        h4sc.addCmd(upnpTag(),H4PC_ROOT, H4PC_UPNP, nullptr);
+        h4sc.addCmd(nameTag(),H4PC_UPNP,0, CMDVS(_friendly));
+
+        h4asws.hookConnect([this](){ start(); });
+        h4asws.hookDisconnect([this](){ stop(); });
+        H4PluginService::hookFactory([this](){ SPIFFS.remove(CSTR(string("/"+string(nameTag())))); });
+    } else { 
+        #ifdef H4_LOG_EVENTS
+            //DEPENDFAIL(asws);
+            h4sc.logEventType(H4P_LOG_DEPENDFAIL,"%s->%s", H4PC_UPNP,aswsTag());
+        #endif
+    }
 }
 
-void  H4P_UPNPSwitch::friendlyName(const string& name){ h4wifi.setPersistentValue(nametag(),name,true); }
+void  H4P_UPNPCommon::friendlyName(const string& name){ h4wifi.setPersistentValue(nameTag(),name,true); }
 
-uint32_t H4P_UPNPSwitch::_friendly(vector<string> vs){
-    return guard<1>(vs,[this](vector<string> vs){
-        return ([this](string h){
-            h4wifi.setPersistentValue(nametag(),h,true);
-            return H4_CMD_OK;
-        })(PAYLOAD);
-    });    
+uint32_t H4P_UPNPCommon::_friendly(vector<string> vs){
+    return H4Plugin::guard1(vs,[this](vector<string> vs){
+        //h4wifi.setPersistentValue(nameTag(),PAYLOAD,true);
+        Serial.printf("WOULD FRIEND %s\n",CSTR(PAYLOAD));
+        return H4_CMD_OK;
+    });
 }
 
-void H4P_UPNPSwitch::__upnpSend(uint32_t mx,const string s,IPAddress ip,uint16_t port){
+void H4P_UPNPCommon::__upnpSend(uint32_t mx,const string s,IPAddress ip,uint16_t port){
 	h4.nTimesRandom(H4P_UDP_REPEAT,0,mx,bind([this](IPAddress ip,uint16_t port,string s) {
 		_udp.writeTo((uint8_t *)CSTR(s), s.size(), ip, port);
 		},ip,port,s)
 	); // name this!!
 }
 
-void H4P_UPNPSwitch::_listenUDP(){
+void H4P_UPNPCommon::_listenUDP(){
 if(_udp.listenMulticast(_ubIP, 1900)) {
     _udp.onPacket([this](AsyncUDPPacket packet) {
         h4.queueFunction(bind([this](string msg, IPAddress ip, uint16_t port) {
@@ -75,7 +86,7 @@ if(_udp.listenMulticast(_ubIP, 1900)) {
                         }
                 }
                 string ST = uhdrs["ST"];
-                if (ST==_pups[1] || ST==_uuid+_cb["udn"]) { // make tag
+                if (ST==_pups[1] || ST==_uuid+H4Plugin::_cb["udn"]) { // make tag
                     string tail=((ST==_pups[1]) ? ST:"");
                     __upnpSend(1000 * atoi(CSTR(uhdrs["MX"])), "HTTP/1.1 200 OK\r\nST:" + ST +"\r\n" +__upnpCommon(tail), ip,port);
                 }
@@ -85,40 +96,38 @@ if(_udp.listenMulticast(_ubIP, 1900)) {
    }
 }
 
-string H4P_UPNPSwitch::__makeUSN(const string& s){
-	string full=_uuid+_cb["udn"];
+string H4P_UPNPCommon::__makeUSN(const string& s){
+	string full=_uuid+H4Plugin::_cb["udn"];
 	return s.size() ? full+="::"+s:full;
 }
 
-string H4P_UPNPSwitch::__upnpCommon(const string& usn){
-	_cb["usn"]=__makeUSN(usn);
+string H4P_UPNPCommon::__upnpCommon(const string& usn){
+	H4Plugin::_cb["usn"]=__makeUSN(usn);
 	string rv=H4P_WiFi::replaceParams(_ucom);
 	return rv+"\r\n\r\n";
 }
 
-void H4P_UPNPSwitch::start(){
-    _cb[nametag()]=_name;
-    h4wifi.getPersistentValue(nametag(),"upnp ");
+void H4P_UPNPCommon::start(){
+    H4Plugin::_cb[nameTag()]=_name;
+    h4wifi.getPersistentValue(nameTag(),"upnp ");
     if(!(WiFi.getMode() & WIFI_AP)){
-//        _cb["root"]=_urn+"device-1-0",
-//        _cb["root"]="urn:schemas-upnp-org:device-1-0"; // hoist to up.xml
-        _cb["age"]=stringFromInt(H4P_UDP_REFRESH/1000); // fix
+        H4Plugin::_cb["age"]=stringFromInt(H4P_UDP_REFRESH/1000); // fix
 
-        _cb["udn"]="Socket-1_0-upnp"+_cb[chiptag()];
-        _cb["updt"]=_pups[2];
-        _cb["umfr"]="Belkin International Inc.";
-        _cb["usvc"]=_pups[3];
-        _cb["usid"]=_urn+"serviceId:basicevent1";
+        H4Plugin::_cb["udn"]="Socket-1_0-upnp"+H4Plugin::_cb[chipTag()];
+        H4Plugin::_cb["updt"]=_pups[2];
+        H4Plugin::_cb["umfr"]="Belkin International Inc.";
+        H4Plugin::_cb["usvc"]=_pups[3];
+        H4Plugin::_cb["usid"]=_urn+"serviceId:basicevent1";
 
         _xml=H4P_WiFi::replaceParamsFile("/up.xml");
         _ucom=H4P_WiFi::replaceParamsFile("/ucom.txt");
         _soap=H4P_SerialCmd::read("/soap.xml");
-// erase redundant _cb?
-        _cb.erase("age");
-        _cb.erase("updt");
-        _cb.erase("umfr");
-        _cb.erase("usvc");
-        _cb.erase("usid");
+// erase redundant H4Plugin::_cb?
+        H4Plugin::_cb.erase("age");
+        H4Plugin::_cb.erase("updt");
+        H4Plugin::_cb.erase("umfr");
+        H4Plugin::_cb.erase("usvc");
+        H4Plugin::_cb.erase("usid");
 //
         h4asws.on("/we",HTTP_GET, [this](AsyncWebServerRequest *request){ request->send(200,"text/xml",CSTR(_xml)); });
         h4asws.on("/upnp", HTTP_POST,[this](AsyncWebServerRequest *request){ _upnp(request); },
@@ -132,28 +141,28 @@ void H4P_UPNPSwitch::start(){
         _listenUDP();
         _notify("alive"); // TAG
         h4.every(H4P_UDP_REFRESH / 3,[this](){ _notify("alive"); },nullptr,H4P_TRID_NTFY,true); // TAG
-        H4PluginService::svc(upnptag(),H4P_LOG_SVC_UP); // simulate service
+        H4PluginService::svc(upnpTag(),H4P_LOG_SVC_UP); // simulate service
     }
 }
 
-void H4P_UPNPSwitch::_upnp(AsyncWebServerRequest *request){ // redo
+void H4P_UPNPCommon::_upnp(AsyncWebServerRequest *request){ // redo
   h4.queueFunction(bind([this](AsyncWebServerRequest *request) {
         string soap=stringFromBuff((const byte*) request->_tempObject,strlen((const char*) request->_tempObject));
-        _cb["gs"]=(soap.find("Get")==string::npos) ? "Set":"Get";
-        if(_cb["gs"]=="Set") _pp->logicalWrite(soap.find(">1<")==string::npos ? 0:1);
-        _cb[statetag()]=_pp->state ? "1":"0";
+        H4Plugin::_cb["gs"]=(soap.find("Get")==string::npos) ? "Set":"Get";
+        if(H4Plugin::_cb["gs"]=="Set") _setState(soap.find(">1<")==string::npos ? 0:1);
+        H4Plugin::_cb[stateTag()]=_getState() ? "1":"0";
         request->send(200, "text/xml", CSTR(H4P_WiFi::replaceParams(_soap))); // refac
     },request),nullptr, H4P_TRID_SOAP); // TRID_SOAP
 }
 
-void H4P_UPNPSwitch::stop(){
+void H4P_UPNPCommon::stop(){
     _notify("byebye");
     h4.cancelSingleton(H4P_TRID_NTFY);
     _udp.close();
-    H4PluginService::svc(upnptag(),H4P_LOG_SVC_DOWN); // simulate service
+    H4PluginService::svc(upnpTag(),H4P_LOG_SVC_DOWN); // simulate service
 }
 
-void H4P_UPNPSwitch::_notify(const string& phase){ // chunker it up
+void H4P_UPNPCommon::_notify(const string& phase){ // chunker it up
     chunker<vector<string>>(_pups,[this,phase](vector<string>::const_iterator i){ 
         string NT=(*i).size() ? (*i):__makeUSN("");
         string nfy="NOTIFY * HTTP/1.1\r\nHOST:"+string(_ubIP.toString().c_str())+":1900\r\nNTS:ssdp:"+phase+"\r\nNT:"+NT+"\r\n"+__upnpCommon((*i));

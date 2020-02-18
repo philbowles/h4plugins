@@ -32,60 +32,26 @@ SOFTWARE.
 
 #include<H4PCommon.h>
 #include<H4P_SerialCmd.h>
-#include<H4P_BasicSwitch.h>
+#include<H4P_WiFiSelect.h>
 #include<H4P_WiFi.h>
+#include<H4P_BinarySwitch.h>
+#include<H4P_AsyncWebServer.h>
+#include<H4P_UPNPCommon.h>
+
 #ifndef H4P_NO_WIFI
 
-#include<H4P_AsyncWebServer.h>
-
-class H4P_UPNPSwitch: public H4P_BasicSwitch {
-        AsyncUDP 	    _udp;
-        IPAddress		_ubIP;
-        
-        VSCMD(_friendly);
-
-            string              _uuid="uuid:";
-            string              _urn="Belkin:";
-
-            vector<string>      _pups={
-                "",
-                "upnp:rootdevice"
-            };
-
-            string              _name;
-            string              _soap;
-            string              _ucom;
-            string              _xml;
-
-            string          __makeUSN(const string& s);
-            string          __upnpCommon(const string& usn);
-            void            __upnpSend(uint32_t mx,const string s,IPAddress ip,uint16_t port);
-
-            void            broadcast(uint32_t mx,const string s){ __upnpSend(mx,s,_ubIP,1900); }
-
-            void            _hookIn();
-            void            _listenUDP();
-            void            _notify(const string& s);
-            void            _upnp(AsyncWebServerRequest *request);
-
-            void            start();
-            void            stop();
+class H4P_UPNPSwitch: public H4P_BinarySwitch, public H4P_UPNPCommon {
+        void        _hookIn() override{ H4P_UPNPCommon::_pseudoHookIn(); }
+        bool        _getState() override { return H4P_BinarySwitch::_getState(); }
+        void        _setState(bool b) override { H4P_BinarySwitch::_setState(b); }
     public:
-        H4P_UPNPSwitch(string name,uint8_t pin,H4GM_SENSE sense, uint8_t initial,H4BS_FN_SWITCH f=[](bool){}):
-            _name(name),
-            H4P_BasicSwitch(pin,sense,initial,f){            
-                _pups.push_back(_urn+"device:controllee:1");
-                _pups.push_back(_urn+"service:basicevent:1");
-                _pid=upnptag();
-                _names = {
-                    {H4P_TRID_SOAP, "SOAP"},
-                    {H4P_TRID_NTFY, "NTFY"}
-                };
-            }
-         
-            void        friendlyName(const string& name);
+        H4P_UPNPSwitch(const string& name,uint8_t pin,H4GM_SENSE sense, uint32_t initial,H4BS_FN_SWITCH f=[](bool){}): 
+            H4P_BinarySwitch(pin,sense,initial,f),
+            H4P_UPNPCommon(name){
+        }
 };
-    extern __attribute__((weak)) H4P_UPNPSwitch h4upnp;
-#endif
+    
+//extern __attribute__((weak)) H4P_UPNPSwitch h4thing;
 
+#endif
 #endif // H4P_UPNPSwitch_H

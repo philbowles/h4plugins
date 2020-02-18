@@ -27,40 +27,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_BasicSwitch_HO
-#define H4P_BasicSwitch_HO
+#ifndef H4P_MQTTLogger_HO
+#define H4P_MQTTLogger_HO
 
-#include<H4PCommon.h>
-#include<H4P_GPIOManager.h>
-#include<H4P_MQTT.h>
-#ifndef H4P_NO_WIFI
+#ifndef ARDUINO_ARCH_STM32
+#include <H4PCommon.h>
+#include <H4P_MQTT.h>
 
-class H4P_BasicSwitch: public H4Plugin{
-//
-    protected:
-            VSCMD(_switch);
-
-        void            _publish(bool b){  
-            if(h4._hasName(H4P_TRID_MQTT)) h4mqtt.publishDevice(statetag(),b);
+class H4P_MQTTLogger: public H4PLogService {
+        void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error){
+            h4mqtt.publishDevice(_pid,msg);
         }
-
-        virtual void    _hookIn() override {
-            if(h4._hasName(H4P_TRID_MQTT)) {
-                h4mqtt.hookConnect([this](){ _publish(_pp->state); });
-            }
-        }            
-        OutputPin*      _pp;
-
+        void _hookIn() override { // protect
+            if(H4Plugin::isLoaded(mqttTag())){
+                H4PLogService::_hookIn();
+                h4mqtt.hookConnect([this](){ start(); });
+                h4mqtt.hookDisconnect([this](){ stop(); });
+            } else { DEPENDFAIL(mqtt); }
+        }
     public:
-        H4P_BasicSwitch(uint8_t pin,H4GM_SENSE sense, uint8_t initial,H4BS_FN_SWITCH f=[](bool){});
-
-            void        turnOff(){ turn(false); }
-            void        turnOn(){ turn(true); }
-            void        toggle(){ turn(!_pp->state); }
-            void        turn(bool b);        
+        H4P_MQTTLogger(const string& topic,uint32_t filter=H4P_LOG_ALL): H4PLogService(topic,filter){}
 };
-
-extern __attribute__((weak)) H4P_BasicSwitch h4bs;
-
 #endif
-#endif // H4P_BasicSwitch_H
+#endif // H4P_MQTTLogger_H

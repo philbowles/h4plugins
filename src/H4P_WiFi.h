@@ -27,31 +27,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_WiFi_H
-#define H4P_WiFi_H
 
 #include<H4PCommon.h>
 
-extern void h4FactoryReset();
-
+#ifndef H4P_WiFi_H
+#define H4P_WiFi_H
+#include<H4P_WiFiSelect.h>
 #ifndef ARDUINO_ARCH_STM32
 #include <H4P_SerialCmd.h>
 
-#ifdef ARDUINO_ARCH_ESP8266
-    #include<ESP8266WiFi.h>
-    #include<ESP8266mDNS.h>
-    #include<ArduinoOTA.h>
-    #include<ESPAsyncTCP.h>
-    #include<ESPAsyncUDP.h>
-    #include<DNSServer.h>
-
-#else
-    #include<WiFi.h>
-//    #include<SPIFFS.h>
-    #include <AsyncTCP.h>
-    #include <AsyncUDP.h>
-    #include<DNSServer.h>
-#endif
+extern void h4FactoryReset();
 
 class H4P_WiFi: public H4PluginService{
                 DNSServer* _dnsServer;
@@ -73,23 +58,22 @@ class H4P_WiFi: public H4PluginService{
     public:
 //          included here aginst better wishes due to compiler bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89605
         H4P_WiFi(string ssid,string psk,string device="",H4_FN_VOID onC=[](){},H4_FN_VOID onD=[](){}): H4PluginService(onC,onD){
-            _cb[ssidtag()]=ssid;
+            _cb[ssidTag()]=ssid;
             _cb["psk"]=psk;
-            _cb[devicetag()]=device;
+            _cb[deviceTag()]=device;
 
-            _pid=wifitag();
-            subid=H4PC_WIFI;
+            _pid=wifiTag();
             _names={ 
-                    {H4P_TRID_WIFI,uppercase(_pid)},
+//                    {H4P_TRID_WIFI,uppercase(_pid)},
                     {H4P_TRID_WFAP,"WFAP"},
                     {H4P_TRID_HOTA,"HOTA"}
             };
 
             _local={
-                {"clear",   { H4PC_WIFI, 0, CMD(clear)}},
+                {"clear",   { subid, 0, CMD(clear)}},
                 {"factory", { H4PC_ROOT, 0, CMD(h4FactoryReset) }},
-                {"change",  { H4PC_WIFI, 0, CMDVS(_change)}},             
-                {"host",    { H4PC_WIFI, 0, CMDVS(_host)}},             
+                {"change",  { subid, 0, CMDVS(_change)}},             
+                {"host",    { subid, 0, CMDVS(_host)}},             
                 {_pid,      { H4PC_SHOW, 0, CMD(show) }}
             };
         }                
@@ -97,7 +81,7 @@ class H4P_WiFi: public H4PluginService{
                 void     clear();
                 void     change(string ssid,string psk);
                 void     getPersistentValue(string v,string prefix);
-                void     host(string h){ setPersistentValue(devicetag(),h,true); }
+                void     host(string h){ setPersistentValue(deviceTag(),h,true); }
                 void     setPersistentValue(string n,string v,bool reboot);
                 void     start() override;
                 void     stop() override;

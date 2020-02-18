@@ -1,6 +1,6 @@
 ![H4P Flyer](/assets/DiagLogo.jpg) 
 
-# Task Sniffer
+# Task Sniffer (short name="snif")
 
 ## Adds task activity dump to H4 Universal Scheduler/Timer.
 
@@ -45,10 +45,6 @@ A task ID can be one of:
 `const char* giveTaskName(uint32_t n) // You get an ID, you return the name of the matching task`
 
 Allows user to name his own tasks so that they are more easily identifiable in the task dump
-
-## Trusted Name
-
-*SNIF*
 
 ## Unloadable
 

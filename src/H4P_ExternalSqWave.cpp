@@ -71,15 +71,17 @@ uint32_t H4P_ExternalSqWave::_dsweep(vector<string> vs){ return __sweep(vs,'D',H
 //      H4P_ExternalSqWave
 //
 H4P_ExternalSqWave::H4P_ExternalSqWave(uint8_t rx,uint8_t tx,uint32_t initialF,uint32_t initialD): SoftwareSerial(rx,tx){ 
-    _pid=esqwtag();
+    _pid=esqwTag();
     _names={ {H4P_TRID_SQWV,uppercase(_pid)} };
+    uint32_t H4PC_ESW_SET=++nextSubid;
+    uint32_t H4PC_ESW_SWEEP=++nextSubid;
     _cmds={
-        {_pid,      { H4PC_ROOT, H4PC_ESW_ROOT, nullptr}},
-        {"set",     { H4PC_ESW_ROOT, H4PC_ESW_SET, nullptr}},
+        {_pid,      { H4PC_ROOT, subid, nullptr}},
+        {"set",     { subid, H4PC_ESW_SET, nullptr}},
         {"d",       { H4PC_ESW_SET, 0, CMDVS(_dset)}},
         {"f",       { H4PC_ESW_SET, 0, CMDVS(_fset)}},
-        {"stop",    { H4PC_ESW_ROOT, 0, CMD(stop)}},            
-        {"sweep",   { H4PC_ESW_ROOT, H4PC_ESW_SWEEP, nullptr}},
+        {"stop",    { subid, 0, CMD(stop)}},            
+        {"sweep",   { subid, H4PC_ESW_SWEEP, nullptr}},
         {"f",       { H4PC_ESW_SWEEP, 0, CMDVS(_fsweep)}},
         {"d",       { H4PC_ESW_SWEEP, 0, CMDVS(_dsweep)}}
     };

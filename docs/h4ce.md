@@ -1,5 +1,6 @@
 ![H4P Flyer](/assets/DiagLogo.jpg) 
-# Command Errors
+
+# Command Errors (short name="cerr")
 
 # Adds error-code to meaningful message translation to SerialCmd plugin for H4 Universal Scheduler/Timer.
 
@@ -45,10 +46,6 @@ None, but must be included *before* [**H4P_SerialCmd**](h4sc.md)
 ## Commands Added
 
 none
-
-### Trusted Name
-
-*CERR*
 
 ### Unloadable
 

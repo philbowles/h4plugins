@@ -29,32 +29,30 @@ SOFTWARE.
 #ifndef ARDUINO_ARCH_STM32
 #include<H4P_LocalLogger.h>
 //
-H4P_LocalLogger::H4P_LocalLogger(uint32_t limit): H4PLogService(logtag()), _limit(limit) {
-    subid=H4PC_LLOG;
-    _names={ {H4P_TRID_LLOG,uppercase(_pid)} };
+H4P_LocalLogger::H4P_LocalLogger(uint32_t limit): H4PLogService(logTag()), _limit(limit) {
+    // subid=H4PC_LLOG;
+//    _names={ {H4P_TRID_LLOG,uppercase(_pid)} };
     _local={
         {_pid,     {H4PC_SHOW, 0, CMD(show)}},
-        {"clear",  {H4PC_LLOG, 0, CMD(clear)}},
-        {"flush",  {H4PC_LLOG, 0, CMD(flush)}}
+        {"clear",  {subid, 0, CMD(clear)}},
+        {"flush",  {subid, 0, CMD(flush)}}
     };
 }
 
-void H4P_LocalLogger::clear(){ SPIFFS.remove(CSTR(string("/").append(logtag()))); }
+void H4P_LocalLogger::clear(){ SPIFFS.remove(CSTR(string("/").append(logTag()))); }
 
 void H4P_LocalLogger::flush(){
     show();
     clear();
 }
 
-void H4P_LocalLogger::show(){ h4sc._dump(vector<string>{logtag()}); }
+void H4P_LocalLogger::show(){ h4sc._dump(vector<string>{logTag()}); }
 //
 //      our raison d'etre
 //
 void H4P_LocalLogger::_logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t e){
-    if(_running){
-        vector<string> msgparts={stringFromInt(millis()),stringFromInt(type),source,target,stringFromInt(e),msg};
-        uint32_t size=h4sc.write("/log",join(msgparts,",").append("\n"),"a");
-        if(size > _limit) flush();
-    }
+    vector<string> msgparts={stringFromInt(millis()),stringFromInt(type),source,target,stringFromInt(e),msg};
+    uint32_t size=h4sc.write("/log",join(msgparts,",").append("\n"),"a");
+    if(size > _limit) flush();
 }
 #endif

@@ -29,7 +29,7 @@ SOFTWARE.
 #include<H4P_TaskSniffer.h>
 
 uint32_t H4P_TaskSniffer::__incexc(vector<string> vs,function<void(vector<uint32_t>)> f){
-    return guard<1>(vs,[f,this](vector<string> vs){
+    return guard1(vs,[f,this](vector<string> vs){
         auto vi=expectInt(PAYLOAD);
         if(vi.size()) return ([f,this](vector<uint32_t> vu){ 
             f(vu);
@@ -54,38 +54,30 @@ uint32_t H4P_TaskSniffer::__incexc(vector<string> vs,function<void(vector<uint32
 
 void H4P_TaskSniffer::_alwaysExclude(){ // still need this?
     exclude({
-        H4P_TRID_GPIO,
-        H4P_TRID_SQWV,
-        H4P_TRID_WIFI,
-        H4P_TRID_MQTT,
-        H4P_TRID_ASWS,
-        H4P_TRID_UBSW
+ //       H4P_TRID_SQWV,
+//        H4P_TRID_WIFI,
+//        H4P_TRID_MQTT,
+//        H4P_TRID_ASWS,
+//        H4P_TRID_UBSW
     }); 
 }        
 
 void H4P_TaskSniffer::_common(){
-    _pid=sniftag();
-    _names={ {H4P_TRID_SNIF,uppercase(_pid)} };
+    _pid=snifTag();
+//    _names={ {H4P_TRID_SNIF,uppercase(_pid)} };
     _cmds={
         {_pid,      {H4PC_SHOW, 0, CMD(show)}},
-        {_pid,      {H4PC_ROOT, H4PC_SNIF, nullptr}},
-        {"include", {H4PC_SNIF, 0, CMDVS(_tsInclude)}},
-        {"exclude", {H4PC_SNIF, 0, CMDVS(_tsExclude)}}
+        {_pid,      {H4PC_ROOT, subid, nullptr}},
+        {"include", {subid, 0, CMDVS(_tsInclude)}},
+        {"exclude", {subid, 0, CMDVS(_tsExclude)}}
     };
     h4._hookEvent(bind(&H4P_TaskSniffer::_taskDump,this,_1,_2));    
 }
 
 void H4P_TaskSniffer::_taskDump(H4_TASK_PTR t,const char c){
     if(hitList.count((t->uid)%100)) {
-      Serial.print(h4._size());
-      Serial.print(":");
-      Serial.print(micros());
-      Serial.print(":");
-      Serial.print(micros());
-      Serial.print(":");
-      Serial.print(c);
-      Serial.print(": ");
-      h4._dumpTask(t);
+        reply("%d:%u:%c: ",h4.size(),micros(),c);
+        h4._dumpTask(t);
     }
 }
 //

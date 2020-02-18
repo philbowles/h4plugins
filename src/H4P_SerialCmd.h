@@ -43,8 +43,6 @@ using   namespace std::placeholders;
 
 class H4Plugin;
 
-constexpr const char* stag(){ return "scmd"; }
-
 using H4P_FN_LOG = function<void(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error)>;
 
 class H4P_SerialCmd: public H4Plugin {
@@ -73,6 +71,7 @@ class H4P_SerialCmd: public H4Plugin {
         void            config(){ for(auto const& c:_cb) H4Plugin::reply("%s=%s\n",CSTR(c.first),CSTR(c.second)); }        
         void            dumpQ();
         void            help();
+        void            plugins();
         void            Qstats();
         void            tnames();
         void            showUnload();
@@ -80,11 +79,12 @@ class H4P_SerialCmd: public H4Plugin {
         void            addCmd(const string& name,uint32_t owner, uint32_t levID,H4_FN_MSG f=nullptr){ _addCmd(name, {owner,levID,f}); }
         uint32_t        invokeCmd(string,string="",const char* src="user");			
         uint32_t        invokeCmd(string,uint32_t,const char* src="user"); 
-        void            logEvent(const string& msg){ _logEvent(msg,H4P_LOG_USER,"user","self",0); }
-        void            removeCmd(const string& name); 
-        void            unload(const char* pid);
+        void            logEventType(H4P_LOG_TYPE,const string& fmt,...);
+        void            removeCmd(const string& name,uint32_t subid=0); 
+        void            unload(const uint32_t subid);
 //      syscall only
         void            _addCmd(const string& name,struct command cmd){ commands.insert(make_pair(name,cmd)); }
+        void            _noOP(){} // for non-events
         void            _hookLogChain(H4P_FN_LOG f){ _logChain.push_back(f); }
         void            _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error);
         uint32_t        _executeCmd(string topic, string pload);

@@ -26,15 +26,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-beta:
-Erickcampos50@gmail.com
-
-
 */
 #ifndef H4P_HO
 #define H4P_HO
 
-#define H4P_VERSION "0.2.1"
+#define H4P_VERSION "0.3.4"
 
 #include<H4.h>
 #include<H4Utils.h>
@@ -51,7 +47,7 @@ using namespace std::placeholders;
 #endif
 //
 using 	H4_FN_MSG 		=function<uint32_t(vector<string>)>;
-using   H4BS_FN_SWITCH   =function<void(bool)>;
+using   H4BS_FN_SWITCH  =function<void(bool)>;
 
 struct command{
 	uint32_t            owner;
@@ -76,15 +72,20 @@ enum H4_CMD_ERROR:uint32_t  {
 };
 
 enum H4P_LOG_TYPE {
-    H4P_LOG_SVC_UP,
-    H4P_LOG_SVC_DOWN,
-    H4P_LOG_CMD,
-    H4P_LOG_USER
+    H4P_LOG_SVC_UP=1,
+    H4P_LOG_SVC_DOWN=2,
+    H4P_LOG_CMD=4,
+    H4P_LOG_USER=8,
+    H4P_LOG_DEPENDFAIL=16,
+    H4P_LOG_MQTT_HEAP=32,
+    H4P_LOG_ALL=0xffffffff
 };
+#define ON true
+#define OFF false
 //
 // literal string RAM savers
 //
-#define STAG(x) constexpr char* x##tag(){ return #x; }
+#define STAG(x) constexpr char* x##Tag(){ return #x; }
 
 constexpr const char* cmdhash(){ return "h4/#"; }
 
@@ -103,6 +104,7 @@ STAG(name);
 STAG(onof);
 STAG(port);
 STAG(qwrn);
+STAG(scmd);
 STAG(snif);
 STAG(ssid);
 STAG(state);
@@ -122,10 +124,16 @@ STAG(wifi);
 #define CMDVS(x) ([this](vector<string> vs)->uint32_t{ return x(vs); })
 
 #define VSCMD(x) uint32_t x(vector<string>)
-#ifdef H4P_SERIAL_LOGGING
-    #define EVENT(x) h4sc.logEvent(x)
+#ifdef H4P_LOG_EVENTS
+    #define EVENT(x,...) h4sc.logEventType(H4P_LOG_USER,x, ##__VA_ARGS__)
+    #define SYSEVENT(e,x,...) h4sc.logEventType(e,x, ##__VA_ARGS__)
+    #define DEPENDFAIL(x) h4sc.logEventType(H4P_LOG_DEPENDFAIL,"%s->%s", CSTR(_pid),x##Tag())
+    #define logEvent(x,...) logEventType(H4P_LOG_USER,x, ##__VA_ARGS__)
 #else
-    #define EVENT(x)
+    #define EVENT(x,...)
+    #define SYSEVENT(e,x,...)
+    #define DEPENDFAIL(x)
+    #define logEvent(x,...) _noOP()
 #endif
 //
 //      PLUGINS
@@ -134,14 +142,13 @@ enum trustedIds {
   H4P_TRID_PATN = 50,
   H4P_TRID_PP1x,
   H4P_TRID_PWM1,
-  H4P_TRID_GPIO,
+  H4P_TRID_SYNC,
   H4P_TRID_DBNC,
   H4P_TRID_RPTP,
   H4P_TRID_POLL,
   H4P_TRID_MULT,
   H4P_TRID_TRIG,
   H4P_TRID_SQWV,
-  H4P_TRID_WIFI,
   H4P_TRID_HOTA,
   H4P_TRID_WFAP,
   H4P_TRID_MQMS,
@@ -151,50 +158,27 @@ enum trustedIds {
   H4P_TRID_SOAP,
   H4P_TRID_UDPM,
   H4P_TRID_NTFY,
-  H4P_TRID_UBSW,
-  H4P_TRID_3FNB,
-  H4P_TRID_CERR,
   H4P_TRID_SCMD,
-  H4P_TRID_QWRN,
-  H4P_TRID_SNIF,
-  H4P_TRID_LLOG,
-  H4P_TRID_SLOG,
-  H4P_TRID_MLOG,
+  H4P_TRID_HLOG
 };
 
 enum H4PC_CMD_ID{
     H4PC_ROOT=1,
     H4PC_SHOW,
-    H4PC_SNIF,
-    H4PC_QWRN,
-    H4PC_ESW_ROOT,
-    H4PC_ESW_SET,
-    H4PC_ESW_SWEEP,
-    H4PC_WIFI,
-    H4PC_MQTT,
-    H4PC_ASWS,
-    H4PC_SPIF,
-    H4PC_UPNP, 
-    H4PC_LLOG, 
-    H4PC_SLOG,
-    H4PC_MLOG
+    H4PC_UPNP,
+    H4PC_MAX
 };
 
 class H4Plugin {
     protected:
-        static   H4P_CONFIG_BLOCK _cb;
-
         static  H4_CMD_MAP      commands;
 
                 H4_FN_VOID      _hook=nullptr;
                 H4_INT_MAP      _names={};
                 H4_CMD_MAP      _cmds={};
 
-        template<size_t N>
-        uint32_t guard(vector<string> vs,H4_FN_MSG f){
-            if(vs.size()<N) return H4_CMD_TOO_FEW_PARAMS;
-            return vs.size()>N ? H4_CMD_TOO_MANY_PARAMS:f(vs);
-        }
+        static  uint32_t        nextSubid;
+
 
         vector<uint32_t>    expectInt(string pl,const char* delim=",");  
     
@@ -202,14 +186,27 @@ class H4Plugin {
 
             uint32_t        guardInt4(vector<string> vs,function<void(uint32_t,uint32_t,uint32_t,uint32_t)> f);
 
-            uint32_t        guardString1(vector<string> vs,function<void(string)> f);
-
             uint32_t        guardString2(vector<string> vs,function<void(string,string)> f);
-
+    public:
+        static uint32_t guard1(vector<string> vs,H4_FN_MSG f){
+            if(!vs.size()) return H4_CMD_TOO_FEW_PARAMS;
+            return vs.size()>1 ? H4_CMD_TOO_MANY_PARAMS:f(vs);
+        }
             string          _pid; // diag hoist
 
-    public:
-        static vector<H4Plugin*>  _pending;
+            uint32_t        subid;
+
+        static vector<H4Plugin*>    _plugins;
+        static H4P_CONFIG_BLOCK     _cb;
+
+        static  H4Plugin* isLoaded(const string& x){
+            for(auto const& p:H4Plugin::_plugins) if(p->_pid==x) return p;
+            return nullptr;
+        }
+        static  string pidFromSubid(const uint32_t s){
+            for(auto const& p:H4Plugin::_plugins) if(p->subid==s) return p->_pid;
+            return string("WTF? id=").append(stringFromInt(s));
+        }
 
         virtual void        _startup();
 
@@ -232,7 +229,6 @@ class H4Plugin {
 
 class H4PluginService: public H4Plugin {
     protected:
-            uint32_t            subid;
             H4_CMD_MAP          _local;           
             vector<H4_FN_VOID>  _connChain;
             vector<H4_FN_VOID>  _discoChain;
@@ -244,10 +240,6 @@ class H4PluginService: public H4Plugin {
         static vector<H4_FN_VOID>  _factoryChain;
 
                 void        _startup() override;
-
-        virtual void        _hookIn() override {}
-
-        virtual void        _greenLight() override {}
 
         H4PluginService(H4_FN_VOID onConnect=[](){},H4_FN_VOID onDisconnect=[](){}){
                 hookConnect(onConnect);
@@ -264,17 +256,21 @@ class H4PluginService: public H4Plugin {
 };
 
 class H4PLogService: public H4PluginService {
+                bool        _running=true;
+                uint32_t    _filter=0;
+        virtual void        _filterLog(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error=0){
+            if(_running){ if(type & _filter) _logEvent(msg,type,source,target,error); }
+        }
     protected:
-         bool        _running=true;
-
                 void        _hookIn() override;
+
         virtual void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error=0)=0;
     public:
-        H4PLogService(const string& lid){ _pid=lid; }
-
+        H4PLogService(const string& lid,uint32_t filter=0xffffffff): _filter(filter){
+            _pid=lid;
+        }
                 void        start() override { svc(_pid,H4P_LOG_SVC_UP); _running=true; };
                 void        stop() override { _running=false; svc(_pid,H4P_LOG_SVC_DOWN);  };
-
 };
 
 #endif // H4P_HO

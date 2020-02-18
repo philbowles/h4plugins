@@ -53,8 +53,8 @@ void H4P_AsyncWebServer::_rest(AsyncWebServerRequest *request){
 	h4.queueFunction(bind([this](AsyncWebServerRequest *request){
 		string chop=replaceAll(CSTR(request->url()),"/rest/","");        
         string msg="";
-        uint32_t res=h4sc._simulatePayload(CSTR(chop),aswstag());
-        if(h4._hasName(H4P_TRID_CERR)) msg=h4ce.getErrorMessage(res);
+        uint32_t res=h4sc._simulatePayload(CSTR(chop),aswsTag());
+        if(H4Plugin::isLoaded(cerrTag())) msg=h4ce.getErrorMessage(res);
         string j="{\"res\":"+stringFromInt(res)+",\"msg\":\""+msg+"\",\"lines\":[";
         string fl;
         if(!res){
@@ -81,7 +81,6 @@ void H4P_AsyncWebServer::start(){
         Serial.printf("WOOT\n");
         string rootweb=WiFi.getMode() & WIFI_AP ? "/ap.htm":"/sta.htm"; // streeamline - even fn change
         request->send(SPIFFS,CSTR(rootweb),String(),false,aswsReplace);
-//        _cb.erase("opts");
     });
 
     on("/",HTTP_POST, [this](AsyncWebServerRequest *request){ 
@@ -91,11 +90,11 @@ void H4P_AsyncWebServer::start(){
 		    AsyncWebParameter* p = request->getParam(i);
 		    rp[CSTR(p->name())]=CSTR(p->value());
 	    }
-        h4wifi.change(rp[ssidtag()],rp["psk"]);
-        if(h4._hasName(H4P_TRID_SOAP)){
-            h4wifi.setPersistentValue(nametag(),rp[nametag()],false);
+        h4wifi.change(rp[ssidTag()],rp["psk"]);
+        if(H4Plugin::isLoaded(upnpTag())){
+            h4wifi.setPersistentValue(nameTag(),rp[nameTag()],false);
         }
-        h4wifi.host(rp[devicetag()]);
+        h4wifi.host(rp[deviceTag()]);
     });
 
 	on("/rest",HTTP_GET,[this](AsyncWebServerRequest *request){ _rest(request); });
