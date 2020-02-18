@@ -31,6 +31,7 @@ SOFTWARE.
 #define H4GPIOmanager_HO
 
 #include<H4PCommon.h>
+#include<H4P_BinaryThing.h>
 #include<climits>
 
 #define H4GM_PASTE(x) x##Pin
@@ -59,8 +60,6 @@ enum H4GM_SENSE:uint8_t {
     ACTIVE_HIGH
 };
 
-#define ON true
-#define OFF false
 #define NORMALISE(a,b) (!(a ^ b))
 
 class  H4GPIOPin;
@@ -81,7 +80,6 @@ class H4GPIOPin{
             H4GM_FN_EVENT   onEvent=nullptr;
 
             void            _setState(uint32_t s){ // tidy
-//                                Serial.printf("_setState %d\n",s);
                                 state=s;
                                 stateChange();
                             }
@@ -100,7 +98,10 @@ class H4GPIOPin{
             void            stampEvent();    
 
     virtual void            stateChange(){ sendEvent(); };
-   
+
+    virtual uint32_t        logicalRead(){ return state; }
+
+            void _factoryCommon(H4P_BinaryThing* btp);
     public:
             uint8_t         pin=0;                  // GPIO hardware pin number
             uint8_t         gpioType=0;             // INPUT, INOUT_PULLUP, OUTPUT etc
@@ -120,6 +121,7 @@ class H4GPIOPin{
                 sendEvent increments nEvents, so unless we do this hack, all pins will appear to have had
                 an event, when in reality, they haven't 
             */
+
         virtual void        begin(){ lastCall(); }
 
         virtual void        lastCall(){ sendEvent(); }
@@ -140,7 +142,6 @@ class H4GPIOPin{
         virtual ~H4GPIOPin(){}
 
         virtual void        dump();
-
 };
 //
 //  Inheritance order, not alphabetical
@@ -290,12 +291,12 @@ class LatchingPin: public CircularPin {
 	protected:
         virtual void    lastCall() override;
     public:
+        uint32_t    logicalRead() override { return latched; }
         virtual void dump(){
             CircularPin::dump();
             Serial.print(" Latching=");Serial.println(latched); 
         }  		        
         uint32_t   	latched; // logical state
-
         LatchingPin(uint8_t _p,uint8_t _g,H4GM_STYLE _s,uint8_t _a,uint32_t _d,H4GM_FN_EVENT _c);
         virtual ~LatchingPin(){}
 };
@@ -314,12 +315,19 @@ class OutputPin: public H4GPIOPin {
 
 class EncoderPin: public H4GPIOPin{
 	protected:
-		static int8_t      rot_states[];//   {0, -1, 1, 0, 1, 0, 0, -1, -1, 0, 0, 1, 0, 1, -1, 0}; // make static
+        
+        static int8_t      rot_states[];//   {0, -1, 1, 0, 1, 0, 0, -1, -1, 0, 0, 1, 0, 1, -1, 0}; // make static
 		       uint8_t     AB = 0x03;
 
 		void            stateChange();
-
 	public:
+        EncoderPin* _pairUp(EncoderPin* pa){
+            _primary=false;
+            pa->_otherPin=this;
+            _otherPin=pa;
+            return this;
+        }
+        uint32_t    logicalRead() override { return constrain(encoderValue,0,1); } // constrain
         virtual void dump(){
             H4GPIOPin::dump();
             Serial.print(" encoderValue=");Serial.println(encoderValue); 
@@ -340,6 +348,7 @@ class EncoderAutoPin: public EncoderPin{
         virtual void    sendEvent() override { setValue(autoValue+(vIncr*encoderValue)); }
         int             vMin,vMax,vIncr;
 	public:
+        uint32_t    logicalRead() override { return autoValue; }
         int             autoValue=0;
         virtual void dump(){
             EncoderPin::dump();
@@ -364,24 +373,22 @@ class EncoderAutoPin: public EncoderPin{
 //      H4P_GPIOManager
 //
 class H4P_GPIOManager: public H4Plugin{//
-        H4GM_PINMAP     pins={};
-
         void             _greenLight() override;
 
         H4GPIOPin*      isManaged(uint8_t p){ return pins.count(p) ? pins[p]:nullptr; }
         OutputPin*      isOutput(uint8_t p);
 
         template<typename T, typename... Args>
-        T* pinFactory(uint8_t _p,Args... args) {
+        T* thingFactory(H4P_BinaryThing* btp,uint8_t _p,Args... args) {
             T*  pinclass=new T(_p,args...);
-            pins[_p]=pinclass;
-            pinclass->begin();
+            pinclass->_factoryCommon(btp);
             return pinclass;
         }
 
         void                run();
 
     public:
+        static H4GM_PINMAP     pins;
         H4P_GPIOManager();
         //              returns 32 not 8 as it can also analogRead and state will hold analog value as well as digital 1/0
             uint32_t        logicalRead(uint8_t p);
@@ -393,18 +400,24 @@ class H4P_GPIOManager: public H4Plugin{//
 //
         CircularPin*        Circular(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,uint32_t nStages,H4GM_FN_EVENT callback);//
         DebouncedPin*       Debounced(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback);//
-        EncoderPin*         Encoder(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE sense,H4GM_FN_EVENT);						
-        EncoderPin*         Encoder(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE sense,int&);						
-        EncoderAutoPin*     EncoderAuto(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE sense,int vMin,int vMax,int vSet,uint32_t vIncr,H4GM_FN_EVENT);						
-        EncoderAutoPin*     EncoderAuto(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE sense,int vMin,int vMax,int vSet,uint32_t vIncr,int&);						
+        DebouncedPin*       DebouncedThing(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4P_BinaryThing* btp);//
+        EncoderPin*         Encoder(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE sense,H4GM_FN_EVENT);
+        EncoderPin*         Encoder(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE sense,int&);
+        EncoderPin*         EncoderThing(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE sense,H4P_BinaryThing* btp);
+        EncoderAutoPin*     EncoderAuto(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE sense,int vMin,int vMax,int vSet,uint32_t vIncr,H4GM_FN_EVENT);
+        EncoderAutoPin*     EncoderAuto(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE sense,int vMin,int vMax,int vSet,uint32_t vIncr,int&);
         FilteredPin*        Filtered(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint8_t filter,H4GM_FN_EVENT callback);//
         LatchingPin*        Latching(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback);//
+        LatchingPin*        LatchingThing(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4P_BinaryThing* btp);//
         MultistagePin*      Multistage(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_STAGE_MAP stageMap,H4GM_FN_EVENT callback);//
-        OutputPin*          Output(uint8_t p,H4GM_SENSE sense,uint8_t initial,H4GM_FN_EVENT callback=[](H4GPIOPin*){});// FIX ptr type
+        OutputPin*          Output(uint8_t p,H4GM_SENSE sense,uint8_t initial,H4GM_FN_EVENT callback=nullptr);// FIX ptr type
         PolledPin*          Polled(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t frequency,uint32_t isAnalog,H4GM_FN_EVENT callback);//
+        PolledPin*          PolledThing(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t frequency,uint32_t isAnalog,H4P_BinaryThing* btp);//
         RawPin*             Raw(uint8_t p,uint8_t mode,H4GM_SENSE sense,H4GM_FN_EVENT callback);//
+        RawPin*             RawThing(uint8_t p,uint8_t mode,H4GM_SENSE sense,H4P_BinaryThing*);//
         RepeatingPin*       Repeating(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,uint32_t frequency,H4GM_FN_EVENT callback);//
 		RetriggeringPin*    Retriggering(uint8_t _p, uint8_t _mode,H4GM_SENSE sense,uint32_t timeout, H4GM_FN_EVENT _callback);
+		RetriggeringPin*    RetriggeringThing(uint8_t _p, uint8_t _mode,H4GM_SENSE sense,uint32_t timeout,H4P_BinaryThing* btp);
         SequencedPin*       Sequenced(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback); //
         TimedPin*           Timed(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback); //
 //

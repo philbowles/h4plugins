@@ -2,7 +2,7 @@
 
 # Logging
 
-## Adds logging to H4 Universal Scheduler/Timer + Plugins.
+## Adds event logging to multiple destinations for H4 Universal Scheduler/Timer + Plugins.
 
 *All plugins depend upon the presence of the [H4 library](https://github.com/philbowles/H4), which must be installed first.*
 
@@ -10,41 +10,47 @@
 
 # What do they do?
 
-H4Plugins loggers can send cmd input (and result code) to a variety of destinations, depending on which logger you choose. There are currently 
+H4Plugins loggers can send messages to a variety of destinations, depending on which logger you choose. There are currently 
 
 * H4P_LocalLogger which creates a log file in SPIFFS thus requires you allocating an amount at compile-time with Tools... menu
+* H4P_MQTTLogger sends log messages to MQTT Server **NEW in v0.3.4**
+* H4P_MQTTHeapLogger a specialised H4P_MQTTLogger which periodically logs value of FreeHeap to MQTT **NEW in v0.3.4**
 * H4P_SerialLogger which does exactly what it says on the tin
 
-"In the pipeline" are an HTTP REST logger, MQTT logger and MySQL logger. Writing your own is seriously easy (see below)
+In the experimental pipeline are an HTTP REST logger, and MySQL logger. Writing your own logger is seriously easy (see below)
 
 The important thing to note is that each logger is called in turn, thus you can log to several destinations at a time for a single message. The serial logger is a useful diagnostic aid, as it shows what is getting logged to other - less visible - destinations, e.g. remote servers.
 
-Also note that the main interface `h4sc.logEvent("some message")` will simply do nothing if no loggers are installed. This allows it to be left in the code and "switched on or off" by commenting out the loggers, which can be flipped back in at a stroke for testing.
+Also note that the main interface `h4sc.logEvent("some message",...)` (which operates like `printf` with variable number of parameters) will simply do nothing if no loggers are installed. This allows it to be left in the code and "switched on or off" by commenting out the loggers, which can be flipped back in at a stroke for testing.
 
-Better still. there is a macro EVENT("some message) which simply calls `h4sc.logEvent` but can be "compiled out" by removing the `#define H4P_LOG_EVENTS` entry in `H4PConfig.h`, then there is zero overhead.
+Better still. there is a macro EVENT("some message",...) which simply calls `h4sc.logEvent` but can be "compiled out" by removing the `#define H4P_LOG_EVENTS` entry in `H4PConfig.h`, then there is zero overhead.
 
----
-
-# What gets logged?
-
-The logger interface send the following data items to each logger:
-
-```cpp
-void _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t e){;
-
-```
-* Msg: the content of the message
-  
-* Message type, one of:
+Finally, most loggers have  `filter` parameter which allows the logger to operate on only certain event types:
 
 ```cpp
 enum H4P_LOG_TYPE {
-    H4P_LOG_SVC_UP, // internal H4 event on service UP
-    H4P_LOG_SVC_DOWN, // internal H4 event on service DOWN
-    H4P_LOG_CMD, // command from any source (see below)
-    H4P_LOG_USER // arbitraty message from user code
+    H4P_LOG_SVC_UP=1,// internal H4 event on service UP
+    H4P_LOG_SVC_DOWN=2,// internal H4 event on service DOWN
+    H4P_LOG_CMD=4,// command from any source (see below)
+    H4P_LOG_USER=8,// arbitrary message from user code
+    H4P_LOG_DEPENDFAIL=16,// dependent plugin omitted by user
+    H4P_LOG_MQTT_HEAP=32, // value of current heap
+    H4P_LOG_ALL=0xffffffff
 };
 ```
+
+The values are chosen such that logical operations can be use , e.g. `H4P_LOG_SVC_UP | H4P_LOG_SVC_DOWN` will react only to those two service events. The default filter is `H4P_LOG_ALL`;
+
+---
+
+# What information gets logged?
+
+The logging interface send the following data items to each logger:
+
+* Msg: the content of the message
+  
+* Event type (see above)
+
 * Source: Origin of the event
 
 For `H4P_LOG_SVC_UP` and `H4P_LOG_SVC_DOWN` this will be "H4"
@@ -69,12 +75,11 @@ For `H4P_LOG_CMD` it is the sub-system that initiated the cmd
 
 *N.B.* All loggers offer a minimum command set: in the following, `xxxx` should be replaced by the name of the logger
 
-* h4/xxxx/msg/any old message // send "any old message" to the log
 * h4/xxxx/restart
 * h4/xxxx/start
 * h4/xxxx/stop
 
-They all also support `restart`,`start` and `stop` API functions as with all other H4Plugins services
+Most also implement h4/xxxx/msg/any old message to put any message you choose into the log
 
 # H4P_SerialLogger (name "slog")
 
@@ -83,7 +88,7 @@ They all also support `restart`,`start` and `stop` API functions as with all oth
 ```cpp
 #include<H4Plugins.h>
 H4_USE_PLUGINS
-H4P_SerialLogger h4sl;
+H4P_LocalLogger h4ll(...
 ```
 ## Prequisites
 
@@ -93,10 +98,6 @@ none
 
 none
 
-## Trusted Name
-
-*SLOG*
-
 ## Unloadable
 
 NO
@@ -105,7 +106,7 @@ NO
 
 ## API
 
-none
+Constructor takes `uint32_t` filter parameter that defaults to `H4P_LOG_ALL`.
 
 [Example Code](../examples/H4P_Loggers/H4P_Loggers.ino)
 
@@ -135,15 +136,12 @@ Board must be compiled with an option to reserve an amount of SPIFFS
 * h4/log/clear
 * h4/log/flush
 
-## Trusted Name
-
-*LOG*
-
 ## Unloadable
 
 NO
 
 ---
+
 # Example of raw log file
 
 ## Format
@@ -175,7 +173,7 @@ millis(),type,source,target,error,message
 
 ```cpp
 // constructor
-H4P_LocalLogger(uint32_t limit=10000); // amount of free SPIFFS space to use
+H4P_LocalLogger(uint32_t limit=10000,uint32_t filter=H4P_LOG_ALL); // limit=amount of free SPIFFS space to use
 
 void clear(); // empties the log
 void flush(); // show then clear
@@ -185,6 +183,81 @@ void show();
 
 [Example Code](../examples/H4P_Loggers/H4P_Loggers.ino)
 
+----
+# H4P_MQTTLogger (name: see text) [ ESP8266 / ESP32 only ]
+
+H4P_MQTTLogger differs from all other plugins, as it allows multiple instances in the same sketch - each differentiated byt the topic is publishes. The topic is alos use for the name in any command handling.
+
+## Usage
+
+```cpp
+#include<H4Plugins.h>
+H4_USE_PLUGINS
+...
+H4P_MQTTLogger h4m1("first",...
+// optional: H4P_MQTTLogger h4m2("2nd",...
+// ...               "
+// optional: H4P_MQTTLogger h4m999("police",...
+
+```
+
+## Prequisistes
+
+H4P_WiFi
+H4P_MQTT
+
+## Additional Commnds
+
+none
+
+## Unloadable
+
+NO, but can use stop and start cmds
+
+## API
+
+```cpp
+H4P_MQTTLogger(const string& topic,uint32_t filter=H4P_LOG_ALL);
+```
+
+[Example Code](../examples/H4P_MQTTLogger/H4P_MQTTLogger.ino)
+
+----
+
+# H4P_MQTTHeapLogger (name "heap") [ ESP8266 / ESP32 only ]
+
+H4P_MQTTHeapLogger is a specalised version of H4P_MQTTLogger which periodically publishes the `heap` topic.
+
+## Usage
+
+```cpp
+#include<H4Plugins.h>
+H4_USE_PLUGINS
+...
+H4P_MQTTHeapLogger h4hl(...
+```
+
+## Prequisistes
+
+H4P_WiFi
+H4P_MQTT
+
+## Additional Commnds
+
+none
+
+## Unloadable
+
+NO, but can use stop and start cmds
+
+# API
+
+```cpp
+// constructor
+H4P_MQTTHeapLogger(uint32_t frequency,uint32_t filter=H4P_LOG_ALL); // frequency is in milliseconds
+```
+
+[Example Code](../examples/H4P_MQTTHeapLogger/H4P_MQTTHeapLogger.ino)
 ----
 
 # Advanced topics
@@ -200,105 +273,25 @@ The code would look like this:
 #include <H4PCommon.h>
 
 class myLogger: public H4PLogService {
-        void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error){
-            if(_running) {
-                Serial.print("myLogger ");
-                Serial.print(millis());
-                Serial.print(" ");
-                Serial.println(msg.c_str()); // or  Serial.println(CSTR(msg));
-            }
+        void _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error){
+            Serial.print("myLogger ");
+            Serial.print(millis());
+            Serial.print(" ");
+            Serial.println(msg.c_str()); // or  Serial.println(CSTR(msg));
         }
     public:
-        myLogger(): H4PLogService("mylog"){
-            subid=H4PC_MYLOG; // see note below
-            _names={ {H4P_TRID_MYLOG,uppercase(_pid)} }; // see note below
-        }
+        myLogger(): H4PLogService("mylog"){}
 };
 
-```
-
-**Note** to get the next values for `H4PC_MYLOG` and `H4P_TRID_MYLOG` you need to edit `H4PCommon.h`
-
-```cpp
-...
-  H4P_TRID_NTFY,
-  H4P_TRID_UBSW,
-  H4P_TRID_3FNB,
-  H4P_TRID_CERR,
-  H4P_TRID_SCMD,
-  H4P_TRID_QWRN,
-  H4P_TRID_SNIF,
-  H4P_TRID_LLOG,
-  H4P_TRID_SLOG,
-  H4P_TRID_CURL, // comma added by you
-  H4P_TRID_MYLOG // ADD THIS HERE and put a comma at the end of the line above
-};
-
-enum H4PC_CMD_ID{
-    H4PC_ROOT=1,
-    H4PC_SHOW,
-    subid,
-    H4PC_QWRN,
-    subid,
-    H4PC_ESW_SET,
-    H4PC_ESW_SWEEP,
-    H4PC_WIFI,
-    H4PC_MQTT,
-    H4PC_ASWS,
-    H4PC_SPIF,
-    H4PC_UPNP, 
-    H4PC_LLOG, 
-    H4PC_SLOG,
-    H4PC_CURL, // comma added by you
-    H4PC_MYLOG // ADD THIS HERE and put a comma at the end of the line above
-};
-...
 ```
 
 ...and that's it! Then add the new logger to your sketch - Everything else is automatic.
 
 [Example Code](../examples/H4P_CustomLogger/H4P_CustomLogger.ino)
 
-## Output form Example sketch
-```cpp
-slog
-SVC slog UP
-mylog
-myLogger 117 mylog
-SVC mylog UP
-normal call
-myLogger 117 normal call
-test1
-myLogger 117 test1
-Ztest2
-myLogger 118 Ztest2
-scmd: h4/dump
-scmd: h4/mylog/msg
-scmd: h4/mylog/restart
-scmd: h4/mylog/start
-scmd: h4/mylog/stop
-scmd: h4/reboot
-scmd: h4/show/all
-scmd: h4/show/config
-scmd: h4/show/q
-scmd: h4/show/qstats
-scmd: h4/show/spif
-scmd: h4/show/tnames
-scmd: h4/show/unload
-scmd: h4/slog/msg
-scmd: h4/slog/restart
-scmd: h4/slog/start
-scmd: h4/slog/stop
-scmd: h4/unload
-scmd: help
-help
-myLogger 40943 help
-
-```
-
 ---
 
-## MySQL schema (for future use)
+## MySQL schema (for future use by HTTP REST / MySQL loggers)
 
 CREATE TABLE `event` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

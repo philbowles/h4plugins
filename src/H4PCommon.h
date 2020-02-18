@@ -47,7 +47,7 @@ using namespace std::placeholders;
 #endif
 //
 using 	H4_FN_MSG 		=function<uint32_t(vector<string>)>;
-using   H4BS_FN_SWITCH   =function<void(bool)>;
+using   H4BS_FN_SWITCH  =function<void(bool)>;
 
 struct command{
 	uint32_t            owner;
@@ -80,6 +80,8 @@ enum H4P_LOG_TYPE {
     H4P_LOG_MQTT_HEAP=32,
     H4P_LOG_ALL=0xffffffff
 };
+#define ON true
+#define OFF false
 //
 // literal string RAM savers
 //
@@ -162,13 +164,13 @@ enum trustedIds {
 
 enum H4PC_CMD_ID{
     H4PC_ROOT=1,
-    H4PC_SHOW
+    H4PC_SHOW,
+    H4PC_UPNP,
+    H4PC_MAX
 };
 
 class H4Plugin {
     protected:
-        static   H4P_CONFIG_BLOCK _cb;
-
         static  H4_CMD_MAP      commands;
 
                 H4_FN_VOID      _hook=nullptr;
@@ -177,11 +179,6 @@ class H4Plugin {
 
         static  uint32_t        nextSubid;
 
-        template<size_t N>
-        uint32_t guard(vector<string> vs,H4_FN_MSG f){
-            if(vs.size()<N) return H4_CMD_TOO_FEW_PARAMS;
-            return vs.size()>N ? H4_CMD_TOO_MANY_PARAMS:f(vs);
-        }
 
         vector<uint32_t>    expectInt(string pl,const char* delim=",");  
     
@@ -189,16 +186,18 @@ class H4Plugin {
 
             uint32_t        guardInt4(vector<string> vs,function<void(uint32_t,uint32_t,uint32_t,uint32_t)> f);
 
-            uint32_t        guardString1(vector<string> vs,function<void(string)> f);
-
             uint32_t        guardString2(vector<string> vs,function<void(string,string)> f);
-
     public:
+        static uint32_t guard1(vector<string> vs,H4_FN_MSG f){
+            if(!vs.size()) return H4_CMD_TOO_FEW_PARAMS;
+            return vs.size()>1 ? H4_CMD_TOO_MANY_PARAMS:f(vs);
+        }
             string          _pid; // diag hoist
 
             uint32_t        subid;
 
-        static vector<H4Plugin*>  _plugins;
+        static vector<H4Plugin*>    _plugins;
+        static H4P_CONFIG_BLOCK     _cb;
 
         static  H4Plugin* isLoaded(const string& x){
             for(auto const& p:H4Plugin::_plugins) if(p->_pid==x) return p;

@@ -77,20 +77,22 @@ uint32_t H4P_SerialCmd::_simulatePayload(string flat,const char* src){ // refac
 		string topic=join(vs,"/");
 		return invokeCmd(topic,pload,src);			
 	}
-    else return H4_CMD_TOO_FEW_PARAMS;
+    else return H4_CMD_TOO_FEW_PARAMS; // really?
 }
 //
-//      cmd responders
-//
+
 uint32_t H4P_SerialCmd::_unload(vector<string> vs){ 
-    return guardString1(vs,[this](string s){ 
-        H4Plugin* p=H4Plugin::isLoaded(s);
-        if(p) {
-//            Serial.printf("UNLOAD %s id=%d\n",CSTR(s),p->subid);
-            unload(p->subid);
-            showUnload();
-        } // else return H4_CMD_NAME_UNKNOWN;
-    }); 
+    return guard1(vs,[this](vector<string> vs){
+        return ([this](string s){
+            H4Plugin* p=H4Plugin::isLoaded(s);
+            if(p) {
+                unload(p->subid);
+                showUnload();
+                return H4_CMD_OK;
+            }
+            return H4_CMD_NAME_UNKNOWN;
+        })(PAYLOAD);
+    });
 }
 //
 //      public
@@ -110,7 +112,6 @@ uint32_t H4P_SerialCmd::_executeCmd(string topic, string pload){
 	vector<string> vs=split(CSTR(topic),"/");
     _cb["source"]=vs[0];
     _cb["target"]=vs[1];
-//    Serial.printf("CMD src=%s tgt=%s  %s[%s]\n",CSTR(_cb["source"]),CSTR(_cb["target"]),CSTR(topic),CSTR(pload));
 	vs.push_back(pload);
     vector<string> cmd(vs.begin()+2,vs.end());
 	uint32_t rv=_dispatch(vector<string>(cmd)); // optimise?
@@ -134,18 +135,19 @@ uint32_t H4P_SerialCmd::invokeCmd(string topic,uint32_t payload,const char* src)
     return invokeCmd(topic,stringFromInt(payload),src);
 }
 
-void H4P_SerialCmd::unload(const uint32_t subid){ // move to H4Plugin?
+void H4P_SerialCmd::unload(const uint32_t subid){
     if(H4::unloadables.count(subid)) {
         h4._unHook(H4::unloadables[subid]);
         H4::unloadables.erase(subid);
-    } //else Serial.printf("UWTFunload: %d\n",subid);
+    }
 }	
 //
 //      H4P_SerialCmd
 //
 void H4P_SerialCmd::_hookIn(){
 #ifndef ARDUINO_ARCH_STM32    
-    if(!SPIFFS.begin()) Serial.println("Warning: NO SPIFFS");
+//    if(!SPIFFS.begin()) Serial.println("Warning: NO SPIFFS");
+    SPIFFS.begin();
 #endif
 }
 
@@ -187,7 +189,7 @@ void H4P_SerialCmd::logEventType(H4P_LOG_TYPE t,const string& fmt,...){
 
 void H4P_SerialCmd::plugins(){ for(auto const& p:H4Plugin::_plugins) reply("P: %s ID=%d\n",CSTR(p->_pid),p->subid); }
 
-void H4P_SerialCmd::Qstats(){ reply("Q capacity: %u size: %u\n",h4._capacity(),h4._size()); }
+void H4P_SerialCmd::Qstats(){ reply("Q capacity: %u size: %u\n",h4._capacity(),h4.size()); }
 
 void H4P_SerialCmd::showUnload(){ for(auto const& u:H4::unloadables) reply("U: %d=%s\n",u.first,CSTR(H4Plugin::pidFromSubid(u.first))); }
 
@@ -237,10 +239,10 @@ uint32_t H4P_SerialCmd::write(const string& fn,const string& data,const char* mo
 }
 
 uint32_t H4P_SerialCmd::_dump(vector<string> vs){
-    return guard<1>(vs,[this](vector<string> vs){
+    return guard1(vs,[this](vector<string> vs){
         return ([this](string h){ 
-            Serial.printf("DUMP FILE %s\n",CSTR(h));
-            Serial.printf("%s\n",CSTR(read("/"+h)));
+            reply("DUMP FILE %s\n",CSTR(h));
+            reply("%s\n",CSTR(read("/"+h)));
             return H4_CMD_OK;
         })(PAYLOAD);
     });

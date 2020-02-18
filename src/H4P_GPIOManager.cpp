@@ -46,6 +46,25 @@ H4GPIOPin::H4GPIOPin(
 //
 //  DIAGNOSTICS
 //
+void H4GPIOPin::_factoryCommon(H4P_BinaryThing* btp){
+//              hookThing(btp); // denormalise
+    if(btp){
+        onEvent=[btp](H4GPIOPin* pp){ 
+            /*
+            Serial.print("Hooked thing says ");
+            Serial.print(pp->logicalRead());
+            Serial.print(" nE=");
+            Serial.println(pp->nEvents);
+            */
+            if(pp->style==H4GM_PS_LATCHING) {
+                if(pp->nEvents) btp->toggle(); // POTENTIAL BUG! if btp already commanded on, 1st time wont toggle
+            } else btp->turn(pp->logicalRead());
+        };
+    }
+    H4P_GPIOManager::pins[pin]=this;
+    begin();
+}
+
 void H4GPIOPin::dump(){ // tart this up
     Serial.print("PIN ");Serial.println(pin);
     Serial.print(" gpioType=");Serial.println(gpioType);
@@ -213,7 +232,7 @@ SequencedPin::SequencedPin(uint8_t _p,uint8_t _g,H4GM_STYLE _s,uint8_t _a,uint32
 void SequencedPin::sendEvent() {
     if(state){
         ++stage;
-          lastCall();
+        lastCall();
     }
 }
 
@@ -222,10 +241,7 @@ void RetriggeringPin::stateChange(){
  //   Serial.print("SC ");Serial.println(state);
 	if(state){
 		if(timer) timer=h4.cancel(timer);
-		else {
-//            Serial.print("SE NO TIMER ");Serial.println(state);
-            sendEvent();
-        }
+		else sendEvent();
 		timer=h4.once(timeout,[this]( ){
 				timer=nullptr;
 				sendEvent();
@@ -274,7 +290,7 @@ OutputPin* H4P_GPIOManager::isOutput(uint8_t p){
     return nullptr;
 }
 
-uint32_t H4P_GPIOManager::logicalRead(uint8_t p){ if(pins.count(p)) return pins[p]->state; }
+uint32_t H4P_GPIOManager::logicalRead(uint8_t p){ if(pins.count(p)) return pins[p]->logicalRead(); }
 
 void H4P_GPIOManager::logicalWrite(uint8_t p,uint8_t l) { 
     if(isManaged(p)) if(pins[p]->style==H4GM_PS_OUTPUT) reinterpret_cast<OutputPin*>(pins[p])->logicalWrite(l);
@@ -287,37 +303,39 @@ void H4P_GPIOManager::toggle(uint8_t p){ if(isManaged(p))  reinterpret_cast<Outp
 //      (Oblique) Strategies
 //
 CircularPin* H4P_GPIOManager::Circular(uint8_t pin,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,uint32_t nStages,H4GM_FN_EVENT callback){
-    return pinFactory<CircularPin>(pin,mode,H4GM_PS_CIRCULAR,sense,dbTimeMs,nStages,callback);
+    return thingFactory<CircularPin>(nullptr,pin,mode,H4GM_PS_CIRCULAR,sense,dbTimeMs,nStages,callback);
 }
 
-LatchingPin* H4P_GPIOManager::Latching(uint8_t pin,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback){
-    return pinFactory<LatchingPin>(pin, mode, H4GM_PS_LATCHING, sense, dbTimeMs, callback);
-}
 
 DebouncedPin* H4P_GPIOManager::Debounced(uint8_t pin,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback){
-    return pinFactory<DebouncedPin>(pin, mode, H4GM_PS_DEBOUNCED, sense, dbTimeMs, callback);
+    return thingFactory<DebouncedPin>(nullptr,pin, mode, H4GM_PS_DEBOUNCED, sense, dbTimeMs, callback);
+}
+DebouncedPin* H4P_GPIOManager::DebouncedThing(uint8_t pin,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4P_BinaryThing* btp){
+    return thingFactory<DebouncedPin>(btp,pin, mode, H4GM_PS_DEBOUNCED, sense, dbTimeMs, nullptr);
 }
 
 EncoderPin* H4P_GPIOManager::Encoder(uint8_t pinA,uint8_t pinB,uint8_t mode,H4GM_SENSE sense,H4GM_FN_EVENT callback){
-    EncoderPin* pa=pinFactory<EncoderPin>(pinA,mode, H4GM_PS_ENCODER_A, sense, [](H4GPIOPin*){});
-    EncoderPin* pb=pinFactory<EncoderPin>(pinB,mode, H4GM_PS_ENCODER_B, sense, callback);
-    pb->_primary=false;
-    pa->_otherPin=pb;
-    pb->_otherPin=pa;
-    return pb;
-}
+    EncoderPin* pa=thingFactory<EncoderPin>(nullptr,pinA,mode, H4GM_PS_ENCODER_A, sense, nullptr);
+    EncoderPin* pb=thingFactory<EncoderPin>(nullptr,pinB,mode, H4GM_PS_ENCODER_B, sense, callback);
+    return pb->_pairUp(pa);
+} 
 EncoderPin* H4P_GPIOManager::Encoder(uint8_t pinA,uint8_t pinB,uint8_t mode,H4GM_SENSE sense,int& i){
-    return Encoder(pinA,pinB,mode,sense,[&i](H4GPIOPin* p){ i+=reinterpret_cast<EncoderPin*>(p)->encoderValue; });       
+    return Encoder(pinA,pinB,mode,sense,[&i](H4GPIOPin* p){ i+=reinterpret_cast<EncoderPin*>(p)->encoderValue; });
+}
+EncoderPin* H4P_GPIOManager::EncoderThing(uint8_t pinA,uint8_t pinB,uint8_t mode,H4GM_SENSE sense,H4P_BinaryThing* btp){
+    EncoderPin* pa=thingFactory<EncoderPin>(nullptr,pinA,mode, H4GM_PS_ENCODER_A, sense, nullptr);
+    EncoderPin* pb=thingFactory<EncoderPin>(btp,pinB,mode, H4GM_PS_ENCODER_B, sense, nullptr);
+    return pb->_pairUp(pa);
 }
 
 EncoderAutoPin* H4P_GPIOManager::EncoderAuto(uint8_t pinA,uint8_t pinB,uint8_t mode,H4GM_SENSE sense,int vMin,int vMax,int vSet,uint32_t vIncr,H4GM_FN_EVENT callback){
-    EncoderAutoPin* pa=pinFactory<EncoderAutoPin>(pinA,mode, H4GM_PS_ENCODER_AUTO_A, sense, vMin, vMax, vIncr, [](H4GPIOPin*){});
-    EncoderAutoPin* pb=pinFactory<EncoderAutoPin>(pinB,mode, H4GM_PS_ENCODER_AUTO_B, sense, vMin, vMax, vIncr, callback);
+    EncoderAutoPin* pa=thingFactory<EncoderAutoPin>(nullptr,pinA,mode, H4GM_PS_ENCODER_AUTO_A, sense, vMin, vMax, vIncr, nullptr);
+    EncoderAutoPin* pb=thingFactory<EncoderAutoPin>(nullptr,pinB,mode, H4GM_PS_ENCODER_AUTO_B, sense, vMin, vMax, vIncr, callback);
+    if(vSet < vMin || vSet > vMax) pb->setCenter();
+    else pb->setValue(vSet);    
     pb->_primary=false;
     pa->_otherPin=pb;
     pb->_otherPin=pa;
-    if(vSet < vMin || vSet > vMax) pb->setCenter();
-    else pb->setValue(vSet);
     return pb;
 }
 
@@ -326,45 +344,57 @@ EncoderAutoPin* H4P_GPIOManager::EncoderAuto(uint8_t pinA,uint8_t pinB,uint8_t m
 }
 
 FilteredPin* H4P_GPIOManager::Filtered(uint8_t pin,uint8_t mode,H4GM_SENSE sense,uint8_t filter,H4GM_FN_EVENT callback){
-    return pinFactory<FilteredPin>(pin, mode, H4GM_PS_FILTERED, sense, filter, callback);
+    return thingFactory<FilteredPin>(nullptr,pin, mode, H4GM_PS_FILTERED, sense, filter, callback);
+}
+
+LatchingPin* H4P_GPIOManager::Latching(uint8_t pin,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback){
+    return thingFactory<LatchingPin>(nullptr,pin, mode, H4GM_PS_LATCHING, sense, dbTimeMs, callback);
+}
+LatchingPin* H4P_GPIOManager::LatchingThing(uint8_t pin,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4P_BinaryThing* btp){
+    return thingFactory<LatchingPin>(btp,pin, mode, H4GM_PS_LATCHING, sense, dbTimeMs,nullptr); // replace with nullotr and if?
 }
 
 MultistagePin* H4P_GPIOManager::Multistage(uint8_t pin,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_STAGE_MAP stageMap,H4GM_FN_EVENT callback){
-    return pinFactory<MultistagePin>(pin,mode,H4GM_PS_MULTISTAGE,sense,dbTimeMs,stageMap,callback);
+    return thingFactory<MultistagePin>(nullptr,pin,mode,H4GM_PS_MULTISTAGE,sense,dbTimeMs,stageMap,callback);
 }
 
 OutputPin* H4P_GPIOManager::Output(uint8_t pin,H4GM_SENSE sense,uint8_t initial,H4GM_FN_EVENT callback){
-    return pinFactory<OutputPin>(pin, H4GM_PS_OUTPUT, sense, initial, callback);
+    return thingFactory<OutputPin>(nullptr,pin, H4GM_PS_OUTPUT, sense, initial, callback);
 }
 
 PolledPin* H4P_GPIOManager::Polled(uint8_t pin,uint8_t mode,H4GM_SENSE sense,uint32_t frequency,uint32_t isAnalog,H4GM_FN_EVENT callback){ // fix order
-    return pinFactory<PolledPin>(pin, mode, H4GM_PS_POLLED, sense, frequency, isAnalog, callback);
+    return thingFactory<PolledPin>(nullptr,pin, mode, H4GM_PS_POLLED, sense, frequency, isAnalog, callback);
+}
+PolledPin* H4P_GPIOManager::PolledThing(uint8_t pin,uint8_t mode,H4GM_SENSE sense,uint32_t frequency,uint32_t isAnalog,H4P_BinaryThing* btp){ // fix order
+    return thingFactory<PolledPin>(btp,pin, mode, H4GM_PS_POLLED, sense, frequency, isAnalog, nullptr);
 }
 
 RawPin* H4P_GPIOManager::Raw(uint8_t pin,uint8_t mode,H4GM_SENSE sense,H4GM_FN_EVENT callback){
-    return pinFactory<RawPin>(pin, mode, H4GM_PS_RAW, sense, callback);
+    return thingFactory<RawPin>(nullptr,pin, mode, H4GM_PS_RAW, sense, callback);
+}
+RawPin* H4P_GPIOManager::RawThing(uint8_t pin,uint8_t mode,H4GM_SENSE sense,H4P_BinaryThing* btp){
+    return thingFactory<RawPin>(btp,pin, mode, H4GM_PS_RAW, sense, nullptr);
 }
 
 RepeatingPin* H4P_GPIOManager::Repeating(uint8_t pin,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,uint32_t frequency,H4GM_FN_EVENT callback){
-    return pinFactory<RepeatingPin>(pin, mode, H4GM_PS_REPEATING, sense, dbTimeMs, frequency, callback);
+    return thingFactory<RepeatingPin>(nullptr,pin, mode, H4GM_PS_REPEATING, sense, dbTimeMs, frequency, callback);
 }
 
 RetriggeringPin* H4P_GPIOManager::Retriggering(uint8_t pin,uint8_t mode,H4GM_SENSE sense,uint32_t timeout,H4GM_FN_EVENT callback){
-    return pinFactory<RetriggeringPin>(pin, mode, H4GM_PS_REPEATING, sense, timeout, callback);
+    return thingFactory<RetriggeringPin>(nullptr,pin, mode, H4GM_PS_REPEATING, sense, timeout, callback);
+}
+RetriggeringPin* H4P_GPIOManager::RetriggeringThing(uint8_t pin,uint8_t mode,H4GM_SENSE sense,uint32_t timeout,H4P_BinaryThing* btp){
+    return thingFactory<RetriggeringPin>(btp,pin, mode, H4GM_PS_REPEATING, sense, timeout, nullptr);
 }
 
 SequencedPin* H4P_GPIOManager::Sequenced(uint8_t pin,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback){
-    return pinFactory<SequencedPin>(pin, mode, H4GM_PS_SEQUENCED, sense, dbTimeMs, callback);
+    return thingFactory<SequencedPin>(nullptr,pin, mode, H4GM_PS_SEQUENCED, sense, dbTimeMs, callback);
 }
 
 TimedPin* H4P_GPIOManager::Timed(uint8_t pin,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback){
-    return pinFactory<TimedPin>(pin, mode, H4GM_PS_TIMED, sense, dbTimeMs, 0, callback);
+    return thingFactory<TimedPin>(nullptr,pin, mode, H4GM_PS_TIMED, sense, dbTimeMs, 0, callback);
 }
 //
 //      DIAGNOSTICS
-//
-
-//
-//      cmd functions
 //
 void H4P_GPIOManager::dump(){ for(auto const& p:pins) p.second->dump(); }

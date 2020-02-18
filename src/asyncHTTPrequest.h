@@ -18,7 +18,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.  
    
 ***********************************************************************************/
-#define DEBUG_IOTA_HTTP
 
 #ifndef DEBUG_IOTA_PORT
 #define DEBUG_IOTA_PORT Serial
@@ -38,6 +37,7 @@
 #define DEBUG_HTTP(format,...)  if(_debug){\
                                     DEBUG_IOTA_PORT.printf("Debug(%3ld): ", millis()-_requestStartTime);\
                                     DEBUG_IOTA_PORT.printf_P(PSTR(format),##__VA_ARGS__);}
+
 
 #define DEFAULT_RX_TIMEOUT 3                    // Seconds for timeout
 

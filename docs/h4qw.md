@@ -1,5 +1,5 @@
 ![H4P Flyer](/assets/DiagLogo.jpg) 
-# Queue Warn
+# Queue Warn (short name="qwrn")
 
 ## Adds low internal queue warning to H4 Universal Scheduler/Timer
 
@@ -38,10 +38,6 @@ none, but must be created after [**H4P_SerialCmd**](h4sc.md) if using that plugi
 ```cpp
 void onQueueWarning(bool) // called after switch state changes
 ```
-
-## Trusted Name
-
-*QWRN*
 
 ## Unloadable
 

@@ -61,12 +61,10 @@ void H4P_ThreeFunctionButton::_hookIn(){
     }
 }
 
-H4P_ThreeFunctionButton::H4P_ThreeFunctionButton(H4P_BasicSwitch* bsp,uint32_t dbTimeMs,uint8_t pin,uint8_t mode,H4GM_SENSE b_sense,uint8_t led,H4GM_SENSE l_sense):
+H4P_ThreeFunctionButton::H4P_ThreeFunctionButton(H4P_BinaryThing* bsp,uint32_t dbTimeMs,uint8_t pin,uint8_t mode,H4GM_SENSE b_sense,uint8_t led,H4GM_SENSE l_sense):
         _bsp(bsp),_led(led),_active(l_sense){
-
+            
     _pid=tfnbTag();
-//    _names={{H4P_TRID_3FNB,uppercase(_pid)}};
-
     H4GM_FN_EVENT cb=bind(&H4P_ThreeFunctionButton::progress,this,_1);
     _createMS=bind(&H4P_GPIOManager::Multistage,&h4gm,pin,mode,b_sense,dbTimeMs,_sm,cb);
 }

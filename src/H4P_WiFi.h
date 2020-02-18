@@ -27,31 +27,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_WiFi_H
-#define H4P_WiFi_H
 
 #include<H4PCommon.h>
 
-extern void h4FactoryReset();
-
+#ifndef H4P_WiFi_H
+#define H4P_WiFi_H
+#include<H4P_WiFiSelect.h>
 #ifndef ARDUINO_ARCH_STM32
 #include <H4P_SerialCmd.h>
 
-#ifdef ARDUINO_ARCH_ESP8266
-    #include<ESP8266WiFi.h>
-    #include<ESP8266mDNS.h>
-    #include<ArduinoOTA.h>
-    #include<ESPAsyncTCP.h>
-    #include<ESPAsyncUDP.h>
-    #include<DNSServer.h>
-
-#else
-    #include<WiFi.h>
-//    #include<SPIFFS.h>
-    #include <AsyncTCP.h>
-    #include <AsyncUDP.h>
-    #include<DNSServer.h>
-#endif
+extern void h4FactoryReset();
 
 class H4P_WiFi: public H4PluginService{
                 DNSServer* _dnsServer;

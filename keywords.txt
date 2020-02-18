@@ -6,22 +6,8 @@
 # Library (	KEYWORD1)
 #######################################
 
-H4P_SerialCmd	KEYWORD1
-H4P_FlasherController	KEYWORD1
-H4P_LocalLogger	KEYWORD1
-H4P_MQTTLogger	KEYWORD1
-H4P_MQTTHeapLogger	KEYWORD1
-H4P_SerialLogger	KEYWORD1
-H4P_GPIOManager	KEYWORD1
-H4P_WiFi	KEYWORD1
-H4P_MQTT	KEYWORD1
-H4P_BasicSwitch	KEYWORD1
-H4P_UPNPSwitch	KEYWORD1
-H4P_ThreeFunctionButton	KEYWORD1
-H4P_CmdErrors	KEYWORD1
-H4P_QueueWarn	KEYWORD1
-H4P_TaskSniffer	KEYWORD1
-H4P_ExternalSqWave	KEYWORD1
+H4P_Plugins	KEYWORD1
+H4P_USE_PLUGINS KEYWORD1
 
 #######################################
 # Datatypes 
@@ -32,14 +18,19 @@ H4P_FlasherController	KEYWORD1
 H4P_GPIOManager	KEYWORD1
 H4P_WiFi	KEYWORD1
 H4P_MQTT	KEYWORD1
-H4P_BasicSwitch	KEYWORD1
+H4P_BinarySwitch	KEYWORD1
+H4P_BinaryThing	KEYWORD1
 H4P_UPNPSwitch	KEYWORD1
+H4P_UPNPThing	KEYWORD1
 H4P_ThreeFunctionButton	KEYWORD1
 H4P_CmdErrors	KEYWORD1
 H4P_QueueWarn	KEYWORD1
 H4P_TaskSniffer	KEYWORD1
 H4P_AsyncWebServer	KEYWORD1
-H4P_ExternalSqWave	KEYWORD1
+H4P_SerialLogger	KEYWORD1
+H4P_LocalLogger	KEYWORD1
+H4P_MQTTLogger	KEYWORD1
+H4P_MQTTHeapLogger	KEYWORD1
 
 #######################################
 # Methods and Functions (	KEYWORD2)
@@ -63,8 +54,13 @@ Encoder	KEYWORD2
 EncoderAuto	KEYWORD2
 Filtered	KEYWORD2
 Latching	KEYWORD2
+logEvent	KEYWORD2
+logicalRead	KEYWORD2
+logicalWrite	KEYWORD2
+Latching	KEYWORD2
 Multistage	KEYWORD2
 Output	KEYWORD2
+plugins	KEYWORD2
 Polled	KEYWORD2
 Raw	KEYWORD2
 Repeating	KEYWORD2
@@ -107,6 +103,13 @@ exclude	KEYWORD2
 friendlyName	KEYWORD2
 host	KEYWORD2
 showSPIFFS	KEYWORD2
+
+DebouncedThing	KEYWORD2
+EncoderThing	KEYWORD2
+LatchingThing	KEYWORD2
+PolledThing	KEYWORD2
+RawThing	KEYWORD2
+RetriggeringThing	KEYWORD2
 
 #######################################
 # Constants (	LITERAL11)

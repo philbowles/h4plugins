@@ -39,22 +39,24 @@ SOFTWARE.
 #include<H4PCommon.h>
 #include<H4P_GPIOManager.h>
 #include<H4P_FlasherController.h>
+
+#include<H4P_WiFiSelect.h>
 #include<H4P_WiFi.h>
 #include<H4P_MQTT.h>
-#include<H4P_BasicSwitch.h>
+#include<H4P_BinaryThing.h>
 
 #ifndef H4P_NO_WIFI
 
 extern void h4FactoryReset();
 
 class H4P_ThreeFunctionButton: public H4Plugin{
-            H4P_BasicSwitch*    _bsp;
+            H4P_BinaryThing*    _bsp;
             uint8_t             _led;
             H4GM_SENSE          _active;
             H4GM_STAGE_MAP _sm={
                 {0,[this](H4GPIOPin* ptr){ _bsp->toggle(); }},
-                {2000,[](H4GPIOPin* ptr){ h4reboot(); }},
-                {5000,[](H4GPIOPin* ptr){ h4FactoryReset(); }}
+                {H43F_REBOOT,[](H4GPIOPin* ptr){ h4reboot(); }},
+                {H43F_FACTORY,[](H4GPIOPin* ptr){ h4FactoryReset(); }}
             };    
             H4_FN_VOID      _createMS;
 
@@ -63,7 +65,7 @@ class H4P_ThreeFunctionButton: public H4Plugin{
             void progress(H4GPIOPin* ptr);
     public:
         H4P_ThreeFunctionButton(
-            H4P_BasicSwitch* bsp,  //
+            H4P_BinaryThing* bsp,  //
             uint32_t dbTimeMs, // arbitrary
 //          the input button            
             uint8_t pin,

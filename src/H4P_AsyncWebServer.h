@@ -31,12 +31,11 @@ SOFTWARE.
 #define H4P_AsyncWebServer_HO
 
 #include<H4PCommon.h>
-#include<H4P_CmdErrors.h>
-#include<H4P_SerialCmd.h>
+#include<H4P_WiFiSelect.h>
 #include<H4P_WiFi.h>
 #ifndef H4P_NO_WIFI
-
-#include<ESPAsyncWebServer.h>
+#include<H4P_CmdErrors.h>
+#include<H4P_SerialCmd.h>
 
 class H4P_AsyncWebServer: public AsyncWebServer, public H4PluginService {
             H4_CMD_MAP          _local={};
@@ -55,7 +54,6 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4PluginService {
             _cb["auser"]=admin;
             _cb["apasswd"]=passwd;
             _pid=aswsTag();
-            //subid=H4PC_ASWS;
             _names={{H4P_TRID_ASWS,uppercase(_pid)}};
             _cmds={};
         }

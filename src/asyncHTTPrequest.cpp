@@ -1,3 +1,5 @@
+#include<H4P_WiFiSelect.h>
+#ifndef H4P_NO_WIFI
 #include "asyncHTTPrequest.h"
 
 //**************************************************************************************************************
@@ -124,13 +126,10 @@ bool	asyncHTTPrequest::send(const char* body){
     Serial.printf("BODY1 %s [%d]\n",body, strlen(body));
 //    DEBUG_HTTP("send(char*) %s.16... (%d)\r\n",body, strlen(body));
     _addHeader("Content-Length", String(strlen(body)).c_str());
-     Serial.printf("BODY2 %s\n",body);
+     Serial.printf("BODY2 %s %s\n",body,String(strlen(body)).c_str());
     if( ! _buildRequest()) return false;
-     Serial.printf("BODY2A %s\n",body);
     _request->write(body);
-     Serial.printf("BODY3 %s\n",body);
    _send();
-    Serial.printf("BODY4 %s\n",body);
     return true;
 }
 
@@ -256,6 +255,7 @@ bool  asyncHTTPrequest::_parseURL(const char* url){
 
 //**************************************************************************************************************
 bool  asyncHTTPrequest::_parseURL(String url){
+    Serial.printf("_parseURL() %s\n", url.c_str());
     delete _URL;
     int hostBeg = 0;
     _URL = new URL;
@@ -267,9 +267,11 @@ bool  asyncHTTPrequest::_parseURL(String url){
     else if(url.substring(0,8).equalsIgnoreCase("HTTPS://")){
         return false;
     }
+    Serial.printf("_parseURL(2) %s\n", url.c_str());
     
     int pathBeg = url.indexOf('/', hostBeg);
     if(pathBeg < 0) return false;
+    Serial.printf("_parseURL(3) %s\n", url.c_str());
     int hostEnd = pathBeg;
     int portBeg = url.indexOf(':',hostBeg);
     if(portBeg > 0 && portBeg < pathBeg){
@@ -285,7 +287,7 @@ bool  asyncHTTPrequest::_parseURL(String url){
     _URL->query = new char[url.length() - queryBeg + 1];
     strcpy(_URL->query, url.substring(queryBeg).c_str());
     DEBUG_HTTP("_parseURL() %s%s:%d%s%.16s\r\n", _URL->scheme, _URL->host, _URL->port, _URL->path, _URL->query);
-    Serial.printf("_parseURL() %s%s:%d%s%.16s\r\n", _URL->scheme, _URL->host, _URL->port, _URL->path, _URL->query);
+    Serial.printf("_parseURL(99) %s%s:%d%s%.16s\r\n", _URL->scheme, _URL->host, _URL->port, _URL->path, _URL->query);
     return true;
 }
 
@@ -794,3 +796,4 @@ char* asyncHTTPrequest::_charstar(const __FlashStringHelper * str){
   strcpy_P(ptr, (PGM_P)str);
   return ptr;
 }
+#endif

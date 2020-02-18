@@ -19,12 +19,17 @@ H4_USE_PLUGINS
       H4P_TaskSniffer h4ts({13,14,15}); dumps only tasks with IDs 13,14,15 ( equivalent to h4/include/13,14,15 )
 
 */
-#define SMALL_Q       1
+#define SMALL_Q       10
 #define Q_WARN_PCENT  50
 
 H4 h4(115200,SMALL_Q); //auto-start Serial @ 115200, small Q of 10 to force a warning
 
-void qIsLow(bool inDanger){ if(inDanger) h4.dumpQ(); }
+void qIsLow(bool inDanger){ 
+  if(inDanger) {
+    Serial.println("Warning, Will Robinson - low Q!!!"); // See 1960s TV SciFi series "Lost in Space" :)
+    h4.dumpQ();
+  }
+}
 
 H4P_SerialCmd h4sc;
 H4P_QueueWarn h4qw(qIsLow,50); // call qIsLow when free Q drops below 50%
@@ -57,18 +62,17 @@ void h4setup() { // H4 constructor starts Serial
         h4qw.show(); // show limits
     //
     //  we need a lot of things in the queue
-    //  initial size is 10 and we warn @ 50% (=5 tasks)
-    //  so 6 will definitely bust it
     //
         h4.once(30000,[](){ Serial.println("30 seconds later"); },nullptr,2); // "tag" this task as UF30
         h4.once(40000,[](){ 
-        Serial.println("40 seconds later");
-        Serial.println("Add more jobs to generate 2nd Warning");
-        h4.once(25000,[](){ Serial.println("65 seconds later"); },nullptr,1); // 40 + 25 "tag" as UF25
-        h4.once(35000,[](){ Serial.println("75 seconds later"); },nullptr,3); // 40 + 35 "tag" as UF35
+          Serial.println("40 seconds later");
+          h4.once(25000,[](){ Serial.println("65 seconds later"); },nullptr,1); // 40 + 25 "tag" as UF25
+          h4.once(35000,[](){ Serial.println("75 seconds later"); },nullptr,3); // 40 + 35 "tag" as UF35
         },nullptr,4); // "tag" as UF40
         h4.once(50000,[](){ Serial.println("50 seconds later"); },nullptr,5);// "tag" as UF50
         h4.once(60000,[](){ Serial.println("60 seconds later"); },nullptr,6);// "tag" as UF60
         h4.once(70000,[](){ Serial.println("70 seconds later"); },nullptr,7);// "tag" as UF70
         h4.once(80000,[](){ Serial.println("80 seconds later"); },nullptr,8);// "tag" as UF80
+        h4.once(90000,[](){ Serial.println("80 seconds later"); });// no tag: anon
+        h4.once(95000,[](){ Serial.println("80 seconds later"); });// no tag: anon
 }

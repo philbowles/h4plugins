@@ -64,7 +64,7 @@ vector<uint32_t> H4Plugin::expectInt(string pl,const char* delim){
 }      
 
 uint32_t H4Plugin::guardInt1(vector<string> vs,function<void(uint32_t)> f){
-    return guard<1>(vs,[f,this](vector<string> vs){
+    return guard1(vs,[f,this](vector<string> vs){
         auto vi=expectInt(PAYLOAD);
         if(vi.size()==1) return ([f](uint32_t v){ f(v); return H4_CMD_OK; })(vi[0]);
         else return H4_CMD_NOT_NUMERIC;
@@ -72,25 +72,20 @@ uint32_t H4Plugin::guardInt1(vector<string> vs,function<void(uint32_t)> f){
 }        
 
 uint32_t H4Plugin::guardInt4(vector<string> vs,function<void(uint32_t,uint32_t,uint32_t,uint32_t)> f){
-    return guard<1>(vs,[f,this](vector<string> vs){
+    return guard1(vs,[f,this](vector<string> vs){
         auto vi=expectInt(PAYLOAD);
         if(vi.size()==4) return ([f](uint32_t v1,uint32_t v2,uint32_t v3,uint32_t v4){ f(v1,v2,v3,v4); return H4_CMD_OK; })(vi[0],vi[1],vi[2],vi[3]);
         else return H4_CMD_NOT_NUMERIC;
     });
 }
 
-uint32_t H4Plugin::guardString1(vector<string> vs,function<void(string)> f){
-    return guard<1>(vs,[f,this](vector<string> vs){
-        auto vg=split(PAYLOAD,",");
-        if(vg.size()<2) return ([f](string s1){ f(s1); return H4_CMD_OK; })(vg[0]);
-        else return H4_CMD_TOO_MANY_PARAMS;
-    });
-} 
-
 uint32_t H4Plugin::guardString2(vector<string> vs,function<void(string,string)> f){
-    return guard<1>(vs,[f,this](vector<string> vs){
+    return guard1(vs,[f,this](vector<string> vs){
         auto vg=split(PAYLOAD,",");
-        if(vg.size()<3) return ([f](string s1,string s2){ f(s1,s2); return H4_CMD_OK; })(vg[0],vg[1]);
+        if(vg.size()<3){ 
+            if(vg.size()>1) return ([f](string s1,string s2){ f(s1,s2); return H4_CMD_OK; })(vg[0],vg[1]);
+            return H4_CMD_TOO_FEW_PARAMS;
+        }
         else return H4_CMD_TOO_MANY_PARAMS;
     });
 } 

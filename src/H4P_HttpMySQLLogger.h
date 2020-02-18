@@ -46,10 +46,11 @@ class H4P_HttpMySQLLogger: public H4PLogService {
         }
         //
         void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error){
-            request.open("POST", "http://192.168.1.22:8266");
-            static char buf[256];
-            sprintf(buf,"msg=%s&type=%d&source=%s&target=%s&error=%d\r\n\r\n",CSTR(msg),type,CSTR(source),CSTR(target),error);
-            Serial.printf("H=%u %s\n",ESP.getFreeHeap(),buf);
+            request.open("POST", "http://192.168.1.22:8266/");
+            char buf[256];
+            sprintf(buf,"msg=%s&type=%d&source=%s&target=%s&error=%d",CSTR(msg),type,CSTR(source),CSTR(target),error);
+//            Serial.printf("H=%u %s\n",ESP.getFreeHeap(),buf);
+            request.setReqHeader("Content-Type","application/x-www-form-urlencoded");
             request.send(buf);
         }
         void _hookIn() override { // protect

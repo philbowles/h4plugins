@@ -29,7 +29,7 @@ SOFTWARE.
 #include<H4P_TaskSniffer.h>
 
 uint32_t H4P_TaskSniffer::__incexc(vector<string> vs,function<void(vector<uint32_t>)> f){
-    return guard<1>(vs,[f,this](vector<string> vs){
+    return guard1(vs,[f,this](vector<string> vs){
         auto vi=expectInt(PAYLOAD);
         if(vi.size()) return ([f,this](vector<uint32_t> vu){ 
             f(vu);
@@ -76,15 +76,8 @@ void H4P_TaskSniffer::_common(){
 
 void H4P_TaskSniffer::_taskDump(H4_TASK_PTR t,const char c){
     if(hitList.count((t->uid)%100)) {
-      Serial.print(h4._size());
-      Serial.print(":");
-      Serial.print(micros());
-      Serial.print(":");
-      Serial.print(micros());
-      Serial.print(":");
-      Serial.print(c);
-      Serial.print(": ");
-      h4._dumpTask(t);
+        reply("%d:%u:%c: ",h4.size(),micros(),c);
+        h4._dumpTask(t);
     }
 }
 //

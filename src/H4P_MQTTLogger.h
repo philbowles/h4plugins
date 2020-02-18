@@ -43,8 +43,7 @@ class H4P_MQTTLogger: public H4PLogService {
                 H4PLogService::_hookIn();
                 h4mqtt.hookConnect([this](){ start(); });
                 h4mqtt.hookDisconnect([this](){ stop(); });
-            } 
-            else { DEPENDFAIL(mqtt); }
+            } else { DEPENDFAIL(mqtt); }
         }
     public:
         H4P_MQTTLogger(const string& topic,uint32_t filter=H4P_LOG_ALL): H4PLogService(topic,filter){}

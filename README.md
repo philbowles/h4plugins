@@ -9,7 +9,7 @@
 *All plugins depend upon the presence of the [H4 library](https://github.com/philbowles/H4), which must be installed first.*
 
 ---
-Version **0.2.1** [Release Notes](changelog.txt)
+Version **0.3.4** [Release Notes](changelog.txt) **MUST UPGRADE TO [H4 library](https://github.com/philbowles/H4) v0.4.1 first!**
 
 ![H4PluginsFF](/assets/h4plugins.jpg)
 
@@ -49,7 +49,7 @@ As you can see, all you need to do is list the modules you want (in the right or
 
 The modular design of H4's plugin architecture minimises scarce resources in low-memory MCU targets: You only compile in what you need with a simple `#include`. Detailed diagnostics can be easily included and controlled at runtime via the serial console, HTTP REST or MQTT depending on which options you choose. It is built on top of the very stable [H4](https://github.com/philbowles/H4) timer/scheduler which traces its ancestry back to "Esparto" - of which one user recently said: *"and now have Esparto modules with months of uptime without an issue"*.
 
-There are 31 example sketches demonstrating the features and API of all of the plugins. They should be used both as a template and a learning resource.
+There are 40 example sketches demonstrating all the features and the API of all of the plugins. They should be used both as a template for your own sketches and as a learning resource.
 
 Users are strongly recommended to work through them in the order [listed below](readme.md#current-plugins-februrary-2020)
 
@@ -89,27 +89,32 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 
 ---
 
-# Current Plugins (Feb 2020)
+# Current Plugins (as of v0.3.4 - Feb 2020)
 
 ## Core IOT functionality
 
-* [**H4P_SerialCmd**](docs/h4sc.md): Send commands to H4 and/or plugins to control and/or diagnose
+* [**H4P_SerialCmd**](docs/h4sc.md): Send commands from multiple sources to H4 and/or plugins to control and/or diagnose
 * [**H4P_FlasherController**](docs/h4fc.md): One-line coding of multiple simultaneous LED flashing by Square Wave, PWM, abitrary pattern and Morse code
 * [**H4P_GPIOManager**](docs/h4gm.md): One-line coding of debouncing, retriggering, rotary encoding plus numerous other GPIO strategies
 * [**H4P_WiFi**](docs/h4wifi.md): Automatic Connection / reconnection manager + AP configuration + OTA + HTTP REST
+* [**H4P_AsyncWebServer**](docs/h4asws.md): Fully Asynchronous Webserver
 * [**H4P_MQTT**](docs/h4mqtt.md): Automatic Connection/ reconnection MQTT client alows remote control of H4
-* [**H4P_BasicSwitch**](docs/h4onof.md): GPIO object that allows control by simple commands that become available to other plugins
-* [**H4P_UPNPSwitch**](docs/h4upnp.md): Extends [H4P_BasicSwitch](docs/h4onof.md) into full UPNP device with Alexa voice control
-* [**H4P_ThreeFunctionButton**](docs/h43fnb.md): Multi-function physical control on/off,reboot,factory reset depending on hold time
+* [**H4P_BinarySwitch**](docs/h4onof.md): GPIO object that allows control by commands from multiple sources
+* [**H4P_BinaryThing**](docs/xxx.md): functional object that allows control by commands from multiple sources  **NEW in v0.3.4**
+* [**H4P_UPNPSwitch**](docs/h4upnp.md): Extends [H4P_BinarySwitch](docs/h4onof.md) into full UPNP device with Alexa voice control
+* [**H4P_UPNPThing**](docs/xxx.md): Extends [H4P_BinaryThing](docs/xxx.md) into full UPNP device with Alexa voice control  **NEW in v0.3.4**
+* [**H4P_ThreeFunctionButton**](docs/h43fnb.md): Multi-function physical control on/off,reboot,factory reset depending on hold time. Binds to xSwitch or xThing
 
 ## Diagnostic / Development tools:
 
 * [**H4P_CmdErrors**](docs/h4ce.md): Provide text error messages instead of error codes to SerialCmd
 * [**H4P_QueueWarn**](docs/h4qw.md): Call user function on low Queue
 * [**H4P_TaskSniffer**](docs/h4ts.md): Low-level task / queue dumper for H4 + Plugins
-* [**H4P_SerialLogger**](docs/h4logs.md): Event logging to serial monitor **NEW in v0.2.0**
-* [**H4P_LocalLogger**](docs/h4logs.md): Event logging to SPIFFS file **NEW in v0.2.0**
-* 
+* [**H4P_SerialLogger**](docs/h4logs.md): Event logging to serial monitor
+* [**H4P_LocalLogger**](docs/h4logs.md): Event logging to SPIFFS file
+* [**H4P_MQTTLogger**](docs/h4logs.md): Event logging to MQTT Server **NEW in v0.3.4**
+* [**H4P_MQTTHeapLogger**](docs/h4logs.md): Specialised H4P_MQTTLogger which periodically logs value of FreeHEap **NEW in v0.3.4**
+  
 ## Specialist Device Drivers
 
 * [**H4P_ExternalSqWave**](docs/h4esw.md): Serial driver for cheap ebay square wave device
@@ -164,8 +169,6 @@ And:
 
 If using WiFi, you will need to install either the [ESP8266 sketch data uploader](https://github.com/esp8266/arduino-esp8266fs-plugin) or the [ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin) (or both) depending on which platform you compile for. 
 
-*(Many thanks to Kerry Clendinning for his help with this section)*
-
 ## Note for PlatformIO users
 
 Unfortunately PlatformIO has (had?) several issues that prevent *some* valid Arduino libraries from being installed correctly. I am happy to provide support for H4Plugins code if you manage to get an installation working, providing that none of the files are changed in any way. Sadly, until PlatformIO get the issues fixed, I am unable to provide any support for the installation / build process.
@@ -185,7 +188,6 @@ are recommended (if available for the chosen board):
 ## For WiFi sketches
 
 * lwIP Variant: v2 Higher Bandwidth (No Features)
-* SSL Support: Basic SSL Ciphers (Lower ROM Use)
 
 ### **IMPORTANT**
 
@@ -201,7 +203,6 @@ WiFI sketches must reserve SPIFFS space to hold the AP Mode web pages. These tak
 * Server-pull OTA
 * NODE-RED nodes for H4 devices
 * NODE-RED GUI controller for management of grid of H4 devices
-* Command logger (+SQL)
 * wifiClient http / https
 
 Plus of course any others you think may be useful. Let me know using one of the links below

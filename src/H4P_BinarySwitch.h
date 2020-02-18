@@ -27,40 +27,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_BasicSwitch_HO
-#define H4P_BasicSwitch_HO
+#ifndef H4P_BinarySwitch_HO
+#define H4P_BinarySwitch_HO
 
-#include<H4PCommon.h>
+#include<H4P_BinaryThing.h>
 #include<H4P_GPIOManager.h>
-#include<H4P_MQTT.h>
-#ifndef H4P_NO_WIFI
 
-class H4P_BasicSwitch: public H4Plugin{
+class H4P_BinarySwitch: public H4P_BinaryThing{
 //
     protected:
-            VSCMD(_switch);
-
-        void            _publish(bool b){  
-            if(H4Plugin::isLoaded(mqttTag())) h4mqtt.publishDevice(stateTag(),b);
-        }
-
-        virtual void    _hookIn() override {
-            if(H4Plugin::isLoaded(mqttTag())) {
-                h4mqtt.hookConnect([this](){ _publish(_pp->state); });
-            }
-        }            
-        OutputPin*      _pp;
-
+        OutputPin*          _pp;
+        virtual void        _setState(bool b) override { _pp->logicalWrite(_state=b); }        
     public:
-        H4P_BasicSwitch(uint8_t pin,H4GM_SENSE sense, uint8_t initial,H4BS_FN_SWITCH f=[](bool){});
-
-            void        turnOff(){ turn(false); }
-            void        turnOn(){ turn(true); }
-            void        toggle(){ turn(!_pp->state); }
-            void        turn(bool b);        
+        H4P_BinarySwitch(uint8_t pin,H4GM_SENSE sense, uint32_t initial,H4BS_FN_SWITCH f=[](bool){}): H4P_BinaryThing(f,initial){
+            _pp=h4gm.Output(pin,sense,initial,[](H4GPIOPin* ptr){});
+        }
 };
 
-extern __attribute__((weak)) H4P_BasicSwitch h4bs;
+//extern __attribute__((weak)) H4P_BinarySwitch h4bs;
 
-#endif
-#endif // H4P_BasicSwitch_H
+#endif // H4P_BinarySwitch_H

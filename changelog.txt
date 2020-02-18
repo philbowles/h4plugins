@@ -1,3 +1,25 @@
+2020/02/18  0.3.4
+    breaking changes:
+    1. _hasName removed from H4: MUST upgrade to 0.4.1
+    2. BasicSwitch renamed to BinarySwitch
+    new
+    1. Logging
+        filtering added to exisiting loggers
+        added loggers:
+            H4P_MQTTLogger
+            H4P_MQTTHeapLogger
+    2. Thing/Switch paradigm
+        BasicSwitch renamed to BinarySwitch
+        added   BinaryThing
+                UPNPThing
+        GPIOManager heavily modified
+            added   DebouncedThing
+                    EncoderThing
+                    LatchingThing
+                    PolledThing
+                    RawThing
+                    RetriggeringThing
+
 2020/02/12  0.2.1
     patch - put back in ip display on got ip
     move AP mode ssid lists delete to STA got IP
