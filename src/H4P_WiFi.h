@@ -36,7 +36,7 @@ SOFTWARE.
 #ifndef ARDUINO_ARCH_STM32
 #include <H4P_SerialCmd.h>
 
-extern void h4FactoryReset();
+//extern void h4FactoryReset();
 
 class H4P_WiFi: public H4PluginService{
                 DNSServer* _dnsServer;
@@ -64,14 +64,13 @@ class H4P_WiFi: public H4PluginService{
 
             _pid=wifiTag();
             _names={ 
-//                    {H4P_TRID_WIFI,uppercase(_pid)},
                     {H4P_TRID_WFAP,"WFAP"},
                     {H4P_TRID_HOTA,"HOTA"}
             };
 
             _local={
                 {"clear",   { subid, 0, CMD(clear)}},
-                {"factory", { H4PC_ROOT, 0, CMD(h4FactoryReset) }},
+//                {"factory", { H4PC_ROOT, 0, CMD(h4FactoryReset) }},
                 {"change",  { subid, 0, CMDVS(_change)}},             
                 {"host",    { subid, 0, CMDVS(_host)}},             
                 {_pid,      { H4PC_SHOW, 0, CMD(show) }}

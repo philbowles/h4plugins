@@ -28,6 +28,8 @@ SOFTWARE.
 */
 #include<H4Plugins.h>
 
+extern void h4FactoryReset();
+
 H4_CMD_MAP_I H4P_SerialCmd::__exactMatch(const string& cmd,uint32_t owner){
     auto any=commands.equal_range(cmd);
     for(auto i=any.first;i!=any.second;i++) if(i->second.owner==owner) return i;
@@ -159,6 +161,7 @@ H4P_SerialCmd::H4P_SerialCmd(){
         {"h4",         { 0, H4PC_ROOT, nullptr}},
         {"help",       { 0, 0, CMD(help) }},
         {"reboot",     { H4PC_ROOT, 0, CMD(h4reboot) }},
+        {"factory",    { H4PC_ROOT, 0, CMD(h4FactoryReset) }},
         {"show",       { H4PC_ROOT, H4PC_SHOW, nullptr}},
         {"all",        { H4PC_SHOW, 0, CMD(all) }},
         {"config",     { H4PC_SHOW, 0, CMD(config) }},

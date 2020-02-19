@@ -30,7 +30,7 @@ SOFTWARE.
 #ifndef H4P_HO
 #define H4P_HO
 
-#define H4P_VERSION "0.3.4"
+#define H4P_VERSION "0.3.5"
 
 #include<H4.h>
 #include<H4Utils.h>
@@ -58,6 +58,7 @@ struct command{
 using 	H4_CMD_MAP		    =std::unordered_multimap<string,command>;
 using 	H4_CMD_MAP_I        =H4_CMD_MAP::iterator;
 using   H4P_CONFIG_BLOCK    =std::unordered_map<string,string>;
+using   H4P_FN_PSCHANGE     =function<void(string,string)>;
 
 enum H4_CMD_ERROR:uint32_t  {
     H4_CMD_OK,
@@ -108,6 +109,7 @@ STAG(scmd);
 STAG(snif);
 STAG(ssid);
 STAG(state);
+STAG(stor);
 STAG(tfnb);
 STAG(upnp);
 STAG(wink);

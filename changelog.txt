@@ -1,3 +1,8 @@
+2020/02/19  0.3.5
+    breaking changes:
+        h4/factory moved to serialcmd from wifi // update docs!
+    changed
+        persistentStorage plugin
 2020/02/18  0.3.4
     breaking changes:
     1. _hasName removed from H4: MUST upgrade to 0.4.1

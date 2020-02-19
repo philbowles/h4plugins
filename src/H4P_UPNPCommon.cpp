@@ -57,8 +57,7 @@ void  H4P_UPNPCommon::friendlyName(const string& name){ h4wifi.setPersistentValu
 
 uint32_t H4P_UPNPCommon::_friendly(vector<string> vs){
     return H4Plugin::guard1(vs,[this](vector<string> vs){
-        //h4wifi.setPersistentValue(nameTag(),PAYLOAD,true);
-        Serial.printf("WOULD FRIEND %s\n",CSTR(PAYLOAD));
+        h4wifi.setPersistentValue(nameTag(),PAYLOAD,true);
         return H4_CMD_OK;
     });
 }

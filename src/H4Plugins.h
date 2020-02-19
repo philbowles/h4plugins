@@ -3,6 +3,7 @@
 
 #include<H4P_CmdErrors.h>
 #include<H4P_SerialCmd.h>
+#include<H4P_PersistentStorage.h>
 #include<H4P_LocalLogger.h>
 #include<H4P_SerialLogger.h>
 //#include<H4P_HttpMySQLLogger.h>

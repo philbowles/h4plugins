@@ -9,7 +9,7 @@
 *All plugins depend upon the presence of the [H4 library](https://github.com/philbowles/H4), which must be installed first.*
 
 ---
-Version **0.3.4** [Release Notes](changelog.txt) **MUST UPGRADE TO [H4 library](https://github.com/philbowles/H4) v0.4.1 first!**
+Version **0.3.5** [Release Notes](changelog.txt) **MUST UPGRADE TO [H4 library](https://github.com/philbowles/H4) v0.4.1 first!**
 
 ![H4PluginsFF](/assets/h4plugins.jpg)
 
@@ -104,6 +104,7 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 * [**H4P_UPNPSwitch**](docs/h4upnp.md): Extends [H4P_BinarySwitch](docs/h4onof.md) into full UPNP device with Alexa voice control
 * [**H4P_UPNPThing**](docs/xxx.md): Extends [H4P_BinaryThing](docs/xxx.md) into full UPNP device with Alexa voice control  **NEW in v0.3.4**
 * [**H4P_ThreeFunctionButton**](docs/h43fnb.md): Multi-function physical control on/off,reboot,factory reset depending on hold time. Binds to xSwitch or xThing
+* [**H4P_PersistentStorage**](docs/h4stor.md): Save name/value pairs across reboots (requires SPIFFS)  **NEW in v0.3.5**
 
 ## Diagnostic / Development tools:
 
