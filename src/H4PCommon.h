@@ -30,7 +30,7 @@ SOFTWARE.
 #ifndef H4P_HO
 #define H4P_HO
 
-#define H4P_VERSION "0.3.5"
+#define H4P_VERSION "0.3.6"
 
 #include<H4.h>
 #include<H4Utils.h>

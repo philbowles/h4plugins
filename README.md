@@ -9,7 +9,7 @@
 *All plugins depend upon the presence of the [H4 library](https://github.com/philbowles/H4), which must be installed first.*
 
 ---
-Version **0.3.5** [Release Notes](changelog.txt) **MUST UPGRADE TO [H4 library](https://github.com/philbowles/H4) v0.4.1 first!**
+Version **0.3.6** [Release Notes](changelog.txt) **MUST UPGRADE TO [H4 library](https://github.com/philbowles/H4) v0.4.1 first!**
 
 ![H4PluginsFF](/assets/h4plugins.jpg)
 
