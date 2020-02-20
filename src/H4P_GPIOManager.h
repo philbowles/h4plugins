@@ -52,6 +52,7 @@ enum H4GM_STYLE:uint8_t {
     H4GM_PS_RAW,
     H4GM_PS_REPEATING,
     H4GM_PS_SEQUENCED,
+    H4GM_PS_THRESHA,
     H4GM_PS_TIMED
 };
 
@@ -99,10 +100,10 @@ class H4GPIOPin{
 
     virtual void            stateChange(){ sendEvent(); };
 
-    virtual uint32_t        logicalRead(){ return state; }
 
             void _factoryCommon(H4P_BinaryThing* btp);
     public:
+    virtual uint32_t        logicalRead(){ return state; }
             uint8_t         pin=0;                  // GPIO hardware pin number
             uint8_t         gpioType=0;             // INPUT, INOUT_PULLUP, OUTPUT etc
             H4GM_STYLE      style;                  // Strategy: Raw, debounced, retriggering etc
@@ -185,11 +186,11 @@ class PolledPin: public H4GPIOPin {
         uint32_t        frequency;
         bool            isAnalog;
 
-        void            read();
-
-        void            run() override {}
-
+                void            run() override {}
+    protected:
+        virtual void            read();
 	public:
+    //    uint32_t logicalRead() override { return isAnalog ? }
         virtual void dump(){
             H4GPIOPin::dump();
             Serial.print(" frequency=");Serial.println(frequency); 
@@ -197,6 +198,22 @@ class PolledPin: public H4GPIOPin {
         }            
         PolledPin(uint8_t _p,uint8_t _g,H4GM_STYLE _s,uint8_t _a,uint32_t _f,uint32_t _v,H4GM_FN_EVENT _c);
         virtual ~PolledPin(){}
+};
+using H4GM_COMPARE=function<bool(uint32_t,uint32_t)>;
+#define H4GM_LESS std::less<uint32_t>()
+#define H4GM_GREATER std::greater<uint32_t>()
+
+class AnalogThresholdPin: public PolledPin {
+        H4GM_COMPARE    fCompare;
+        void        read() override;
+	public:
+        uint32_t    limit;
+        virtual void dump(){
+            PolledPin::dump();
+            Serial.print(" limit=");Serial.println(limit); 
+        }            
+        AnalogThresholdPin(uint8_t _p,uint32_t _f,uint32_t _l,H4GM_COMPARE _cf,H4GM_FN_EVENT _c);
+        virtual ~AnalogThresholdPin(){}
 };
 
 class RetriggeringPin: public H4GPIOPin {
@@ -224,7 +241,6 @@ class RepeatingPin: public DebouncedPin {
                     held=t;
                     H4GPIOPin::sendEvent();
                 }
-
                 void    sendEvent() override;
 	public:
         uint32_t    held=0;
@@ -303,12 +319,10 @@ class LatchingPin: public CircularPin {
 
 class OutputPin: public H4GPIOPin {
                 void    run(){}
-
     public:
                 void     logicalWrite(uint8_t);
 
                 void     toggle(){ logicalWrite(!state); }
-
         OutputPin(uint8_t _p,H4GM_STYLE _s,uint8_t _a,uint32_t _i,H4GM_FN_EVENT _c);
         virtual ~OutputPin(){}
 };
@@ -340,7 +354,6 @@ class EncoderPin: public H4GPIOPin{
 
 		EncoderPin(uint8_t _pA,uint8_t _g,H4GM_STYLE _s,uint8_t _a,H4GM_FN_EVENT _c);
         virtual ~EncoderPin(){}
-
 };
 
 class EncoderAutoPin: public EncoderPin{
@@ -398,6 +411,8 @@ class H4P_GPIOManager: public H4Plugin{//
 //
 //      Strategies
 //
+        AnalogThresholdPin* AnalogThreshold(uint8_t p,uint32_t freq,uint32_t threshold,H4GM_COMPARE compare,H4GM_FN_EVENT callback);//
+        AnalogThresholdPin* AnalogThresholdThing(uint8_t p,uint32_t freq,uint32_t threshold,H4GM_COMPARE compare,H4P_BinaryThing* btp);//
         CircularPin*        Circular(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,uint32_t nStages,H4GM_FN_EVENT callback);//
         DebouncedPin*       Debounced(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback);//
         DebouncedPin*       DebouncedThing(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4P_BinaryThing* btp);//

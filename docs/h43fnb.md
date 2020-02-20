@@ -29,6 +29,8 @@ A "long" press - anything over 5 seconds** - starts the LED flashing extremely r
 
 # Usage
 
+H4P_ThreeFunctionButton is a specialised example of an IOT "Thing" - you should read ["Things vs Switches"](things.md) before continuing
+
 ```cpp
 #include<H4Plugins.h>
 H4_USE_PLUGINS

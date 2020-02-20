@@ -149,8 +149,8 @@ void H4PluginService::svc(const string& uid,H4P_LOG_TYPE ud) {
     #ifdef H4P_LOG_EVENTS 
         if(H4Plugin::isLoaded(scmdTag())) {
             h4sc._logEvent(uid,ud,"h4","",0);
-            Serial.print("SVC ");Serial.print(CSTR(uid));
-            Serial.print(" ");Serial.println(ud==H4P_LOG_SVC_UP ? "UP":"DOWN");
+//            Serial.print("SVC ");Serial.print(CSTR(uid));
+//            Serial.print(" ");Serial.println(ud==H4P_LOG_SVC_UP ? "UP":"DOWN");
         }
     #endif
 }

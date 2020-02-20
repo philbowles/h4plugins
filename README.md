@@ -13,9 +13,9 @@ Version **0.3.5** [Release Notes](changelog.txt) **MUST UPGRADE TO [H4 library](
 
 ![H4PluginsFF](/assets/h4plugins.jpg)
 
-Think of this as "IOT Lego" for [**H4**](https://github.com/philbowles/H4) - and if you are not already using H4's advanced scheduling and timing features, why not? Get it now from the link above, as you will need it to use the H4Plugins system.
+Think of this as "IOT Lego" or an "IOT Swiss Army Knife" (or both) for [**H4**](https://github.com/philbowles/H4) - and if you are not already using H4's advanced scheduling and timing features, why not? Get it now from the link above, as you will need it to use the H4Plugins system.
 
-H4Plugins includes modules for WiFi + OTA, Webserver, MQTT, 14 different types of GPIO handling, voice control and diagnostics. By "plugging " together only the required modules, you can rapidly build your own custom firmware or IOT app. Everything you build will be stable and responsive: the plugins work together to allow multiple simultaneous processes to run, so ***no more WDT resets***! As your experience grows you can extend your app / firmware with H4Plugins' well-documented API and runtime command system. Let's see H4Plugins being used as replacement firmware for a SONOFF Basic switch.
+H4Plugins includes modules for WiFi + OTA, Webserver, MQTT, 15 different types of GPIO handling, voice control and diagnostics. By "plugging " together only the required modules, you can rapidly build your own custom firmware or IOT app. Everything you build will be stable and responsive: the plugins work together to allow multiple simultaneous processes to run, so ***no more WDT resets***! As your experience grows you can extend your app / firmware with H4Plugins' well-documented API and runtime command system. Let's see H4Plugins being used as replacement firmware for a SONOFF Basic switch.
 
 What follows is the *entire H4Plugins code* - despite the fact it might look like there is something missing, there is not. The code as shown compiles to produce firmware that can be uploaded directly to any / all of your SONOFF devices and provides:
 
@@ -49,7 +49,7 @@ As you can see, all you need to do is list the modules you want (in the right or
 
 The modular design of H4's plugin architecture minimises scarce resources in low-memory MCU targets: You only compile in what you need with a simple `#include`. Detailed diagnostics can be easily included and controlled at runtime via the serial console, HTTP REST or MQTT depending on which options you choose. It is built on top of the very stable [H4](https://github.com/philbowles/H4) timer/scheduler which traces its ancestry back to "Esparto" - of which one user recently said: *"and now have Esparto modules with months of uptime without an issue"*.
 
-There are 40 example sketches demonstrating all the features and the API of all of the plugins. They should be used both as a template for your own sketches and as a learning resource.
+There are 44 example sketches demonstrating all the features and the API of all of the plugins. They should be used both as a template for your own sketches and as a learning resource.
 
 Users are strongly recommended to work through them in the order [listed below](readme.md#current-plugins-februrary-2020)
 
@@ -160,7 +160,7 @@ Or:
 * [ESP32 AsyncUDP Library](https://github.com/espressif/arduino-esp32/tree/master/libraries/AsyncUDP)
 * [ESP32 AsyncTCP Library](https://github.com/me-no-dev/AsyncTCP)
 
-Depending on what target you are compiling for
+Depending on what target you are compiling for (if both, then downlaod all libraries above)
 And:
 
 * [ESPAsyncWebServer](https://github.com/philbowles/ESPAsyncWebServer) * See note

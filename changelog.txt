@@ -1,8 +1,17 @@
+
+2020/02/19  0.3.6
+    bugfix
+        Polled not getting value on fake event when in analog mode
+    new
+        GPIO types
+        AnalogThreshold + new example
+        AnalogThresholdThing + new example
+
 2020/02/19  0.3.5
     breaking changes:
         h4/factory moved to serialcmd from wifi // update docs!
     changed
-        persistentStorage plugin
+        persistentStorage plugin + new example
 2020/02/18  0.3.4
     breaking changes:
     1. _hasName removed from H4: MUST upgrade to 0.4.1
@@ -39,19 +48,15 @@
     than a ground-up rewrite :)
 
 TODO:
-H4 
-    rebootChain->forward_list? (watch size!)
 LONGTERM 
-    heaplogger
     remote client get
     sql logger
     rf bridge
     signal on no spiffs
     template for hooking?
     proper condl diags
-
+    diag out all dumps in GPIO
     fix switch.ps1 to use soap etc (revert a la esparto)
     take always ignore out of TS
-SOONER
     lots of const string&
-    find easy way to get FS space etc on ESP32
+SOONER

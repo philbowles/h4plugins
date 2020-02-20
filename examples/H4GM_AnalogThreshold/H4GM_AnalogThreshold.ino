@@ -21,7 +21,7 @@ You will probably need to adjust these values for you own device
 
     uint8_t         pin=0;                  // GPIO hardware pin number
     uint8_t         gpioType=0;             // INPUT, INPUT_PULLUP, OUTPUT etc
-    H4GM_STYLE      style;                  // Strategy: Raw, Polled, retriggering etc
+    H4GM_STYLE      style;                  // Strategy: Raw, debounced, retriggering etc
     uint8_t         sense=0;                // active HIGH or LOW
     unsigned long   Tevt=0;                 // uS time of last event
     int             state=0;                // 32 wide as it holds analog value as well as digital 0/1
@@ -33,33 +33,32 @@ You will probably need to adjust these values for you own device
     uint32_t        cMax=UINT_MAX;          // max permitted cps (see "throttling");
     uint32_t        nEvents=UINT_MAX;       // sigma "Events" (meaning depends on inheriting strategy)
             
-    Additional members for Polled:
+    Additional members for AnalogThreshold:
 
-        none
+        limit       the threshold value: below this figure = 0, above it = 1
 
-        Polled has its state checked periodically, usually with a large value, e.g. minutes. It is used
+        AnalogThreshold has its state checked periodically, usually with a large value, e.g. minutes. It is used
         when you do *not* want to react quickly. A good example is a light sensor at dusk: you want lights
         to come on when it is "dark". As the light fades the sensor will "flutter" rapidly for quite a long
         time before settling to its "dark" value. Only *then* do you want to switch the lights.
 
-        It can be used for both digital and analog values: when isAnalog == true; 'state' will contain raw
+        Each time it is polled, it will compare the raw analog value with limit and return 1 ig greater, else 0
         analog value.
-
-        New in v0.0.3.4 is the "PolledThing" which "ties" or links" or "binds" the Polled pin to any kind
-        of xSwitch or xThing
-
 */
-#define U_POLL_FREQ     5000
 
-H4 h4(115200,20); //auto-start Serial @ 115200, Q size=20 
-
+H4 h4(115200); //auto-start Serial @ 115200, Q size=20 
 H4P_GPIOManager h4gm;
-H4P_BinarySwitch h4bt(LED_BUILTIN,UL_ACTIVE,OFF);
-// or e.g. H4P_BinaryThing, UPNPThing, UPNPSwitch - in fact any xSwitch or xThing
+
+#define U_POLL_FREQ     5000
+#define U_LIMIT          100
 
 void h4setup() { // H4 constructor starts Serial
-    Serial.println("H4P_GPIOManager Polled Example v"H4P_VERSION);
-    Serial.print("GPIO ");Serial.print(USER_BTN);Serial.print(" ACTIVE ");Serial.println(UB_ACTIVE ? "HIGH":"LOW");
+    Serial.println("H4P_GPIOManager AnalogThreshold Example v"H4P_VERSION);
 
-    h4gm.PolledThing(USER_BTN,INPUT,UB_ACTIVE,U_POLL_FREQ,false,&h4bt);
+    h4gm.AnalogThreshold(A0,U_POLL_FREQ,U_LIMIT,[](H4GPIOPin* ptr){
+        H4GM_PIN(AnalogThreshold); // Create the correct pointer type in 'pin'
+        Serial.print("T=");Serial.print(millis());
+        Serial.print(" AnalogThreshold ");Serial.print(pin->pin);
+        Serial.print(" AnalogThreshold IS ");Serial.println(pin->logicalRead());
+    });
 }

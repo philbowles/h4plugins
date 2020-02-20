@@ -184,7 +184,7 @@ void H4P_WiFi::_gotIP(){
   	ArduinoOTA.setHostname(CSTR(host));
 	ArduinoOTA.setRebootOnSuccess(false);	
 	ArduinoOTA.begin();
-    EVENT("IP=%s\n",CSTR(_cb["ip"]));
+    EVENT("IP=%s",CSTR(_cb["ip"]));
     h4pcConnected();
 }
 

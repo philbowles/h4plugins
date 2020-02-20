@@ -50,6 +50,7 @@ Let's face it: there are only so many things you can do with a GPIO pin! Yes, th
 
 GPIOManager currently provides behaviours for:
 
+* AnalogThreshold - send 0 or 1 depending on raw analog value > or < user-defined limit
 * Circular - Counts 1 - N, 1 - N etc
 * Debounced - Eliminates switch bounce
 * Encoder - Standard quadrature rotary encoder
@@ -67,6 +68,7 @@ GPIOManager currently provides behaviours for:
 
 You should also read [Things vs Switches](things.md) which explains how some of the above strategies can be autmatically tied/bound/linked to predefined output actions. In it you will find how to use these variants of the above, each of which send an ON or OFF command to a linked output handler
 
+* AnalogThresholdThing - binds a AnalogThreshold input to a BinarySwitch or UPNPSwitch output
 * DebouncedThing - binds a Debounced input to a BinarySwitch or UPNPSwitch output
 * EncoderThing - binds a Encoder input to a BinarySwitch or UPNPSwitch output
 * LatchingThing - binds a Latching input to a BinarySwitch or UPNPSwitch output
@@ -270,6 +272,25 @@ This strategy can also do an `analogRead` if required: `state` will hold the raw
 
 ---
 
+### **AnalogThreshold**
+
+**AnalogThreshold** is a specialised version of **Polled**. As with **Polled** it has its state checked periodically but it then converts the raw analog value to a 0 or a 1 and compares it with a threshhold value. It will only execute the callback function if the > or < test against the threshold succeeds.
+
+#### Additional fields for AnalogThreshold
+
+`uint32_t        limit; // The threshold value`
+
+The constructor has a `compare` parameter which can be either `H4GM_LESS` or `H4GM_GREATER`
+
+* If the raw value of the encoder is 77 and you specify a limit of 100 and use `H4GM_LESS` then the callback will receive 1 as 77 is less than 100
+* If the raw value of the encoder is 77 and you specify a limit of 100 and use `H4GM_GREATER` then the callback will receive 0 as 77 is NOT greater than 100
+* If the raw value of the encoder is 100 and you specify a limit of 512 and use `H4GM_LESS` then the callback will receive 1 as 100 is less than 512
+* If the raw value of the encoder is 100 and you specify a limit of 512 and use `H4GM_GREATER` then the callback will receive 0 as 100 is NOT greater than 512
+
+[Example Code](../examples/H4GM_AnalogThreshold/H4GM_AnalogThreshold.ino)
+
+---
+
 ### **Encoder**
 
 Manages a rotary encoder, including all necessary debouncing and decoding. You get called with additional field `encoderValue` of -1 for every anti-clockwise click or +1 for clockwise. It's that simple. Obviously it requires two physical pins but one single call does everything for you.
@@ -279,6 +300,7 @@ It also has a variant that takes the name of an `int` variable instead of a call
 #### Additional fields for Encoder
 
 `int        encoderValue; // +1 clockwise click. -1 anti-clockwise`
+
 [Example Code](../examples/H4GM_Encoder/H4GM_Encoder.ino)
 
 ---
@@ -315,6 +337,7 @@ setPercent // manually set value to % of max - min
 setCenter // manully set the value to the mid-point (max - min / 2)
 
 ```
+
 [Example Code](../examples/H4GM_EncoderAuto/H4GM_EncoderAuto.ino)
 
 ---
@@ -375,6 +398,7 @@ For simplicity the code calls another plugin [H4P_FlasherController](../h4fc) to
 `int       stage; // current table entry not exceeding held time`
 
 `uint32_t        held; // Number of microseconds GPIO was held ON`
+
 [Example Code](../examples/H4GM_Multistage/H4GM_Multistage.ino)
 
 ---
@@ -411,6 +435,8 @@ void            toggle(uint8_t p); // reverse current logical state
 //
 //      Strategies
 //
+AnalogThresholdPin* AnalogThreshold(uint8_t p,uint32_t freq,uint32_t threshold,H4GM_COMPARE compare,H4GM_FN_EVENT callback);//
+AnalogThresholdPin* AnalogThresholdThing(uint8_t p,uint32_t freq,uint32_t threshold,H4GM_COMPARE compare,H4P_BinaryThing* btp);//
 CircularPin*        Circular(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,uint32_t nStages,H4GM_FN_EVENT callback);//
 DebouncedPin*       Debounced(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback);//
 DebouncedPin*       DebouncedThing(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4P_BinaryThing* btp);//

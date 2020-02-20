@@ -109,13 +109,14 @@ Your app can contain exactly one of these
 
 And as many GPIO input connectors as you need, to make your app do whatever it needs to do
 
-* DebouncedThing
-* EncoderThing
-* LatchingThing
-* PolledThing
-* RawThing
-* RetriggeringThing
-* [H4P_ThreeFunctionButton](h43fnb.md)
+* AnalogThresholdThing [Example Code](../examples/H4GM_AnalogThresholdThing/H4GM_AnalogThresholdThing.ino)
+* DebouncedThing [Example Code](../examples/H4GM_DebouncedThing/H4GM_DebouncedThing.ino)
+* EncoderThing [Example Code](../examples/H4GM_EncoderThing/H4GM_EncoderThing.ino)
+* LatchingThing [Example Code](../examples/H4GM_LatchingThing/H4GM_LatchingThing.ino)
+* PolledThing [Example Code](../examples/H4GM_PolledThing/H4GM_PolledThing.ino)
+* RawThing [Example Code](../examples/H4GM_RawThing/H4GM_RawThing.ino)
+* RetriggeringThing [Example Code](../examples/H4GM_RetriggeringThing/H4GM_RetriggeringThing.ino)
+* [H4P_ThreeFunctionButton](h43fnb.md) [Example Code](../examples/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
 
 ---
 
@@ -197,6 +198,7 @@ void friendlyName(const string& name); // sets UPNP friendly name. Causes a rebo
 
 You need to read the [H4P_GPIOManager](h4gm.md) documentation before using these
 
+[Example Sketch - AnalogThresholdThing](../examples/H4GM_DebouncedThing/H4GM_DebouncedThing.ino)
 [Example Sketch - DebouncedThing](../examples/H4GM_DebouncedThing/H4GM_DebouncedThing.ino)
 [Example Sketch - EncoderThing](../examples/H4GM_EncoderThing/H4GM_EncoderThing.ino)
 [Example Sketch - LatchingThing](../examples/H4GM_LatchingThing/H4GM_LatchingThing.ino)
@@ -261,7 +263,6 @@ The number of milliseconds "lifetime" between UPNP "keepalive" broadcasts
 The integer number of repeat UDP messages sent on each occasion to prevent packet loss
 
 ---
-
 
 (c) 2020 Phil Bowles h4plugins@gmail.com
 

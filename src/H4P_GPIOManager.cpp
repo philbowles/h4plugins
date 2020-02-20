@@ -216,7 +216,8 @@ void MultistagePin::sendEvent(){
 }
 
 PolledPin::PolledPin(uint8_t _p,uint8_t _g,H4GM_STYLE _s,uint8_t _a,uint32_t _f,uint32_t _v,H4GM_FN_EVENT _c): H4GPIOPin(_p,_g,_s,_a,_c),frequency(_f),isAnalog(_v){
-    h4.every(frequency,[this](){ read(); },nullptr,H4P_TRID_POLL);    
+    h4.every(frequency,[this](){ read(); },nullptr,H4P_TRID_POLL);
+    if(isAnalog) state=analogRead(pin);
 }
 void PolledPin::read(){
     if(isAnalog){ // integrate with ::run? abstratc readAny ?
@@ -226,6 +227,17 @@ void PolledPin::read(){
             _setState(inst);
         }
     } else H4GPIOPin::run();
+}
+
+AnalogThresholdPin::AnalogThresholdPin(uint8_t _p,uint32_t _f,uint32_t _l,H4GM_COMPARE _cf,H4GM_FN_EVENT _c): limit(_l), fCompare(_cf), PolledPin(_p,INPUT,H4GM_PS_THRESHA,ACTIVE_HIGH,_f,true,_c) {
+    state=fCompare(analogRead(pin),limit); // refakta
+}
+void AnalogThresholdPin::read(){
+    uint32_t inst=fCompare(analogRead(pin),limit);
+    if(inst!=state){
+        stampEvent();
+        _setState(inst);
+    }
 }
 
 SequencedPin::SequencedPin(uint8_t _p,uint8_t _g,H4GM_STYLE _s,uint8_t _a,uint32_t _t,H4GM_FN_EVENT _c): DebouncedPin(_p,_g,_s,_a,_t,_c){}
@@ -238,7 +250,6 @@ void SequencedPin::sendEvent() {
 
 RetriggeringPin::RetriggeringPin(uint8_t _p,uint8_t _g,H4GM_STYLE _s,uint8_t _a,uint32_t _t,H4GM_FN_EVENT _c): H4GPIOPin(_p,_g,_s,_a,_c),timeout(_t){}
 void RetriggeringPin::stateChange(){
- //   Serial.print("SC ");Serial.println(state);
 	if(state){
 		if(timer) timer=h4.cancel(timer);
 		else sendEvent();
@@ -302,10 +313,17 @@ void H4P_GPIOManager::toggle(uint8_t p){ if(isManaged(p))  reinterpret_cast<Outp
 //
 //      (Oblique) Strategies
 //
+
+AnalogThresholdPin* H4P_GPIOManager::AnalogThreshold(uint8_t pin,uint32_t freq,uint32_t threshold,H4GM_COMPARE compare,H4GM_FN_EVENT callback){
+    return thingFactory<AnalogThresholdPin>(nullptr,pin,freq,threshold,compare,callback);
+}
+AnalogThresholdPin* H4P_GPIOManager::AnalogThresholdThing(uint8_t pin,uint32_t freq,uint32_t threshold,H4GM_COMPARE compare,H4P_BinaryThing* btp){
+    return thingFactory<AnalogThresholdPin>(btp,pin,freq,threshold,compare,nullptr);
+}
+
 CircularPin* H4P_GPIOManager::Circular(uint8_t pin,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,uint32_t nStages,H4GM_FN_EVENT callback){
     return thingFactory<CircularPin>(nullptr,pin,mode,H4GM_PS_CIRCULAR,sense,dbTimeMs,nStages,callback);
 }
-
 
 DebouncedPin* H4P_GPIOManager::Debounced(uint8_t pin,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback){
     return thingFactory<DebouncedPin>(nullptr,pin, mode, H4GM_PS_DEBOUNCED, sense, dbTimeMs, callback);
