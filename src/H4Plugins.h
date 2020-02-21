@@ -14,6 +14,7 @@
 #include<H4P_FlasherController.h>
 
 #ifndef ARDUINO_ARCH_STM32
+    #include<H4P_WiFiSelect.h>
     #include<H4P_WiFi.h>
     #include<H4P_MQTT.h>
     #include<H4P_MQTTLogger.h>

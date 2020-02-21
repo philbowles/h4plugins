@@ -30,6 +30,7 @@
 #endif
 
 #include <Arduino.h>
+#include<H4P_WiFiSelect.h>
 #include <ESPAsyncTCP.h>
 #include <pgmspace.h>
 #include <xbuf.h>

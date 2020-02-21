@@ -36,6 +36,7 @@ SOFTWARE.
 #ifndef H4P_NO_WIFI
 #include<H4P_CmdErrors.h>
 #include<H4P_SerialCmd.h>
+    #include<ESPAsyncWebServer.h>
 
 class H4P_AsyncWebServer: public AsyncWebServer, public H4PluginService {
             H4_CMD_MAP          _local={};
