@@ -58,7 +58,7 @@ struct command{
 using 	H4_CMD_MAP		    =std::unordered_multimap<string,command>;
 using 	H4_CMD_MAP_I        =H4_CMD_MAP::iterator;
 using   H4P_CONFIG_BLOCK    =std::unordered_map<string,string>;
-using   H4P_FN_PSCHANGE     =function<void(string,string)>;
+using   H4P_FN_PSCHANGE     =function<void(const string&,const string&)>;
 
 enum H4_CMD_ERROR:uint32_t  {
     H4_CMD_OK,

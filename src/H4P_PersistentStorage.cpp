@@ -77,7 +77,7 @@ uint32_t H4P_PersistentStorage::_get(vector<string> vs){
 
 uint32_t H4P_PersistentStorage::_set(vector<string> vs){
     return guardString2(vs,[this](string a,string b){ 
-        psRam[a]=b; 
+        setstring(a,b);
         _showItem(a); //
     }); 
 }
