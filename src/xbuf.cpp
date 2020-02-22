@@ -1,3 +1,4 @@
+#ifndef ARDUINO_ARCH_STM32
 #include<H4P_WiFiSelect.h>
 #ifndef H4P_NO_WIFI
 #include <xbuf.h>
@@ -266,4 +267,5 @@ void        xbuf::remSeg(){
     }   
     _offset = 0;
 }
+#endif
 #endif
