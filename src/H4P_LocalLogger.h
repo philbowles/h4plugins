@@ -37,7 +37,7 @@ class H4P_LocalLogger: public H4PLogService {
 //
         uint32_t    _limit;
 
-        virtual void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error=0);
+        virtual void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target);
     public:
         H4P_LocalLogger(uint32_t limit=10000); // amount of free SPIFFS space to use
 

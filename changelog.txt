@@ -1,4 +1,10 @@
 
+2020/02/19  0.4.0
+    fixed
+        OTA on ESP32
+    new
+        mysql logger EXPERIMENTAL!
+        
 2020/02/19  0.3.6
     bugfix
         Polled not getting value on fake event when in analog mode

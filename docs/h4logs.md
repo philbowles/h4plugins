@@ -35,6 +35,7 @@ enum H4P_LOG_TYPE {
     H4P_LOG_USER=8,// arbitrary message from user code
     H4P_LOG_DEPENDFAIL=16,// dependent plugin omitted by user
     H4P_LOG_MQTT_HEAP=32, // value of current heap
+    H4P_LOG_MQTT_Q=64, // size of queue
     H4P_LOG_ALL=0xffffffff
 };
 ```

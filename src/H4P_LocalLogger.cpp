@@ -48,8 +48,8 @@ void H4P_LocalLogger::show(){ h4sc._dump(vector<string>{logTag()}); }
 //
 //      our raison d'etre
 //
-void H4P_LocalLogger::_logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t e){
-    vector<string> msgparts={stringFromInt(millis()),stringFromInt(type),source,target,stringFromInt(e),msg};
+void H4P_LocalLogger::_logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target){
+    vector<string> msgparts={stringFromInt(millis()),stringFromInt(type),source,target,msg};
     uint32_t size=h4sc.write("/log",join(msgparts,",").append("\n"),"a");
     if(size > _limit) flush();
 }

@@ -69,6 +69,7 @@ void H4P_AsyncWebServer::_rest(AsyncWebServerRequest *request){
         lines.clear();
 	},request),nullptr,H4P_TRID_ASWS);
 }
+
 String H4P_AsyncWebServer::aswsReplace(const String& var){
     string v=CSTR(var);
     return _cb.count(v) ? String(CSTR(_cb[v])):"?";
@@ -78,7 +79,7 @@ void H4P_AsyncWebServer::start(){
 	reset();
 
     on("/",HTTP_GET, [this](AsyncWebServerRequest *request){ 
-        Serial.printf("WOOT\n");
+        H4EVENT(request->client()->remoteIP().toString().c_str(),aswsTag());
         string rootweb=WiFi.getMode() & WIFI_AP ? "/ap.htm":"/sta.htm"; // streeamline - even fn change
         request->send(SPIFFS,CSTR(rootweb),String(),false,aswsReplace);
     });
@@ -109,7 +110,6 @@ void H4P_AsyncWebServer::start(){
 void H4P_AsyncWebServer::stop(){ 
     end();
     h4pcDisconnected();
-    Serial.printf("ASWS down\n");
 }
 
 #endif // H4_WIFI

@@ -31,6 +31,7 @@ SOFTWARE.
 #define H4P_BinaryThing_HO
 
 #include<H4PCommon.h>
+#include<H4P_SerialCmd.h>
 #include<H4P_WiFiSelect.h>
 #ifndef H4P_NO_WIFI
     #include<H4P_MQTT.h>
@@ -57,12 +58,8 @@ class H4P_BinaryThing: public H4Plugin{
         virtual void        _setState(bool b) { _state=b; }
 
                 uint32_t    _showState(vector<string> vs){ reply("State: %s\n",_getState() ? "ON":"OFF"); return H4_CMD_OK; }
-        uint32_t            _switch(vector<string> vs){ return guardInt1(vs,bind(&H4P_BinaryThing::turn,this,_1)); }
-        void                _greenLight() override { _f(_state); }
-
-
-
-
+                uint32_t    _switch(vector<string> vs){ return guardInt1(vs,bind(&H4P_BinaryThing::turn,this,_1)); }
+                void        _greenLight() override { _f(_state); }
     public:
         H4P_BinaryThing(H4BS_FN_SWITCH f=[](bool){},bool initial=OFF): _f(f),_state(initial){
             _pid=onofTag();
@@ -78,14 +75,16 @@ class H4P_BinaryThing: public H4Plugin{
         void turnOff(){ turn(false); }
         void turnOn(){ turn(true); }
         void toggle(){ turn(!_state); }
-        void turn(bool b){ 
+        void turn(bool b){ _turn(b,"user"); }
+        // syscall only
+        void _turn(bool b,const string& src){
             if(b!=_getState()){
                 _setState(b);
                 _f(_state);
                 _publish(_state);
+                H4EVENT((_state ? "ON":"OFF"),src);
             }
         }
 };
 
-//extern __attribute__((weak)) H4P_BinaryThing h4bt;
 #endif // H4P_BinaryThing_H

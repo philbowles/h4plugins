@@ -106,23 +106,30 @@ void H4P_SerialCmd::all(){
     });
 }
 
-void H4P_SerialCmd::_logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error){
-    for(auto const& l:_logChain) l(msg,type,source,target,error); // if 0 serial print
+void H4P_SerialCmd::_logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target){
+//    Serial.printf("H4P_SerialCmd::_logEvent %s -> %d loggers\n",CSTR(msg),_logChain.size());
+    for(auto const& l:_logChain) l(msg,type,source,target); // if 0 serial print
 }
 
 uint32_t H4P_SerialCmd::_executeCmd(string topic, string pload){
+//    Serial.printf("_executeCmd %s\n",CSTR(topic));
 	vector<string> vs=split(CSTR(topic),"/");
     _cb["source"]=vs[0];
     _cb["target"]=vs[1];
 	vs.push_back(pload);
     vector<string> cmd(vs.begin()+2,vs.end());
-	uint32_t rv=_dispatch(vector<string>(cmd)); // optimise?
-    _logEvent(join(cmd,"/"),H4P_LOG_CMD,vs[0],vs[1],rv);
+    #ifdef H4P_LOG_EVENTS
+//        Serial.printf("_executeCmd 2 %s\n",CSTR(topic));
+        _logEvent(join(cmd,"/"),H4P_LOG_CMD,vs[0],vs[1]);
+    #endif	
+    uint32_t rv=_dispatch(vector<string>(cmd)); // optimise?
+    #ifdef H4P_LOG_EVENTS
+        if(rv) _logEvent(_errorString(rv),H4P_LOG_ERROR,vs[0],vs[1]);
+    #endif
     return rv;
 }
 
 void H4P_SerialCmd::help(){ 
-//    reply("Available cmds:\n");
     vector<string> unsorted={};
     __flatten([&unsorted](string s){ unsorted.push_back(s); });
     sort(unsorted.begin(),unsorted.end());
@@ -130,7 +137,7 @@ void H4P_SerialCmd::help(){
 }
 
 uint32_t H4P_SerialCmd::invokeCmd(string topic,string payload,const char* src){ 
-    return _executeCmd(string(src)+"/self/"+CSTR(topic),string(CSTR(payload)));
+    return _executeCmd(string(src)+"/h4/"+CSTR(topic),string(CSTR(payload)));
 }
 
 uint32_t H4P_SerialCmd::invokeCmd(string topic,uint32_t payload,const char* src){ 
@@ -187,7 +194,7 @@ void H4P_SerialCmd::logEventType(H4P_LOG_TYPE t,const string& fmt,...){
     va_start(ap, fmt); 
     vsnprintf(buff,255,CSTR(fmt),ap);
     va_end(ap);
-    _logEvent(buff,t,"user","self",0);
+    _logEvent(buff,t,"user","h4");
 }
 
 void H4P_SerialCmd::plugins(){ for(auto const& p:H4Plugin::_plugins) reply("P: %s ID=%d\n",CSTR(p->_pid),p->subid); }
@@ -198,6 +205,9 @@ void H4P_SerialCmd::showUnload(){ for(auto const& u:H4::unloadables) reply("U: %
 
 void H4P_SerialCmd::tnames(){ for(auto const& n:H4::trustedNames) { reply("T: %d=%s\n",n.first,CSTR(n.second)); }}
 //
+string H4P_SerialCmd::_errorString(uint32_t err){
+    return H4Plugin::isLoaded(cerrTag()) ? h4ce.getErrorMessage(err):"Error: "+stringFromInt(err);
+}
 void H4P_SerialCmd::run(){ // halting loop optimise
     static string cmd="";
 	static int	c;
@@ -206,12 +216,7 @@ void H4P_SerialCmd::run(){ // halting loop optimise
         if (c == '\n') {
             h4.queueFunction(bind([this](string cmd){
                 uint32_t err=_simulatePayload(cmd);
-                if(err){
-                    string msg;
-                    if(H4Plugin::isLoaded(cerrTag())) msg=h4ce.getErrorMessage(err)+" "+cmd;
-                    else msg="Error: "+stringFromInt(err);
-                    reply("%s\n",CSTR(msg));
-                }
+                if(err) reply("%s\n",CSTR(_errorString(err)));
             },cmd),nullptr,H4P_TRID_SCMD);
             cmd="";
         } else cmd+=c;		

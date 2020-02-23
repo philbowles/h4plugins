@@ -27,6 +27,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_ThreeFunctionButton.h>
+#include<H4P_FlasherController.h>
+
+#include<H4P_WiFiSelect.h>
+#include<H4P_WiFi.h>
+#include<H4P_MQTT.h>
 #ifndef H4P_NO_WIFI
 
 void H4P_ThreeFunctionButton::progress(H4GPIOPin* ptr){ // run this as each stage changes
@@ -61,8 +66,8 @@ void H4P_ThreeFunctionButton::_hookIn(){
     }
 }
 
-H4P_ThreeFunctionButton::H4P_ThreeFunctionButton(H4P_BinaryThing* bsp,uint32_t dbTimeMs,uint8_t pin,uint8_t mode,H4GM_SENSE b_sense,uint8_t led,H4GM_SENSE l_sense):
-        _bsp(bsp),_led(led),_active(l_sense){
+H4P_ThreeFunctionButton::H4P_ThreeFunctionButton(H4P_BinaryThing* btp,uint32_t dbTimeMs,uint8_t pin,uint8_t mode,H4GM_SENSE b_sense,uint8_t led,H4GM_SENSE l_sense):
+        _btp(btp),_led(led),_active(l_sense){
             
     _pid=tfnbTag();
     H4GM_FN_EVENT cb=bind(&H4P_ThreeFunctionButton::progress,this,_1);

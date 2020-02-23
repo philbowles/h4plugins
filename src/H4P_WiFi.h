@@ -50,6 +50,7 @@ class H4P_WiFi: public H4PluginService{
                 void        _hookIn() override;
                 void        _lostIP();
                 void        _scan();
+                void        _setHost(const string& host);
                 void        _startSTA();
                 void        _startAP();
                 void        _stop();

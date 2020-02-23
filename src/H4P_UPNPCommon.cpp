@@ -148,8 +148,11 @@ void H4P_UPNPCommon::_upnp(AsyncWebServerRequest *request){ // redo
   h4.queueFunction(bind([this](AsyncWebServerRequest *request) {
         string soap=stringFromBuff((const byte*) request->_tempObject,strlen((const char*) request->_tempObject));
         H4Plugin::_cb["gs"]=(soap.find("Get")==string::npos) ? "Set":"Get";
-        if(H4Plugin::_cb["gs"]=="Set") _setState(soap.find(">1<")==string::npos ? 0:1);
-        H4Plugin::_cb[stateTag()]=_getState() ? "1":"0";
+        uint32_t _set=soap.find(">1<")==string::npos ? 0:1;
+        if(H4Plugin::_cb["gs"]=="Set"){
+            _turn(_set,upnpTag());//
+        }
+        H4Plugin::_cb[stateTag()]=stringFromInt(_getState());
         request->send(200, "text/xml", CSTR(H4P_WiFi::replaceParams(_soap))); // refac
     },request),nullptr, H4P_TRID_SOAP); // TRID_SOAP
 }

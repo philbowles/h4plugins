@@ -6,7 +6,7 @@
 #include<H4P_PersistentStorage.h>
 #include<H4P_LocalLogger.h>
 #include<H4P_SerialLogger.h>
-//#include<H4P_HttpMySQLLogger.h>
+#include<H4P_HttpMySQLLogger.h>
 #include<H4P_ExternalSqWave.h>
 #include<H4P_TaskSniffer.h>
 #include<H4P_QueueWarn.h>
@@ -19,6 +19,7 @@
     #include<H4P_MQTT.h>
     #include<H4P_MQTTLogger.h>
     #include<H4P_MQTTHeapLogger.h>
+    #include<H4P_MQTTQueueLogger.h>
     #include<H4P_AsyncWebServer.h>
     #include<H4P_UPNPSwitch.h>
     #include<H4P_UPNPThing.h>

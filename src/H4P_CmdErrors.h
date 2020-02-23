@@ -33,7 +33,6 @@ SOFTWARE.
 #include<H4PCommon.h>
 
 class H4P_CmdErrors: public H4Plugin {
-//    protected:
         H4_INT_MAP  cmdErrors={
             {H4_CMD_OK,"OK"},
             {H4_CMD_UNKNOWN,"Unknown cmd"},
@@ -42,15 +41,30 @@ class H4P_CmdErrors: public H4Plugin {
             {H4_CMD_NOT_NUMERIC,"Numeric value expected"},
             {H4_CMD_OUT_OF_BOUNDS,"Value out of range"},
             {H4_CMD_NAME_UNKNOWN,"Name not known"},
-            {H4_CMD_PAYLOAD_FORMAT,"Incorrect Payload Format"},     
-            {H4_CMD_PROHIBITED,"Prohibited from here"}     
+            {H4_CMD_PAYLOAD_FORMAT,"Incorrect Payload Format"}
+//            {H4_CMD_PROHIBITED,"Prohibited from here"}
         };
-//         
+//
+        H4_INT_MAP  logTypes={
+            {H4P_LOG_H4,"H4"},
+            {H4P_LOG_SVC_UP,"SVC UP"},
+            {H4P_LOG_SVC_DOWN,"SVC DOWN"},
+            {H4P_LOG_CMD,"CMD"},
+            {H4P_LOG_USER,"USER"},
+            {H4P_LOG_DEPENDFAIL,"DEPEND FAIL"},
+            {H4P_LOG_MQTT_HEAP,"MQTT HEAP"},
+            {H4P_LOG_MQTT_Q,"MQTT Q"},
+            {H4P_LOG_ERROR,"ERROR"}
+        };
     public:
-        H4P_CmdErrors(){ _pid=cerrTag(); }
+        H4P_CmdErrors(){ _pid=cerrTag(); }//?
 
         string      getErrorMessage(uint32_t e){
             return cmdErrors.count(e) ? cmdErrors[e]:string("No such error (")+stringFromInt(e)+")";
+        }
+
+        string      getLogType(uint32_t e){
+            return logTypes.count(e) ? logTypes[e]:string("No such type (")+stringFromInt(e)+")";
         }
 };
 

@@ -43,7 +43,7 @@ SOFTWARE.
 class H4P_UPNPSwitch: public H4P_BinarySwitch, public H4P_UPNPCommon {
         void        _hookIn() override{ H4P_UPNPCommon::_pseudoHookIn(); }
         bool        _getState() override { return H4P_BinarySwitch::_getState(); }
-        void        _setState(bool b) override { H4P_BinarySwitch::_setState(b); }
+        void        _turn(bool b,const string& src) override { H4P_BinarySwitch::_turn(b,src); }
     public:
         H4P_UPNPSwitch(const string& name,uint8_t pin,H4GM_SENSE sense, uint32_t initial,H4BS_FN_SWITCH f=[](bool){}): 
             H4P_BinarySwitch(pin,sense,initial,f),

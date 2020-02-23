@@ -43,11 +43,11 @@ using   namespace std::placeholders;
 
 class H4Plugin;
 
-using H4P_FN_LOG = function<void(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error)>;
+using H4P_FN_LOG = function<void(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target)>;
 
 class H4P_SerialCmd: public H4Plugin {
         vector<H4P_FN_LOG>  _logChain;
-  protected:
+//  protected:
         VSCMD(_unload);
 
         H4_CMD_MAP_I    __exactMatch(const string& cmd,uint32_t owner);
@@ -56,6 +56,8 @@ class H4P_SerialCmd: public H4Plugin {
         uint32_t        _dispatch(vector<string> vs,uint32_t owner);
         void            _hookIn() override;
         void            _flattenCmds(function<void(string)> fn,string cmd="",string prefix="",uint32_t owner=0);
+        string          _errorString(uint32_t e);
+
         void            run();
     public:
 #ifndef ARDUINO_ARCH_STM32
@@ -84,9 +86,9 @@ class H4P_SerialCmd: public H4Plugin {
         void            unload(const uint32_t subid);
 //      syscall only
         void            _addCmd(const string& name,struct command cmd){ commands.insert(make_pair(name,cmd)); }
-        void            _noOP(){} // for non-events
+//        void            _noOP(){} // for non-events
         void            _hookLogChain(H4P_FN_LOG f){ _logChain.push_back(f); }
-        void            _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error);
+        void            _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target);
         uint32_t        _executeCmd(string topic, string pload);
         uint32_t        _simulatePayload(string flat,const char* src="kybd");
 };

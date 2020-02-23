@@ -31,15 +31,16 @@ SOFTWARE.
 #define H4P_SerialLogger_HO
 
 #include <H4PCommon.h>
+#include <H4P_CmdErrors.h>
 #include <H4P_SerialCmd.h>
 
 class H4P_SerialLogger: public H4PLogService {
-        void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error){
-            Serial.print("TYPE"); Serial.print(type);
-            Serial.print(" s="); Serial.print(CSTR(source));
-            Serial.print(" t="); Serial.print(CSTR(target));
-            Serial.print(" e="); Serial.print(error);
-            Serial.print(" ");Serial.println(CSTR(msg));
+        string _getType(uint32_t t){ return H4Plugin::isLoaded(cerrTag()) ? h4ce.getLogType(t):"TYPE="+stringFromInt((int) t); }
+        void   _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target){
+            Serial.print(CSTR(_getType(type)));
+            Serial.print(" "); Serial.print(CSTR(source));
+            Serial.print("->"); Serial.print(CSTR(target));
+            Serial.print(": ");Serial.println(CSTR(msg));
         }
     public:
         H4P_SerialLogger(uint32_t filter=H4P_LOG_ALL): H4PLogService("slog",filter){}

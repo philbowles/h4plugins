@@ -148,9 +148,9 @@ void H4PluginService::h4pcDisconnected(){
 void H4PluginService::svc(const string& uid,H4P_LOG_TYPE ud) {
     #ifdef H4P_LOG_EVENTS 
         if(H4Plugin::isLoaded(scmdTag())) {
-            h4sc._logEvent(uid,ud,"h4","",0);
-//            Serial.print("SVC ");Serial.print(CSTR(uid));
-//            Serial.print(" ");Serial.println(ud==H4P_LOG_SVC_UP ? "UP":"DOWN");
+            h4sc._logEvent(uid,ud,"svc","h4");
+            Serial.print("SVC ");Serial.print(CSTR(uid));
+            Serial.print(" ");Serial.println(ud==H4P_LOG_SVC_UP ? "UP":"DOWN");
         }
     #endif
 }
@@ -158,7 +158,6 @@ void H4PluginService::svc(const string& uid,H4P_LOG_TYPE ud) {
 //      H4PlogService
 //
 void H4PLogService::_hookIn(){ 
-    h4sc._hookLogChain(bind(&H4PLogService::_filterLog,this,_1,_2,_3,_4,_5));
+    h4sc._hookLogChain(bind(&H4PLogService::_filterLog,this,_1,_2,_3,_4));
     h4sc.addCmd("msg",subid, 0, CMDNULL);
-    start();
 }

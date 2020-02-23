@@ -73,7 +73,7 @@ class H4P_UPNPCommon{
     protected:
                 void        _pseudoHookIn();
         virtual bool        _getState()=0;
-        virtual void        _setState(bool b)=0;
+        virtual void        _turn(bool b,const string& src)=0;
     public:
         H4P_UPNPCommon(const string& name): _name(name){
             _pups.push_back(_urn+"device:controllee:1");

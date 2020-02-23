@@ -68,19 +68,22 @@ enum H4_CMD_ERROR:uint32_t  {
     H4_CMD_NOT_NUMERIC,
     H4_CMD_OUT_OF_BOUNDS,
     H4_CMD_NAME_UNKNOWN,
-    H4_CMD_PAYLOAD_FORMAT,
-    H4_CMD_PROHIBITED
+    H4_CMD_PAYLOAD_FORMAT
 };
 
 enum H4P_LOG_TYPE {
-    H4P_LOG_SVC_UP=1,
-    H4P_LOG_SVC_DOWN=2,
-    H4P_LOG_CMD=4,
-    H4P_LOG_USER=8,
-    H4P_LOG_DEPENDFAIL=16,
-    H4P_LOG_MQTT_HEAP=32,
-    H4P_LOG_ALL=0xffffffff
+    H4P_LOG_H4=1,
+    H4P_LOG_SVC_UP=2,
+    H4P_LOG_SVC_DOWN=4,
+    H4P_LOG_CMD=8,
+    H4P_LOG_USER=16,
+    H4P_LOG_DEPENDFAIL=32,
+    H4P_LOG_MQTT_HEAP=64,
+    H4P_LOG_MQTT_Q=128,
+    H4P_LOG_ALL=0xffffffff,
+    H4P_LOG_ERROR=H4P_LOG_ALL
 };
+
 #define ON true
 #define OFF false
 //
@@ -128,14 +131,16 @@ STAG(wifi);
 #define VSCMD(x) uint32_t x(vector<string>)
 #ifdef H4P_LOG_EVENTS
     #define EVENT(x,...) h4sc.logEventType(H4P_LOG_USER,x, ##__VA_ARGS__)
+    #define H4EVENT(x,y) if(H4Plugin::isLoaded(scmdTag())) { h4sc._logEvent((x),H4P_LOG_H4,y,_pid); }
     #define SYSEVENT(e,x,...) h4sc.logEventType(e,x, ##__VA_ARGS__)
     #define DEPENDFAIL(x) h4sc.logEventType(H4P_LOG_DEPENDFAIL,"%s->%s", CSTR(_pid),x##Tag())
-    #define logEvent(x,...) logEventType(H4P_LOG_USER,x, ##__VA_ARGS__)
+    #define h4UserEvent(x,...) if(H4Plugin::isLoaded(scmdTag())) { h4sc.logEventType(H4P_LOG_USER,x, ##__VA_ARGS__); }
 #else
     #define EVENT(x,...)
+    #define H4EVENT(x,y)
     #define SYSEVENT(e,x,...)
     #define DEPENDFAIL(x)
-    #define logEvent(x,...) _noOP()
+    #define h4UserEvent(x,...)
 #endif
 //
 //      PLUGINS
@@ -161,7 +166,9 @@ enum trustedIds {
   H4P_TRID_UDPM,
   H4P_TRID_NTFY,
   H4P_TRID_SCMD,
-  H4P_TRID_HLOG
+  H4P_TRID_HLOG,
+  H4P_TRID_QLOG,
+  H4P_TRID_MLRQ
 };
 
 enum H4PC_CMD_ID{
@@ -242,6 +249,7 @@ class H4PluginService: public H4Plugin {
         static vector<H4_FN_VOID>  _factoryChain;
 
                 void        _startup() override;
+        virtual void        _greenLight() override {}
 
         H4PluginService(H4_FN_VOID onConnect=[](){},H4_FN_VOID onDisconnect=[](){}){
                 hookConnect(onConnect);
@@ -258,21 +266,21 @@ class H4PluginService: public H4Plugin {
 };
 
 class H4PLogService: public H4PluginService {
-                bool        _running=true;
+                bool        _running=false;
                 uint32_t    _filter=0;
-        virtual void        _filterLog(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error=0){
-            if(_running){ if(type & _filter) _logEvent(msg,type,source,target,error); }
+        virtual void        _filterLog(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target){
+            if(_running){ if(type & _filter) _logEvent(msg,type,source,target); }
         }
     protected:
-                void        _hookIn() override;
-
-        virtual void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error=0)=0;
+        virtual void        _hookIn() override;
+        virtual void        _greenLight() override { start(); }
+        virtual void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target)=0;
     public:
         H4PLogService(const string& lid,uint32_t filter=0xffffffff): _filter(filter){
             _pid=lid;
         }
-                void        start() override { svc(_pid,H4P_LOG_SVC_UP); _running=true; };
-                void        stop() override { _running=false; svc(_pid,H4P_LOG_SVC_DOWN);  };
+        virtual void        start() override { svc(_pid,H4P_LOG_SVC_UP); _running=true; };
+        virtual void        stop() override { _running=false; svc(_pid,H4P_LOG_SVC_DOWN); };
 };
 
 #endif // H4P_HO

@@ -35,10 +35,9 @@ SOFTWARE.
 #include <H4P_MQTT.h>
 
 class H4P_MQTTLogger: public H4PLogService {
-        void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error){
-            h4mqtt.publishDevice(_pid,msg);
-        }
-        void _hookIn() override { // protect
+        void _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target){ h4mqtt.publishDevice(_pid,msg); }
+    protected:
+        void _hookIn() override {
             if(H4Plugin::isLoaded(mqttTag())){
                 H4PLogService::_hookIn();
                 h4mqtt.hookConnect([this](){ start(); });

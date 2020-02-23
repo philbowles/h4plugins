@@ -29,7 +29,29 @@ SOFTWARE.
 #include<H4PCommon.h>
 #include<H4P_WiFi.h>
 
+//extern uint32_t upat;
+
 #ifndef H4P_NO_WIFI
+void H4P_WiFi::_gotIP(){
+    _discoDone=false;
+    _cb["ip"]=WiFi.localIP().toString().c_str();
+    _cb[ssidTag()]=CSTR(WiFi.SSID());
+    _cb["psk"]=CSTR(WiFi.psk());
+
+    string host=_cb[deviceTag()];
+
+    h4.every(H4WF_OTA_RATE,[](){ ArduinoOTA.handle(); },nullptr,H4P_TRID_HOTA,true);
+    //WiFi.hostname(CSTR(host));
+    _setHost(host);
+  	ArduinoOTA.setHostname(CSTR(host));
+	ArduinoOTA.setRebootOnSuccess(false);	
+	ArduinoOTA.begin();
+
+    _cb.erase("opts"); // lose any old AP ssids
+    H4EVENT(_cb["ip"],_pid);
+    h4pcConnected();
+}
+
 void H4P_WiFi::_hookIn(){ 
     WiFi.onEvent(_wifiEvent);
     H4PluginService::hookFactory([this](){ clear(); });
@@ -115,6 +137,10 @@ void H4P_WiFi::_lostIP(){
 }
 
 #ifdef ARDUINO_ARCH_ESP8266
+void H4P_WiFi::_setHost(const string& host){
+    WiFi.hostName(CSTR(host));
+}
+
 string H4P_WiFi::_getChipID(){ return stringFromInt(ESP.getChipId(),"%06X"); }
 
 void H4P_WiFi::clear(){ 
@@ -171,22 +197,7 @@ void H4P_WiFi::stop(){
 //
 //      H4P_WiFi
 //
-void H4P_WiFi::_gotIP(){
-    _discoDone=false;
-    _cb["ip"]=WiFi.localIP().toString().c_str();
-    _cb[ssidTag()]=CSTR(WiFi.SSID());
-    _cb["psk"]=CSTR(WiFi.psk());
 
-    string host=_cb[deviceTag()];
-
-    h4.every(H4WF_OTA_RATE,[](){ ArduinoOTA.handle(); },nullptr,H4P_TRID_HOTA,true);
-    WiFi.hostname(CSTR(host));
-  	ArduinoOTA.setHostname(CSTR(host));
-	ArduinoOTA.setRebootOnSuccess(false);	
-	ArduinoOTA.begin();
-    EVENT("IP=%s",CSTR(_cb["ip"]));
-    h4pcConnected();
-}
 
 /*
 ESP8266
@@ -204,17 +215,22 @@ ESP8266
     WIFI_EVENT_MODE_CHANGE
 
 */
+
 void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
     switch(event) {
         case WIFI_EVENT_STAMODE_DISCONNECTED:
 			h4.queueFunction([](){ h4wifi._lostIP(); });
             break;    
 		case WIFI_EVENT_STAMODE_GOT_IP:
+//            upat=millis();
 			h4.queueFunction([](){ h4wifi._gotIP(); });
 			break;
 	}
 }
 #else
+void H4P_WiFi::_setHost(const string& host){
+    WiFi.setHostname(CSTR(host));
+}
 string H4P_WiFi::_getChipID(){
     uint64_t macAddress = ESP.getEfuseMac();
     uint64_t macAddressTrunc = macAddress << 40;
@@ -261,19 +277,25 @@ void H4P_WiFi::stop(){
     _stop();
     WiFi.disconnect(true,false);
 }
-//
-//      H4P_WiFi
-//
+/*
 void H4P_WiFi::_gotIP(){
     _discoDone=false;
     _cb["ip"]=WiFi.localIP().toString().c_str();
     _cb[ssidTag()]=CSTR(WiFi.SSID());
     _cb["psk"]=CSTR(WiFi.psk());
     string host=_cb[deviceTag()];
+
+    h4.every(H4WF_OTA_RATE,[](){ ArduinoOTA.handle(); },nullptr,H4P_TRID_HOTA,true);
+    WiFi.setHostname(CSTR(host));
+  	ArduinoOTA.setHostname(CSTR(host));
+	ArduinoOTA.setRebootOnSuccess(false);	
+	ArduinoOTA.begin();
+
     _cb.erase("opts"); // lose any old AP ssids
     EVENT("IP=%s\n",CSTR(_cb["ip"]));
     h4pcConnected();
 }
+*/
 /* ESP32
 * WiFi Events
 0  SYSTEM_EVENT_WIFI_READY               < ESP32 WiFi ready
@@ -313,6 +335,7 @@ void H4P_WiFi::_gotIP(){
     WL_DISCONNECTED     = 6
 
 */
+
 void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
     switch(event) {
         case SYSTEM_EVENT_STA_STOP:
@@ -320,6 +343,7 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
 			if(!(WiFi.getMode() & WIFI_AP)) h4.queueFunction([](){ h4wifi._lostIP(); });
             break;
 		case SYSTEM_EVENT_STA_GOT_IP:
+//            upat=millis();
 			h4.queueFunction([](){ h4wifi._gotIP(); });
 			break;
 	}

@@ -58,7 +58,7 @@ void H4GPIOPin::_factoryCommon(H4P_BinaryThing* btp){
             */
             if(pp->style==H4GM_PS_LATCHING) {
                 if(pp->nEvents) btp->toggle(); // POTENTIAL BUG! if btp already commanded on, 1st time wont toggle
-            } else btp->turn(pp->logicalRead());
+            } else btp->_turn(pp->logicalRead(),gpioTag());
         };
     }
     H4P_GPIOManager::pins[pin]=this;
