@@ -35,7 +35,8 @@ void H4P_UPNPCommon::_pseudoHookIn(){
 
         h4._hookLoop(nullptr,{ 
             {H4P_TRID_SOAP, "SOAP"},
-            {H4P_TRID_SOAP, "UDPM"},
+            {H4P_TRID_UDPM, "UDPM"},
+            {H4P_TRID_UDPS, "UDPS"},
             {H4P_TRID_NTFY, "NTFY"} 
             },H4PC_UPNP);
 
@@ -65,8 +66,7 @@ uint32_t H4P_UPNPCommon::_friendly(vector<string> vs){
 void H4P_UPNPCommon::__upnpSend(uint32_t mx,const string s,IPAddress ip,uint16_t port){
 	h4.nTimesRandom(H4P_UDP_REPEAT,0,mx,bind([this](IPAddress ip,uint16_t port,string s) {
 		_udp.writeTo((uint8_t *)CSTR(s), s.size(), ip, port);
-		},ip,port,s)
-	); // name this!!
+		},ip,port,s),nullptr,H4P_TRID_UDPS); // name this!!
 }
 
 void H4P_UPNPCommon::_listenUDP(){

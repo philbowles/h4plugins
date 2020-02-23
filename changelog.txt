@@ -2,9 +2,19 @@
 2020/02/19  0.4.0
     fixed
         OTA on ESP32
+        onChange bug in persistent storage
     new
-        mysql logger EXPERIMENTAL!
-        
+        mysql logger EXPERIMENTAL! + new example
+        EVENTS on Binary thing and most thing drivers for logging
+        cmdErrors enchanced to reverse logTypes
+        getLogType added
+        H4P_MQTTQueueLogger + example
+
+    changed
+        error removed from dealut log msg
+        new H4P_LOG_ERROR with seperate log msg id res > 0
+        serial logger trnslates type code is cmderrors used
+
 2020/02/19  0.3.6
     bugfix
         Polled not getting value on fake event when in analog mode
@@ -54,9 +64,16 @@
     than a ground-up rewrite :)
 
 TODO:
+SHORTTERM
+    coalesce wifif scan 8266/32
+MEDIUMTERM
+    getnextseq in mysl logger?
+    dependfail on all dependencies // #defineable out?
+    "muser" tag
 LONGTERM 
+    merge h4plugin / service?
+    async mqtt?
     remote client get
-    sql logger
     rf bridge
     signal on no spiffs
     template for hooking?

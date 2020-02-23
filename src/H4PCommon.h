@@ -104,17 +104,21 @@ STAG(esqw);
 STAG(gpio);
 STAG(log);
 STAG(mqtt);
+STAG(msg);
 STAG(name);
 STAG(onof);
 STAG(port);
+STAG(psk);
 STAG(qwrn);
 STAG(scmd);
 STAG(snif);
+STAG(src);
 STAG(ssid);
 STAG(state);
 STAG(stor);
 STAG(tfnb);
 STAG(upnp);
+STAG(user);
 STAG(wink);
 STAG(wifi);
 
@@ -164,6 +168,7 @@ enum trustedIds {
   H4P_TRID_ASWS,
   H4P_TRID_SOAP,
   H4P_TRID_UDPM,
+  H4P_TRID_UDPS,
   H4P_TRID_NTFY,
   H4P_TRID_SCMD,
   H4P_TRID_HLOG,

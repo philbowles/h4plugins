@@ -102,7 +102,7 @@ uint32_t H4P_SerialCmd::_unload(vector<string> vs){
 void H4P_SerialCmd::all(){
     __flatten([this](string s){ 
         vector<string> candidates=split(s,"/");
-        if(candidates.size()>1 && candidates[1]=="show" && candidates[2]!="all") invokeCmd(s,"",CSTR(_cb["source"])); // snake / tail etc
+        if(candidates.size()>1 && candidates[1]=="show" && candidates[2]!="all") invokeCmd(s,"",CSTR(_cb[srcTag()])); // snake / tail etc
     });
 }
 
@@ -114,7 +114,7 @@ void H4P_SerialCmd::_logEvent(const string &msg,H4P_LOG_TYPE type,const string& 
 uint32_t H4P_SerialCmd::_executeCmd(string topic, string pload){
 //    Serial.printf("_executeCmd %s\n",CSTR(topic));
 	vector<string> vs=split(CSTR(topic),"/");
-    _cb["source"]=vs[0];
+    _cb[srcTag()]=vs[0];
     _cb["target"]=vs[1];
 	vs.push_back(pload);
     vector<string> cmd(vs.begin()+2,vs.end());
@@ -194,7 +194,7 @@ void H4P_SerialCmd::logEventType(H4P_LOG_TYPE t,const string& fmt,...){
     va_start(ap, fmt); 
     vsnprintf(buff,255,CSTR(fmt),ap);
     va_end(ap);
-    _logEvent(buff,t,"user","h4");
+    _logEvent(buff,t,userTag(),"h4");
 }
 
 void H4P_SerialCmd::plugins(){ for(auto const& p:H4Plugin::_plugins) reply("P: %s ID=%d\n",CSTR(p->_pid),p->subid); }

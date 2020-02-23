@@ -39,7 +39,7 @@ void  H4P_AsyncWebServer::_hookIn(){
 }
 
 bool H4P_AsyncWebServer::_webAuth(AsyncWebServerRequest *request){
-	if(_cb["user"]!=""){
+	if(_cb[userTag()]!=""){
 		if(!request->authenticate(CSTR(_cb["auser"]),CSTR(_cb["apasswd"]),NULL,false)) {
 			request->requestAuthentication(NULL,false);
 			return false;
@@ -48,7 +48,6 @@ bool H4P_AsyncWebServer::_webAuth(AsyncWebServerRequest *request){
 }
 
 void H4P_AsyncWebServer::_rest(AsyncWebServerRequest *request){
-//	Serial.printf("%s from %s\n",CSTR(request->url()),CSTR(request->client()->remoteIP().toString())); // guarantee non-empty response
 	if(!_webAuth(request)) return;
 	h4.queueFunction(bind([this](AsyncWebServerRequest *request){
 		string chop=replaceAll(CSTR(request->url()),"/rest/","");        
@@ -91,7 +90,7 @@ void H4P_AsyncWebServer::start(){
 		    AsyncWebParameter* p = request->getParam(i);
 		    rp[CSTR(p->name())]=CSTR(p->value());
 	    }
-        h4wifi.change(rp[ssidTag()],rp["psk"]);
+        h4wifi.change(rp[ssidTag()],rp[pskTag()]);
         if(H4Plugin::isLoaded(upnpTag())){
             h4wifi.setPersistentValue(nameTag(),rp[nameTag()],false);
         }

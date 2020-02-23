@@ -75,7 +75,7 @@ class H4P_BinaryThing: public H4Plugin{
         void turnOff(){ turn(false); }
         void turnOn(){ turn(true); }
         void toggle(){ turn(!_state); }
-        void turn(bool b){ _turn(b,"user"); }
+        void turn(bool b){ _turn(b,userTag()); }
         // syscall only
         void _turn(bool b,const string& src){
             if(b!=_getState()){

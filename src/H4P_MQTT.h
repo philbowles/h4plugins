@@ -59,7 +59,7 @@ class H4P_MQTT: public H4PluginService, public PubSubClient{
             H4PluginService(onC,onD)
         {
             _cb["broker"]=broker;
-            _cb["port"]=stringFromInt(port);
+            _cb[portTag()]=stringFromInt(port);
             _cb["muser"]=user,
             _cb["mpasswd"]=pass;
 

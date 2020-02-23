@@ -79,8 +79,8 @@ class H4P_SerialCmd: public H4Plugin {
         void            showUnload();
 //      user
         void            addCmd(const string& name,uint32_t owner, uint32_t levID,H4_FN_MSG f=nullptr){ _addCmd(name, {owner,levID,f}); }
-        uint32_t        invokeCmd(string,string="",const char* src="user");			
-        uint32_t        invokeCmd(string,uint32_t,const char* src="user"); 
+        uint32_t        invokeCmd(string,string="",const char* src=userTag());			
+        uint32_t        invokeCmd(string,uint32_t,const char* src=userTag()); 
         void            logEventType(H4P_LOG_TYPE,const string& fmt,...);
         void            removeCmd(const string& name,uint32_t subid=0); 
         void            unload(const uint32_t subid);

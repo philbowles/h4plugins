@@ -42,7 +42,7 @@ void H4P_MQTT::_forceDisconnect(bool autorestart){
     if(!_discoDone){
         h4pcDisconnected();   
         _discoDone=true;
-        EVENT("MQTT down reason %d",state());
+        H4EVENT(stringFromInt(state()),mqttTag());
     }
     if(autorestart && WiFi.status()==WL_CONNECTED) start();
 }

@@ -36,7 +36,7 @@ void H4P_WiFi::_gotIP(){
     _discoDone=false;
     _cb["ip"]=WiFi.localIP().toString().c_str();
     _cb[ssidTag()]=CSTR(WiFi.SSID());
-    _cb["psk"]=CSTR(WiFi.psk());
+    _cb[pskTag()]=CSTR(WiFi.psk());
 
     string host=_cb[deviceTag()];
 
@@ -125,7 +125,7 @@ uint32_t H4P_WiFi::_change(vector<string> vs){ return guardString2(vs,[this](str
 void H4P_WiFi::change(string ssid,string psk){ // add device / name?
     stop();
     _cb[ssidTag()]=ssid;
-    _cb["psk"]=psk;
+    _cb[pskTag()]=psk;
     _startSTA();
 }
 
@@ -137,9 +137,10 @@ void H4P_WiFi::_lostIP(){
 }
 
 #ifdef ARDUINO_ARCH_ESP8266
-void H4P_WiFi::_setHost(const string& host){
-    WiFi.hostName(CSTR(host));
-}
+//
+//      ESP8266
+//
+void H4P_WiFi::_setHost(const string& host){ WiFi.hostname(CSTR(host)); }
 
 string H4P_WiFi::_getChipID(){ return stringFromInt(ESP.getChipId(),"%06X"); }
 
@@ -153,7 +154,6 @@ void H4P_WiFi::clear(){
 void H4P_WiFi::_scan(){ // check 4 common hoist
     WiFi.enableSTA(true);
     int n=WiFi.scanNetworks();
-    EVENT("SCAN finds %d\n",n);
 
     for (uint8_t i = 0; i < n; i++){
         char buf[128];
@@ -170,7 +170,7 @@ void H4P_WiFi::_startSTA(){
     WiFi.enableAP(false); 
 	WiFi.setAutoConnect(true);
 	WiFi.setAutoReconnect(true);
-    WiFi.begin(CSTR(_cb[ssidTag()]),CSTR(_cb["psk"]));
+    WiFi.begin(CSTR(_cb[ssidTag()]),CSTR(_cb[pskTag()]));
 }
 
 void H4P_WiFi::start(){
@@ -194,11 +194,6 @@ void H4P_WiFi::stop(){
     }
 	WiFi.mode(WIFI_OFF);
 }
-//
-//      H4P_WiFi
-//
-
-
 /*
 ESP8266
 
@@ -228,6 +223,9 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
 	}
 }
 #else
+//
+//      ESP32
+//
 void H4P_WiFi::_setHost(const string& host){
     WiFi.setHostname(CSTR(host));
 }
@@ -241,7 +239,7 @@ void H4P_WiFi::clear(){
 	WiFi.disconnect(true,true);
 }
 
-void H4P_WiFi::_scan(){
+void H4P_WiFi::_scan(){ // coalescee
     int n=WiFi.scanNetworks();
 
     for (uint8_t i = 0; i < n; i++){
@@ -258,7 +256,7 @@ void H4P_WiFi::_startSTA(){
     WiFi.setSleep(false);
     WiFi.enableAP(false); 
 	WiFi.setAutoReconnect(true);
-    WiFi.begin(CSTR(_cb[ssidTag()]),CSTR(_cb["psk"]));
+    WiFi.begin(CSTR(_cb[ssidTag()]),CSTR(_cb[pskTag()]));
 }
 
 void H4P_WiFi::start(){ if(WiFi.begin()) if(WiFi.SSID()=="" && WiFi.psk()=="") _startAP(); }
@@ -277,25 +275,6 @@ void H4P_WiFi::stop(){
     _stop();
     WiFi.disconnect(true,false);
 }
-/*
-void H4P_WiFi::_gotIP(){
-    _discoDone=false;
-    _cb["ip"]=WiFi.localIP().toString().c_str();
-    _cb[ssidTag()]=CSTR(WiFi.SSID());
-    _cb["psk"]=CSTR(WiFi.psk());
-    string host=_cb[deviceTag()];
-
-    h4.every(H4WF_OTA_RATE,[](){ ArduinoOTA.handle(); },nullptr,H4P_TRID_HOTA,true);
-    WiFi.setHostname(CSTR(host));
-  	ArduinoOTA.setHostname(CSTR(host));
-	ArduinoOTA.setRebootOnSuccess(false);	
-	ArduinoOTA.begin();
-
-    _cb.erase("opts"); // lose any old AP ssids
-    EVENT("IP=%s\n",CSTR(_cb["ip"]));
-    h4pcConnected();
-}
-*/
 /* ESP32
 * WiFi Events
 0  SYSTEM_EVENT_WIFI_READY               < ESP32 WiFi ready

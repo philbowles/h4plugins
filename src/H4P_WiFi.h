@@ -60,7 +60,7 @@ class H4P_WiFi: public H4PluginService{
 //          included here aginst better wishes due to compiler bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89605
         H4P_WiFi(string ssid,string psk,string device="",H4_FN_VOID onC=[](){},H4_FN_VOID onD=[](){}): H4PluginService(onC,onD){
             _cb[ssidTag()]=ssid;
-            _cb["psk"]=psk;
+            _cb[pskTag()]=psk;
             _cb[deviceTag()]=device;
 
             _pid=wifiTag();

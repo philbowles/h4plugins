@@ -96,7 +96,7 @@ void H4Plugin::reply(const char* fmt,...){ // find pub sub size
     va_start(ap, fmt); 
     vsnprintf(buff,127,fmt,ap);
     va_end(ap);
-    string source=_cb["source"];
+    string source=_cb[srcTag()];
     #ifndef H4P_NO_WIFI
         if(source==aswsTag()) h4asws._reply(buff);
         else { 
@@ -159,5 +159,5 @@ void H4PluginService::svc(const string& uid,H4P_LOG_TYPE ud) {
 //
 void H4PLogService::_hookIn(){ 
     h4sc._hookLogChain(bind(&H4PLogService::_filterLog,this,_1,_2,_3,_4));
-    h4sc.addCmd("msg",subid, 0, CMDNULL);
+    h4sc.addCmd(msgTag(),subid, 0, CMDNULL);
 }

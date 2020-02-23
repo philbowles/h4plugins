@@ -44,7 +44,7 @@ class H4P_MQTTHeapLogger: public H4P_MQTTLogger {
             H4P_MQTTLogger::stop();
             h4.cancelSingleton(H4P_TRID_HLOG);
              }
-        void _greenLight() override { h4sc.removeCmd("msg",subid); } // msg is meaningless - we only "see" H4P_LOG_MQTT_HEAP events
+        void _greenLight() override { h4sc.removeCmd(msgTag(),subid); } // msg is meaningless - we only "see" H4P_LOG_MQTT_HEAP events
     public:
         H4P_MQTTHeapLogger(uint32_t f): _f(f),H4P_MQTTLogger("heap",H4P_LOG_MQTT_HEAP){ _names={{H4P_TRID_HLOG,"HLOG"}}; }
 };
