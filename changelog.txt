@@ -5,16 +5,18 @@
         onChange bug in persistent storage
     new
         mysql logger EXPERIMENTAL! + new example
+        nodejs express webserver for the above
         EVENTS on Binary thing and most thing drivers for logging
         cmdErrors enchanced to reverse logTypes
         getLogType added
         H4P_MQTTQueueLogger + example
-
+        h4UserEvent macro compileable out
     changed
+    getConfig moved from service to plugin - no accessible form SerialCmd
         error removed from dealut log msg
         new H4P_LOG_ERROR with seperate log msg id res > 0
-        serial logger trnslates type code is cmderrors used
-
+        serial logger translates type code is cmderrors used
+        customLogger.ino modified for error removal
 2020/02/19  0.3.6
     bugfix
         Polled not getting value on fake event when in analog mode
@@ -66,6 +68,7 @@
 TODO:
 SHORTTERM
     coalesce wifif scan 8266/32
+    event on PS changed
 MEDIUMTERM
     getnextseq in mysl logger?
     dependfail on all dependencies // #defineable out?

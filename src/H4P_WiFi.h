@@ -57,7 +57,7 @@ class H4P_WiFi: public H4PluginService{
         static  void        _wifiEvent(WiFiEvent_t event);
 
     public:
-//          included here aginst better wishes due to compiler bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89605
+//          included here against better wishes due to compiler bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89605
         H4P_WiFi(string ssid,string psk,string device="",H4_FN_VOID onC=[](){},H4_FN_VOID onD=[](){}): H4PluginService(onC,onD){
             _cb[ssidTag()]=ssid;
             _cb[pskTag()]=psk;
@@ -71,7 +71,6 @@ class H4P_WiFi: public H4PluginService{
 
             _local={
                 {"clear",   { subid, 0, CMD(clear)}},
-//                {"factory", { H4PC_ROOT, 0, CMD(h4FactoryReset) }},
                 {"change",  { subid, 0, CMDVS(_change)}},             
                 {"host",    { subid, 0, CMDVS(_host)}},             
                 {_pid,      { H4PC_SHOW, 0, CMD(show) }}

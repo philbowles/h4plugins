@@ -1,0 +1,23 @@
+{
+  "name": "h4",
+  "version": "1.0.0",
+  "description": "h4plugins mysql logger demo",
+  "main": "h4.js",
+  "repository": "https://github.com/philbowles/h4pluginsmysqllogger",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "h4",
+    "h4plugins",
+    "mysql"
+  ],
+  "author": "Phil Bowles",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.2"
+  }
+}

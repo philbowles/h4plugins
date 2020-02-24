@@ -81,7 +81,5 @@ class H4P_UPNPCommon{
 
         void        friendlyName(const string& name);
 };
-//    extern __attribute__((weak)) H4P_UPNPCommon h4upnp;
 #endif
-
 #endif // H4P_UPNPCommon_H

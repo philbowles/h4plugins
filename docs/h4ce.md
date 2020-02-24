@@ -57,6 +57,7 @@ NO
 
 ```cpp
 string      getErrorMessage(uint32_t errorCode);
+string      getLogType(uint32_t errorCode); // trnaslate logging type codes into human-readable form
 ```
 
 [Example Code](../examples/H4P_CmdErrors/H4P_CmdErrors.ino)

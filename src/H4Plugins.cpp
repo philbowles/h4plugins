@@ -111,18 +111,15 @@ void H4Plugin::reply(const char* fmt,...){ // find pub sub size
 }
 
 void H4Plugin::_startup(){
-//    reply("H4Plugin::_startup %s nN=%d nC=%d\n",CSTR(_pid),_names.size(),_cmds.size());
     h4._hookLoop(_hook,_names,subid);
     if(_cmds.size()) commands.insert(_cmds.begin(),_cmds.end());
     _cmds.clear();
     _names.clear();
-//    dumpCommands();
 }
 //
 //      H4PluginService
 //
 void H4PluginService::_startup(){
-//    reply("H4PluginService::_startup %s nN=%d nC=%d SUBID=%d\n",CSTR(_pid),_names.size(),_cmds.size(),subid);
     _cmds={
             {"restart", { 0, 0, CMD(restart)}},
             {"start",   { 0, 0, CMD(start)}},

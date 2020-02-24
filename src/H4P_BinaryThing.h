@@ -46,12 +46,8 @@ class H4P_BinaryThing: public H4Plugin{
         #ifdef H4P_NO_WIFI
             void         _publish(bool b){}
         #else                
-            virtual void        _hookIn() override { 
-                        if(H4Plugin::isLoaded(mqttTag())) h4mqtt.hookConnect([this](){ _publish(_getState()); }); 
-                    }                    
-                    void         _publish(bool b){  
-                        if(H4Plugin::isLoaded(mqttTag())) h4mqtt.publishDevice(stateTag(),b);             
-                    }
+            virtual void _hookIn() override { if(H4Plugin::isLoaded(mqttTag())) h4mqtt.hookConnect([this](){ _publish(_getState()); }); }
+                    void  _publish(bool b){ if(H4Plugin::isLoaded(mqttTag())) h4mqtt.publishDevice(stateTag(),b); }
         #endif
 
         virtual bool        _getState() { return _state; }

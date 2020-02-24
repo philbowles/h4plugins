@@ -30,7 +30,7 @@ SOFTWARE.
 #ifndef H4P_HO
 #define H4P_HO
 
-#define H4P_VERSION "0.3.6"
+#define H4P_VERSION "0.4.0"
 
 #include<H4.h>
 #include<H4Utils.h>
@@ -134,13 +134,13 @@ STAG(wifi);
 
 #define VSCMD(x) uint32_t x(vector<string>)
 #ifdef H4P_LOG_EVENTS
-    #define EVENT(x,...) h4sc.logEventType(H4P_LOG_USER,x, ##__VA_ARGS__)
+ //   #define EVENT(x,...) h4sc.logEventType(H4P_LOG_USER,x, ##__VA_ARGS__)
     #define H4EVENT(x,y) if(H4Plugin::isLoaded(scmdTag())) { h4sc._logEvent((x),H4P_LOG_H4,y,_pid); }
     #define SYSEVENT(e,x,...) h4sc.logEventType(e,x, ##__VA_ARGS__)
     #define DEPENDFAIL(x) h4sc.logEventType(H4P_LOG_DEPENDFAIL,"%s->%s", CSTR(_pid),x##Tag())
     #define h4UserEvent(x,...) if(H4Plugin::isLoaded(scmdTag())) { h4sc.logEventType(H4P_LOG_USER,x, ##__VA_ARGS__); }
 #else
-    #define EVENT(x,...)
+//    #define EVENT(x,...)
     #define H4EVENT(x,y)
     #define SYSEVENT(e,x,...)
     #define DEPENDFAIL(x)
@@ -212,6 +212,7 @@ class H4Plugin {
 
         static vector<H4Plugin*>    _plugins;
         static H4P_CONFIG_BLOCK     _cb;
+               string      getConfig(const string& c){ return _cb[c]; }
 
         static  H4Plugin* isLoaded(const string& x){
             for(auto const& p:H4Plugin::_plugins) if(p->_pid==x) return p;
@@ -260,7 +261,7 @@ class H4PluginService: public H4Plugin {
                 hookConnect(onConnect);
                 hookDisconnect(onDisconnect);
         }
-                string      getConfig(const string& c){ return _cb[c]; }
+//                string      getConfig(const string& c){ return _cb[c]; }
                 void        hookConnect(H4_FN_VOID f){ _connChain.push_back(f); }
                 void        hookDisconnect(H4_FN_VOID f){ _discoChain.push_back(f); } 
         static  void        hookFactory(H4_FN_VOID f){ _factoryChain.push_back(f); } 

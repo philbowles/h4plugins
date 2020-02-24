@@ -1,6 +1,6 @@
 ![H4P Logo](/assets/DiagLogo.jpg)
 
-# Logging
+# Logging / Loggers
 
 ## Adds event logging to multiple destinations for H4 Universal Scheduler/Timer + Plugins.
 
@@ -12,12 +12,15 @@
 
 H4Plugins loggers can send messages to a variety of destinations, depending on which logger you choose. There are currently 
 
-* H4P_LocalLogger which creates a log file in SPIFFS thus requires you allocating an amount at compile-time with Tools... menu
+* H4P_HttpMySQLLogger which sends logged events to a remote Webserver for storage in a MySQL database **NEW in v0.4.0**
+  **N.B. H4P_HttpMySQLLogger is experimental and has [its own documentation page](h4mysql.md)**
+
 * H4P_MQTTLogger sends log messages to MQTT Server **NEW in v0.3.4**
 * H4P_MQTTHeapLogger a specialised H4P_MQTTLogger which periodically logs value of FreeHeap to MQTT **NEW in v0.3.4**
+* H4P_MQTTQueueLogger a specialised H4P_MQTTLogger which periodically logs size of queue to MQTT **NEW in v0.4.0**
 * H4P_SerialLogger which does exactly what it says on the tin
 
-In the experimental pipeline are an HTTP REST logger, and MySQL logger. Writing your own logger is seriously easy (see below)
+Writing your own logger is seriously easy (see below)
 
 The important thing to note is that each logger is called in turn, thus you can log to several destinations at a time for a single message. The serial logger is a useful diagnostic aid, as it shows what is getting logged to other - less visible - destinations, e.g. remote servers.
 
@@ -29,14 +32,16 @@ Finally, most loggers have  `filter` parameter which allows the logger to operat
 
 ```cpp
 enum H4P_LOG_TYPE {
-    H4P_LOG_SVC_UP=1,// internal H4 event on service UP
-    H4P_LOG_SVC_DOWN=2,// internal H4 event on service DOWN
-    H4P_LOG_CMD=4,// command from any source (see below)
-    H4P_LOG_USER=8,// arbitrary message from user code
-    H4P_LOG_DEPENDFAIL=16,// dependent plugin omitted by user
-    H4P_LOG_MQTT_HEAP=32, // value of current heap
-    H4P_LOG_MQTT_Q=64, // size of queue
-    H4P_LOG_ALL=0xffffffff
+    H4P_LOG_H4=1, // reserved for H4 plugins own use
+    H4P_LOG_SVC_UP=2,// internal H4 event on service UP
+    H4P_LOG_SVC_DOWN=4,// internal H4 event on service DOWN
+    H4P_LOG_CMD=8,// command from any source (see below)
+    H4P_LOG_USER=16,// arbitrary message from user code
+    H4P_LOG_DEPENDFAIL=32,// dependent plugin omitted by user
+    H4P_LOG_MQTT_HEAP=64, // value of current heap
+    H4P_LOG_MQTT_Q=128, // size of queue
+    H4P_LOG_ALL=0xffffffff,
+    H4P_LOG_ERROR=H4P_LOG_ALL
 };
 ```
 
@@ -59,6 +64,7 @@ For `H4P_LOG_CMD` it is the sub-system that initiated the cmd
     * "serl" when issued from the serial console
     * "mqtt" in response to a subscribed topic
     * "asws" if it came from the AsyncWebServer HTTP REST interface
+    * "upnp" when from a UPNP device e.g. Amazon Alexa
     * "user" when called directly from user code
 
 * Target: will usually be empty or "self" when sent by anything other than MQTT. For subscribed topics, it will be the prefix of the MQTT publish as described in [H4P_MQTT](h4mqtt.md). In summary, one of:
@@ -68,8 +74,6 @@ For `H4P_LOG_CMD` it is the sub-system that initiated the cmd
     * < the device chip ID > e.g. "17D858"
     * < your device name > e.g. "myIOTdevice"
 
-* Error Code: return value if Type = `H4P_LOG_CMD`, otherwise zero.
-  
 ---
 
 # Loggers
@@ -89,7 +93,7 @@ Most also implement h4/xxxx/msg/any old message to put any message you choose in
 ```cpp
 #include<H4Plugins.h>
 H4_USE_PLUGINS
-H4P_LocalLogger h4ll(...
+H4P_SerialLogger h4ll(...
 ```
 ## Prequisites
 
@@ -124,7 +128,7 @@ H4P_LocalLogger reserves a user-defind amount of free SPIFFS space to create a l
 ```cpp
 #include<H4Plugins.h>
 H4_USE_PLUGINS
-H4P_SerialLogger h4sl;
+H4P_LocalLogger h4sl;
 ```
 
 ## Prequisistes
@@ -227,7 +231,7 @@ H4P_MQTTLogger(const string& topic,uint32_t filter=H4P_LOG_ALL);
 
 # H4P_MQTTHeapLogger (name "heap") [ ESP8266 / ESP32 only ]
 
-H4P_MQTTHeapLogger is a specalised version of H4P_MQTTLogger which periodically publishes the `heap` topic.
+H4P_MQTTHeapLogger is a specalised version of H4P_MQTTLogger which periodically publishes the `heap` topic with a payload of the current free heap
 
 ## Usage
 
@@ -261,6 +265,43 @@ H4P_MQTTHeapLogger(uint32_t frequency,uint32_t filter=H4P_LOG_ALL); // frequency
 [Example Code](../examples/H4P_MQTTHeapLogger/H4P_MQTTHeapLogger.ino)
 ----
 
+# H4P_MQTTQueueLogger (name "qlog") [ ESP8266 / ESP32 only ]
+
+H4P_MQTTHeapLogger is a specalised version of H4P_MQTTLogger which periodically publishes the `qlog` topic with a payload of H4 queue size
+
+## Usage
+
+```cpp
+#include<H4Plugins.h>
+H4_USE_PLUGINS
+...
+H4P_MQTTQueueLogger h4hl(...
+```
+
+## Prequisistes
+
+H4P_WiFi
+H4P_MQTT
+
+## Additional Commnds
+
+none
+
+## Unloadable
+
+NO, but can use stop and start cmds
+
+# API
+
+```cpp
+// constructor
+H4P_MQTTQueueLogger(uint32_t frequency,uint32_t filter=H4P_LOG_ALL); // frequency is in milliseconds
+```
+
+[Example Code](../examples/H4P_MQTTHeapLogger/H4P_MQTTHeapLogger.ino)
+
+----
+
 # Advanced topics
 
 ## Writing your own logger
@@ -289,22 +330,6 @@ class myLogger: public H4PLogService {
 ...and that's it! Then add the new logger to your sketch - Everything else is automatic.
 
 [Example Code](../examples/H4P_CustomLogger/H4P_CustomLogger.ino)
-
----
-
-## MySQL schema (for future use by HTTP REST / MySQL loggers)
-
-CREATE TABLE `event` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `type` int(11) NOT NULL,
-  `error` int(11) NOT NULL,
-  `source` varchar(16) DEFAULT NULL,
-  `target` varchar(16) DEFAULT NULL,
-  `msg` varchar(64) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 
 ---
 
