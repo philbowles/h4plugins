@@ -12,7 +12,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
+copies of the Software, and to permit persons to whom the Software iss
 furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all
@@ -27,26 +27,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_MQTTQueueLogger_HO
-#define H4P_MQTTQueueLogger_HO
+#ifndef H4P_IPPresence_HO
+#define H4P_IPPresence_HO
 
-#ifndef ARDUINO_ARCH_STM32
-#include <H4PCommon.h>
-#include <H4P_AsyncMQTT.h>
+#include<H4PCommon.h>
+#include<H4P_SerialCmd.h>
+#include<H4P_WiFiSelect.h>
+#include<H4P_WiFi.h>
+#ifndef H4P_NO_WIFI
 
-class H4P_MQTTQueueLogger: public H4P_MQTTLogger {
-        uint32_t _f;
-        void start() override { 
-            H4P_MQTTLogger::start();
-            h4.every(_f,[this](){ SYSEVENT(H4P_LOG_MQTT_Q,_pid,mqttTag(),"%u",h4.size()); },nullptr,H4P_TRID_QLOG,true);
-        }
-        void stop() override {
-            H4P_MQTTLogger::stop();
-            h4.cancelSingleton(H4P_TRID_HLOG);
-        }
-        void _greenLight() override { h4sc.removeCmd(msgTag(),subid); } // msg is meaningless - we only "see" H4P_LOG_MQTT_Q events
+#define H4P_IPPD_RATE   5000
+
+class H4P_IPPresence: public H4PluginService{
+        H4BS_FN_SWITCH  _detect;
+        string          _ip;
+        uint32_t        _present=0;
+        uint32_t        _ping=0;
+        H4_TIMER        _pinger;
+        void _hookIn() override;
+        void _ping_recv_cb(void *opt, void *resp);
     public:
-        H4P_MQTTQueueLogger(uint32_t f): _f(f),H4P_MQTTLogger("qlog",H4P_LOG_MQTT_Q){ _names={{H4P_TRID_QLOG,"QLOG"}}; }
+        H4P_IPPresence(const string& ip,const string& friendly,H4BS_FN_SWITCH onDetect):_ip(ip), _detect(onDetect), H4PluginService([](){},[](){}){
+            _pid=friendly;
+            _names={{H4P_TRID_IPPD,"PING"}};
+        }
+                void        start() override;
+                void        stop() override;
+                bool        isPresent(){ return _present; }
 };
+
+    extern __attribute__((weak)) H4P_IPPresence h4ippd;
 #endif
-#endif // H4P_MQTTLogger_H
+
+#endif // H4P_IPPresence_H

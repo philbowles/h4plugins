@@ -2,7 +2,7 @@
 #include <H4P_SerialCmd.h>
 #include <H4P_CmdErrors.h>
 #include <H4P_WiFi.h>
-#include <H4P_MQTT.h>
+#include <H4P_AsyncMQTT.h>
 
 H4 h4(115200);
 //
@@ -28,13 +28,13 @@ H4 h4(115200);
 // In this case, vs.size() will = 4: you know immediatly its junk
 //
 //  Remember, the "s" in "vs" is "string": if there is  value you want to treat as an int, there are two useful MACROS:
-//  PARAM( n ) and PAYLOAD_INT
+//  PARAM( n ) and H4PAYLOAD_INT
 //  So if you subscribe to something/# and someone publishes
 //  something/with/an/int/42 and payload of 666 then
 //  ...
 //  ...
 //  vs[4]="42"     in code, use int myInt=PARAM(4);    // 42
-//  vs[5]="666"    in code use int myPayload=PAYLOAD_INT; // 666
+//  vs[5]="666"    in code use int myPayload=H4PAYLOAD_INT; // 666
 // 
  void onMQTTConnect(){
     Serial.print("USER: MQTT connected\n");
@@ -48,7 +48,7 @@ void onMQTTDisconnect(){
 H4P_SerialCmd h4sc;
 H4P_CmdErrors h4ce;
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","testbed");
-H4P_MQTT h4mqtt("192.168.1.4",1883,"","",onMQTTConnect,onMQTTDisconnect); // no username / pword
+H4P_AsyncMQTT h4mqtt("192.168.1.4",1883,"","",onMQTTConnect,onMQTTDisconnect); // no username / pword
 
 uint32_t myCallback(vector<string> vs){
   for(auto const& v:vs) Serial.printf("v: %s\n",CSTR(v)); // show input

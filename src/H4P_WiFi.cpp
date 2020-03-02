@@ -48,7 +48,7 @@ void H4P_WiFi::_gotIP(){
 	ArduinoOTA.begin();
 
     _cb.erase("opts"); // lose any old AP ssids
-    H4EVENT(_cb["ip"],_pid);
+    H4EVENT("IP=%s",CSTR(_cb["ip"]));
     h4pcConnected();
 }
 
@@ -116,7 +116,7 @@ uint32_t H4P_WiFi::_host(vector<string> vs){
         return ([this](string h){
             host(h); 
             return H4_CMD_OK;
-        })(PAYLOAD);
+        })(H4PAYLOAD);
     });
 }
 

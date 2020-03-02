@@ -10,7 +10,7 @@
 
 # What do they do?
 
-Let's not forget that "IOT" is the Internet of *Things*. So what is a "Thing"? The answer is: *anything you want it to be*. In H4 Plugins terms, it is an object that holds an interal `state` of `ON` or `OFF` and reacts to commands `on`,`off`,`toggle` and `switch`. If you are using the  [H4P_MQTT plugin](h4mqtt.md) it publishes the `state` topic whenever the state changes. A Switch is a just a Thing with a predefined output function linked to a single GPIO.
+Let's not forget that "IOT" is the Internet of *Things*. So what is a "Thing"? The answer is: *anything you want it to be*. In H4 Plugins terms, it is an object that holds an interal `state` of `ON` or `OFF` and reacts to commands `on`,`off`,`toggle` and `switch`. If you are using the  [H4P_AsyncMQTT plugin](h4mqtt.md) it publishes the `state` topic whenever the state changes. A Switch is a just a Thing with a predefined output function linked to a single GPIO.
 
 There can only be one *output* Thing (or Switch) in a sketch/app: it is effectively the default handler for the above commands. It is what your device does when any source ( [Serial](h4sc.md), [MQTT](h4mqtt.md), [HTTP REST](h4asws.md) or [linked GPIO input connector](h5gpio.md) ) sends an `on`,`off`,`toggle` or `switch` command.
 
@@ -30,21 +30,21 @@ You define the output GPIO12 as a BinarySwitch:
 ```cpp
 #include<H4Plugins.h>
 H4_USE_PLUGINS
-H4P_BinarySwitch h4bt(12,ACTIVE_HIGH,OFF);
+H4P_BinarySwitch h4onof(12,ACTIVE_HIGH,OFF);
 ```
 
 Even before adding anything else you can now switch on the light  when any source ( [Serial](h4sc.md), [MQTT](h4mqtt.md), [HTTP REST](h4asws.md) or [linked GPIO input connector](h5gpio.md) ) sends an `on`,`off`,`toggle` or `switch` command.
 
-Next, add the sensors and tie them all to the `BinarySwitch` `h4bt`
+Next, add the sensors and tie them all to the `BinarySwitch` `h4onof`
 
 ```cpp
 H4P_GPIOManager h4gm;
 
 void h4setup(){
-    h4gm.LatchingThing(0,INPUT,ACTIVE_LOW,15,&h4bt); // 15ms debounce timeout
-    h4gm.RetriggeringThing(4,INPUT,ACTIVE_HIGH,10000,&h4bt); // 10sec motion timeout
-    h4gm.DebouncedThing(5,INPUT,ACTIVE_HIGH,15,&h4bt); // door alarm
-    h4gm.DebouncedThing(5,INPUT,ACTIVE_HIGH,15,&h4bt); // window alarm
+    h4gm.LatchingThing(0,INPUT,ACTIVE_LOW,15,&h4onof); // 15ms debounce timeout
+    h4gm.RetriggeringThing(4,INPUT,ACTIVE_HIGH,10000,&h4onof); // 10sec motion timeout
+    h4gm.DebouncedThing(5,INPUT,ACTIVE_HIGH,15,&h4onof); // door alarm
+    h4gm.DebouncedThing(5,INPUT,ACTIVE_HIGH,15,&h4onof); // window alarm
 }
 ```
 
@@ -152,7 +152,7 @@ H4P_BinarySwitch h4onof;
   
 ## Topics automatically published
 
-If [H4P_MQTT](h4mqtt.md) is also used, this plugin publishes `h4/< your device name >/state` with a payload set to the current state whenever the state changes
+If [H4P_AsyncMQTT](h4mqtt.md) is also used, this plugin publishes `h4/< your device name >/state` with a payload set to the current state whenever the state changes
 
 ## Unloadable
 

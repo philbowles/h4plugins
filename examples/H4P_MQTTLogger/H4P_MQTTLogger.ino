@@ -19,7 +19,7 @@ void onMQTTDisconnect(){
     h4.cancel(mqttPinger);
 }
 
-H4P_MQTT h4mqtt("192.168.1.4",1883,"","",onMQTTConnect,onMQTTDisconnect);
+H4P_AsyncMQTT h4mqtt("192.168.1.4",1883,"","",onMQTTConnect,onMQTTDisconnect);
 
 H4P_AsyncWebServer h4asws("admin","admin");
 

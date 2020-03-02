@@ -37,11 +37,25 @@ SOFTWARE.
 #ifndef H4P_NO_WIFI
 
 #include<H4P_AsyncWebServer.h>
+#include<H4P_BinaryThing.h>
+/*
+struct H4P_USN {
+    uint32_t        mx=0;
+    H4_TIMER        timer=nullptr;
+    bool            told=false;
+    H4BS_FN_SWITCH  f=nullptr;
+};
 
+using H4P_USN_MAP       =unordered_map<string,H4P_USN>;
+*/
 class H4P_UPNPCommon{
+        string          _pid=upnpTag();
         AsyncUDP 	    _udp;
         IPAddress		_ubIP;
-        
+//        H4P_USN_MAP     _detect;
+        H4_FN_VOID      _fc;
+        void*           _owner;
+
         VSCMD(_friendly);
 
             string              _uuid="uuid:";
@@ -65,6 +79,8 @@ class H4P_UPNPCommon{
 
             void            _listenUDP();
             void            _notify(const string& s);
+//            void            _notifyUSN(const string& usn,bool b);
+//            void            _offlineUSN(const string& usn,bool notify=false,bool state=false);
             void            _upnp(AsyncWebServerRequest *request);
 
             void            start();
@@ -72,14 +88,28 @@ class H4P_UPNPCommon{
     protected:
                 void        _pseudoHookIn();
         virtual bool        _getState()=0;
-        virtual void        _turn(bool b,const string& src)=0;
+
+#ifdef H4P_LOG_EVENTS
+        void        _turn(bool b,const string& src) { reinterpret_cast<H4P_BinaryThing*>(_owner)->_turn(b,src); }
+#else
+        void        _turn(bool b,const string& src) { reinterpret_cast<H4P_BinaryThing*>(_owner)->turn(b); }
+#endif
+
     public:
-        H4P_UPNPCommon(const string& name): _name(name){
+        H4P_UPNPCommon(void* owner,const string& name,H4_FN_VOID fc=nullptr): _owner(owner),_name(name),_fc(fc){
             _pups.push_back(_urn+"device:controllee:1");
             _pups.push_back(_urn+"service:basicevent:1");
         }
-
+        /*
+        void        listenUSN(const string& usn,H4BS_FN_SWITCH f=nullptr){
+            H4EVENT("listenUSN %s",CSTR(usn));
+            _offlineUSN(usn,false); // do not notify
+            _detect[usn].f=f;
+        }
+        */
         void        friendlyName(const string& name);
+ 
+//        void grid(){ for(auto const& d:_detect) if(d.second.told) reinterpret_cast<H4Plugin*>(_owner)->reply("L: %s\n",CSTR(d.first)); }
 };
 #endif
 #endif // H4P_UPNPCommon_H

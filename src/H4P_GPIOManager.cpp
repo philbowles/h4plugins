@@ -46,26 +46,23 @@ H4GPIOPin::H4GPIOPin(
 //
 //  DIAGNOSTICS
 //
-void H4GPIOPin::_factoryCommon(H4P_BinaryThing* btp){
-//              hookThing(btp); // denormalise
+void H4GPIOPin::_factoryCommon(H4P_BinaryThing* btp){ // optimise for no logging
     if(btp){
-        onEvent=[btp](H4GPIOPin* pp){ 
-            /*
-            Serial.print("Hooked thing says ");
-            Serial.print(pp->logicalRead());
-            Serial.print(" nE=");
-            Serial.println(pp->nEvents);
-            */
+        onEvent=[this,btp](H4GPIOPin* pp){ 
             if(pp->style==H4GM_PS_LATCHING) {
                 if(pp->nEvents) btp->toggle(); // POTENTIAL BUG! if btp already commanded on, 1st time wont toggle
-            } else btp->_turn(pp->logicalRead(),gpioTag());
+#ifdef H4P_LOG_EVENTS
+            } else btp->_turn(pp->logicalRead(),gpioTag()+string("("+stringFromInt(pin)+"/"+stringFromInt(style)+")"));
+#else
+            } else btp->turn(pp->logicalRead());
+#endif
         };
     }
     H4P_GPIOManager::pins[pin]=this;
     begin();
 }
 
-void H4GPIOPin::dump(){ // tart this up
+void H4GPIOPin::dump(){ // tart this up - complete rework
     Serial.print("PIN ");Serial.println(pin);
     Serial.print(" gpioType=");Serial.println(gpioType);
     Serial.print(" style=");Serial.println(style);

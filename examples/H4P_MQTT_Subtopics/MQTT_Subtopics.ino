@@ -2,7 +2,7 @@
 #include <H4P_SerialCmd.h>
 #include <H4P_CmdErrors.h>
 #include <H4P_WiFi.h>
-#include <H4P_MQTT.h>
+#include <H4P_AsyncMQTT.h>
 
 H4 h4(115200);
 
@@ -23,17 +23,17 @@ void onMQTTDisconnect(){
 H4P_SerialCmd h4sc;
 H4P_CmdErrors h4ce;
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","testbed");
-H4P_MQTT h4mqtt("192.168.1.4",1883,"","",onMQTTConnect,onMQTTDisconnect); // no username / pword
+H4P_AsyncMQTT h4mqtt("192.168.1.4",1883,"","",onMQTTConnect,onMQTTDisconnect); // no username / pword
 
 uint32_t myCallback(vector<string> vs){
-  Serial.printf("USER: Msg received with %d parts and payload=%s\n",vs.size(),PAYLOAD.c_str()); // convert payload to C-style string
+  Serial.printf("USER: Msg received with %d parts and payload=%s\n",vs.size(),H4PAYLOAD.c_str()); // convert payload to C-style string
   dumpvs(vs);
-  if(PAYLOAD=="good") {
+  if(H4PAYLOAD=="good") {
       h4mqtt.publishDevice("goodpayload","Thank You!");
       return H4_CMD_OK;
   }
   else {
-      h4mqtt.publishDevice("badpayload",PAYLOAD);
+      h4mqtt.publishDevice("badpayload",H4PAYLOAD);
       return H4_CMD_PAYLOAD_FORMAT;
   }
 }

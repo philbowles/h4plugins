@@ -16,7 +16,7 @@ H4 MQTT Manager is a "wrapper" around the well-known and stable "pubSubClient" l
 
 All H4 commands have identical syntax across all H4Plugins. When a command is sent from MQTT, it needs an additional prefix, which controls which of your devices receives the message. 
 
-H4P_MQTT automatically subscribes to some special topics: `all/#`, `< your device name >/#`, `< your board type >/#` and `< your board's unique chip ID >/#`
+H4P_AsyncMQTT automatically subscribes to some special topics: `all/#`, `< your device name >/#`, `< your board type >/#` and `< your board's unique chip ID >/#`
 
 Assuming the actual command is `h4/reboot` then:
 
@@ -40,7 +40,7 @@ Most often you will use the last form to address one specific device.
 H4_USE_PLUGINS
 
 H4P_WiFi h4wifi(...
-H4P_MQTT h4mqtt(...
+H4P_AsyncMQTT h4mqtt(...
 ```
 
 ## Dependencies
@@ -58,7 +58,7 @@ H4P_MQTT h4mqtt(...
 
 ## Topics automatically published
 
-H4P_MQTT publishes `all/h4/mqtt/online` when it connects up and `all/h4/mqtt/online` when it loses the MQTT connection, both with a payload of < your device name > . This allows 3rd party software e.g. NODE-RED as well as H4P_MQTT itself to maintain a list of all devices on the network, providing of course that the current device isn't the one causing the "offline" status :)
+H4P_AsyncMQTT publishes `all/h4/mqtt/online` when it connects up and `all/h4/mqtt/online` when it loses the MQTT connection, both with a payload of < your device name > . This allows 3rd party software e.g. NODE-RED as well as H4P_AsyncMQTT itself to maintain a list of all devices on the network, providing of course that the current device isn't the one causing the "offline" status :)
 
 This requires that those corresponding commands are publicly exposed / available, but *they should never be invoked by the user*
 
@@ -89,7 +89,7 @@ void onMQTTConnect(){
 }
 
 ...
-H4P_MQTT h4mqtt("myMQTTserver.local",1883,"admin","admin",onMQTTConnect);
+H4P_AsyncMQTT h4mqtt("myMQTTserver.local",1883,"admin","admin",onMQTTConnect);
 
 void h4setup(){
     ...
@@ -108,13 +108,13 @@ As already mentioned you can call any method of the [Arduino pubsubclient librar
 * Calling publish inside a subscribe callback function is a recipe for disaster
 * It goes completely outside H4's "main loop" philosophy and will almost certainly "break" your code unless you are an expert.
 
-For all of the above reasons, it is recommended that you use *only* H4P_MQTT functions. The benefit is they can contain any code you want and as much of it as you want and you can call "publish" with no fear. Also, H4P_MQTT provides a lot of functionality for you, using `subscribeDevice` and `publishDevice`. Unless/until you are confident with coding for MQTT message handling *and* are an expert, stick with the H4P_MQTT way.
+For all of the above reasons, it is recommended that you use *only* H4P_AsyncMQTT functions. The benefit is they can contain any code you want and as much of it as you want and you can call "publish" with no fear. Also, H4P_AsyncMQTT provides a lot of functionality for you, using `subscribeDevice` and `publishDevice`. Unless/until you are confident with coding for MQTT message handling *and* are an expert, stick with the H4P_AsyncMQTT way.
 
 ## Subscribing
 
 It is important that you understand the MQTT topic syntax before reading his section. If this is not the case, follow this link to [read about MQTT topic syntax](https://mosquitto.org/man/mqtt-7.html) before continuing.
 
-When you call `subscribeDevice` you tell H4P_MQTT the topic and your callback function to handle the topic. In the following examples, let's assume your device is called `mything` and you want it to handle `mytopic`.
+When you call `subscribeDevice` you tell H4P_AsyncMQTT the topic and your callback function to handle the topic. In the following examples, let's assume your device is called `mything` and you want it to handle `mytopic`.
 
 The first thing to note is that your device name is added to the front of the topic, so "under the hood" you are actually subscribing to `mything/mytopic`. This allows you to have many devices in the system running the same code, but only have one specific device respond to a given message.
 
@@ -126,7 +126,7 @@ vs[0]=whatever was in the message payload
 
 You may wonder why you get a `vector<string>` when there is only 1 item: the payload, but this will become obvious later when we talk about subtopics and wildcards.
 
-No matter how many parts there are to the message, the payload is always the last item. To make life easier H4 has macros `PAYLOAD` if you are expecting a string and `PAYLOAD_INT` if you are expecting a number. 
+No matter how many parts there are to the message, the payload is always the last item. To make life easier H4 has macros `H4PAYLOAD` if you are expecting a string and `H4PAYLOAD_INT` if you are expecting a number. 
 
 Also there is a global string called `H4_MQTT::target` which will contain the message prefix (see above) such as "all" or "mything" or "WEMOS_D1MINI" depending on how/why you received this message. Normally you don't need to know this, but it's there if you want it.
 
@@ -152,8 +152,8 @@ Pulling together all of the above, the simplest callback will look like somethin
 
 ```cpp
 uint32_t myCallback(vector<string> vs){
-    Serial.printf("Msg received with payload=%s\n",PAYLOAD.c_str()); // convert payload to C-style string
-    if(PAYLOAD=="good") return H4_CMD_OK;
+    Serial.printf("Msg received with payload=%s\n",H4PAYLOAD.c_str()); // convert payload to C-style string
+    if(H4PAYLOAD=="good") return H4_CMD_OK;
     else return H4_CMD_PAYLOAD_FORMAT;
 }
 ```
@@ -226,11 +226,11 @@ As you can see, this could get complicated when multiple subtopics are required,
 
 ## Wildcard topics
 
-**N.B.** **H4P_MQTT Supports ONLY `#` wildcards. It does NOT support `+` wildcards**
+**N.B.** **H4P_AsyncMQTT Supports ONLY `#` wildcards. It does NOT support `+` wildcards**
 
-When handling wildcard topics, your callback needs to take care to validate *everything* after the "#" since neither you nor H4P_MQTT - by defintion - can predict what it will be and MQTT itself will allow *anything*. Assume for example you subscribe to `cards/#` and you are only really interested in `cards/hearts`, `cards/clubs`, `cards/diamonds` and `cards/spades`.
+When handling wildcard topics, your callback needs to take care to validate *everything* after the "#" since neither you nor H4P_AsyncMQTT - by defintion - can predict what it will be and MQTT itself will allow *anything*. Assume for example you subscribe to `cards/#` and you are only really interested in `cards/hearts`, `cards/clubs`, `cards/diamonds` and `cards/spades`.
 
-You could easily receive `cards/junk/Ace/morejunk/totalrubbish/63/XYZ`. H4P_MQTT will dutifully parse this into:
+You could easily receive `cards/junk/Ace/morejunk/totalrubbish/63/XYZ`. H4P_AsyncMQTT will dutifully parse this into:
 
 ```cpp
 // don't forget the first part is always omitted: this code IS the 'cards' handler!
@@ -254,7 +254,7 @@ You *must* validate both the number of arguments (subtopics) and "sensible" valu
 
 ```cpp
 // Constructor
-H4P_MQTT(string ssid,string psk,string device="",H4_FN_VOID onConnect=[](){},H4_FN_VOID onDisconnect=[](){});
+H4P_AsyncMQTT(string ssid,string psk,string device="",H4_FN_VOID onConnect=[](){},H4_FN_VOID onDisconnect=[](){});
 // device is the local name for e.g. OTA. Will be visible in your system as < device >.local
 // onConnect = user callback when MQTT connects / reconnects
 // onDisconnect = user callback when MQTT disconnects
@@ -280,7 +280,7 @@ The following values are defined in `H4PConfig.h` . They are chosen initally to 
 
 * H4MQ_RETRY            5000
 
-The number of milliseconds H4P_MQTT will wait between attempst to reconnect if server disappears.
+The number of milliseconds H4P_AsyncMQTT will wait between attempst to reconnect if server disappears.
 
 * H4MQ_MQTT_RATE        1000
 

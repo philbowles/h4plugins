@@ -27,6 +27,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_ExternalSqWave.h>
+uint32_t H4P_ExternalSqWave::guardInt4(vector<string> vs,function<void(uint32_t,uint32_t,uint32_t,uint32_t)> f){
+    return guard1(vs,[f,this](vector<string> vs){
+        auto vi=expectInt(H4PAYLOAD);
+        if(vi.size()==4) return ([f](uint32_t v1,uint32_t v2,uint32_t v3,uint32_t v4){ f(v1,v2,v3,v4); return H4_CMD_OK; })(vi[0],vi[1],vi[2],vi[3]);
+        else return H4_CMD_NOT_NUMERIC;
+    });
+}
 
 void  H4P_ExternalSqWave::_Sweep(uint32_t c,uint32_t lim,uint32_t p,uint32_t l,uint32_t h,uint32_t i,function<void(uint32_t)> onChange){
     h4.every(p,bind([this](uint32_t c,uint32_t l,uint32_t h,uint32_t i,function<void(uint32_t)> f){

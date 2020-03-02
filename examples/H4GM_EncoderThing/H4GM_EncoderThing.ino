@@ -52,7 +52,7 @@ You will probably need to adjust these values for you own device
 
 H4 h4(115200,20); //auto-start Serial @ 115200, Q size=20 
 H4P_GPIOManager h4gm;
-H4P_BinarySwitch h4bt(LED_BUILTIN,UL_ACTIVE,OFF);
+H4P_BinarySwitch h4onof(LED_BUILTIN,UL_ACTIVE,OFF);
 // or e.g. H4P_BinaryThing, UPNPThing, UPNPSwitch - in fact any xSwitch or xThing
 
 // Any clockwise rotation turns LED on, anticlockwise -> off
@@ -60,5 +60,5 @@ H4P_BinarySwitch h4bt(LED_BUILTIN,UL_ACTIVE,OFF);
 
 void h4setup() { // H4 constructor starts Serial
     Serial.println("H4P_GPIOManager EncoderThing Example v"H4P_VERSION);
-    h4gm.EncoderThing(ENCODER_A,ENCODER_B,INPUT,UB_ACTIVE,&h4bt); // tie rotations to BinarySwitch
+    h4gm.EncoderThing(ENCODER_A,ENCODER_B,INPUT,UB_ACTIVE,&h4onof); // tie rotations to BinarySwitch
 }

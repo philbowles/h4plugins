@@ -30,15 +30,15 @@ SOFTWARE.
 
 uint32_t H4P_TaskSniffer::__incexc(vector<string> vs,function<void(vector<uint32_t>)> f){
     return guard1(vs,[f,this](vector<string> vs){
-        auto vi=expectInt(PAYLOAD);
+        auto vi=expectInt(H4PAYLOAD);
         if(vi.size()) return ([f,this](vector<uint32_t> vu){ 
             f(vu);
             show(); 
             return H4_CMD_OK;
         })(vi);
         else {
-            if((PAYLOAD).find_first_of("-")!=string::npos){
-                vector<uint32_t> range=expectInt(PAYLOAD,"-");
+            if((H4PAYLOAD).find_first_of("-")!=string::npos){
+                vector<uint32_t> range=expectInt(H4PAYLOAD,"-");
                 if(range.size()==2 && range[0]<range[1]){
                     range[1]=std::min(range[1],(uint32_t) 99);
                     vector<uint32_t> expanded;

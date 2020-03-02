@@ -28,7 +28,7 @@ SOFTWARE.
 */
 #include<H4PCommon.h>
 #include<H4P_SerialCmd.h>
-#include<H4P_MQTT.h>
+#include<H4P_AsyncMQTT.h>
 #include<H4P_AsyncWebServer.h>
 
 void __attribute__((weak)) h4AddAwsHandlers(){}
@@ -65,23 +65,23 @@ vector<uint32_t> H4Plugin::expectInt(string pl,const char* delim){
 
 uint32_t H4Plugin::guardInt1(vector<string> vs,function<void(uint32_t)> f){
     return guard1(vs,[f,this](vector<string> vs){
-        auto vi=expectInt(PAYLOAD);
+        auto vi=expectInt(H4PAYLOAD);
         if(vi.size()==1) return ([f](uint32_t v){ f(v); return H4_CMD_OK; })(vi[0]);
         else return H4_CMD_NOT_NUMERIC;
     });
 }        
-
+/*
 uint32_t H4Plugin::guardInt4(vector<string> vs,function<void(uint32_t,uint32_t,uint32_t,uint32_t)> f){
     return guard1(vs,[f,this](vector<string> vs){
-        auto vi=expectInt(PAYLOAD);
+        auto vi=expectInt(H4PAYLOAD);
         if(vi.size()==4) return ([f](uint32_t v1,uint32_t v2,uint32_t v3,uint32_t v4){ f(v1,v2,v3,v4); return H4_CMD_OK; })(vi[0],vi[1],vi[2],vi[3]);
         else return H4_CMD_NOT_NUMERIC;
     });
 }
-
+*/
 uint32_t H4Plugin::guardString2(vector<string> vs,function<void(string,string)> f){
     return guard1(vs,[f,this](vector<string> vs){
-        auto vg=split(PAYLOAD,",");
+        auto vg=split(H4PAYLOAD,",");
         if(vg.size()<3){ 
             if(vg.size()>1) return ([f](string s1,string s2){ f(s1,s2); return H4_CMD_OK; })(vg[0],vg[1]);
             return H4_CMD_TOO_FEW_PARAMS;
@@ -145,7 +145,7 @@ void H4PluginService::h4pcDisconnected(){
 void H4PluginService::svc(const string& uid,H4P_LOG_TYPE ud) {
     #ifdef H4P_LOG_EVENTS 
         if(H4Plugin::isLoaded(scmdTag())) {
-            h4sc._logEvent(uid,ud,"svc","h4");
+            h4sc._logEvent(uid,ud,"svc",h4Tag());
             Serial.print("SVC ");Serial.print(CSTR(uid));
             Serial.print(" ");Serial.println(ud==H4P_LOG_SVC_UP ? "UP":"DOWN");
         }
@@ -154,7 +154,11 @@ void H4PluginService::svc(const string& uid,H4P_LOG_TYPE ud) {
 //
 //      H4PlogService
 //
-void H4PLogService::_hookIn(){ 
-    h4sc._hookLogChain(bind(&H4PLogService::_filterLog,this,_1,_2,_3,_4));
-    h4sc.addCmd(msgTag(),subid, 0, CMDNULL);
+void H4PLogService::_hookIn(){
+#ifdef H4P_LOG_EVENTS 
+    if(H4Plugin::isLoaded(scmdTag())) {
+        h4sc._hookLogChain(bind(&H4PLogService::_filterLog,this,_1,_2,_3,_4));
+        h4sc.addCmd(msgTag(),subid, 0, CMDNULL);
+    } else { DEPENDFAIL(scmd); }
+#endif
 }

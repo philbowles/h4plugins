@@ -11,8 +11,9 @@ H4_USE_PLUGINS
 //
 H4 h4(115200);
 H4P_SerialCmd h4sc;
-H4P_BinaryThing h4onof([](bool b){ Serial.print("I am now ");Serial.println(b ? "ON":"OFF"); });
+H4P_SerialLogger h4sl;
+H4P_BinaryThing h4onof([](bool b){ Serial.print("I am now ");Serial.println(b ? "ON":"OFF"); },OFF,10000);
 
 void h4setup(){
-  h4.every(10000,[]{ h4onof.toggle(); });
+  h4onof.turnOn(); // will turn off automatically after 10 seconds
 }

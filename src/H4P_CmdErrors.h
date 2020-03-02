@@ -46,7 +46,7 @@ class H4P_CmdErrors: public H4Plugin {
         };
 //
         H4_INT_MAP  logTypes={
-            {H4P_LOG_H4,"H4"},
+            {H4P_LOG_H4,h4Tag()},
             {H4P_LOG_SVC_UP,"SVC UP"},
             {H4P_LOG_SVC_DOWN,"SVC DOWN"},
             {H4P_LOG_CMD,"CMD"},

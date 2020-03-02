@@ -15,7 +15,7 @@ H4P_SerialCmd is the "command and control" centre of H4 and its plugin system. I
 It is much more powerful than that though as it is the lowest-level bulding block for handling commands from:
 
 * HTTP REST API (when using the [H4P_WiFi](h4wifi.md) plugin)
-* MQTT (when using the [H4P_MQTT](h4mqtt.md) plugin)
+* MQTT (when using the [H4P_AsyncMQTT](h4mqtt.md) plugin)
 * User code by calling API functions directly
 
 This is made possible by having a single command format across all sources, based on MQTT-style topics. While the different sources require slightly different treatment in how the command is entered by the user, the syntax of the command itself is common to all.
@@ -32,7 +32,7 @@ h4/some/cmd/with/many/levels/42,666
 
 The payload is "42,666" and the command is handled exactly the same way as an MQTT command with a topic of `h4/some/cmd/with/many/levels` and  payload of "42,666"
 
-This allows a consistent interface for all command handling irrespective of the source. See the [**H4P_AsyncWebServer** (http "REST")](h4asws.md) and [**H4P_MQTT**](h4mqtt.md) plugins for examples of this in action.
+This allows a consistent interface for all command handling irrespective of the source. See the [**H4P_AsyncWebServer** (http "REST")](h4asws.md) and [**H4P_AsyncMQTT**](h4mqtt.md) plugins for examples of this in action.
 
 The following external events all cause the same action: rebooting the device
 
@@ -214,7 +214,7 @@ Shows which plugins can be unloaded. SerialCmd itsef can be (see `unload`) using
 
 Many plugins "hook in" to H4's main loop. This takes processing power away from other features. SerialCmd itself has to check on every loop if there is a command waiting and that can significantly hurt the overall performance. Unloading a plugin simply "unhooks" it from H4's main loop, by defintion preventing it from working which is why it is very dangerous to call as other plugins may break if they depend on the one you just unloaded.
 
-SerialCmd can be safely unloaded - it will continue to provide command functionality to other plugins that depend upon it. e.g. [**H4P_AsyncWebServer** (http "REST")](h4asws.md) and [**H4P_MQTT**](h4mqtt.md) but it will no longer accept serial commands on its own behalf. Thus it can only be done once and cannot be undone. Unloading SCMD will show a huge performance improvement, so it it worth considering once testing is complete, especially for devices that will be deployed remotely.and will never be able to recive serial commands.
+SerialCmd can be safely unloaded - it will continue to provide command functionality to other plugins that depend upon it. e.g. [**H4P_AsyncWebServer** (http "REST")](h4asws.md) and [**H4P_AsyncMQTT**](h4mqtt.md) but it will no longer accept serial commands on its own behalf. Thus it can only be done once and cannot be undone. Unloading SCMD will show a huge performance improvement, so it it worth considering once testing is complete, especially for devices that will be deployed remotely.and will never be able to recive serial commands.
 
 ---
 

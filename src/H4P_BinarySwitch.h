@@ -41,11 +41,9 @@ class H4P_BinarySwitch: public H4P_BinaryThing{
             _pp->logicalWrite(_state=b);
         }        
     public:
-        H4P_BinarySwitch(uint8_t pin,H4GM_SENSE sense, uint32_t initial,H4BS_FN_SWITCH f=[](bool){}): H4P_BinaryThing(f,initial){
+        H4P_BinarySwitch(uint8_t pin,H4GM_SENSE sense, uint32_t initial,H4BS_FN_SWITCH f=nullptr,uint32_t timer=0): H4P_BinaryThing(f,initial,timer){
             _pp=h4gm.Output(pin,sense,initial,[](H4GPIOPin* ptr){});
         }
 };
-
-//extern __attribute__((weak)) H4P_BinarySwitch h4bs;
 
 #endif // H4P_BinarySwitch_H

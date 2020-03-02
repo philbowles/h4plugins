@@ -31,7 +31,7 @@ SOFTWARE.
 
 #include<H4P_WiFiSelect.h>
 #include<H4P_WiFi.h>
-#include<H4P_MQTT.h>
+#include<H4P_AsyncMQTT.h>
 #ifndef H4P_NO_WIFI
 
 void H4P_ThreeFunctionButton::progress(H4GPIOPin* ptr){ // run this as each stage changes

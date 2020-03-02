@@ -32,13 +32,13 @@ SOFTWARE.
 
 #ifndef ARDUINO_ARCH_STM32
 #include <H4PCommon.h>
-#include <H4P_MQTT.h>
+#include <H4P_AsyncMQTT.h>
 
 class H4P_MQTTHeapLogger: public H4P_MQTTLogger {
         uint32_t _f;
         void start() override { 
             H4P_MQTTLogger::start();
-            h4.every(_f,[](){ SYSEVENT(H4P_LOG_MQTT_HEAP,"%u",ESP.getFreeHeap()); },nullptr,H4P_TRID_HLOG,true);
+            h4.every(_f,[this](){ SYSEVENT(H4P_LOG_MQTT_HEAP,_pid,mqttTag(),"%u",ESP.getFreeHeap()); },nullptr,H4P_TRID_HLOG,true);
             }
         void stop() override { 
             H4P_MQTTLogger::stop();

@@ -42,7 +42,7 @@ H4P_SerialCmd h4sc;
 H4P_GPIOManager h4gm;
 H4P_FlasherController h4fc;
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","h4plugins");
-H4P_MQTT h4mqtt("192.168.1.4",1883);
+H4P_AsyncMQTT h4mqtt("192.168.1.4",1883);
 H4P_AsyncWebServer h4asws("admin","admin");
 H4P_UPNPSwitch h4upnp("Demo Switch",RELAY_BUILTIN,ACTIVE_HIGH,OFF);
 H4P_ThreeFunctionButton h43fb(&h4upnp,15,BUTTON_BUILTIN,INPUT,ACTIVE_LOW,LED_BUILTIN,ACTIVE_LOW);
@@ -101,10 +101,10 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 * [**H4P_GPIOManager**](docs/h4gm.md): One-line coding of debouncing, retriggering, rotary encoding plus numerous other GPIO strategies
 * [**H4P_WiFi**](docs/h4wifi.md): Automatic Connection / reconnection manager + AP configuration + OTA + HTTP REST
 * [**H4P_AsyncWebServer**](docs/h4asws.md): Fully Asynchronous Webserver
-* [**H4P_MQTT**](docs/h4mqtt.md): Automatic Connection/ reconnection MQTT client alows remote control of H4
-* [**H4P_BinarySwitch**](docs/h4onof.md): GPIO object that allows control by commands from multiple sources
+* [**H4P_AsyncMQTT**](docs/h4mqtt.md): Automatic Connection/ reconnection MQTT client alows remote control of H4
+* [**H4P_BinarySwitch**](docs/things.md): GPIO object that allows control by commands from multiple sources
 * [**H4P_BinaryThing**](docs/xxx.md): functional object that allows control by commands from multiple sources  **NEW in v0.3.4**
-* [**H4P_UPNPSwitch**](docs/h4upnp.md): Extends [H4P_BinarySwitch](docs/h4onof.md) into full UPNP device with Alexa voice control
+* [**H4P_UPNPSwitch**](docs/things.md): Extends [H4P_BinarySwitch](docs/things.md) into full UPNP device with Alexa voice control
 * [**H4P_UPNPThing**](docs/things.md): Extends [H4P_BinaryThing](docs/things.md) into full UPNP device with Alexa voice control  **NEW in v0.3.4**
 * [**H4P_ThreeFunctionButton**](docs/h43fnb.md): Multi-function physical control on/off,reboot,factory reset depending on hold time. Binds to xSwitch or xThing
 * [**H4P_PersistentStorage**](docs/h4stor.md): Save name/value pairs across reboots (requires SPIFFS)  **NEW in v0.3.5**

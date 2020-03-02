@@ -50,6 +50,8 @@ class H4P_ExternalSqWave: public H4Plugin, public SoftwareSerial{
 
         void            _Sweep(uint32_t c,uint32_t lim,uint32_t timer,uint32_t fromF,uint32_t toF,uint32_t inc,function<void(uint32_t)> onChange);
 
+            uint32_t        guardInt4(vector<string> vs,function<void(uint32_t,uint32_t,uint32_t,uint32_t)> f);
+
     public:
         H4P_ExternalSqWave(uint8_t rx,uint8_t tx,uint32_t initialF=0,uint32_t initialD=0);                
 

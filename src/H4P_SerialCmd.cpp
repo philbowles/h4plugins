@@ -74,7 +74,7 @@ void H4P_SerialCmd::_flattenCmds(function<void(string)> fn,string cmd,string pre
 uint32_t H4P_SerialCmd::_simulatePayload(string flat,const char* src){ // refac
 	vector<string> vs=split(flat,"/");
     if(vs.size()){
-		string pload=CSTR(PAYLOAD);
+		string pload=CSTR(H4PAYLOAD);
 		vs.pop_back();
 		string topic=join(vs,"/");
 		return invokeCmd(topic,pload,src);			
@@ -93,7 +93,7 @@ uint32_t H4P_SerialCmd::_unload(vector<string> vs){
                 return H4_CMD_OK;
             }
             return H4_CMD_NAME_UNKNOWN;
-        })(PAYLOAD);
+        })(H4PAYLOAD);
     });
 }
 //
@@ -165,7 +165,7 @@ H4P_SerialCmd::H4P_SerialCmd(){
     _hook=[this](){ run(); };
     _names={ {H4P_TRID_SCMD,uppercase(_pid)} };
     _cmds={
-        {"h4",         { 0, H4PC_ROOT, nullptr}},
+        {h4Tag(),         { 0, H4PC_ROOT, nullptr}},
         {"help",       { 0, 0, CMD(help) }},
         {"reboot",     { H4PC_ROOT, 0, CMD(h4reboot) }},
         {"factory",    { H4PC_ROOT, 0, CMD(h4FactoryReset) }},
@@ -188,13 +188,13 @@ H4P_SerialCmd::H4P_SerialCmd(){
 // diag
 void H4P_SerialCmd::dumpQ(){ h4.dumpQ(); }
 
-void H4P_SerialCmd::logEventType(H4P_LOG_TYPE t,const string& fmt,...){
+void H4P_SerialCmd::logEventType(H4P_LOG_TYPE t,const string& src,const string& tgt,const string& fmt,...){
     char buff[256];
     va_list ap; 
     va_start(ap, fmt); 
     vsnprintf(buff,255,CSTR(fmt),ap);
     va_end(ap);
-    _logEvent(buff,t,userTag(),"h4");
+    _logEvent(buff,t,src,tgt);
 }
 
 void H4P_SerialCmd::plugins(){ for(auto const& p:H4Plugin::_plugins) reply("P: %s ID=%d\n",CSTR(p->_pid),p->subid); }
@@ -252,7 +252,7 @@ uint32_t H4P_SerialCmd::_dump(vector<string> vs){
             reply("DUMP FILE %s\n",CSTR(h));
             reply("%s\n",CSTR(read("/"+h)));
             return H4_CMD_OK;
-        })(PAYLOAD);
+        })(H4PAYLOAD);
     });
 }
 

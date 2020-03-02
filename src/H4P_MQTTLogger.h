@@ -32,7 +32,7 @@ SOFTWARE.
 
 #ifndef ARDUINO_ARCH_STM32
 #include <H4PCommon.h>
-#include <H4P_MQTT.h>
+#include <H4P_AsyncMQTT.h>
 
 class H4P_MQTTLogger: public H4PLogService {
         void _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target){ h4mqtt.publishDevice(_pid,msg); }

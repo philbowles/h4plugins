@@ -43,15 +43,22 @@ SOFTWARE.
 class H4P_UPNPSwitch: public H4P_BinarySwitch, public H4P_UPNPCommon {
         void        _hookIn() override{ H4P_UPNPCommon::_pseudoHookIn(); }
         bool        _getState() override { return H4P_BinarySwitch::_getState(); }
+/*
+#ifdef H4P_LOG_EVENTS
         void        _turn(bool b,const string& src) override { H4P_BinarySwitch::_turn(b,src); }
+#else
+        void        _turn(bool b,const string& src) override { H4P_BinarySwitch::turn(b); }
+#endif
+*/
     public:
-        H4P_UPNPSwitch(const string& name,uint8_t pin,H4GM_SENSE sense, uint32_t initial,H4BS_FN_SWITCH f=[](bool){}): 
-            H4P_BinarySwitch(pin,sense,initial,f),
-            H4P_UPNPCommon(name){
+        H4P_UPNPSwitch(const string& name,uint8_t pin,H4GM_SENSE sense, uint32_t initial,
+                        H4BS_FN_SWITCH f=nullptr,
+                        H4_FN_VOID onConnect=nullptr,
+                        uint32_t timer=0): 
+            H4P_BinarySwitch(pin,sense,initial,f,timer),
+            H4P_UPNPCommon(this,name,onConnect){
         }
 };
-    
-//extern __attribute__((weak)) H4P_UPNPSwitch h4thing;
 
 #endif
 #endif // H4P_UPNPSwitch_H

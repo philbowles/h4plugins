@@ -47,7 +47,6 @@ using H4P_FN_LOG = function<void(const string &msg,H4P_LOG_TYPE type,const strin
 
 class H4P_SerialCmd: public H4Plugin {
         vector<H4P_FN_LOG>  _logChain;
-//  protected:
         VSCMD(_unload);
 
         H4_CMD_MAP_I    __exactMatch(const string& cmd,uint32_t owner);
@@ -81,12 +80,11 @@ class H4P_SerialCmd: public H4Plugin {
         void            addCmd(const string& name,uint32_t owner, uint32_t levID,H4_FN_MSG f=nullptr){ _addCmd(name, {owner,levID,f}); }
         uint32_t        invokeCmd(string,string="",const char* src=userTag());			
         uint32_t        invokeCmd(string,uint32_t,const char* src=userTag()); 
-        void            logEventType(H4P_LOG_TYPE,const string& fmt,...);
+        void            logEventType(H4P_LOG_TYPE,const string& src,const string& tgt,const string& fmt,...);
         void            removeCmd(const string& name,uint32_t subid=0); 
         void            unload(const uint32_t subid);
 //      syscall only
         void            _addCmd(const string& name,struct command cmd){ commands.insert(make_pair(name,cmd)); }
-//        void            _noOP(){} // for non-events
         void            _hookLogChain(H4P_FN_LOG f){ _logChain.push_back(f); }
         void            _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target);
         uint32_t        _executeCmd(string topic, string pload);

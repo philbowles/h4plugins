@@ -32,33 +32,31 @@ SOFTWARE.
 void H4P_UPNPCommon::_pseudoHookIn(){
     if(H4Plugin::isLoaded(aswsTag())){
         _ubIP=IPAddress(239,255,255,250);
-
         h4._hookLoop(nullptr,{ 
             {H4P_TRID_SOAP, "SOAP"},
             {H4P_TRID_UDPM, "UDPM"},
+            {H4P_TRID_UDPM, "UDPM"},
             {H4P_TRID_UDPS, "UDPS"},
+            {H4P_TRID_UDPU, "UDPU"},
             {H4P_TRID_NTFY, "NTFY"} 
             },H4PC_UPNP);
 
-        h4sc.addCmd(upnpTag(),H4PC_ROOT, H4PC_UPNP, nullptr);
+        h4sc.addCmd(_pid,H4PC_ROOT, H4PC_UPNP, nullptr);
         h4sc.addCmd(nameTag(),H4PC_UPNP,0, CMDVS(_friendly));
+//        h4sc.addCmd("grid",H4PC_UPNP,0, CMD(grid));
 
         h4asws.hookConnect([this](){ start(); });
         h4asws.hookDisconnect([this](){ stop(); });
         H4PluginService::hookFactory([this](){ SPIFFS.remove(CSTR(string("/"+string(nameTag())))); });
-    } else { 
-        #ifdef H4_LOG_EVENTS
-            //DEPENDFAIL(asws);
-            h4sc.logEventType(H4P_LOG_DEPENDFAIL,"%s->%s", H4PC_UPNP,aswsTag());
-        #endif
     }
+    else DEPENDFAIL(asws);
 }
 
 void  H4P_UPNPCommon::friendlyName(const string& name){ h4wifi.setPersistentValue(nameTag(),name,true); }
 
 uint32_t H4P_UPNPCommon::_friendly(vector<string> vs){
     return H4Plugin::guard1(vs,[this](vector<string> vs){
-        h4wifi.setPersistentValue(nameTag(),PAYLOAD,true);
+        h4wifi.setPersistentValue(nameTag(),H4PAYLOAD,true);
         return H4_CMD_OK;
     });
 }
@@ -68,32 +66,69 @@ void H4P_UPNPCommon::__upnpSend(uint32_t mx,const string s,IPAddress ip,uint16_t
 		_udp.writeTo((uint8_t *)CSTR(s), s.size(), ip, port);
 		},ip,port,s),nullptr,H4P_TRID_UDPS); // name this!!
 }
+/*
+void H4P_UPNPCommon::_notifyUSN(const string& usn,bool b){
+    H4P_USN u=_detect[usn];
+    if(b!=u.told){
+        _detect[usn].told=b;
+        H4BS_FN_SWITCH f=u.f;
+        if(f) f(b);
+        H4EVENT("%s->%d", CSTR(usn),b)
+    }
+}
 
+void H4P_UPNPCommon::_offlineUSN(const string& usn,bool notify,bool state){
+    if(_detect.count(usn)) h4.cancel(_detect[usn].timer);
+    _detect[usn].timer=nullptr;
+    if(notify) _notifyUSN(usn,state);
+}
+*/
 void H4P_UPNPCommon::_listenUDP(){
 if(_udp.listenMulticast(_ubIP, 1900)) {
     _udp.onPacket([this](AsyncUDPPacket packet) {
         h4.queueFunction(bind([this](string msg, IPAddress ip, uint16_t port) {
+            H4P_CONFIG_BLOCK uhdrs;
+            vector<string> hdrs = split(msg, "\r\n");
+            while (hdrs.back() == "") hdrs.pop_back();
+            for (auto const &h :vector<string>(++hdrs.begin(), hdrs.end())) {
+                    size_t p = h.find(":");
+                    if (p != string::npos) {
+                        string key=uppercase(string(h.begin(),h.begin()+p));
+                        uhdrs[key]=trim(string(h.begin()+p+1,h.end()));
+                    }
+            }
+            uint32_t mx=1000 * atoi(CSTR(replaceAll(uhdrs["CACHE-CONTROL"],"max-age=","")));
             if (msg[0] == 'M') {
-                H4P_CONFIG_BLOCK uhdrs;
-                vector<string> hdrs = split(msg, "\r\n");
-                while (hdrs.back() == "") hdrs.pop_back();
-                for (auto const &h :vector<string>(++hdrs.begin(), hdrs.end())) {
-                        size_t p = h.find(":");
-                        if (p != string::npos) {
-                            string key=uppercase(string(h.begin(),h.begin()+p));
-                            uhdrs[key]=trim(string(h.begin()+p+1,h.end()));
-                        }
-                }
                 string ST = uhdrs["ST"];
                 if (ST==_pups[1] || ST==_uuid+H4Plugin::_cb["udn"]) { // make tag
                     string tail=((ST==_pups[1]) ? ST:"");
-                    __upnpSend(1000 * atoi(CSTR(uhdrs["MX"])), "HTTP/1.1 200 OK\r\nST:" + ST +"\r\n" +__upnpCommon(tail), ip,port);
+                    __upnpSend(mx, "HTTP/1.1 200 OK\r\nST:" + ST +"\r\n" +__upnpCommon(tail), ip,port);
                 }
             }
+/*
+            else {
+                string usn=uhdrs["USN"];
+                if(_detect.count(usn)){
+                    // is is one of us?
+                    for(auto const& u:uhdrs) Serial.printf("%s=%s\n",CSTR(u.first),CSTR(u.second));
+//                    if(uhdrs.count("X-H4-DEVICE")){
+//                        Serial.printf("Hoorah! its one of our own: %s\n",CSTR(uhdrs["X-H4-DEVICE"]));
+//                    }
+                    if(uhdrs["NTS"].find("alive")!=string::npos){
+                        _offlineUSN(usn,false);// do not notify
+                        _detect[usn].mx=mx; 
+                        _detect[usn].timer=h4.once(mx,[this,usn](){ _offlineUSN(usn,true,false); },nullptr,H4P_TRID_UDPU);
+                        _notifyUSN(usn,true); // notify true=online
+                    }
+                    else _offlineUSN(usn,true,false); // notify false=offline
+                }
+            }
+*/
         },stringFromBuff(packet.data(), packet.length()),packet.remoteIP(), packet.remotePort()),nullptr, H4P_TRID_UDPM);
     });
    }
 }
+
 
 string H4P_UPNPCommon::__makeUSN(const string& s){
 	string full=_uuid+H4Plugin::_cb["udn"];
@@ -140,7 +175,8 @@ void H4P_UPNPCommon::start(){
         _listenUDP();
         _notify("alive"); // TAG
         h4.every(H4P_UDP_REFRESH / 3,[this](){ _notify("alive"); },nullptr,H4P_TRID_NTFY,true); // TAG
-        H4PluginService::svc(upnpTag(),H4P_LOG_SVC_UP); // simulate service
+        if(_fc) _fc(); // simulate h4pcconnected
+        H4PluginService::svc(_pid,H4P_LOG_SVC_UP); // simulate service
     }
 }
 
@@ -150,7 +186,7 @@ void H4P_UPNPCommon::_upnp(AsyncWebServerRequest *request){ // redo
         H4Plugin::_cb["gs"]=(soap.find("Get")==string::npos) ? "Set":"Get";
         uint32_t _set=soap.find(">1<")==string::npos ? 0:1;
         if(H4Plugin::_cb["gs"]=="Set"){
-            _turn(_set,upnpTag());//
+            _turn(_set,_pid);//
         }
         H4Plugin::_cb[stateTag()]=stringFromInt(_getState());
         request->send(200, "text/xml", CSTR(H4P_WiFi::replaceParams(_soap))); // refac
@@ -158,10 +194,16 @@ void H4P_UPNPCommon::_upnp(AsyncWebServerRequest *request){ // redo
 }
 
 void H4P_UPNPCommon::stop(){
+    /*
+    for(auto const& d:_detect){
+        _offlineUSN(d.first,false); // do not notify
+        _detect.erase(d.first);
+    }
+    */
     _notify("byebye");
     h4.cancelSingleton(H4P_TRID_NTFY);
     _udp.close();
-    H4PluginService::svc(upnpTag(),H4P_LOG_SVC_DOWN); // simulate service
+    H4PluginService::svc(_pid,H4P_LOG_SVC_DOWN); // simulate service
 }
 
 void H4P_UPNPCommon::_notify(const string& phase){ // chunker it up

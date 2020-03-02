@@ -102,6 +102,7 @@ STAG(curl);
 STAG(device);
 STAG(esqw);
 STAG(gpio);
+STAG(h4);
 STAG(log);
 STAG(mqtt);
 STAG(msg);
@@ -113,6 +114,7 @@ STAG(qwrn);
 STAG(scmd);
 STAG(snif);
 STAG(src);
+// svc?
 STAG(ssid);
 STAG(state);
 STAG(stor);
@@ -122,8 +124,8 @@ STAG(user);
 STAG(wink);
 STAG(wifi);
 
-#define PAYLOAD vs.back()
-#define PAYLOAD_INT atoi(CSTR(vs.back()))
+#define H4PAYLOAD vs.back()
+#define H4PAYLOAD_INT atoi(CSTR(vs.back()))
 #define STOI(n) atoi(CSTR(n))
 #define PARAM_INT(n) STOI(vs[n])
 #define CHOP_FRONT(vs) (vector<string>(++vs.begin(),vs.end()))
@@ -134,15 +136,13 @@ STAG(wifi);
 
 #define VSCMD(x) uint32_t x(vector<string>)
 #ifdef H4P_LOG_EVENTS
- //   #define EVENT(x,...) h4sc.logEventType(H4P_LOG_USER,x, ##__VA_ARGS__)
-    #define H4EVENT(x,y) if(H4Plugin::isLoaded(scmdTag())) { h4sc._logEvent((x),H4P_LOG_H4,y,_pid); }
-    #define SYSEVENT(e,x,...) h4sc.logEventType(e,x, ##__VA_ARGS__)
-    #define DEPENDFAIL(x) h4sc.logEventType(H4P_LOG_DEPENDFAIL,"%s->%s", CSTR(_pid),x##Tag())
-    #define h4UserEvent(x,...) if(H4Plugin::isLoaded(scmdTag())) { h4sc.logEventType(H4P_LOG_USER,x, ##__VA_ARGS__); }
+    #define SYSEVENT(e,s,t,x,...) if(H4Plugin::isLoaded(scmdTag())) { h4sc.logEventType(H4P_LOG_H4,s,t,x, ##__VA_ARGS__); }
+    #define H4EVENT(x,...) if(H4Plugin::isLoaded(scmdTag())) { h4sc.logEventType(H4P_LOG_H4,_pid,h4Tag(),x, ##__VA_ARGS__); }
+    #define DEPENDFAIL(x) Serial.printf("FATAL: %s needs %s!\n",CSTR(_pid),x##Tag())
+    #define h4UserEvent(x,...) if(H4Plugin::isLoaded(scmdTag())) { h4sc.logEventType(H4P_LOG_USER,userTag(),h4Tag(),x, ##__VA_ARGS__); }
 #else
-//    #define EVENT(x,...)
-    #define H4EVENT(x,y)
     #define SYSEVENT(e,x,...)
+    #define H4EVENT(x,...)
     #define DEPENDFAIL(x)
     #define h4UserEvent(x,...)
 #endif
@@ -164,16 +164,19 @@ enum trustedIds {
   H4P_TRID_WFAP,
   H4P_TRID_MQMS,
   H4P_TRID_MQRC,
-  H4P_TRID_MQTT,
+//  H4P_TRID_MQTT,
   H4P_TRID_ASWS,
   H4P_TRID_SOAP,
   H4P_TRID_UDPM,
   H4P_TRID_UDPS,
+  H4P_TRID_UDPU,
   H4P_TRID_NTFY,
   H4P_TRID_SCMD,
   H4P_TRID_HLOG,
   H4P_TRID_QLOG,
-  H4P_TRID_MLRQ
+  H4P_TRID_MLRQ,
+  H4P_TRID_BTTO,
+  H4P_TRID_IPPD
 };
 
 enum H4PC_CMD_ID{
@@ -198,7 +201,7 @@ class H4Plugin {
     
             uint32_t        guardInt1(vector<string> vs,function<void(uint32_t)> f);
 
-            uint32_t        guardInt4(vector<string> vs,function<void(uint32_t,uint32_t,uint32_t,uint32_t)> f);
+//            uint32_t        guardInt4(vector<string> vs,function<void(uint32_t,uint32_t,uint32_t,uint32_t)> f);
 
             uint32_t        guardString2(vector<string> vs,function<void(string,string)> f);
     public:
@@ -261,7 +264,6 @@ class H4PluginService: public H4Plugin {
                 hookConnect(onConnect);
                 hookDisconnect(onDisconnect);
         }
-//                string      getConfig(const string& c){ return _cb[c]; }
                 void        hookConnect(H4_FN_VOID f){ _connChain.push_back(f); }
                 void        hookDisconnect(H4_FN_VOID f){ _discoChain.push_back(f); } 
         static  void        hookFactory(H4_FN_VOID f){ _factoryChain.push_back(f); } 

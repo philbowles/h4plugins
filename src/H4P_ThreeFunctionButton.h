@@ -50,7 +50,11 @@ class H4P_ThreeFunctionButton: public H4Plugin{
             uint8_t             _led;
             H4GM_SENSE          _active;
             H4GM_STAGE_MAP _sm={
+#ifdef H4P_LOG_EVENTS
                 {0,[this](H4GPIOPin* ptr){ _btp->_turn(!_btp->state(),_pid); }},
+#else
+                {0,[this](H4GPIOPin* ptr){ _btp->turn(!_btp->state()); }},
+#endif
                 {H43F_REBOOT,[](H4GPIOPin* ptr){ h4reboot(); }},
                 {H43F_FACTORY,[](H4GPIOPin* ptr){ h4FactoryReset(); }}
             };    

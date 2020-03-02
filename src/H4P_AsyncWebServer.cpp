@@ -78,7 +78,7 @@ void H4P_AsyncWebServer::start(){
 	reset();
 
     on("/",HTTP_GET, [this](AsyncWebServerRequest *request){ 
-        H4EVENT(request->client()->remoteIP().toString().c_str(),aswsTag());
+        H4EVENT("%s",request->client()->remoteIP().toString().c_str());
         string rootweb=WiFi.getMode() & WIFI_AP ? "/ap.htm":"/sta.htm"; // streeamline - even fn change
         request->send(SPIFFS,CSTR(rootweb),String(),false,aswsReplace);
     });

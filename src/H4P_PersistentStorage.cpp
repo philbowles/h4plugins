@@ -70,7 +70,7 @@ void  H4P_PersistentStorage::setstring(const string& name,const string& value){
 
 uint32_t H4P_PersistentStorage::_get(vector<string> vs){
     return H4Plugin::guard1(vs,[this](vector<string> vs){
-        if(psRam.count(PAYLOAD)) _showItem(PAYLOAD);
+        if(psRam.count(H4PAYLOAD)) _showItem(H4PAYLOAD);
         return H4_CMD_OK;
     });
 }

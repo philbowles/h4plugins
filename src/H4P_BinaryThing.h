@@ -34,11 +34,11 @@ SOFTWARE.
 #include<H4P_SerialCmd.h>
 #include<H4P_WiFiSelect.h>
 #ifndef H4P_NO_WIFI
-    #include<H4P_MQTT.h>
+    #include<H4P_AsyncMQTT.h>
 #endif
 
 class H4P_BinaryThing: public H4Plugin{
-//
+        uint32_t         _timeout;
     protected:
         bool            _state=false;
         H4BS_FN_SWITCH  _f;
@@ -55,9 +55,9 @@ class H4P_BinaryThing: public H4Plugin{
 
                 uint32_t    _showState(vector<string> vs){ reply("State: %s\n",_getState() ? "ON":"OFF"); return H4_CMD_OK; }
                 uint32_t    _switch(vector<string> vs){ return guardInt1(vs,bind(&H4P_BinaryThing::turn,this,_1)); }
-                void        _greenLight() override { _f(_state); }
+                void        _greenLight() override { if(_f) _f(_state); }
     public:
-        H4P_BinaryThing(H4BS_FN_SWITCH f=[](bool){},bool initial=OFF): _f(f),_state(initial){
+        H4P_BinaryThing(H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): _f(f),_state(initial),_timeout(timer){
             _pid=onofTag();
             _cmds={
                 {"on",     {H4PC_ROOT, 0, CMD(turnOn)}},
@@ -66,21 +66,38 @@ class H4P_BinaryThing: public H4Plugin{
                 {"switch", {H4PC_ROOT, 0, CMDVS(_switch)}},
                 {"toggle", {H4PC_ROOT, 0, CMD(toggle)}}
             };
+            _names={{H4P_TRID_BTTO,"BTTO"}};
         }
         bool state(){ return _getState(); }
         void turnOff(){ turn(false); }
         void turnOn(){ turn(true); }
         void toggle(){ turn(!_state); }
+        #ifdef H4P_LOG_EVENTS
         void turn(bool b){ _turn(b,userTag()); }
         // syscall only
         void _turn(bool b,const string& src){
+            h4.cancelSingleton(H4P_TRID_BTTO);
+            if(b && _timeout) h4.once(_timeout,[this](){ _turn(OFF,"btto"); },nullptr,H4P_TRID_BTTO,true);
             if(b!=_getState()){
                 _setState(b);
-                _f(_state);
+                if(_f) _f(_state);
                 _publish(_state);
-                H4EVENT((_state ? "ON":"OFF"),src);
+                SYSEVENT(H4P_LOG_H4,src,onofTag(),"%s",(_state ? "ON":"OFF"));
             }
         }
+        #else
+//        void turn(bool b){ _turn(b,userTag()); }
+        // syscall only
+        void turn(bool b){
+            h4.cancelSingleton(H4P_TRID_BTTO);
+            if(b && _timeout) h4.once(_timeout,[this](){ turn(OFF); },nullptr,H4P_TRID_BTTO,true);
+            if(b!=_getState()){
+                _setState(b);
+                if(_f) _f(_state);
+                _publish(_state);
+            }
+        }
+        #endif
 };
 
 #endif // H4P_BinaryThing_H

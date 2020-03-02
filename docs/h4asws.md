@@ -18,7 +18,7 @@ Asynchronous Web Server provide bot an AP mode server to allow first-time / fact
 
 Fill in the details, click "connect" and the device will boot into STA mode using the new credentials for the rest of its days until you force a "factory reset". 
 
-N.B. The "name" field is only relevant if you are also using the [H4P_UPNPSwitch](/h4upnp.md) plugin, when it will become the "friendly name" of the device as shown in Windows Network Explorer. Is is also the name by which Amazon Alexa will control it via voice commands "switch on < name >" and "switch off < name >"
+N.B. The "name" field is only relevant if you are also using the [H4P_UPNPSwitch](/things.md) plugin, when it will become the "friendly name" of the device as shown in Windows Network Explorer. Is is also the name by which Amazon Alexa will control it via voice commands "switch on < name >" and "switch off < name >"
 
 ---
 

@@ -6,7 +6,7 @@ H4P_SerialCmd h4sc;
 
 H4P_SerialLogger h4sl;
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","mysqllogger");
-H4P_MQTT h4mqtt("192.168.1.4",1883);
+H4P_AsyncMQTT h4mqtt("192.168.1.4",1883);
 H4P_HttpMySQLLogger h4mysql("http://192.168.1.20:8266/"); // trailing slash!!!
 
 uint32_t serno;

@@ -67,7 +67,7 @@ For `H4P_LOG_CMD` it is the sub-system that initiated the cmd
     * "upnp" when from a UPNP device e.g. Amazon Alexa
     * "user" when called directly from user code
 
-* Target: will usually be empty or "self" when sent by anything other than MQTT. For subscribed topics, it will be the prefix of the MQTT publish as described in [H4P_MQTT](h4mqtt.md). In summary, one of:
+* Target: will usually be empty or "self" when sent by anything other than MQTT. For subscribed topics, it will be the prefix of the MQTT publish as described in [H4P_AsyncMQTT](h4mqtt.md). In summary, one of:
     
     * all
     * < your board type > e.g. "WEMOS_D1MINI"
@@ -209,7 +209,7 @@ H4P_MQTTLogger h4m1("first",...
 ## Prequisistes
 
 H4P_WiFi
-H4P_MQTT
+H4P_AsyncMQTT
 
 ## Additional Commnds
 
@@ -245,7 +245,7 @@ H4P_MQTTHeapLogger h4hl(...
 ## Prequisistes
 
 H4P_WiFi
-H4P_MQTT
+H4P_AsyncMQTT
 
 ## Additional Commnds
 
@@ -281,7 +281,7 @@ H4P_MQTTQueueLogger h4hl(...
 ## Prequisistes
 
 H4P_WiFi
-H4P_MQTT
+H4P_AsyncMQTT
 
 ## Additional Commnds
 
