@@ -29,11 +29,13 @@ SOFTWARE.
 #ifndef ARDUINO_ARCH_STM32
 #include<H4P_LocalLogger.h>
 //
-H4P_LocalLogger::H4P_LocalLogger(uint32_t limit): H4PLogService(logTag()), _limit(limit) {
-    _local={
-        {_pid,     {H4PC_SHOW, 0, CMD(show)}},
-        {"clear",  {subid, 0, CMD(clear)}},
-        {"flush",  {subid, 0, CMD(flush)}}
+H4P_LocalLogger::H4P_LocalLogger(uint32_t limit,uint32_t filter): H4PLogService(logTag(),filter), _limit(limit) {
+    _fname=string(logTag())+".csv";
+    _cmds={
+        {_pName,   {H4PC_ROOT, _subCmd, nullptr}},
+        {msgTag(), {_subCmd, 0, CMDNULL}},
+        {"clear",  {_subCmd, 0, CMD(clear)}},
+        {"flush",  {_subCmd, 0, CMD(flush)}}
     };
 }
 
@@ -44,13 +46,13 @@ void H4P_LocalLogger::flush(){
     clear();
 }
 
-void H4P_LocalLogger::show(){ h4sc._dump(vector<string>{logTag()}); }
+void H4P_LocalLogger::show(){ h4sc._dump(vector<string>{_fname}); }
 //
 //      our raison d'etre
 //
 void H4P_LocalLogger::_logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target){
     vector<string> msgparts={stringFromInt(millis()),stringFromInt(type),source,target,msg};
-    uint32_t size=h4sc.write("/log",join(msgparts,",").append("\n"),"a");
+    uint32_t size=h4sc.write("/"+_fname,join(msgparts,",")+"\n","a");
     if(size > _limit) flush();
 }
 #endif

@@ -35,7 +35,7 @@ SOFTWARE.
 #include <H4P_SerialCmd.h>
 
 class H4P_SerialLogger: public H4PLogService {
-        string _getType(uint32_t t){ return H4Plugin::isLoaded(cerrTag()) ? h4ce.getLogType(t):"TYPE="+stringFromInt((int) t); }
+        string _getType(uint32_t t){ return isLoaded(cerrTag()) ? h4ce.getLogType(t):"TYPE="+stringFromInt((int) t); }
         void   _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target){
             Serial.print(CSTR(_getType(type)));
             Serial.print(" "); Serial.print(CSTR(source));

@@ -73,6 +73,6 @@ void h4setup() { // H4 constructor starts Serial
         h4.once(60000,[](){ Serial.println("60 seconds later"); },nullptr,6);// "tag" as UF60
         h4.once(70000,[](){ Serial.println("70 seconds later"); },nullptr,7);// "tag" as UF70
         h4.once(80000,[](){ Serial.println("80 seconds later"); },nullptr,8);// "tag" as UF80
-        h4.once(90000,[](){ Serial.println("80 seconds later"); });// no tag: anon
-        h4.once(95000,[](){ Serial.println("80 seconds later"); });// no tag: anon
+        h4.once(90000,[](){ Serial.println("90 seconds later"); });// no tag: anon
+        h4.once(95000,[](){ Serial.println("95 seconds later"); });// no tag: anon
 }

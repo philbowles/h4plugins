@@ -44,19 +44,18 @@ SOFTWARE.
 #ifndef H4P_NO_WIFI
 
 extern void h4FactoryReset();
-
 class H4P_ThreeFunctionButton: public H4Plugin{
             H4P_BinaryThing*    _btp;
             uint8_t             _led;
             H4GM_SENSE          _active;
             H4GM_STAGE_MAP _sm={
 #ifdef H4P_LOG_EVENTS
-                {0,[this](H4GPIOPin* ptr){ _btp->_turn(!_btp->state(),_pid); }},
+                {0,[this](H4GPIOPin*){ _btp->_turn(!_btp->state(),_pName); }},
 #else
-                {0,[this](H4GPIOPin* ptr){ _btp->turn(!_btp->state()); }},
+                {0,[this](H4GPIOPin*){ _btp->turn(!_btp->state()); }},
 #endif
-                {H43F_REBOOT,[](H4GPIOPin* ptr){ h4reboot(); }},
-                {H43F_FACTORY,[](H4GPIOPin* ptr){ h4FactoryReset(); }}
+                {H43F_REBOOT,[](H4GPIOPin*){ h4reboot(); }},
+                {H43F_FACTORY,[](H4GPIOPin*){ h4FactoryReset(); }}
             };    
             H4_FN_VOID      _createMS;
 
@@ -66,11 +65,11 @@ class H4P_ThreeFunctionButton: public H4Plugin{
     public:
         H4P_ThreeFunctionButton(
             H4P_BinaryThing* btp,  //
-            uint32_t dbTimeMs, // arbitrary
 //          the input button            
             uint8_t pin,
             uint8_t mode,
             H4GM_SENSE b_sense,
+            uint32_t dbTimeMs, // arbitrary
 //          the linked LED for message flashing
             uint8_t led,
             H4GM_SENSE l_sense);

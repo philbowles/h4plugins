@@ -37,49 +37,36 @@ uint32_t H4P_AsyncMQTT::_change(vector<string> vs){
 }
 
 void H4P_AsyncMQTT::_hookIn() {
-    if(H4Plugin::isLoaded(wifiTag()) ){
-        _setup();
+    DEPEND(wifi);
+    _setup();
 
-        onMessage([this](char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t length, size_t index, size_t total){
-            h4.queueFunction(
-                bind([](string topic, string pload){ 
-                    h4sc._executeCmd(CSTR(string(mqttTag()).append("/").append(topic)),pload); 
-                },string(topic),stringFromBuff((byte*) payload,length)),
-            nullptr,H4P_TRID_MQMS);
+    onMessage([this](char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t length, size_t index, size_t total){
+        h4.queueFunction(
+            bind([](string topic, string pload){ 
+                h4sc._executeCmd(CSTR(string(mqttTag()).append("/").append(topic)),pload); 
+            },string(topic),stringFromBuff((byte*) payload,length)),
+        nullptr,H4P_TRID_MQMS);
 
-        });	
-        
-        onConnect([this](bool b){
-            h4.cancelSingleton(H4P_TRID_MQRC);
-            _discoDone=false;
-            h4.dumpQ();            
-//            subscribe(CSTR(string("all/").append(cmdhash())),0);
-//            subscribe(CSTR(string(device+"/"+cmdhash())),0);
-//            subscribe(CSTR(string(_cb[chipTag()]+"/"+cmdhash())),0);
-//            subscribe(CSTR(string(_cb[boardTag()]+"/"+cmdhash())),0);
-            publish("all/h4/mqtt/online",0,false,CSTR(device));
-            h4pcConnected();
-            Serial.printf("MQTT CONNECTED %d\n",b);
-        });
+    });	
+    
+    onConnect([this](bool b){
+        h4.cancelSingleton(H4P_TRID_MQRC);
+        _discoDone=false;
+        subscribe(CSTR(string("all/").append(cmdhash())),0);
+        subscribe(CSTR(string(device+"/"+cmdhash())),0);
+        subscribe(CSTR(string(_cb[chipTag()]+"/"+cmdhash())),0);
+        subscribe(CSTR(string(_cb[boardTag()]+"/"+cmdhash())),0);
+        publish("all/h4/mqtt/online",0,false,CSTR(device));
+        _upHooks();
+    });
 
-        onDisconnect([this](AsyncMqttClientDisconnectReason reason){
-            Serial.printf("MQTT DISCONNECT\n");
-            if(!_discoDone){
-                _discoDone=true;
-                h4pcDisconnected();
-                if(autorestart && WiFi.status()==WL_CONNECTED) {
-                    Serial.printf("starting H4P_TRID_MQRC\n");
-                    h4.every(H4MQ_RETRY,[this](){ start(); },nullptr,H4P_TRID_MQRC,true);
-                    Serial.printf("H4P_TRID_MQRC started\n");
-                    h4.dumpQ();
-                }
-            }
-        });
-
-        h4wifi.hookConnect([this](){ start(); });
-        h4wifi.hookDisconnect([this](){ stop(); });
-//        H4EVENT("H4P_AsyncMQTT::_hookIn");
-    } else { DEPENDFAIL(wifi); }
+    onDisconnect([this](AsyncMqttClientDisconnectReason reason){
+        if(!_discoDone){
+            _discoDone=true;
+            _downHooks();
+            if(autorestart && WiFi.status()==WL_CONNECTED) h4.every(H4MQ_RETRY,[this](){ start(); },nullptr,H4P_TRID_MQRC,true);
+        }
+    });
 }
 
 uint32_t H4P_AsyncMQTT::_offline(vector<string> vs){
@@ -142,20 +129,15 @@ void H4P_AsyncMQTT::unsubscribeDevice(string topic){
     unsubscribe(CSTR(fullTopic));
 }
 
-void H4P_AsyncMQTT::start(){ 
-    Serial.printf("MQTT start\n");
+void H4P_AsyncMQTT::_start(){ 
     if(!(WiFi.getMode() & WIFI_AP)) {
-        Serial.printf("MQTT start wifi STA\n");
         autorestart=true;
         connect(); 
     }
-    Serial.printf("MQTT start OUT\n");
 }
 
-void H4P_AsyncMQTT::stop(){
-    Serial.printf("MQTT stop\n");
+void H4P_AsyncMQTT::_stop(){
     if(!(WiFi.getMode() & WIFI_AP)) {
-        Serial.printf("MQTT stop wifi STA\n");
         autorestart=false;
         disconnect(true);
     }

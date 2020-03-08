@@ -27,34 +27,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_UPNPCommon_HO
-#define H4P_UPNPCommon_HO
+#ifndef H4P_UPNPServer_HO
+#define H4P_UPNPServer_HO
 
-#include<H4PCommon.h>
-#include<H4P_SerialCmd.h>
 #include<H4P_WiFiSelect.h>
-#include<H4P_WiFi.h>
 #ifndef H4P_NO_WIFI
 
+#include<H4PCommon.h>
+//#include<H4P_SerialCmd.h>
 #include<H4P_AsyncWebServer.h>
 #include<H4P_BinaryThing.h>
-/*
-struct H4P_USN {
-    uint32_t        mx=0;
-    H4_TIMER        timer=nullptr;
-    bool            told=false;
-    H4BS_FN_SWITCH  f=nullptr;
-};
 
-using H4P_USN_MAP       =unordered_map<string,H4P_USN>;
-*/
-class H4P_UPNPCommon{
-        string          _pid=upnpTag();
+using H4P_FN_USN        =function<void(uint32_t mx,H4P_CONFIG_BLOCK)>;
+using H4P_USN_MAP       =unordered_map<string,H4P_FN_USN>;
+
+class H4P_UPNPServer: public H4Plugin {
+        H4P_BinaryThing* _btp;
         AsyncUDP 	    _udp;
         IPAddress		_ubIP;
-//        H4P_USN_MAP     _detect;
-        H4_FN_VOID      _fc;
-        void*           _owner;
+        H4P_USN_MAP     _detect;
 
         VSCMD(_friendly);
 
@@ -66,10 +57,10 @@ class H4P_UPNPCommon{
                 "upnp:rootdevice"
             };
 
-            string              _name;
-            string              _soap;
-            string              _ucom;
-            string              _xml;
+            string          _name;
+            string          _soap;
+            string          _ucom;
+            string          _xml;
 
             string          __makeUSN(const string& s);
             string          __upnpCommon(const string& usn);
@@ -83,33 +74,22 @@ class H4P_UPNPCommon{
 //            void            _offlineUSN(const string& usn,bool notify=false,bool state=false);
             void            _upnp(AsyncWebServerRequest *request);
 
-            void            start();
-            void            stop();
-    protected:
-                void        _pseudoHookIn();
-        virtual bool        _getState()=0;
-
-#ifdef H4P_LOG_EVENTS
-        void        _turn(bool b,const string& src) { reinterpret_cast<H4P_BinaryThing*>(_owner)->_turn(b,src); }
-#else
-        void        _turn(bool b,const string& src) { reinterpret_cast<H4P_BinaryThing*>(_owner)->turn(b); }
-#endif
-
-    public:
-        H4P_UPNPCommon(void* owner,const string& name,H4_FN_VOID fc=nullptr): _owner(owner),_name(name),_fc(fc){
+            void            _hookIn() override;
+            void            _start() override;
+            void            _stop() override;
+            void            _greenLight() override {}; // dont autostart!
+    public:                
+        H4P_UPNPServer(H4P_BinaryThing* btp,const string& name="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): _btp(btp),_name(name),H4Plugin(upnpTag(),onC,onD){
             _pups.push_back(_urn+"device:controllee:1");
             _pups.push_back(_urn+"service:basicevent:1");
+            _ubIP=IPAddress(239,255,255,250);
+            _hookFactory([this](){ SPIFFS.remove(CSTR(string("/"+string(nameTag())))); });
+            _cmds={ {nameTag(),{_subCmd, 0, CMDVS(_friendly)}} };
         }
-        /*
-        void        listenUSN(const string& usn,H4BS_FN_SWITCH f=nullptr){
-            H4EVENT("listenUSN %s",CSTR(usn));
-            _offlineUSN(usn,false); // do not notify
-            _detect[usn].f=f;
-        }
-        */
-        void        friendlyName(const string& name);
- 
-//        void grid(){ for(auto const& d:_detect) if(d.second.told) reinterpret_cast<H4Plugin*>(_owner)->reply("L: %s\n",CSTR(d.first)); }
+
+             void           friendlyName(const string& name);
+             void           listenUSN(const string& usn,H4P_FN_USN f){ _detect[usn]=f; }
 };
+    extern __attribute__((weak)) H4P_UPNPServer h4upnp;
 #endif
-#endif // H4P_UPNPCommon_H
+#endif // H4P_UPNPServer_H

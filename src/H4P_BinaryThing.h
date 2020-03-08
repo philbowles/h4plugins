@@ -44,21 +44,22 @@ class H4P_BinaryThing: public H4Plugin{
         H4BS_FN_SWITCH  _f;
         
         #ifdef H4P_NO_WIFI
-            void         _publish(bool b){}
+            void            _publish(bool b){}
         #else                
-            virtual void _hookIn() override { if(H4Plugin::isLoaded(mqttTag())) h4mqtt.hookConnect([this](){ _publish(_getState()); }); }
-                    void  _publish(bool b){ if(H4Plugin::isLoaded(mqttTag())) h4mqtt.publishDevice(stateTag(),b); }
+            virtual void    _hookIn() override { if(isLoaded(mqttTag())) h4mqtt.hookConnect([this](){ _publish(_getState()); }); }
+                    void    _publish(bool b){ if(isLoaded(mqttTag())) h4mqtt.publishDevice(stateTag(),b); }
         #endif
 
-        virtual bool        _getState() { return _state; }
         virtual void        _setState(bool b) { _state=b; }
 
                 uint32_t    _showState(vector<string> vs){ reply("State: %s\n",_getState() ? "ON":"OFF"); return H4_CMD_OK; }
                 uint32_t    _switch(vector<string> vs){ return guardInt1(vs,bind(&H4P_BinaryThing::turn,this,_1)); }
-                void        _greenLight() override { if(_f) _f(_state); }
+                void        _start() override { 
+                    H4Plugin::_start();
+                    if(_f) _f(_state);
+                }
     public:
-        H4P_BinaryThing(H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): _f(f),_state(initial),_timeout(timer){
-            _pid=onofTag();
+        H4P_BinaryThing(H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): _f(f),_state(initial),_timeout(timer), H4Plugin(onofTag()) {
             _cmds={
                 {"on",     {H4PC_ROOT, 0, CMD(turnOn)}},
                 {"off",    {H4PC_ROOT, 0, CMD(turnOff)}},
@@ -66,9 +67,9 @@ class H4P_BinaryThing: public H4Plugin{
                 {"switch", {H4PC_ROOT, 0, CMDVS(_switch)}},
                 {"toggle", {H4PC_ROOT, 0, CMD(toggle)}}
             };
-            _names={{H4P_TRID_BTTO,"BTTO"}};
         }
-        bool state(){ return _getState(); }
+        virtual  void show() override { _showState({}); }
+        bool state() { return _getState(); }
         void turnOff(){ turn(false); }
         void turnOn(){ turn(true); }
         void toggle(){ turn(!_state); }
@@ -86,7 +87,6 @@ class H4P_BinaryThing: public H4Plugin{
             }
         }
         #else
-//        void turn(bool b){ _turn(b,userTag()); }
         // syscall only
         void turn(bool b){
             h4.cancelSingleton(H4P_TRID_BTTO);
@@ -98,6 +98,7 @@ class H4P_BinaryThing: public H4Plugin{
             }
         }
         #endif
+        bool        _getState() { return _state; }
 };
 
 #endif // H4P_BinaryThing_H

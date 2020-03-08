@@ -1,3 +1,4 @@
+
 /*
  MIT License
 
@@ -26,48 +27,44 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include<H4P_QueueWarn.h>
+#include<H4P_Skeleton.h>
 
-uint32_t H4P_QueueWarn::__setLimit(uint32_t v){ return (h4._capacity()*v)/100; }
-//
-//      cmd responders
-//
-void H4P_QueueWarn::show(){
-    reply("Qwarn: capacity=%d warn when size > %d",h4._capacity(),limit);
-    reply("Qwarn: max used=%d [%d%%]",maxq,(maxq*100)/h4._capacity());
-}
-
-void H4P_QueueWarn::pcent(uint32_t pc){
-    limit=constrain(__setLimit(pc),H4_Q_ABS_MIN,(uint32_t) h4._capacity());
-    show();
-}
-
-uint32_t H4P_QueueWarn::_qwPcent(vector<string> vs){ return guardInt1(vs,bind(&H4P_QueueWarn::pcent,this,_1)); }
-//
-H4P_QueueWarn::H4P_QueueWarn(function<void(bool)> _f,uint32_t _limit): H4Plugin(qwrnTag()){
+H4P_Skeleton::H4P_Skeleton(const string& name,H4_FN_VOID onStart,H4_FN_VOID onStop): H4Plugin(name,onStart,onStop){
     h4._hookLoop([this](){ _run(); },_subCmd);
+    _hookFactory([this](){ reply("CLEAN UP SOME SHIT\n"); });
     _cmds={
-        {_pName,     {H4PC_ROOT, _subCmd, nullptr}},
-        {"pcent",  {_subCmd,   0, CMDVS(_qwPcent)}}
-    };
-    f=_f;  
-    limit=__setLimit(_limit);
+        {_pName,       { H4PC_ROOT, _subCmd, nullptr}}, // root for this plugin, e.g. h4/ME...
+        {"rattle",     { _subCmd,         0, CMD(rattle)}}, // h4/ME/rattle
+        {"bones",      { _subCmd,         0, CMDVS(_bones)}} // h4/ME/bones[PL]
+    }; 
 }
 
-void H4P_QueueWarn::_run(){ // optimise a la throttle
-    static bool warned=false;
-    uint32_t qsize=h4.size();
-    if(qsize > maxq) maxq=qsize;
-    if(qsize > limit) {
-        if(!warned){
-            f(true);
-            warned=true;
-        }
-    }
-    else {
-        if(warned){
-            f(false);
-            warned=false;
-        }
-    }
+void H4P_Skeleton::_hookIn(){
+// hook to any service you depend on
+    Serial.print(CSTR(_pName));Serial.println(" _hookIn"); 
 }
+
+void H4P_Skeleton::_greenLight(){
+    Serial.print(CSTR(_pName));Serial.println(" _greenLight");
+    start();
+}
+
+void H4P_Skeleton::_start(){
+     Serial.print(CSTR(_pName));Serial.println(" _start"); 
+}
+
+void H4P_Skeleton::_stop(){
+    Serial.print(CSTR(_pName));Serial.println(" _stop"); 
+}
+
+void H4P_Skeleton::_run(){
+// once per loop - be very very careful
+}
+
+//
+uint32_t H4P_Skeleton::_bones(vector<string> vs){
+     Serial.print(CSTR(_pName));Serial.print(" _bones PAYLOAD=");Serial.println(CSTR(H4PAYLOAD));
+     return H4_CMD_OK;
+}
+
+void H4P_Skeleton::rattle(){ Serial.print(CSTR(_pName));Serial.println(" rattle!"); }

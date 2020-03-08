@@ -75,20 +75,16 @@ class H4P_HttpMySQLLogger: public H4PLogService {
         }
 
         void _hookIn() override { // protect
-            if(H4Plugin::isLoaded(wifiTag())){
-                H4PLogService::_hookIn();
-                h4wifi.hookConnect([this](){ start(); });
-                h4wifi.hookDisconnect([this](){ stop(); });
-//                request.setDebug(true);
-                request.onReadyStateChange(bind(&H4P_HttpMySQLLogger::requestCB,this,_1,_2,_3));
-            } else { DEPENDFAIL(wifi); }
+            DEPEND(wifi);
+            H4PLogService::_hookIn();
+//          request.setDebug(true);
+            request.onReadyStateChange(bind(&H4P_HttpMySQLLogger::requestCB,this,_1,_2,_3));
         }
     protected:
-        void _greenLight() override {} // prevetn autostart - wait until mqtt up
+        void _greenLight() override {} // prevetn autostart - wait until wifi up
     public:
         H4P_HttpMySQLLogger(const string& ipaddress,H4P_FN_HTTPFAIL fnFail=nullptr,uint32_t filter=H4P_LOG_ALL): 
             _fail(fnFail),ip(ipaddress),H4PLogService("mysql",filter){
-                _names={{H4P_TRID_MLRQ,"MLRQ"}};
         }
 };
 #endif

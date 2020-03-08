@@ -27,36 +27,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_UPNPThing_HO
-#define H4P_UPNPThing_HO
+#ifndef H4P_Skeleton_H
+#define H4P_Skeleton_H
 
 #include<H4PCommon.h>
-#include<H4P_SerialCmd.h>
-#include<H4P_WiFiSelect.h>
-#include<H4P_WiFi.h>
-#include<H4P_BinaryThing.h>
-#include<H4P_AsyncWebServer.h>
-#include<H4P_UPNPCommon.h>
 
-#ifndef H4P_NO_WIFI
+STAG(spine);
+STAG(hip);
+STAG(knee);
+STAG(ankle);
 
+class H4P_Skeleton: public H4Plugin {
+        VSCMD(_bones);
+    protected:
+        virtual void        _hookIn() override;
+        virtual void        _greenLight() override;
+        virtual void        _start() override;
+        virtual bool        _state() override;
+        virtual void        _stop() override;
 
-class H4P_UPNPThing: public H4P_BinaryThing, public H4P_UPNPCommon {
-        void        _hookIn() override{ H4P_UPNPCommon::_pseudoHookIn(); }
-        bool        _getState() override { return H4P_BinaryThing::_getState(); }
-        /*
-#ifdef H4P_LOG_EVENTS
-        void        _turn(bool b,const string& src) override { H4P_BinaryThing::_turn(b,src); }
-#else
-        void        _turn(bool b,const string& src) override { H4P_BinaryThing::turn(b); }
-#endif
-*/
+        void            _run(); // rare
     public:
-        H4P_UPNPThing(const string& name,H4BS_FN_SWITCH f=nullptr,bool initial=OFF,H4_FN_VOID onConnect=nullptr,uint32_t timer=0):
-            H4P_BinaryThing(f,initial,timer),
-            H4P_UPNPCommon(this,name,onConnect){
-        }
+        H4P_Skeleton(const string& name,H4_FN_VOID onStart=nullptr,H4_FN_VOID onStop=nullptr);
+
+        void rattle();
 };
 
-#endif
-#endif // H4P_UPNPThing_H
+#endif // H4P_Skeleton_H

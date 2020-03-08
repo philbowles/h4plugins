@@ -28,29 +28,26 @@ SOFTWARE.
 */
 #include<H4PCommon.h>
 #include<H4P_SerialCmd.h>
-#include<H4P_AsyncMQTT.h>
-#include<H4P_AsyncWebServer.h>
 
 void __attribute__((weak)) h4AddAwsHandlers(){}
 void __attribute__((weak)) onFactoryReset(){}
 
-vector<H4_FN_VOID>  H4PluginService::_factoryChain;
+vector<H4_FN_VOID>  H4Plugin::_factoryChain;
 
 void h4StartPlugins(){
+//    Serial.printf(" p->_startup()\n");
     for(auto const& p:H4Plugin::_plugins) p->_startup();
-    for(auto const& p:H4Plugin::_plugins) { p->_hookIn(); }
+//    Serial.printf(" p->_hookIn()\n");
+    for(auto const& p:H4Plugin::_plugins) p->_hookIn();
+//     Serial.printf(" p->_greenLight()\n");
     for(auto const& p:H4Plugin::_plugins) p->_greenLight();
-    H4PluginService::hookFactory(onFactoryReset);
+    reverse(H4Plugin::_factoryChain.begin(),H4Plugin::_factoryChain.end());
+    H4Plugin::_hookFactory(onFactoryReset);
 }
 
 void h4FactoryReset(){
-    for(auto &c:H4PluginService::_factoryChain) c();
+    for(auto &c:H4Plugin::_factoryChain) c();
     h4reboot();
-}
-
-H4Plugin::H4Plugin(){
-    subid=++nextSubid;
-    _plugins.push_back(this);
 }
 
 vector<uint32_t> H4Plugin::expectInt(string pl,const char* delim){
@@ -59,9 +56,9 @@ vector<uint32_t> H4Plugin::expectInt(string pl,const char* delim){
     for(auto const& t:tmp){
         if(!isNumeric(t)) return {};
         results.push_back(STOI(t));
-    }            
+    }
     return results;
-}      
+}
 
 uint32_t H4Plugin::guardInt1(vector<string> vs,function<void(uint32_t)> f){
     return guard1(vs,[f,this](vector<string> vs){
@@ -70,15 +67,7 @@ uint32_t H4Plugin::guardInt1(vector<string> vs,function<void(uint32_t)> f){
         else return H4_CMD_NOT_NUMERIC;
     });
 }        
-/*
-uint32_t H4Plugin::guardInt4(vector<string> vs,function<void(uint32_t,uint32_t,uint32_t,uint32_t)> f){
-    return guard1(vs,[f,this](vector<string> vs){
-        auto vi=expectInt(H4PAYLOAD);
-        if(vi.size()==4) return ([f](uint32_t v1,uint32_t v2,uint32_t v3,uint32_t v4){ f(v1,v2,v3,v4); return H4_CMD_OK; })(vi[0],vi[1],vi[2],vi[3]);
-        else return H4_CMD_NOT_NUMERIC;
-    });
-}
-*/
+
 uint32_t H4Plugin::guardString2(vector<string> vs,function<void(string,string)> f){
     return guard1(vs,[f,this](vector<string> vs){
         auto vg=split(H4PAYLOAD,",");
@@ -88,77 +77,65 @@ uint32_t H4Plugin::guardString2(vector<string> vs,function<void(string,string)> 
         }
         else return H4_CMD_TOO_MANY_PARAMS;
     });
-} 
+}
+
+#define H4P_REPLY_BUFFER    128
+
+void  H4Plugin::showPlugins(){ 
+    for(auto const& p:H4Plugin::_plugins){
+        reply("h4/svc/state/%s %s ID=%d",CSTR(p->_pName),p->_state() ? "UP":"DN",p->_subCmd);
+        p->show();
+        reply("");
+    }
+}
 
 void H4Plugin::reply(const char* fmt,...){ // find pub sub size
-    char buff[128];
+    char buff[H4P_REPLY_BUFFER+1];
     va_list ap; 
     va_start(ap, fmt); 
-    vsnprintf(buff,127,fmt,ap);
+    vsnprintf(buff,H4P_REPLY_BUFFER,fmt,ap);
     va_end(ap);
     string source=_cb[srcTag()];
-    #ifndef H4P_NO_WIFI
-        if(source==aswsTag()) h4asws._reply(buff);
-        else { 
-            if(source==mqttTag()) h4mqtt._reply(buff); 
-            else {
-    #endif
-                H4Plugin::_reply(buff);
-    #ifndef H4P_NO_WIFI
-            }
-        }
-    #endif
+    H4Plugin* p=isLoaded(source);
+    if(p) p->_reply(buff);
+    else Serial.printf("%s\n",buff);
 }
 
 void H4Plugin::_startup(){
-    h4._hookLoop(_hook,_names,subid);
-    if(_cmds.size()) commands.insert(_cmds.begin(),_cmds.end());
+    _commands.insert(_cmds.begin(),_cmds.end());
     _cmds.clear();
-    _names.clear();
-}
-//
-//      H4PluginService
-//
-void H4PluginService::_startup(){
-    _cmds={
-            {"restart", { 0, 0, CMD(restart)}},
-            {"start",   { 0, 0, CMD(start)}},
-            {"stop",    { 0, 0, CMD(stop)}}
-        };
-    for(auto &c:_cmds) c.second.owner=subid;
-    h4sc._addCmd(_pid,{H4PC_ROOT,subid,nullptr});
-    _cmds.insert(_local.begin(),_local.end());
-    _local.clear();
-    H4Plugin::_startup();
 }
 
-void H4PluginService::h4pcConnected(){ 
-    for(auto const& c:_connChain) c();
-    svc(_pid,H4P_LOG_SVC_UP);
+void H4Plugin::start() { 
+    if(!state()){
+        H4EVENT("svc start %s",CSTR(_pName));
+        _start(); // call the overrideable
+    } //else Serial.printf("%s already started\n",CSTR(_pName));
 }
 
-void H4PluginService::h4pcDisconnected(){
-    for(auto const& d:_discoChain) d();
-    svc(_pid,H4P_LOG_SVC_DOWN);
+void H4Plugin::stop() { 
+    if(state()){
+        _stop(); // call the overrideable
+        H4EVENT("svc stop %s",CSTR(_pName));
+    } //else Serial.printf("%s already stopped\n",CSTR(_pName));
 }
 
-void H4PluginService::svc(const string& uid,H4P_LOG_TYPE ud) {
-    #ifdef H4P_LOG_EVENTS 
-        if(H4Plugin::isLoaded(scmdTag())) {
-            h4sc._logEvent(uid,ud,"svc",h4Tag());
-            Serial.print("SVC ");Serial.print(CSTR(uid));
-            Serial.print(" ");Serial.println(ud==H4P_LOG_SVC_UP ? "UP":"DOWN");
-        }
-    #endif
+void H4Plugin::_upHooks(){ 
+    _up=true;
+    SYSEVENT(H4P_LOG_SVC_UP,"svc",_pName,"");
+    for(auto const& c:_connected) c();
+}
+
+void H4Plugin::_downHooks(){ 
+    for(auto const& c:_disconnected) c();
+    SYSEVENT(H4P_LOG_SVC_DOWN,"svc",_pName,"");
+    _up=false;
 }
 //
 //      H4PlogService
 //
 void H4PLogService::_hookIn(){
-#ifdef H4P_LOG_EVENTS 
-    if(H4Plugin::isLoaded(scmdTag())) {
-        h4sc._hookLogChain(bind(&H4PLogService::_filterLog,this,_1,_2,_3,_4));
-        h4sc.addCmd(msgTag(),subid, 0, CMDNULL);
-    } else { DEPENDFAIL(scmd); }
-#endif
+    REQUIRE(scmd);
+    h4sc._hookLogChain(bind(&H4PLogService::_filterLog,this,_1,_2,_3,_4));
+//    h4sc.addCmd(msgTag(),_subCmd, 0, CMDNULL);
 }

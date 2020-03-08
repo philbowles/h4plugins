@@ -29,8 +29,6 @@ SOFTWARE.
 #include<H4PCommon.h>
 #include<H4P_WiFi.h>
 
-//extern uint32_t upat;
-
 #ifndef H4P_NO_WIFI
 void H4P_WiFi::_gotIP(){
     _discoDone=false;
@@ -49,19 +47,16 @@ void H4P_WiFi::_gotIP(){
 
     _cb.erase("opts"); // lose any old AP ssids
     H4EVENT("IP=%s",CSTR(_cb["ip"]));
-    h4pcConnected();
+    _upHooks();
 }
 
-void H4P_WiFi::_hookIn(){ 
-    WiFi.onEvent(_wifiEvent);
-    H4PluginService::hookFactory([this](){ clear(); });
-}
+void H4P_WiFi::_hookIn(){ WiFi.onEvent(_wifiEvent); }
 
 void H4P_WiFi::_greenLight() { 
     _cb[chipTag()]=_getChipID();
     _cb[boardTag()]=replaceAll(H4_BOARD,"ESP8266_","");
     getPersistentValue(deviceTag(),"H4_");
-    start();                     
+    start();
 }
 
 void H4P_WiFi::_startAP(){
@@ -75,7 +70,7 @@ void H4P_WiFi::_startAP(){
     h4.every(1000,[this](){ _dnsServer->processNextRequest(); },nullptr,H4P_TRID_WFAP,true);
     _cb["ip"]=WiFi.softAPIP().toString().c_str();
     _scan();
-    h4pcConnected();	        
+    _upHooks();
 }
 
 void H4P_WiFi::getPersistentValue(string v,string prefix){
@@ -131,7 +126,7 @@ void H4P_WiFi::change(string ssid,string psk){ // add device / name?
 
 void H4P_WiFi::_lostIP(){
     if(!_discoDone){
-        h4pcDisconnected();
+        _downHooks();
         _discoDone=true;
     }
 }
@@ -173,23 +168,21 @@ void H4P_WiFi::_startSTA(){
     WiFi.begin(CSTR(_cb[ssidTag()]),CSTR(_cb[pskTag()]));
 }
 
-void H4P_WiFi::start(){
+void H4P_WiFi::_start(){
     if(WiFi.SSID()=="") {
         stop();
         _startAP();
-    }
-    else if(WiFi.getMode()==WIFI_OFF) _startSTA();
+    } else if(WiFi.getMode()==WIFI_OFF) _startSTA();
 }
-void H4P_WiFi::_stop(){} // dummy
 
-void H4P_WiFi::stop(){
+void H4P_WiFi::_stop(){
     h4.cancelSingleton({H4P_TRID_HOTA,H4P_TRID_WFAP});
     if(WiFi.getMode() & WIFI_AP) {
         if(_dnsServer){
             _dnsServer->stop();
             delete _dnsServer;
             _dnsServer=nullptr;
-            h4pcDisconnected();
+            _downHooks();
         }
     }
 	WiFi.mode(WIFI_OFF);
@@ -212,12 +205,12 @@ ESP8266
 */
 
 void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
+//    Serial.printf("_wifiEvent %d\n",event);
     switch(event) {
         case WIFI_EVENT_STAMODE_DISCONNECTED:
 			h4.queueFunction([](){ h4wifi._lostIP(); });
             break;    
 		case WIFI_EVENT_STAMODE_GOT_IP:
-//            upat=millis();
 			h4.queueFunction([](){ h4wifi._gotIP(); });
 			break;
 	}
@@ -259,20 +252,20 @@ void H4P_WiFi::_startSTA(){
     WiFi.begin(CSTR(_cb[ssidTag()]),CSTR(_cb[pskTag()]));
 }
 
-void H4P_WiFi::start(){ if(WiFi.begin()) if(WiFi.SSID()=="" && WiFi.psk()=="") _startAP(); }
+void H4P_WiFi::_start(){ if(WiFi.begin()) if(WiFi.SSID()=="" && WiFi.psk()=="") _startAP(); }
 
-void H4P_WiFi::_stop(){
+void H4P_WiFi::_stopCore(){
     h4.cancelSingleton({H4P_TRID_HOTA,H4P_TRID_WFAP}); 
     if(_dnsServer){
         _dnsServer->stop();
         delete _dnsServer;
         _dnsServer=nullptr;
-        h4pcDisconnected();
+        _downHooks();
     }
 }
 
-void H4P_WiFi::stop(){
-    _stop();
+void H4P_WiFi::_stop(){
+    _stopCore();
     WiFi.disconnect(true,false);
 }
 /* ESP32
@@ -322,7 +315,6 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
 			if(!(WiFi.getMode() & WIFI_AP)) h4.queueFunction([](){ h4wifi._lostIP(); });
             break;
 		case SYSTEM_EVENT_STA_GOT_IP:
-//            upat=millis();
 			h4.queueFunction([](){ h4wifi._gotIP(); });
 			break;
 	}

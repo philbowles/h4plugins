@@ -26,21 +26,68 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include<H4Plugins.h>
+#include<H4P_SerialCmd.h>
+#include<H4P_CmdErrors.h>
 
-extern void h4FactoryReset();
-
-H4_CMD_MAP_I H4P_SerialCmd::__exactMatch(const string& cmd,uint32_t owner){
-    auto any=commands.equal_range(cmd);
-    for(auto i=any.first;i!=any.second;i++) if(i->second.owner==owner) return i;
-    return commands.end();
+H4P_SerialCmd::H4P_SerialCmd(): H4Plugin(scmdTag()){
+//    _hook=[this](){ _run(); };
+    _cmds={
+        {h4Tag(),      { 0, H4PC_ROOT, nullptr}},
+        {"help",       { 0, 0, CMD(help) }},
+        {"reboot",     { H4PC_ROOT, 0, CMD(h4reboot) }},
+        {"factory",    { H4PC_ROOT, 0, CMD(h4FactoryReset) }},
+        {"show",       { H4PC_ROOT, H4PC_SHOW, nullptr}},
+        {"all",        { H4PC_SHOW, 0, CMD(all) }},
+        {"config",     { H4PC_SHOW, 0, CMD(config) }},
+        {"plugins",    { H4PC_SHOW, 0, CMD(showPlugins) }},
+        {"q",          { H4PC_SHOW, 0, CMD(dumpQ) }},
+        {"svc",        { H4PC_ROOT, H4PC_SVC, nullptr}},
+        {"restart",    { H4PC_SVC,  0, CMDVS(_svcRestart) }},
+        {"start",      { H4PC_SVC,  0, CMDVS(_svcStart) }},
+        {"state",      { H4PC_SVC,  0, CMDVS(_svcState) }},
+        {"stop",       { H4PC_SVC,  0, CMDVS(_svcStop) }},
+#ifndef ARDUINO_ARCH_STM32
+        {"spif",       { H4PC_SHOW, 0, CMD(showSPIFFS)}},
+        {"dump",       { H4PC_ROOT, 0, CMDVS(_dump)}},
+#endif
+    }; 
 }
 
-void H4P_SerialCmd::removeCmd(const string& s,uint32_t subid){ if(__exactMatch(s,subid)!=commands.end()) commands.erase(s); }
+void H4P_SerialCmd::_hookIn(){
+#ifndef ARDUINO_ARCH_STM32    
+//    if(!SPIFFS.begin()) Serial.println("Warning: NO SPIFFS");
+    SPIFFS.begin();
+#endif
+}
+
+void H4P_SerialCmd::_run(){ // halting loop optimise
+    static string cmd="";
+	static int	c;
+
+    if((c=Serial.read()) != -1){
+        if (c == '\n') {
+            h4.queueFunction(bind([this](string cmd){
+                uint32_t err=_simulatePayload(cmd);
+                if(err) reply("%s\n",CSTR(_errorString(err)));
+            },cmd),nullptr,H4P_TRID_SCMD);
+            cmd="";
+        } else cmd+=c;		
+    }	
+}
+//
+//
+//
+H4_CMD_MAP_I H4P_SerialCmd::__exactMatch(const string& cmd,uint32_t owner){
+    auto any=_commands.equal_range(cmd);
+    for(auto i=any.first;i!=any.second;i++) if(i->second.owner==owner) return i;
+    return _commands.end();
+}
+
+void H4P_SerialCmd::removeCmd(const string& s,uint32_t _subCmd){ if(__exactMatch(s,_subCmd)!=_commands.end()) _commands.erase(s); }
 
 void H4P_SerialCmd::__flatten(function<void(string)> fn){
     H4_CMD_MAP_I ptr;
-    for(ptr=commands.begin();ptr!=commands.end(); ptr++){
+    for(ptr=_commands.begin();ptr!=_commands.end(); ptr++){
         if(!(ptr->second.owner)){
             if(ptr->second.levID) _flattenCmds(fn,ptr->first,ptr->first,ptr->second.levID);    
             else fn(ptr->first);
@@ -53,7 +100,7 @@ uint32_t H4P_SerialCmd::_dispatch(vector<string> vs,uint32_t owner=0){
         H4_CMD_MAP_I i;
         string cmd=vs[0];
         i=__exactMatch(cmd,owner);
-        if(i!=commands.end()){
+        if(i!=_commands.end()){
             if(i->second.fn) return (bind(i->second.fn,CHOP_FRONT(vs)))();
             else return _dispatch(CHOP_FRONT(vs),i->second.levID);
         } else return H4_CMD_UNKNOWN;
@@ -61,8 +108,8 @@ uint32_t H4P_SerialCmd::_dispatch(vector<string> vs,uint32_t owner=0){
 }
 
 void H4P_SerialCmd::_flattenCmds(function<void(string)> fn,string cmd,string prefix,uint32_t lev){
-    H4_CMD_MAP_I i=commands.find(cmd);
-    for(i=commands.begin();i!=commands.end();i++){
+    H4_CMD_MAP_I i=_commands.find(cmd);
+    for(i=_commands.begin();i!=_commands.end();i++){
         if(i->second.owner==lev){
 			string trim = prefix+"/"+i->first;
 			if(i->second.levID) _flattenCmds(fn,i->first,trim,i->second.levID);
@@ -82,27 +129,47 @@ uint32_t H4P_SerialCmd::_simulatePayload(string flat,const char* src){ // refac
     else return H4_CMD_TOO_FEW_PARAMS; // really?
 }
 //
-
-uint32_t H4P_SerialCmd::_unload(vector<string> vs){ 
-    return guard1(vs,[this](vector<string> vs){
-        return ([this](string s){
-            H4Plugin* p=H4Plugin::isLoaded(s);
+uint32_t H4P_SerialCmd::_svcControl(H4P_SVC_CONTROL svc,vector<string> vs){
+    return guard1(vs,[this,svc](vector<string> vs){
+        return ([this,svc](string s){
+            H4Plugin* p=isLoaded(s);
             if(p) {
-                unload(p->subid);
-                showUnload();
+                switch(svc){
+                    case H4PSVC_START:
+                        p->start();
+                        break;
+                    case H4PSVC_STATE:
+                        p->show();
+                        break;
+                    case H4PSVC_STOP:
+                        p->stop();
+                        break;
+                    case H4PSVC_RESTART:
+                        p->restart();
+                        break;
+                }
                 return H4_CMD_OK;
             }
             return H4_CMD_NAME_UNKNOWN;
         })(H4PAYLOAD);
     });
 }
+
+uint32_t H4P_SerialCmd::_svcRestart(vector<string> vs){ return _svcControl(H4PSVC_RESTART,vs); }
+uint32_t H4P_SerialCmd::_svcStart(vector<string> vs){ return _svcControl(H4PSVC_START,vs); }
+uint32_t H4P_SerialCmd::_svcState(vector<string> vs){ return _svcControl(H4PSVC_STATE,vs); }
+uint32_t H4P_SerialCmd::_svcStop(vector<string> vs){ return _svcControl(H4PSVC_STOP,vs); }
 //
 //      public
 //
 void H4P_SerialCmd::all(){
     __flatten([this](string s){ 
         vector<string> candidates=split(s,"/");
-        if(candidates.size()>1 && candidates[1]=="show" && candidates[2]!="all") invokeCmd(s,"",CSTR(_cb[srcTag()])); // snake / tail etc
+        if(candidates.size()>1 && candidates[1]=="show" && candidates[2]!="all") {
+            reply(CSTR(s));
+            invokeCmd(s,"",CSTR(_cb[srcTag()])); // snake / tail etc
+            reply("\n");
+        }
     });
 }
 
@@ -144,48 +211,6 @@ uint32_t H4P_SerialCmd::invokeCmd(string topic,uint32_t payload,const char* src)
     return invokeCmd(topic,stringFromInt(payload),src);
 }
 
-void H4P_SerialCmd::unload(const uint32_t subid){
-    if(H4::unloadables.count(subid)) {
-        h4._unHook(H4::unloadables[subid]);
-        H4::unloadables.erase(subid);
-    }
-}	
-//
-//      H4P_SerialCmd
-//
-void H4P_SerialCmd::_hookIn(){
-#ifndef ARDUINO_ARCH_STM32    
-//    if(!SPIFFS.begin()) Serial.println("Warning: NO SPIFFS");
-    SPIFFS.begin();
-#endif
-}
-
-H4P_SerialCmd::H4P_SerialCmd(){
-    _pid=scmdTag();
-    _hook=[this](){ run(); };
-    _names={ {H4P_TRID_SCMD,uppercase(_pid)} };
-    _cmds={
-        {h4Tag(),         { 0, H4PC_ROOT, nullptr}},
-        {"help",       { 0, 0, CMD(help) }},
-        {"reboot",     { H4PC_ROOT, 0, CMD(h4reboot) }},
-        {"factory",    { H4PC_ROOT, 0, CMD(h4FactoryReset) }},
-        {"show",       { H4PC_ROOT, H4PC_SHOW, nullptr}},
-        {"all",        { H4PC_SHOW, 0, CMD(all) }},
-        {"config",     { H4PC_SHOW, 0, CMD(config) }},
-        {"plugins",    { H4PC_SHOW, 0, CMD(plugins) }},
-#ifndef ARDUINO_ARCH_STM32
-        {"spif",       { H4PC_SHOW, 0, CMD(showSPIFFS)}},
-        {"dump",       { H4PC_ROOT, 0, CMDVS(_dump)}},
-#endif
-//      diag below here        
-        {"q",          { H4PC_SHOW, 0, CMD(dumpQ) }},
-        {"qstats",     { H4PC_SHOW, 0, CMD(Qstats) }},
-        {"tnames",     { H4PC_SHOW, 0, CMD(tnames) }},
-        {"unload",     { H4PC_SHOW, 0, CMD(showUnload) }},
-        {"unload",     { H4PC_ROOT, 0, CMDVS(_unload) }}
-    };
-};
-// diag
 void H4P_SerialCmd::dumpQ(){ h4.dumpQ(); }
 
 void H4P_SerialCmd::logEventType(H4P_LOG_TYPE t,const string& src,const string& tgt,const string& fmt,...){
@@ -197,31 +222,8 @@ void H4P_SerialCmd::logEventType(H4P_LOG_TYPE t,const string& src,const string& 
     _logEvent(buff,t,src,tgt);
 }
 
-void H4P_SerialCmd::plugins(){ for(auto const& p:H4Plugin::_plugins) reply("P: %s ID=%d\n",CSTR(p->_pid),p->subid); }
+string H4P_SerialCmd::_errorString(uint32_t err){ return isLoaded(cerrTag()) ? h4ce.getErrorMessage(err):"Error: "+stringFromInt(err); }
 
-void H4P_SerialCmd::Qstats(){ reply("Q capacity: %u size: %u\n",h4._capacity(),h4.size()); }
-
-void H4P_SerialCmd::showUnload(){ for(auto const& u:H4::unloadables) reply("U: %d=%s\n",u.first,CSTR(H4Plugin::pidFromSubid(u.first))); }
-
-void H4P_SerialCmd::tnames(){ for(auto const& n:H4::trustedNames) { reply("T: %d=%s\n",n.first,CSTR(n.second)); }}
-//
-string H4P_SerialCmd::_errorString(uint32_t err){
-    return H4Plugin::isLoaded(cerrTag()) ? h4ce.getErrorMessage(err):"Error: "+stringFromInt(err);
-}
-void H4P_SerialCmd::run(){ // halting loop optimise
-    static string cmd="";
-	static int	c;
-
-    if((c=Serial.read()) != -1){
-        if (c == '\n') {
-            h4.queueFunction(bind([this](string cmd){
-                uint32_t err=_simulatePayload(cmd);
-                if(err) reply("%s\n",CSTR(_errorString(err)));
-            },cmd),nullptr,H4P_TRID_SCMD);
-            cmd="";
-        } else cmd+=c;		
-    }	
-}
 #ifndef ARDUINO_ARCH_STM32
 
 string H4P_SerialCmd::read(const string& fn){
@@ -249,8 +251,8 @@ uint32_t H4P_SerialCmd::write(const string& fn,const string& data,const char* mo
 uint32_t H4P_SerialCmd::_dump(vector<string> vs){
     return guard1(vs,[this](vector<string> vs){
         return ([this](string h){ 
-            reply("DUMP FILE %s\n",CSTR(h));
-            reply("%s\n",CSTR(read("/"+h)));
+            Serial.printf("DUMP FILE %s\n",CSTR(h));
+            Serial.printf("%s\n",CSTR(read("/"+h)));
             return H4_CMD_OK;
         })(H4PAYLOAD);
     });
@@ -264,17 +266,17 @@ void H4P_SerialCmd::showSPIFFS(){
 
     FSInfo info;
     SPIFFS.info(info);
-    reply("totalBytes %d\n",info.totalBytes);    
+    reply("totalBytes %d",info.totalBytes);    
     reply("usedBytes %d\n",info.usedBytes);    
     
     Dir dir = SPIFFS.openDir("/");
 
     while (dir.next()) {
         n++;
-        reply("FILE: %s %u\n",CSTR(dir.fileName()),dir.fileSize());
+        reply("%s (%u)",CSTR(dir.fileName()),dir.fileSize());
         sigma+=dir.fileSize();
     }
-    reply("\n %d file(s) %u bytes\n",n,sigma);
+    reply("\n%d file(s) %u bytes",n,sigma);
 }
 #else
 void H4P_SerialCmd::showSPIFFS(){
@@ -287,11 +289,11 @@ void H4P_SerialCmd::showSPIFFS(){
  
     while(file){
         n++;
-        reply("FILE: %s %u\n",file.name(),file.size());
+        reply("%s (%u)",file.name(),file.size());
         sigma+=file.size();
         file = root.openNextFile();
     }
-    reply("\n %d file(s) %u bytes\n",n,sigma);
+    reply("\n%d file(s) %u bytes",n,sigma);
 }
 #endif
 #endif

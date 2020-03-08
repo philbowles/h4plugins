@@ -386,7 +386,6 @@ class EncoderAutoPin: public EncoderPin{
 //      H4P_GPIOManager
 //
 class H4P_GPIOManager: public H4Plugin{//
-        void             _greenLight() override;
 
         H4GPIOPin*      isManaged(uint8_t p){ return pins.count(p) ? pins[p]:nullptr; }
         OutputPin*      isOutput(uint8_t p);
@@ -397,9 +396,13 @@ class H4P_GPIOManager: public H4Plugin{//
             pinclass->_factoryCommon(btp);
             return pinclass;
         }
-
-        void                run();
-
+        void                _start() override;
+        void                _stop() override {
+            bool b=h4._unHook(_subCmd);
+            h4.cancelSingleton(H4P_TRID_SYNC);
+            H4Plugin::_stop();
+        }
+        void                _run();
     public:
         static H4GM_PINMAP     pins;
         H4P_GPIOManager();
@@ -436,7 +439,7 @@ class H4P_GPIOManager: public H4Plugin{//
         SequencedPin*       Sequenced(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback); //
         TimedPin*           Timed(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback); //
 //
-        void                 dump();
+        void                 show() override;
 };
 
 extern __attribute__((weak)) H4P_GPIOManager h4gm;

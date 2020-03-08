@@ -54,10 +54,13 @@ class H4P_CmdErrors: public H4Plugin {
             {H4P_LOG_DEPENDFAIL,"DEPEND FAIL"},
             {H4P_LOG_MQTT_HEAP,"MQTT HEAP"},
             {H4P_LOG_MQTT_Q,"MQTT Q"},
+            {H4P_LOG_PD_ENTER,"PD ENTER"},
+            {H4P_LOG_PD_LEAVE,"PD LEAVE"},
             {H4P_LOG_ERROR,"ERROR"}
         };
+        virtual void        _greenLight(){ start(); }
     public:
-        H4P_CmdErrors(){ _pid=cerrTag(); }//?
+        H4P_CmdErrors(): H4Plugin(cerrTag()) {}
 
         string      getErrorMessage(uint32_t e){
             return cmdErrors.count(e) ? cmdErrors[e]:string("No such error (")+stringFromInt(e)+")";

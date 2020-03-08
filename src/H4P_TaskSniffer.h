@@ -35,21 +35,14 @@ SOFTWARE.
 class H4P_TaskSniffer: public H4Plugin{
     protected:
 //
-//      machinery
-//
         uint32_t            __incexc(vector<string> vs,function<void(vector<uint32_t>)> f);
 
-        void                _alwaysExclude();
-//
-//      cmd responders
-//
         VSCMD(_tsInclude);
         VSCMD(_tsExclude);
 //         
         unordered_set<uint32_t> hitList;
 
                 void        _common();
-
                 void        _taskDump(H4_TASK_PTR t,char c);
 
     public:
@@ -57,7 +50,7 @@ class H4P_TaskSniffer: public H4Plugin{
         H4P_TaskSniffer(uint32_t i);
         H4P_TaskSniffer(initializer_list<uint32_t> i);
 
-                void        include(initializer_list<uint32_t> i){ hitList.insert(i);_alwaysExclude(); }
+                void        include(initializer_list<uint32_t> i){ hitList.insert(i); }
                 void        include(uint32_t i){ include({i}); }
                 void        include(vector<uint32_t> i){ for(auto const& l:i)include(l); }
                 
@@ -65,7 +58,7 @@ class H4P_TaskSniffer: public H4Plugin{
                 void        exclude(initializer_list<uint32_t> i){ for(auto const& l:i) hitList.erase(l); }
                 void        exclude(vector<uint32_t> i){ for(auto const& l:i) hitList.erase(l); }
         
-                void        show();
+                void        show() override;
 };
 
 extern __attribute__((weak)) H4P_TaskSniffer h4ts;

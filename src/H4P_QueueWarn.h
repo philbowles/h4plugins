@@ -46,7 +46,7 @@ class H4P_QueueWarn: public H4Plugin {
 
         uint32_t        __setLimit(uint32_t v);
 
-        void            run();
+        void            _run();
 
     public:
         H4P_QueueWarn(function<void(bool)> _f,uint32_t _limit=50);

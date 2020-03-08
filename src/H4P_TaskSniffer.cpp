@@ -51,7 +51,7 @@ uint32_t H4P_TaskSniffer::__incexc(vector<string> vs,function<void(vector<uint32
         }
     });    
 }
-
+/*
 void H4P_TaskSniffer::_alwaysExclude(){ // still need this?
     exclude({
  //       H4P_TRID_SQWV,
@@ -61,15 +61,12 @@ void H4P_TaskSniffer::_alwaysExclude(){ // still need this?
 //        H4P_TRID_UBSW
     }); 
 }        
-
+*/
 void H4P_TaskSniffer::_common(){
-    _pid=snifTag();
-//    _names={ {H4P_TRID_SNIF,uppercase(_pid)} };
     _cmds={
-        {_pid,      {H4PC_SHOW, 0, CMD(show)}},
-        {_pid,      {H4PC_ROOT, subid, nullptr}},
-        {"include", {subid, 0, CMDVS(_tsInclude)}},
-        {"exclude", {subid, 0, CMDVS(_tsExclude)}}
+        {_pName,      {H4PC_ROOT, _subCmd, nullptr}},
+        {"include", {_subCmd, 0, CMDVS(_tsInclude)}},
+        {"exclude", {_subCmd, 0, CMDVS(_tsExclude)}}
     };
     h4._hookEvent(bind(&H4P_TaskSniffer::_taskDump,this,_1,_2));    
 }
@@ -80,8 +77,6 @@ void H4P_TaskSniffer::_taskDump(H4_TASK_PTR t,const char c){
         h4._dumpTask(t);
     }
 }
-//
-//      cmd responders
 //
 uint32_t H4P_TaskSniffer::_tsExclude(vector<string> vs){ return __incexc(vs,[this](vector<uint32_t> vi){ exclude(vi); }); }
 
@@ -98,18 +93,17 @@ void H4P_TaskSniffer::show(){
 //
 //      public 
 //
-H4P_TaskSniffer::H4P_TaskSniffer(){ 
+H4P_TaskSniffer::H4P_TaskSniffer(): H4Plugin(snifTag()){ 
     for(uint32_t i=0;i<100;i++) hitList.insert(i);
-    _alwaysExclude();
     _common();
 }
 
-H4P_TaskSniffer::H4P_TaskSniffer(uint32_t i){ 
+H4P_TaskSniffer::H4P_TaskSniffer(uint32_t i): H4Plugin(snifTag()){ 
     include(i);
     _common();
 }
 
-H4P_TaskSniffer::H4P_TaskSniffer(initializer_list<uint32_t> i){ 
+H4P_TaskSniffer::H4P_TaskSniffer(initializer_list<uint32_t> i): H4Plugin(snifTag()){ 
     include(i);
     _common();
 }

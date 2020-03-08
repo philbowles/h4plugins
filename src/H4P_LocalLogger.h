@@ -34,16 +34,16 @@ SOFTWARE.
 #include <H4P_SerialCmd.h>
 
 class H4P_LocalLogger: public H4PLogService {
-//
+        string      _fname;
         uint32_t    _limit;
 
         virtual void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target);
     public:
-        H4P_LocalLogger(uint32_t limit=10000); // amount of free SPIFFS space to use
+        H4P_LocalLogger(uint32_t limit=10000,uint32_t filter=H4P_LOG_ALL); // amount of free SPIFFS space to use
 
                 void        clear();
                 void        flush();
-                void        show();
+                void        show() override;
 };
 #endif // stm32
 #endif // H4P_LocalLogger_H

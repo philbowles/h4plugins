@@ -16,7 +16,7 @@ void h4setup() {
     easy=h4ps.getstring("peasy"); // and this
     Serial.printf("Using H4P_PersistentStorage is %s\n",CSTR(h4ps["peasy"]));
 
-    if(h4ps.exists("answer")){
+    if(!h4ps.exists("answer")){
         Serial.printf("What is the secret of %s?\n",CSTR(h4ps["secret"]));
         h4ps.setint("answer",42); // no short way to handle integers
         Serial.println("send h4/reboot to find out");

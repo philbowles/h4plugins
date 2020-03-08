@@ -22,14 +22,14 @@ H4 h4(115200);
 
 H4P_SerialCmd h4sc;
 H4P_GPIOManager h4gm;
-H4P_BinarySwitch h4bs(LED_BUILTIN,UL_ACTIVE,OFF,[](bool b){
+H4P_BinarySwitch h4onof(LED_BUILTIN,UL_ACTIVE,OFF,[](bool b){
     Serial.print("STATE NOW ");Serial.println(b);
   });
 
 void h4setup() { // H4 constructor starts Serial
     Serial.println("H4P_BinarySwitch Simple Example v"H4P_VERSION);
-    h4.once(5000,[](){ h4bs.turnOn(); });
-    h4.once(10000,[](){ h4bs.turnOff(); });
-    h4.once(15000,[](){ h4bs.toggle(); });
-    h4.once(20000,[](){ h4bs.turn(0); });
+    h4.once(5000,[](){ h4onof.turnOn(); });
+    h4.once(10000,[](){ h4onof.turnOff(); });
+    h4.once(15000,[](){ h4onof.toggle(); });
+    h4.once(20000,[](){ h4onof.turn(0); });
 }

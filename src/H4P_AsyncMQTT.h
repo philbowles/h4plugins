@@ -33,12 +33,12 @@ SOFTWARE.
 #include<H4PCommon.h>
 #include<H4P_SerialCmd.h>
 #include<H4P_WiFiSelect.h>
-#include<H4P_WiFi.h>
 #ifndef H4P_NO_WIFI
+#include<H4P_WiFi.h>
 
 #include<AsyncMqttClient.h>
 
-class H4P_AsyncMQTT: public H4PluginService, public AsyncMqttClient{
+class H4P_AsyncMQTT: public H4Plugin, public AsyncMqttClient{
         unordered_set<string>   _grid;
             bool            autorestart=true;
             string          device;
@@ -47,38 +47,33 @@ class H4P_AsyncMQTT: public H4PluginService, public AsyncMqttClient{
         VSCMD(_offline);
         VSCMD(_online);
 
-                void         _hookIn() override;
-                void         _setup();
-
+                void        _setup();
+                void        _start() override;
+                bool        _state() override { return connected(); }
+                void        _stop() override;
+                void        _hookIn() override;
+                void        _greenLight() override {} // do not autostart!
     public:
-        H4P_AsyncMQTT(string broker,uint16_t port, string user="",string pass="",H4_FN_VOID onC=[](){},H4_FN_VOID onD=[](){}):
-            H4PluginService(onC,onD)
+        H4P_AsyncMQTT(string broker,uint16_t port, string user="",string pass="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr):
+            H4Plugin(mqttTag(),onC,onD)
         {
             _cb["broker"]=broker;
             _cb[portTag()]=stringFromInt(port);
             _cb["muser"]=user,
             _cb["mpasswd"]=pass;
 
-            _pid=mqttTag();
-
-            _names={
-                {H4P_TRID_MQMS,"MQMS"},
-                {H4P_TRID_MQRC,"MQRC"}
-            };
-
-            _local={
-                {"change",  { subid, 0, CMDVS(_change) }},            
-                {"grid",    { subid, 0, CMD(showGrid) }},            
-                {"offline", { subid, 0, CMDVS(_offline) }},            
-                {"online",  { subid, 0, CMDVS(_online) }}           
+            _cmds={
+                {_pName,    { H4PC_ROOT, _subCmd, nullptr}},
+                {"change",  { _subCmd, 0, CMDVS(_change) }},            
+                {"grid",    { _subCmd, 0, CMD(showGrid) }},            
+                {"offline", { _subCmd, 0, CMDVS(_offline) }},            
+                {"online",  { _subCmd, 0, CMDVS(_online) }}           
             };       
         }
                 void        change(const string& broker,uint16_t port);
                 void        publishDevice(const string& topic,const string& payload="");
                 void        publishDevice(const string& topic,uint32_t payload){ publishDevice(topic,stringFromInt(payload)); }
                 void        showGrid(){ for(auto const& g:_grid) reply("%s\n",CSTR(g)); }
-                void        start() override;
-                void        stop() override;
                 void        subscribeDevice(string topic,H4_FN_MSG f);
                 void        unsubscribeDevice(string topic);
 

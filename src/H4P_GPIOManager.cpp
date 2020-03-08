@@ -104,9 +104,8 @@ void H4GPIOPin::run(){
 //
 //#define SCALE 1 // cmd to change it
 
-void  H4P_GPIOManager::run(){ for(auto const& p:pins) (p.second)->run(); }
-
-void H4P_GPIOManager::_greenLight(){
+void H4P_GPIOManager::_start(){
+    h4._hookLoop([this](){ _run(); },_subCmd);
     h4.every(1000,[this](){
         for(auto p:pins){
             H4GPIOPin* ptr=p.second;         
@@ -116,21 +115,12 @@ void H4P_GPIOManager::_greenLight(){
             ptr->cps=0;
         }
     },nullptr,H4P_TRID_SYNC,true);
+    H4Plugin::_start();
 }
 
-H4P_GPIOManager::H4P_GPIOManager(){
-    _pid=gpioTag();
-    _hook=[this](){ run(); };
-    _names={
-        {H4P_TRID_SYNC,"SYNC"},
-        {H4P_TRID_DBNC,"DBNC"},
-        {H4P_TRID_RPTP,"RPTP"},
-        {H4P_TRID_POLL,"POLL"},
-        {H4P_TRID_MULT,"MULT"},
-        {H4P_TRID_TRIG,"TRIG"}
-    };
-    _cmds={ {"pins",    { H4PC_SHOW, 0, CMD(dump)}} };
-}
+void  H4P_GPIOManager::_run(){ for(auto const& p:pins) (p.second)->run(); }
+
+H4P_GPIOManager::H4P_GPIOManager(): H4Plugin(gpioTag()){}
 //
 //      (oblique) strategies
 //
@@ -412,4 +402,4 @@ TimedPin* H4P_GPIOManager::Timed(uint8_t pin,uint8_t mode,H4GM_SENSE sense,uint3
 //
 //      DIAGNOSTICS
 //
-void H4P_GPIOManager::dump(){ for(auto const& p:pins) p.second->dump(); }
+void H4P_GPIOManager::show(){ for(auto const& p:pins) p.second->dump(); }
