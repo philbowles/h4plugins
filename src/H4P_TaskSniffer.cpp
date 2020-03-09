@@ -27,6 +27,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_TaskSniffer.h>
+#include<H4P_SerialCmd.h>
 
 uint32_t H4P_TaskSniffer::__incexc(vector<string> vs,function<void(vector<uint32_t>)> f){
     return guard1(vs,[f,this](vector<string> vs){
@@ -51,17 +52,7 @@ uint32_t H4P_TaskSniffer::__incexc(vector<string> vs,function<void(vector<uint32
         }
     });    
 }
-/*
-void H4P_TaskSniffer::_alwaysExclude(){ // still need this?
-    exclude({
- //       H4P_TRID_SQWV,
-//        H4P_TRID_WIFI,
-//        H4P_TRID_MQTT,
-//        H4P_TRID_ASWS,
-//        H4P_TRID_UBSW
-    }); 
-}        
-*/
+
 void H4P_TaskSniffer::_common(){
     _cmds={
         {_pName,      {H4PC_ROOT, _subCmd, nullptr}},
@@ -74,7 +65,9 @@ void H4P_TaskSniffer::_common(){
 void H4P_TaskSniffer::_taskDump(H4_TASK_PTR t,const char c){
     if(hitList.count((t->uid)%100)) {
         reply("%d:%u:%c: ",h4.size(),micros(),c);
-        h4._dumpTask(t);
+#ifdef H4P_LOG_EVENTS        
+        H4P_SerialCmd::_dumpTask(t);
+#endif
     }
 }
 //

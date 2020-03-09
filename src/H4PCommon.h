@@ -220,8 +220,6 @@ class H4Plugin {
                 if(!vs.size()) return H4_CMD_TOO_FEW_PARAMS;
                 return vs.size()>1 ? H4_CMD_TOO_MANY_PARAMS:f(vs);
             }
-
-
                 void        _upHooks();
                 void        _downHooks();
 
@@ -261,8 +259,9 @@ class H4Plugin {
 //
                 string      getConfig(const string& c){ return _cb[c]; }
                 void        reply(const char* fmt,...); // hoist protected
-                void        showPlugins();
-        virtual void        _reply(string msg) { Serial.print(CSTR(_pName));Serial.print(": ");Serial.println(CSTR(msg)); }
+//                void        showPlugins();
+//      syscall only
+        virtual void        _reply(string msg) { /* Serial.print(CSTR(_pName));Serial.print(": ");*/ Serial.println(CSTR(msg)); }
         static  void        _hookFactory(H4_FN_VOID f){ if(f) _factoryChain.push_back(f); } 
 /*
         static void         dumpCommands(H4_CMD_MAP cm=_commands){
@@ -272,6 +271,7 @@ class H4Plugin {
         }
 */
 };
+
 class H4PLogService: public H4Plugin {
                 uint32_t    _filter=0;
             

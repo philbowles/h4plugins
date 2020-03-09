@@ -141,8 +141,9 @@ class H4GPIOPin{
                 );
 
         virtual ~H4GPIOPin(){}
-
+#ifdef H4P_LOG_EVENTS
         virtual void        dump();
+#endif
 };
 //
 //  Inheritance order, not alphabetical
@@ -158,10 +159,12 @@ class FilteredPin: public H4GPIOPin {
     protected:
         void stateChange() override { if(state==filter) sendEvent(); }
     public:
+#ifdef H4P_LOG_EVENTS
         virtual void dump() override {
             H4GPIOPin::dump();
             Serial.print(" filter=");Serial.println(filter); 
-        }               
+        }
+#endif
         FilteredPin(uint8_t _p,uint8_t _g,H4GM_STYLE _s,uint8_t _a,uint8_t _f,H4GM_FN_EVENT _c);
         virtual ~FilteredPin(){}
 };
@@ -173,11 +176,12 @@ class DebouncedPin: public H4GPIOPin {
     protected:
         virtual void    stateChange() override;
     public:
+#ifdef H4P_LOG_EVENTS
         virtual void dump(){
             H4GPIOPin::dump();
             Serial.print(" dbTimeMs=");Serial.println(Td); 
         }        
-        
+#endif
         DebouncedPin(uint8_t _p,uint8_t _g,H4GM_STYLE _s,uint8_t _a,uint32_t _d,H4GM_FN_EVENT _c);
         virtual ~DebouncedPin(){}
 };
@@ -190,15 +194,17 @@ class PolledPin: public H4GPIOPin {
     protected:
         virtual void            read();
 	public:
-    //    uint32_t logicalRead() override { return isAnalog ? }
+#ifdef H4P_LOG_EVENTS
         virtual void dump(){
             H4GPIOPin::dump();
             Serial.print(" frequency=");Serial.println(frequency); 
             Serial.print(" isAnalog=");Serial.println(isAnalog); 
-        }            
+        }        
+#endif
         PolledPin(uint8_t _p,uint8_t _g,H4GM_STYLE _s,uint8_t _a,uint32_t _f,uint32_t _v,H4GM_FN_EVENT _c);
         virtual ~PolledPin(){}
 };
+
 using H4GM_COMPARE=function<bool(uint32_t,uint32_t)>;
 #define H4GM_LESS std::less<uint32_t>()
 #define H4GM_GREATER std::greater<uint32_t>()
@@ -208,10 +214,12 @@ class AnalogThresholdPin: public PolledPin {
         void        read() override;
 	public:
         uint32_t    limit;
+#ifdef H4P_LOG_EVENTS
         virtual void dump(){
             PolledPin::dump();
             Serial.print(" limit=");Serial.println(limit); 
-        }            
+        }        
+#endif
         AnalogThresholdPin(uint8_t _p,uint32_t _f,uint32_t _l,H4GM_COMPARE _cf,H4GM_FN_EVENT _c);
         virtual ~AnalogThresholdPin(){}
 };
@@ -222,10 +230,12 @@ class RetriggeringPin: public H4GPIOPin {
      protected:
         virtual void    stateChange() override;    
 	public:
+#ifdef H4P_LOG_EVENTS
         virtual void dump(){
             H4GPIOPin::dump();
             Serial.print(" timeout=");Serial.println(timeout); 
-        }            
+        }        
+#endif
         RetriggeringPin(uint8_t _p,uint8_t _g,H4GM_STYLE _s,uint8_t _a,uint32_t _t,H4GM_FN_EVENT _c);
         virtual ~RetriggeringPin(){}
 
@@ -244,11 +254,13 @@ class RepeatingPin: public DebouncedPin {
                 void    sendEvent() override;
 	public:
         uint32_t    held=0;
+#ifdef H4P_LOG_EVENTS
         virtual void dump(){
             DebouncedPin::dump();
             Serial.print(" frequency=");Serial.println(frequency); 
             Serial.print(" held=");Serial.println(held); 
-        }            
+        }        
+#endif
         RepeatingPin(uint8_t _p,uint8_t _g,H4GM_STYLE _s,uint8_t _a,uint32_t _d,uint32_t _f,H4GM_FN_EVENT _c);
         virtual ~RepeatingPin(){}
 };
@@ -263,6 +275,7 @@ class MultistagePin: public DebouncedPin { // add dump
 	public:
         uint32_t        stage=0;
         uint32_t        held=0;
+#ifdef H4P_LOG_EVENTS
         virtual void dump(){
             DebouncedPin::dump();
             Serial.print(" stage=");Serial.println(stage); 
@@ -270,7 +283,8 @@ class MultistagePin: public DebouncedPin { // add dump
             for(auto const& s:stageMap) {
                 Serial.print(" action @ ");Serial.println(s.first); 
             }
-        }            
+        }        
+#endif
         MultistagePin(uint8_t _p,uint8_t _g,H4GM_STYLE _s,uint8_t _a,uint32_t _d,H4GM_STAGE_MAP _m,H4GM_FN_EVENT _c);
         virtual ~MultistagePin(){}
 };
@@ -280,11 +294,12 @@ class SequencedPin: public DebouncedPin {
           virtual void      sendEvent() override;
           virtual void      lastCall(){ H4GPIOPin::sendEvent(); }      
 	public:
+#ifdef H4P_LOG_EVENTS
         virtual void dump(){
             DebouncedPin::dump();
             Serial.print(" stage=");Serial.println(stage); 
-        }            
-        
+        }        
+#endif
         uint32_t    stage=0; // current stage of cycle
 		SequencedPin(uint8_t _p,uint8_t _g,H4GM_STYLE _s,uint8_t _a,uint32_t _d,H4GM_FN_EVENT _c);
         virtual ~SequencedPin(){}
@@ -294,10 +309,12 @@ class CircularPin: public SequencedPin {
     protected:
         virtual void     sendEvent() override;          
 	public:
+#ifdef H4P_LOG_EVENTS
         virtual void dump(){
             SequencedPin::dump();
             Serial.print(" nStages=");Serial.println(nStages); 
-        }          
+        }        
+#endif
         uint32_t	nStages=0; // cycle length
 		CircularPin(uint8_t _p,uint8_t _g,H4GM_STYLE _s,uint8_t _a,uint32_t _d,uint32_t nStages,H4GM_FN_EVENT _c);
         virtual ~CircularPin(){}
@@ -308,10 +325,12 @@ class LatchingPin: public CircularPin {
         virtual void    lastCall() override;
     public:
         uint32_t    logicalRead() override { return latched; }
+#ifdef H4P_LOG_EVENTS
         virtual void dump(){
             CircularPin::dump();
             Serial.print(" Latching=");Serial.println(latched); 
-        }  		        
+        }        
+#endif
         uint32_t   	latched; // logical state
         LatchingPin(uint8_t _p,uint8_t _g,H4GM_STYLE _s,uint8_t _a,uint32_t _d,H4GM_FN_EVENT _c);
         virtual ~LatchingPin(){}
@@ -342,11 +361,12 @@ class EncoderPin: public H4GPIOPin{
             return this;
         }
         uint32_t    logicalRead() override { return constrain(encoderValue,0,1); } // constrain
+#ifdef H4P_LOG_EVENTS
         virtual void dump(){
             H4GPIOPin::dump();
             Serial.print(" encoderValue=");Serial.println(encoderValue); 
-        }  		        
-
+        }        
+#endif
         bool            _primary=true;
 		EncoderPin*     _otherPin=nullptr;
 
@@ -363,14 +383,15 @@ class EncoderAutoPin: public EncoderPin{
 	public:
         uint32_t    logicalRead() override { return autoValue; }
         int             autoValue=0;
+#ifdef H4P_LOG_EVENTS
         virtual void dump(){
             EncoderPin::dump();
             Serial.print(" vMin=");Serial.println(vMin); 
             Serial.print(" vMax=");Serial.println(vMax); 
             Serial.print(" vIncr=");Serial.println(vIncr); 
             Serial.print(" autoValue=");Serial.println(autoValue); 
-        }  		        
-
+        }        
+#endif
 		EncoderAutoPin(uint8_t _pA,uint8_t _g,H4GM_STYLE _s,uint8_t _a,int vMin, int vMax, uint32_t vIncr,H4GM_FN_EVENT _c);
         virtual ~EncoderAutoPin(){}
 
@@ -439,7 +460,9 @@ class H4P_GPIOManager: public H4Plugin{//
         SequencedPin*       Sequenced(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback); //
         TimedPin*           Timed(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback); //
 //
-        void                 show() override;
+#ifdef H4P_LOG_EVENTS
+        void                 show() override { for(auto const& p:pins) p.second->dump(); };
+#endif
 };
 
 extern __attribute__((weak)) H4P_GPIOManager h4gm;

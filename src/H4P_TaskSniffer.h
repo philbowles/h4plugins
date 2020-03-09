@@ -44,7 +44,6 @@ class H4P_TaskSniffer: public H4Plugin{
 
                 void        _common();
                 void        _taskDump(H4_TASK_PTR t,char c);
-
     public:
         H4P_TaskSniffer();
         H4P_TaskSniffer(uint32_t i);

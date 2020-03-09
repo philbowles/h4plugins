@@ -81,14 +81,6 @@ uint32_t H4Plugin::guardString2(vector<string> vs,function<void(string,string)> 
 
 #define H4P_REPLY_BUFFER    128
 
-void  H4Plugin::showPlugins(){ 
-    for(auto const& p:H4Plugin::_plugins){
-        reply("h4/svc/state/%s %s ID=%d",CSTR(p->_pName),p->_state() ? "UP":"DN",p->_subCmd);
-        p->show();
-        reply("");
-    }
-}
-
 void H4Plugin::reply(const char* fmt,...){ // find pub sub size
     char buff[H4P_REPLY_BUFFER+1];
     va_list ap; 
@@ -137,5 +129,4 @@ void H4Plugin::_downHooks(){
 void H4PLogService::_hookIn(){
     REQUIRE(scmd);
     h4sc._hookLogChain(bind(&H4PLogService::_filterLog,this,_1,_2,_3,_4));
-//    h4sc.addCmd(msgTag(),_subCmd, 0, CMDNULL);
 }

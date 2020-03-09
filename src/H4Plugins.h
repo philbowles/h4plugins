@@ -1,15 +1,18 @@
 #ifndef H4P_PLUGINS_H
 #define H4P_PLUGINS_H
 
+#include<H4PConfig.h>
+
 #include<H4P_CmdErrors.h>
 #include<H4P_SerialCmd.h>
-#include<H4P_SerialLogger.h>
-//#include<H4P_Skeleton.h>
 #include<H4P_PersistentStorage.h>
-#include<H4P_LocalLogger.h>
+
+#ifdef H4P_LOG_EVENTS
+    #include<H4P_SerialLogger.h>
+    #include<H4P_LocalLogger.h>
+#endif
 
 #include<H4P_ExternalSqWave.h>
-
 #include<H4P_TaskSniffer.h>
 #include<H4P_QueueWarn.h>
 
@@ -20,10 +23,12 @@
     #include<H4P_WiFi.h>
     #include<H4P_AsyncWebServer.h>
     #include<H4P_AsyncMQTT.h>
-    #include<H4P_MQTTLogger.h>
-    #include<H4P_MQTTHeapLogger.h>
-    #include<H4P_MQTTQueueLogger.h>
-    #include<H4P_HttpMySQLLogger.h>
+    #ifdef H4P_LOG_EVENTS
+        #include<H4P_MQTTLogger.h>
+        #include<H4P_MQTTHeapLogger.h>
+        #include<H4P_MQTTQueueLogger.h>
+        #include<H4P_HttpMySQLLogger.h>
+    #endif
     #include<H4P_UPNPServer.h>
     #include<H4P_PresenceDetector.h>
 #endif

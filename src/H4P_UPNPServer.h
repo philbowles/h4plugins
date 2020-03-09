@@ -69,10 +69,7 @@ class H4P_UPNPServer: public H4Plugin {
             void            broadcast(uint32_t mx,const string s){ __upnpSend(mx,s,_ubIP,1900); }
 
             void            _listenUDP();
-            void            _notify(const string& s);
-//            void            _notifyUSN(const string& usn,bool b);
-//            void            _offlineUSN(const string& usn,bool notify=false,bool state=false);
-            void            _upnp(AsyncWebServerRequest *request);
+            void            _notify(const string& s);            void            _upnp(AsyncWebServerRequest *request);
 
             void            _hookIn() override;
             void            _start() override;

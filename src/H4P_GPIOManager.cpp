@@ -61,7 +61,7 @@ void H4GPIOPin::_factoryCommon(H4P_BinaryThing* btp){ // optimise for no logging
     H4P_GPIOManager::pins[pin]=this;
     begin();
 }
-
+#ifdef H4P_LOG_EVENTS
 void H4GPIOPin::dump(){ // tart this up - complete rework
     Serial.print("PIN ");Serial.println(pin);
     Serial.print(" gpioType=");Serial.println(gpioType);
@@ -76,7 +76,7 @@ void H4GPIOPin::dump(){ // tart this up - complete rework
     Serial.print(" cMax=");Serial.println(cMax);
     Serial.print(" nEvents=");Serial.println(nEvents);
 }
-// end diag
+#endif
 
 void H4GPIOPin::stampEvent(){
     unsigned long now=micros();
@@ -399,7 +399,3 @@ SequencedPin* H4P_GPIOManager::Sequenced(uint8_t pin,uint8_t mode,H4GM_SENSE sen
 TimedPin* H4P_GPIOManager::Timed(uint8_t pin,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback){
     return thingFactory<TimedPin>(nullptr,pin, mode, H4GM_PS_TIMED, sense, dbTimeMs, 0, callback);
 }
-//
-//      DIAGNOSTICS
-//
-void H4P_GPIOManager::show(){ for(auto const& p:pins) p.second->dump(); }

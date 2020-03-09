@@ -45,23 +45,7 @@ void H4P_UPNPServer::__upnpSend(uint32_t mx,const string s,IPAddress ip,uint16_t
 		_udp.writeTo((uint8_t *)CSTR(s), s.size(), ip, port);
 		},ip,port,s),nullptr,H4P_TRID_UDPS); // name this!!
 }
-/*
-void H4P_UPNPServer::_notifyUSN(const string& usn,bool b){
-    H4P_USN u=_detect[usn];
-    if(b!=u.told){
-        _detect[usn].told=b;
-        H4BS_FN_SWITCH f=u.f;
-        if(f) f(b);
-        H4EVENT("%s->%d", CSTR(usn),b)
-    }
-}
 
-void H4P_UPNPServer::_offlineUSN(const string& usn,bool notify,bool state){
-    if(_detect.count(usn)) h4.cancel(_detect[usn].timer);
-    _detect[usn].timer=nullptr;
-    if(notify) _notifyUSN(usn,state);
-}
-*/
 void H4P_UPNPServer::_listenUDP(){
     if(_udp.listenMulticast(_ubIP, 1900)) {
         _udp.onPacket([this](AsyncUDPPacket packet) {
@@ -157,19 +141,17 @@ void H4P_UPNPServer::_upnp(AsyncWebServerRequest *request){ // redo
         //H4EVENT("%s",CSTR(soap));
         _cb["gs"]=(soap.find("Get")==string::npos) ? "Set":"Get";
         uint32_t _set=soap.find(">1<")==string::npos ? 0:1;
+#ifdef H4P_LOG_EVENTS
         if(_cb["gs"]=="Set") _btp->_turn(_set,_pName);
+#else
+        if(_cb["gs"]=="Set") _btp->turn(_set);
+#endif
         _cb[stateTag()]=stringFromInt(_btp->_getState());
         request->send(200, "text/xml", CSTR(H4P_WiFi::replaceParams(_soap))); // refac
     },request),nullptr, H4P_TRID_SOAP); // TRID_SOAP
 }
 
 void H4P_UPNPServer::_stop(){
-    /*
-    for(auto const& d:_detect){
-        _offlineUSN(d.first,false); // do not notify
-        _detect.erase(d.first);
-    }
-    */
     _notify("byebye");
     h4.cancelSingleton(H4P_TRID_NTFY);
     _udp.close();
