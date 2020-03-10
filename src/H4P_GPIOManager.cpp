@@ -58,7 +58,6 @@ void H4GPIOPin::_pinFactoryCommon(bool onof){ // optimise for no logging
     #endif
             };
         } else { 
-            //DEPENDFAIL(onof);
             Serial.println("FATAL: 'xThing' needs onof!");
             return;
         }
@@ -66,7 +65,7 @@ void H4GPIOPin::_pinFactoryCommon(bool onof){ // optimise for no logging
     H4P_GPIOManager::pins[pin]=this;
     begin();
 }
-
+#ifdef H4P_LOG_EVENTS
 string H4GPIOPin::dump(){ // tart this up - complete rework
     /*
     Serial.print("PIN ");Serial.println(pin);
@@ -86,7 +85,7 @@ string H4GPIOPin::dump(){ // tart this up - complete rework
     sprintf(buf,"%2d %2d %2d %2d %6d %6d %6d %6d %6d %6d %6d %6d",pin,gpioType,style,sense,Tevt,state,delta,rate,Rpeak,cps,cMax,(int) nEvents);
     return(buf);
 }
-// end diag
+#endif
 
 void H4GPIOPin::stampEvent(){
     unsigned long now=micros();

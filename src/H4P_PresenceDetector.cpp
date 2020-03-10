@@ -32,18 +32,13 @@ SOFTWARE.
 #include<H4P_BinaryThing.h>
 #include<H4P_UPNPServer.h>
 
+#ifdef ARDUINO_ARCH_ESP8266
 extern "C" {
   #include <ping.h>
 }
-//H4P_PD_MAP          H4PDetector::_register;
 
 bool                H4P_IPDetector::_inflight=false;
 struct ping_option  H4P_IPDetector::pop;
-
-#define H4P_IPPD_RATE   10000
-#define H4P_PJ_SPREAD   3
-#define H4P_PJ_LO (H4P_IPPD_RATE - (H4_JITTER_LO * H4P_PJ_SPREAD))
-#define H4P_PJ_HI (H4P_IPPD_RATE + (H4_JITTER_HI * H4P_PJ_SPREAD))
 
 void H4P_IPDetector::_hookIn() { DEPEND(wifi); }
 
@@ -74,6 +69,20 @@ void H4P_IPDetector::_ping_recv_cb(void *arg, void *pdata){
         _inflight=false;
     },p,v));
 }
+H4P_IPDetectorThing::H4P_IPDetectorThing(const string& pid,const string& id): H4P_IPDetector(pid,id){
+    H4P_BinaryThing* _btp;
+    REQUIREBT;
+    if(_btp){
+        _f=[this,_btp](bool b){ 
+#ifdef H4P_LOG_EVENTS
+        _btp->_turn(b,_pName+string("("+_id+")"));
+#else
+        _btp->turn(b);
+#endif
+        };
+    }
+}
+#endif
 //
 void H4P_UPNPDetector::_hookIn() { 
     REQUIRE(onof);
@@ -89,4 +98,18 @@ void H4P_UPNPDetector::_start(){
     });
     _upHooks();
 }
+H4P_UPNPDetectorThing::H4P_UPNPDetectorThing(const string& pid,const string& id): H4P_UPNPDetector(pid,id){
+    H4P_BinaryThing* _btp;
+    REQUIREBT;
+    if(_btp){
+        _f=[this,_btp](bool b){ 
+#ifdef H4P_LOG_EVENTS
+        _btp->_turn(b,_pName+string("("+_id+")"));
+#else
+        _btp->turn(b);
+#endif
+        };
+    }
+}
+
 #endif

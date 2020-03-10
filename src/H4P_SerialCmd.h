@@ -79,22 +79,24 @@ class H4P_SerialCmd: public H4Plugin {
         }
     public:
 #ifndef ARDUINO_ARCH_STM32
-
+        static  string          read(const string& fn);
+        static  uint32_t        write(const string& fn,const string& data,const char* mode="w");
+        void                    showSPIFFS();
+        void                    heap(){ reply("Heap=%u",ESP.getFreeHeap()); }        
+#endif
 #ifdef H4P_LOG_EVENTS
                 void            all();
                 void            config(){ for(auto const& c:_cb) reply("%s=%s",CSTR(c.first),CSTR(c.second)); }        
-                void            heap(){ reply("Heap=%u",ESP.getFreeHeap()); }        
                 void            plugins();
+
+        VSCMD(_dump);   // public so logger can use it
 
                 void            dumpQ();
         static  string          _dumpTask(task*);
-        VSCMD(_dump);   // public so logger can use it
-        void                    showSPIFFS();
+#else
+                void            dumpQ(){}
+        static  string          _dumpTask(task*){}
 #endif
-        static  string          read(const string& fn);
-        static  uint32_t        write(const string& fn,const string& data,const char* mode="w");
-#endif
-
         H4P_SerialCmd();
 //      user
                 void            addCmd(const string& name,uint32_t owner, uint32_t levID,H4_FN_MSG f=nullptr){ _addCmd(name, {owner,levID,f}); }

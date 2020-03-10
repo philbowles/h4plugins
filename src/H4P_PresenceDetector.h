@@ -34,33 +34,9 @@ SOFTWARE.
 #ifndef H4P_NO_WIFI
 
 #include<H4PCommon.h>
-#include<H4P_WiFi.h>
 #include<H4P_SerialCmd.h>
 
-#include<H4P_UPNPServer.h>
-
-#define H4P_IPPD_RATE   5000
-
-//using H4P_FN_PRESENCE   = function<void(const string,bool)>;
-/*
-enum H4P_PD_TYPE {
-    H4P_DETECT_IP,
-    H4P_DETECT_USN
-};
-
-struct H4P_PRESENCE {
-    H4P_PD_TYPE     t;
-    string          n;
-    H4BS_FN_SWITCH  f;
-};
-
-using H4P_PRESENCE_MAP = unordered_map<string,H4P_PRESENCE>;
-*/
-//class H4PDetector;
-
-//using H4P_PD_MAP        = unordered_map<string,H4PDetector*>;
 class H4PDetector: public H4Plugin{
-//        static H4P_PD_MAP          _register;
     protected:
         H4_TIMER        _pinger;
         H4BS_FN_SWITCH  _f;
@@ -86,7 +62,7 @@ class H4PDetector: public H4Plugin{
         bool        isPresent(){ return _here; }
         void show() override { reply("%s (%s) %s Present",CSTR(_pName),CSTR(_id),_here ? "":"NOT"); }
 };
-
+#ifdef ARDUINO_ARCH_ESP8266
 class H4P_IPDetector: public H4PDetector {
         static  bool _inflight;
 
@@ -98,15 +74,23 @@ class H4P_IPDetector: public H4PDetector {
                 void        _hookIn() override;
                 void        _start() override;
     public:
-        H4P_IPDetector(const string& friendly,const string& ip,H4BS_FN_SWITCH f): H4PDetector(friendly,ip,f){}
+        H4P_IPDetector(const string& friendly,const string& ip,H4BS_FN_SWITCH f=nullptr): H4PDetector(friendly,ip,f){}
 };
-
+class H4P_IPDetectorThing: public H4P_IPDetector{
+    public:
+        H4P_IPDetectorThing(const string& pid,const string& id);
+};
+#endif
 class H4P_UPNPDetector: public H4PDetector {
     protected:
                 void        _hookIn() override;
                 void        _start() override;
     public:
-        H4P_UPNPDetector(const string& friendly,const string& usn,H4BS_FN_SWITCH f): H4PDetector(friendly,usn,f){}
+        H4P_UPNPDetector(const string& friendly,const string& usn,H4BS_FN_SWITCH f=nullptr): H4PDetector(friendly,usn,f){}
+};
+class H4P_UPNPDetectorThing: public H4P_UPNPDetector{
+    public:
+        H4P_UPNPDetectorThing(const string& pid,const string& id);
 };
 
 #endif

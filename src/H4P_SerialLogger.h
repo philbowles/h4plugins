@@ -43,7 +43,7 @@ class H4P_SerialLogger: public H4PLogService {
             Serial.print(": ");Serial.println(CSTR(msg));
         }
     public:
-        H4P_SerialLogger(uint32_t filter=H4P_LOG_ALL): H4PLogService("slog",filter){}
+        H4P_SerialLogger(uint32_t filter=H4P_LOG_ALL): H4PLogService("slog",filter){ _up=true; }
 };
 
 #endif // H4P_SerialLogger_H

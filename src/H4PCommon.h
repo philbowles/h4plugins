@@ -30,7 +30,7 @@ SOFTWARE.
 #ifndef H4P_HO
 #define H4P_HO
 
-#define H4P_VERSION "0.4.0"
+#define H4P_VERSION "0.5.0"
 
 #include<H4.h>
 #include<H4Utils.h>
@@ -77,7 +77,7 @@ enum H4P_LOG_TYPE {
     H4P_LOG_SVC_DOWN=4,
     H4P_LOG_CMD=8,
     H4P_LOG_USER=16,
-    H4P_LOG_DEPENDFAIL=32,
+//    H4P_LOG_DEPENDFAIL=32,
     H4P_LOG_MQTT_HEAP=64,
     H4P_LOG_MQTT_Q=128,
     H4P_LOG_PD_ENTER=256,
@@ -116,7 +116,6 @@ STAG(qwrn);
 STAG(scmd);
 STAG(snif);
 STAG(src);
-// svc?
 STAG(ssid);
 STAG(state);
 STAG(stor);
@@ -232,8 +231,9 @@ class H4Plugin {
 //       
         virtual void        _greenLight(){ start(); } // override if necessary!
         virtual void        _hookIn(){}
-                void        _startup();
         virtual bool        _state() { return _up; }
+
+                void        _startup();
 //
         H4Plugin(const string& name,H4_FN_VOID svcUp=nullptr,H4_FN_VOID svcDown=nullptr): _pName(name){
             _subCmd=++_nxtSubCmd;

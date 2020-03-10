@@ -39,7 +39,7 @@ SOFTWARE.
 #include<AsyncMqttClient.h>
 
 class H4P_AsyncMQTT: public H4Plugin, public AsyncMqttClient{
-        unordered_set<string>   _grid;
+//        unordered_set<string>   _grid;
             bool            autorestart=true;
             string          device;
 
@@ -64,20 +64,20 @@ class H4P_AsyncMQTT: public H4Plugin, public AsyncMqttClient{
 
             _cmds={
                 {_pName,    { H4PC_ROOT, _subCmd, nullptr}},
-                {"change",  { _subCmd, 0, CMDVS(_change) }},            
-                {"grid",    { _subCmd, 0, CMD(showGrid) }},            
-                {"offline", { _subCmd, 0, CMDVS(_offline) }},            
-                {"online",  { _subCmd, 0, CMDVS(_online) }}           
+                {"change",  { _subCmd, 0, CMDVS(_change) }}
+//                {"grid",    { _subCmd, 0, CMD(showGrid) }},
+//                {"offline", { _subCmd, 0, CMDVS(_offline) }},
+//                {"online",  { _subCmd, 0, CMDVS(_online) }}
             };       
         }
                 void        change(const string& broker,uint16_t port);
                 void        publishDevice(const string& topic,const string& payload="");
                 void        publishDevice(const string& topic,uint32_t payload){ publishDevice(topic,stringFromInt(payload)); }
-                void        showGrid(){ for(auto const& g:_grid) reply("%s\n",CSTR(g)); }
+//                void        showGrid(){ for(auto const& g:_grid) reply("%s\n",CSTR(g)); }
                 void        subscribeDevice(string topic,H4_FN_MSG f);
                 void        unsubscribeDevice(string topic);
 
-    //          syscall only                               
+    //          syscall only
                 void        _reply(string msg) override { publish(CSTR(string("h4/"+device+"/reply")),0,false,CSTR(msg)); }
 };
 

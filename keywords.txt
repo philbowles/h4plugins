@@ -102,7 +102,6 @@ config	KEYWORD2
 getConfig	KEYWORD2
 getLogType	KEYWORD2
 getErrorMessage	KEYWORD2
-dumpQ	KEYWORD2
 h4FactoryReset	KEYWORD2
 h4reboot	KEYWORD2
 help	KEYWORD2

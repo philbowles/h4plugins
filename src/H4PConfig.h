@@ -28,12 +28,14 @@ SOFTWARE.
 */
 
 // comment this out to prevent and logging by EVENT( whatever ) messages
-#define H4P_LOG_EVENTS
+//#define H4P_LOG_EVENTS
 /*
             TWEAKABLES
 */
 #ifndef H4PCONFIG_H
 #define H4PCONFIG_H
+
+#define H4P_REPLY_BUFFER    512
 
 #define H4P_PREFER_PERSISTENT true
 
@@ -44,7 +46,6 @@ SOFTWARE.
 #define H4FC_MORSE_SUPPORT  false
 
 #define H4MQ_RETRY            5000
-#define H4MQ_MQTT_RATE        1000
 
 #define H4P_UDP_JITTER         250
 #define H4P_UDP_REFRESH     300000
@@ -57,5 +58,10 @@ SOFTWARE.
 #define H43F_FACTORY          5000
 
 #define H4WF_OTA_RATE         1000
+
+#define H4P_IPPD_RATE         5000
+#define H4P_PJ_SPREAD            3
+#define H4P_PJ_LO (H4P_IPPD_RATE - (H4_JITTER_LO * H4P_PJ_SPREAD))
+#define H4P_PJ_HI (H4P_IPPD_RATE + (H4_JITTER_HI * H4P_PJ_SPREAD))
 
 #endif

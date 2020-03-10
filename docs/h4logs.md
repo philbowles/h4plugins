@@ -37,7 +37,7 @@ enum H4P_LOG_TYPE {
     H4P_LOG_SVC_DOWN=4,// internal H4 event on service DOWN
     H4P_LOG_CMD=8,// command from any source (see below)
     H4P_LOG_USER=16,// arbitrary message from user code
-    H4P_LOG_DEPENDFAIL=32,// dependent plugin omitted by user
+//    H4P_LOG_DEPENDFAIL=32,// dependent plugin omitted by user
     H4P_LOG_MQTT_HEAP=64, // value of current heap
     H4P_LOG_MQTT_Q=128, // size of queue
     H4P_LOG_ALL=0xffffffff,

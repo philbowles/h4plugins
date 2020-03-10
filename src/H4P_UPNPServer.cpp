@@ -60,7 +60,6 @@ void H4P_UPNPServer::_listenUDP(){
                     for (auto const &h :vector<string>(++hdrs.begin(), hdrs.end())) {
                         size_t p = h.find(":");
                         if (p != string::npos) {
-                            //Serial.printf("DBUG *%s*\n",CSTR(h));
                             string key=uppercase(string(h.begin(),h.begin()+p));
                             uhdrs[key]=trim(string(h.begin()+p+1,h.end()));
                         }
@@ -68,17 +67,16 @@ void H4P_UPNPServer::_listenUDP(){
                     uint32_t mx=1000 * atoi(CSTR(replaceAll(uhdrs["CACHE-CONTROL"],"max-age=","")));
                     if (msg[0] == 'M') { //-SEARCH
                         string ST = uhdrs["ST"];
-//                        if (ST==_pups[1] || ST==_uuid+_cb["udn"]) { // make tag
                         if (ST==_pups[1]) { // make tag
                             string tail=((ST==_pups[1]) ? ST:"");
                             __upnpSend(mx, "HTTP/1.1 200 OK\r\nST:" + ST +"\r\n" +__upnpCommon(tail), ip,port);
-                        } //else Serial.printf("NOT I %s\n",CSTR(ST));
+                        }
                     }
                     else {
                         if (msg[0] == 'N') { //OTIFY
                             string usn=uhdrs["USN"];
                             if(_detect.count(usn)) _detect[usn](mx,uhdrs);
-                        } else Serial.printf("WTF??? %s\n",CSTR(msg));
+                        }// else Serial.printf("WTF??? %s\n",CSTR(msg));
                     } 
                 } else Serial.printf("msg fail too short!!! *%s*\n",CSTR(msg));
             },stringFromBuff(packet.data(), packet.length()),packet.remoteIP(), packet.remotePort()),nullptr, H4P_TRID_UDPM);
@@ -141,7 +139,6 @@ void H4P_UPNPServer::_start(){
 void H4P_UPNPServer::_upnp(AsyncWebServerRequest *request){ // redo
   h4.queueFunction(bind([this](AsyncWebServerRequest *request) {
         string soap=stringFromBuff((const byte*) request->_tempObject,strlen((const char*) request->_tempObject));
-        //H4EVENT("%s",CSTR(soap));
         _cb["gs"]=(soap.find("Get")==string::npos) ? "Set":"Get";
         uint32_t _set=soap.find(">1<")==string::npos ? 0:1;
 #ifdef H4P_LOG_EVENTS
@@ -151,7 +148,7 @@ void H4P_UPNPServer::_upnp(AsyncWebServerRequest *request){ // redo
 #endif
         _cb[stateTag()]=stringFromInt(_btp->_getState());
         request->send(200, "text/xml", CSTR(H4P_WiFi::replaceParams(_soap))); // refac
-    },request),nullptr, H4P_TRID_SOAP); // TRID_SOAP
+    },request),nullptr, H4P_TRID_SOAP);
 }
 
 void H4P_UPNPServer::_stop(){

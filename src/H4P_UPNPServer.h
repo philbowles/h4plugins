@@ -81,7 +81,10 @@ class H4P_UPNPServer: public H4Plugin {
             _pups.push_back(_urn+"service:basicevent:1");
             _ubIP=IPAddress(239,255,255,250);
             _hookFactory([this](){ SPIFFS.remove(CSTR(string("/"+string(nameTag())))); });
-            _cmds={ {nameTag(),{_subCmd, 0, CMDVS(_friendly)}} };
+            _cmds={ 
+                {upnpTag(),{H4PC_ROOT, _subCmd, nullptr}},
+                {nameTag(),{_subCmd, 0, CMDVS(_friendly)}}
+                };
         }
 
              void           friendlyName(const string& name);

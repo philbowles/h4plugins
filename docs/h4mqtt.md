@@ -280,10 +280,6 @@ The following values are defined in `H4PConfig.h` . They are chosen initally to 
 
 * H4MQ_RETRY            5000
 
-The number of milliseconds H4P_AsyncMQTT will wait between attempst to reconnect if server disappears.
-
-* H4MQ_MQTT_RATE        1000
-
 The number of milliseconds for each call of `mqttClient.loop()`. Most basic sketches call this on every loop, which amounts to 40000 - 60000 times *per second* which is a massive peformance hit and totally unnecessary.
 
 The larger the value, the less of a performace hit, BUT the longer it takes for published messages to arrive at the server. If you make the value too large, you cause exponential queue growth if you also publish a lot of messages. If you only publish say, once a minute then you can crank this up...but do not got past 15000 as pubsubclient will time out on its own and close the connection.

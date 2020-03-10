@@ -52,7 +52,7 @@ class H4P_CmdErrors: public H4Plugin {
             {H4P_LOG_SVC_DOWN,"SVC DOWN"},
             {H4P_LOG_CMD,"CMD"},
             {H4P_LOG_USER,"USER"},
-            {H4P_LOG_DEPENDFAIL,"DEPEND FAIL"},
+//            {H4P_LOG_DEPENDFAIL,"DEPEND FAIL"},
             {H4P_LOG_MQTT_HEAP,"MQTT HEAP"},
             {H4P_LOG_MQTT_Q,"MQTT Q"},
             {H4P_LOG_PD_ENTER,"PD ENTER"},

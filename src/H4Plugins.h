@@ -5,25 +5,20 @@
 
 #include<H4P_CmdErrors.h>
 #include<H4P_SerialCmd.h>
-#include<H4P_PersistentStorage.h>
-
-#ifdef H4P_LOG_EVENTS
-    #include<H4P_SerialLogger.h>
-    #include<H4P_LocalLogger.h>
-#endif
-
+#include<H4P_SerialLogger.h>
 #include<H4P_ExternalSqWave.h>
 #include<H4P_TaskSniffer.h>
 #include<H4P_QueueWarn.h>
-
 #include<H4P_GPIOManager.h>
 #include<H4P_FlasherController.h>
 
 #ifndef ARDUINO_ARCH_STM32
+    #include<H4P_PersistentStorage.h>
     #include<H4P_WiFi.h>
     #include<H4P_AsyncWebServer.h>
     #include<H4P_AsyncMQTT.h>
     #ifdef H4P_LOG_EVENTS
+        #include<H4P_LocalLogger.h>
         #include<H4P_MQTTLogger.h>
         #include<H4P_MQTTHeapLogger.h>
         #include<H4P_MQTTQueueLogger.h>
@@ -40,7 +35,7 @@
 //force  static initialisation
 #define H4_USE_PLUGINS std::vector<H4Plugin*>   H4Plugin::_plugins; \
     H4GM_PINMAP         H4P_GPIOManager::pins; 
-    uint32_t H4Plugin::_nxtSubCmd=H4PC_MAX-1; \
+    uint32_t            H4Plugin::_nxtSubCmd=H4PC_MAX-1; \
     H4P_CONFIG_BLOCK    H4Plugin::_cb; \ 
     H4_CMD_MAP          H4Plugin::_commands;
 #endif

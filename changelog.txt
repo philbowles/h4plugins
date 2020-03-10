@@ -5,7 +5,6 @@
         (dumpQ + many others now compile-outable)
         H4P_AsyncMQTT replaces H4P_MQTT: pubsubclient removed, fixing 5-sec lockout delay on reconnect "feature"
         UPNP Switch / Thing removed: replaced by free-standing UPNPServer
-        
     new
         Presence detection
             IP
@@ -49,7 +48,6 @@
         GPIO types
         AnalogThreshold + new example
         AnalogThresholdThing + new example
-
 2020/02/19  0.3.5
     breaking changes:
         h4/factory moved to serialcmd from wifi // update docs!
@@ -91,16 +89,18 @@
     than a ground-up rewrite :)
 
 TODO:
+SOONER
 SHORTTERM
     coalesce wifif scan 8266/32
     event on PS changed
-    all onof / thing to dynamic discover BT
+    centrlaise / globalise onof?
 MEDIUMTERM
     decent tabulated gpio pin dump
-LONGTERM 
+LONGTERM
+    ethernet module stm32
+    ESP32 bluetooth PD
     remote client get
     rf bridge
     signal on no spiffs
     fix switch.ps1 to use soap etc (revert a la esparto)
     lots of const string&
-SOONER

@@ -56,7 +56,7 @@ void H4P_AsyncMQTT::_hookIn() {
         subscribe(CSTR(string(device+"/"+cmdhash())),0);
         subscribe(CSTR(string(_cb[chipTag()]+"/"+cmdhash())),0);
         subscribe(CSTR(string(_cb[boardTag()]+"/"+cmdhash())),0);
-        publish("all/h4/mqtt/online",0,false,CSTR(device));
+        publish("online",0,false,CSTR(device));
         _upHooks();
     });
 
@@ -68,7 +68,7 @@ void H4P_AsyncMQTT::_hookIn() {
         }
     });
 }
-
+/*
 uint32_t H4P_AsyncMQTT::_offline(vector<string> vs){
     return guard1(vs,[this](vector<string> vs){
         if(H4PAYLOAD!=device) _grid.erase(H4PAYLOAD);
@@ -82,11 +82,11 @@ uint32_t H4P_AsyncMQTT::_online(vector<string> vs){
         return H4_CMD_OK;
     });    
 }
-
+*/
 void H4P_AsyncMQTT::_setup(){
     device=_cb[deviceTag()];
     setClientId(CSTR(device));
-    setWill("all/h4/mqtt/offline",0,false,CSTR(device));
+    setWill("offline",0,false,CSTR(device));
 
     string broker=_cb[brokerTag()];
     uint16_t port=atoi(CSTR(_cb[portTag()]));

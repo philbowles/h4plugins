@@ -52,7 +52,6 @@ class H4P_BinaryThing: public H4Plugin{
 
         virtual void        _setState(bool b) { _state=b; }
 
-//                uint32_t    _showState(vector<string> vs){  }
                 uint32_t    _switch(vector<string> vs){ return guardInt1(vs,bind(&H4P_BinaryThing::turn,this,_1)); }
                 void        _start() override { 
                     H4Plugin::_start();

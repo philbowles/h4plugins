@@ -34,12 +34,14 @@ void __attribute__((weak)) onFactoryReset(){}
 
 vector<H4_FN_VOID>  H4Plugin::_factoryChain;
 
+//bool h4bootfail=false;
+
 void h4StartPlugins(){
 //    Serial.printf(" p->_startup()\n");
     for(auto const& p:H4Plugin::_plugins) p->_startup();
 //    Serial.printf(" p->_hookIn()\n");
     for(auto const& p:H4Plugin::_plugins) p->_hookIn();
-//     Serial.printf(" p->_greenLight()\n");
+//    Serial.printf(" p->_greenLight()\n");
     for(auto const& p:H4Plugin::_plugins) p->_greenLight();
     reverse(H4Plugin::_factoryChain.begin(),H4Plugin::_factoryChain.end());
     H4Plugin::_hookFactory(onFactoryReset);
@@ -64,7 +66,7 @@ uint32_t H4Plugin::guardInt1(vector<string> vs,function<void(uint32_t)> f){
     return guard1(vs,[f,this](vector<string> vs){
         auto vi=expectInt(H4PAYLOAD);
         if(vi.size()==1) return ([f](uint32_t v){ f(v); return H4_CMD_OK; })(vi[0]);
-        else return H4_CMD_NOT_NUMERIC;
+        return H4_CMD_NOT_NUMERIC;
     });
 }        
 
@@ -75,11 +77,9 @@ uint32_t H4Plugin::guardString2(vector<string> vs,function<void(string,string)> 
             if(vg.size()>1) return ([f](string s1,string s2){ f(s1,s2); return H4_CMD_OK; })(vg[0],vg[1]);
             return H4_CMD_TOO_FEW_PARAMS;
         }
-        else return H4_CMD_TOO_MANY_PARAMS;
+        return H4_CMD_TOO_MANY_PARAMS;
     });
 }
-
-#define H4P_REPLY_BUFFER    512
 
 void H4Plugin::reply(const char* fmt,...){ // find pub sub size
     char buff[H4P_REPLY_BUFFER+1];
@@ -90,7 +90,7 @@ void H4Plugin::reply(const char* fmt,...){ // find pub sub size
     string source=_cb[srcTag()];
     H4Plugin* p=isLoaded(source);
     if(p) p->_reply(buff);
-    else Serial.printf("%s\n",buff);
+    else Serial.println(buff);
 }
 
 void H4Plugin::_startup(){
