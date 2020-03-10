@@ -41,8 +41,8 @@ SOFTWARE.
 
 #define H4P_IPPD_RATE   5000
 
-using H4P_FN_PRESENCE   = function<void(const string,bool)>;
-
+//using H4P_FN_PRESENCE   = function<void(const string,bool)>;
+/*
 enum H4P_PD_TYPE {
     H4P_DETECT_IP,
     H4P_DETECT_USN
@@ -55,8 +55,12 @@ struct H4P_PRESENCE {
 };
 
 using H4P_PRESENCE_MAP = unordered_map<string,H4P_PRESENCE>;
+*/
+//class H4PDetector;
 
+//using H4P_PD_MAP        = unordered_map<string,H4PDetector*>;
 class H4PDetector: public H4Plugin{
+//        static H4P_PD_MAP          _register;
     protected:
         H4_TIMER        _pinger;
         H4BS_FN_SWITCH  _f;
@@ -72,10 +76,15 @@ class H4PDetector: public H4Plugin{
                 h4.cancel(_pinger);
                 _downHooks();
             };
+            void        _greenLight() override {}
     public:
         string          _id;
         bool            _here=false;
+
         H4PDetector(const string& pid,const string& id,H4BS_FN_SWITCH f): _id(id),_f(f),H4Plugin(pid){}
+                        
+        bool        isPresent(){ return _here; }
+        void show() override { reply("%s (%s) %s Present",CSTR(_pName),CSTR(_id),_here ? "":"NOT"); }
 };
 
 class H4P_IPDetector: public H4PDetector {
@@ -88,7 +97,6 @@ class H4P_IPDetector: public H4PDetector {
     protected:
                 void        _hookIn() override;
                 void        _start() override;
-                void        _greenLight() override {}
     public:
         H4P_IPDetector(const string& friendly,const string& ip,H4BS_FN_SWITCH f): H4PDetector(friendly,ip,f){}
 };
@@ -97,41 +105,10 @@ class H4P_UPNPDetector: public H4PDetector {
     protected:
                 void        _hookIn() override;
                 void        _start() override;
-                void        _greenLight() override {}
     public:
         H4P_UPNPDetector(const string& friendly,const string& usn,H4BS_FN_SWITCH f): H4PDetector(friendly,usn,f){}
 };
 
-using H4P_PD_MAP       =unordered_map<string,H4PDetector*>;
-
-class H4P_PresenceDetector: public H4Plugin{
-        H4P_PD_MAP          _register;
-    public:
-        H4P_PresenceDetector(H4P_PRESENCE_MAP pm): H4Plugin("ispy"){
-            for(auto const& p:pm){
-                H4PDetector* d;
-                switch(p.second.t){
-                    case H4P_DETECT_IP:
-                        d=new H4P_IPDetector(p.first,p.second.n,p.second.f);
-                        break;
-                    case H4P_DETECT_USN:
-                        d=new H4P_UPNPDetector(p.first,p.second.n,p.second.f);
-                        break;
-                }
-                _register[p.first]=d;
-            }
-            pm.clear();
-        }
-                bool        isPresent(const string& friendly){ 
-                    if(_register.count(friendly)) return _register[friendly]->_here;
-                    return false;
-                }
-                void show() override {
-                    reply("Present:");
-                    for(auto const& r:_register) if(r.second->_here) reply("%s (%s)",CSTR(r.first),CSTR(r.second->_id));
-                }
-};
-    extern __attribute__((weak)) H4P_PresenceDetector h4pd;
 #endif
 
 #endif // H4P_PresenceDetector_H

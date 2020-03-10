@@ -52,7 +52,7 @@ class H4P_BinaryThing: public H4Plugin{
 
         virtual void        _setState(bool b) { _state=b; }
 
-                uint32_t    _showState(vector<string> vs){ reply("State: %s\n",_getState() ? "ON":"OFF"); return H4_CMD_OK; }
+//                uint32_t    _showState(vector<string> vs){  }
                 uint32_t    _switch(vector<string> vs){ return guardInt1(vs,bind(&H4P_BinaryThing::turn,this,_1)); }
                 void        _start() override { 
                     H4Plugin::_start();
@@ -63,12 +63,12 @@ class H4P_BinaryThing: public H4Plugin{
             _cmds={
                 {"on",     {H4PC_ROOT, 0, CMD(turnOn)}},
                 {"off",    {H4PC_ROOT, 0, CMD(turnOff)}},
-                {"state",  {H4PC_ROOT, 0, CMDVS(_showState)}},
+                {"state",  {H4PC_ROOT, 0, CMD(show)}},
                 {"switch", {H4PC_ROOT, 0, CMDVS(_switch)}},
                 {"toggle", {H4PC_ROOT, 0, CMD(toggle)}}
             };
         }
-        virtual  void show() override { _showState({}); }
+        virtual  void show() override { reply("State: %s",_getState() ? "ON":"OFF"); }
         bool state() { return _getState(); }
         void turnOff(){ turn(false); }
         void turnOn(){ turn(true); }

@@ -79,7 +79,7 @@ uint32_t H4Plugin::guardString2(vector<string> vs,function<void(string,string)> 
     });
 }
 
-#define H4P_REPLY_BUFFER    128
+#define H4P_REPLY_BUFFER    512
 
 void H4Plugin::reply(const char* fmt,...){ // find pub sub size
     char buff[H4P_REPLY_BUFFER+1];

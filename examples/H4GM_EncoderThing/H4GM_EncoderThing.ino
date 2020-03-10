@@ -60,5 +60,5 @@ H4P_BinarySwitch h4onof(LED_BUILTIN,UL_ACTIVE,OFF);
 
 void h4setup() { // H4 constructor starts Serial
     Serial.println("H4P_GPIOManager EncoderThing Example v"H4P_VERSION);
-    h4gm.EncoderThing(ENCODER_A,ENCODER_B,INPUT,UB_ACTIVE,&h4onof); // tie rotations to BinarySwitch
+    h4gm.EncoderThing(ENCODER_A,ENCODER_B,INPUT,UB_ACTIVE); // tie rotations to BinarySwitch
 }

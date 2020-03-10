@@ -29,7 +29,10 @@ SOFTWARE.
 #include<H4P_UPNPServer.h>
 #ifndef H4P_NO_WIFI
 
-void H4P_UPNPServer::_hookIn(){ DEPEND(asws); }
+void H4P_UPNPServer::_hookIn(){
+    DEPEND(asws);
+    REQUIREBT;
+}
 
 void  H4P_UPNPServer::friendlyName(const string& name){ h4wifi.setPersistentValue(nameTag(),name,true); }
 

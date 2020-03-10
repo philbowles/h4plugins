@@ -1,4 +1,29 @@
 
+2020/02/19  0.5.0
+    breaking changes
+        dumpQ / trustednames fully decoupled from H4 - requires upgrade to H4/0.5.0
+        (dumpQ + many others now compile-outable)
+        H4P_AsyncMQTT replaces H4P_MQTT: pubsubclient removed, fixing 5-sec lockout delay on reconnect "feature"
+        UPNP Switch / Thing removed: replaced by free-standing UPNPServer
+        
+    new
+        Presence detection
+            IP
+            IPThing
+            USN
+            USNThing
+        Service management cmds: h4/svc/{start|stop|restart}/XXXX
+        h4/show/heap
+        H4P_CmdErrors
+            new getTaskType / getTaskName to blend with new decoupled dumpQ
+    changed
+        Huge code refactor / tidy / optimise (sonoff example now 445152) / Free Heap increased
+            ALL plugins now operate as services, new svc control commands common to all
+        much "show" type functionality moved into #ifdef H4P_LOG_EVENTS optional compilation blocks
+    deleted
+        many service start/restart/stop cmds, replaced by: Service management cmds
+        unload concept disappears: h4/svc/stop now unhooks what used to be unloadable
+        trustednames concept disappears, see new getTaskType / getTaskName
 2020/02/19  0.4.0
     fixed
         OTA on ESP32
@@ -69,20 +94,13 @@ TODO:
 SHORTTERM
     coalesce wifif scan 8266/32
     event on PS changed
+    all onof / thing to dynamic discover BT
 MEDIUMTERM
-    getnextseq in mysl logger?
-    dependfail on all dependencies // #defineable out?
-    "muser" tag
+    decent tabulated gpio pin dump
 LONGTERM 
-    merge h4plugin / service?
-    async mqtt?
     remote client get
     rf bridge
     signal on no spiffs
-    template for hooking?
-    proper condl diags
-    diag out all dumps in GPIO
     fix switch.ps1 to use soap etc (revert a la esparto)
-    take always ignore out of TS
     lots of const string&
 SOONER

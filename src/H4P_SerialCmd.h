@@ -86,8 +86,8 @@ class H4P_SerialCmd: public H4Plugin {
                 void            heap(){ reply("Heap=%u",ESP.getFreeHeap()); }        
                 void            plugins();
 
-        static  void            dumpQ();
-        static  void            _dumpTask(task*);
+                void            dumpQ();
+        static  string          _dumpTask(task*);
         VSCMD(_dump);   // public so logger can use it
         void                    showSPIFFS();
 #endif

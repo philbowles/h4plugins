@@ -60,11 +60,12 @@ class H4P_ThreeFunctionButton: public H4Plugin{
             H4_FN_VOID      _createMS;
 
             void            _hookIn() override;
-
+            void            _start() override;
+            void            _stop() override;
+            
             void progress(H4GPIOPin* ptr);
     public:
         H4P_ThreeFunctionButton(
-            H4P_BinaryThing* btp,  //
 //          the input button            
             uint8_t pin,
             uint8_t mode,

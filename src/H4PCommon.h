@@ -140,7 +140,7 @@ STAG(wifi);
 #ifdef H4P_LOG_EVENTS
     #define SYSEVENT(e,s,t,x,...) if(isLoaded(scmdTag())) { h4sc.logEventType(e,s,t,x, ##__VA_ARGS__); }
     #define H4EVENT(x,...) if(isLoaded(scmdTag())) { h4sc.logEventType(H4P_LOG_H4,_pName,h4Tag(),x, ##__VA_ARGS__); }
-    #define DEPENDFAIL(x) { Serial.print("FATAL: ");Serial.print(CSTR(_pName));Serial.print(" needs ");Serial.println(x##Tag()); }
+    #define DEPENDFAIL(x) { Serial.print("FATAL: ");Serial.print(CSTR(_pName));Serial.print(" needs ");Serial.println(x##Tag());return; }
     #define h4UserEvent(x,...) if(H4Plugin::isLoaded(scmdTag())) { h4sc.logEventType(H4P_LOG_USER,userTag(),h4Tag(),x, ##__VA_ARGS__); }
 #else
     #define SYSEVENT(e,x,...)
@@ -151,11 +151,12 @@ STAG(wifi);
 
 #define DEPEND(x) { H4Plugin* p=isLoaded(x##Tag()); \
             if(p) { p->hookConnect([this](){ start(); });p->hookDisconnect([this](){ stop(); }); }\
-            else { DEPENDFAIL(x);return;} }
+            else { DEPENDFAIL(x) } }
 #define REQUIRE(x) { H4Plugin* p=isLoaded(x##Tag()); \
-            if(!p) { DEPENDFAIL(x);return;} }
-//
-//      PLUGINS
+            if(!p) { DEPENDFAIL(x) } }
+#define REQUIREBT { H4Plugin* p=isLoaded(onofTag()); \
+            if(!p) { DEPENDFAIL(onof) } \
+            _btp=reinterpret_cast<H4P_BinaryThing*>(p); }
 //
 enum trustedIds {
   H4P_TRID_PATN = 50,
@@ -207,9 +208,6 @@ class H4Plugin {
                 bool                _discoDone=false;
                 bool                _up=false;
 
-                string              _pName;
-                uint32_t            _subCmd;
-
         vector<uint32_t>    expectInt(string pl,const char* delim=",");  
     
             uint32_t        guardInt1(vector<string> vs,function<void(uint32_t)> f);
@@ -226,15 +224,16 @@ class H4Plugin {
         virtual void        _restart(){ stop();start(); }
         virtual void        _start() { _upHooks(); }
         virtual void        _stop() { _downHooks(); }
-        virtual bool        _state() { return _up; }
-//
     public:
         static  vector<H4Plugin*>   _plugins;
         static  vector<H4_FN_VOID>  _factoryChain;
- //       
-                void        _startup();
-        virtual void        _hookIn(){}
+                string              _pName;
+                uint32_t            _subCmd;
+//       
         virtual void        _greenLight(){ start(); } // override if necessary!
+        virtual void        _hookIn(){}
+                void        _startup();
+        virtual bool        _state() { return _up; }
 //
         H4Plugin(const string& name,H4_FN_VOID svcUp=nullptr,H4_FN_VOID svcDown=nullptr): _pName(name){
             _subCmd=++_nxtSubCmd;
@@ -249,7 +248,7 @@ class H4Plugin {
         }
         
                 void        restart(){ _restart(); };
-        virtual void        show(){ reply("%s is %s",CSTR(_pName),state() ? "UP":"DOWN"); }
+        virtual void        show(){ /* reply("%s is %s",CSTR(_pName),state() ? "UP":"DOWN"); */ }
                 void        start();
                 bool        state(){ return _state(); }
                 void        stop();
@@ -259,7 +258,6 @@ class H4Plugin {
 //
                 string      getConfig(const string& c){ return _cb[c]; }
                 void        reply(const char* fmt,...); // hoist protected
-//                void        showPlugins();
 //      syscall only
         virtual void        _reply(string msg) { /* Serial.print(CSTR(_pName));Serial.print(": ");*/ Serial.println(CSTR(msg)); }
         static  void        _hookFactory(H4_FN_VOID f){ if(f) _factoryChain.push_back(f); } 

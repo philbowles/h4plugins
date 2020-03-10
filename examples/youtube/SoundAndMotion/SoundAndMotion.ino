@@ -22,7 +22,7 @@ H4P_FlasherController h4fc;
 H4P_ThreeFunctionButton h43fb(&h4onof,15,BUTTON_BUILTIN,INPUT,ACTIVE_LOW,LED_BUILTIN,ACTIVE_LOW);
 
 void h4setup(){
-    h4gm.RetriggeringThing(MOTION,INPUT,ACTIVE_HIGH,10000,&h4onof); // 10sec motion timeout
+    h4gm.RetriggeringThing(MOTION,INPUT,ACTIVE_HIGH,10000); // 10sec motion timeout
     h4gm.Polled(LIGHT,INPUT,ACTIVE_HIGH,F_POLL,true,[](H4GPIOPin* ptr){
         H4GM_PIN(Polled);
         Serial.printf("POLLED = %d\n",pin->state);

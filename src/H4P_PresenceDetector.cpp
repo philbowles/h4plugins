@@ -35,6 +35,7 @@ SOFTWARE.
 extern "C" {
   #include <ping.h>
 }
+//H4P_PD_MAP          H4PDetector::_register;
 
 bool                H4P_IPDetector::_inflight=false;
 struct ping_option  H4P_IPDetector::pop;
@@ -44,15 +45,13 @@ struct ping_option  H4P_IPDetector::pop;
 #define H4P_PJ_LO (H4P_IPPD_RATE - (H4_JITTER_LO * H4P_PJ_SPREAD))
 #define H4P_PJ_HI (H4P_IPPD_RATE + (H4_JITTER_HI * H4P_PJ_SPREAD))
 
-//
-//      H4P_UPNPDetector
-//
 void H4P_IPDetector::_hookIn() { DEPEND(wifi); }
 
 void H4P_IPDetector::_start(){
     _pinger=h4.everyRandom(H4P_PJ_LO,H4P_PJ_HI,[this](){
         if(!_inflight){
             _inflight=true;
+            //Serial.printf("PING inflight %s\n",CSTR(_id));
             memset(&pop,'\0',sizeof(ping_option));
             pop.count = 1;    //  try to ping how many times
             pop.coarse_time = 1;  // ping interval
@@ -61,21 +60,20 @@ void H4P_IPDetector::_start(){
             ping_regist_recv(&pop,reinterpret_cast<ping_recv_function>(&H4P_IPDetector::_ping_recv_cb));
             ping_regist_sent(&pop,NULL);
             ping_start(&pop);
-        } 
+        } //else Serial.printf("inflight %s deferred\n",CSTR(_id));
     },nullptr,H4P_TRID_IPPD);
     _upHooks();
-}
+} 
 
 void H4P_IPDetector::_ping_recv_cb(void *arg, void *pdata){
     H4P_IPDetector* p=reinterpret_cast<H4P_IPDetector*>(reinterpret_cast<struct ping_option*>(arg)->reverse);
     uint32_t v=1+(reinterpret_cast<struct ping_resp*>(pdata)->ping_err);
     h4.queueFunction(bind([](H4P_IPDetector* p,uint32_t v){ 
+        //Serial.printf("END PING %s %d\n",CSTR(p->_id),v);
         p->_inout(v);
         _inflight=false;
     },p,v));
 }
-//
-//      H4P_UPNPDetector
 //
 void H4P_UPNPDetector::_hookIn() { 
     REQUIRE(onof);

@@ -34,7 +34,6 @@ SOFTWARE.
 #ifndef H4P_NO_WIFI
 
 #include<H4PCommon.h>
-//#include<H4P_SerialCmd.h>
 #include<H4P_AsyncWebServer.h>
 #include<H4P_BinaryThing.h>
 
@@ -69,14 +68,15 @@ class H4P_UPNPServer: public H4Plugin {
             void            broadcast(uint32_t mx,const string s){ __upnpSend(mx,s,_ubIP,1900); }
 
             void            _listenUDP();
-            void            _notify(const string& s);            void            _upnp(AsyncWebServerRequest *request);
+            void            _notify(const string& s);
+            void            _upnp(AsyncWebServerRequest *request);
 
             void            _hookIn() override;
             void            _start() override;
             void            _stop() override;
             void            _greenLight() override {}; // dont autostart!
     public:                
-        H4P_UPNPServer(H4P_BinaryThing* btp,const string& name="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): _btp(btp),_name(name),H4Plugin(upnpTag(),onC,onD){
+        H4P_UPNPServer(const string& name="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): _name(name),H4Plugin(upnpTag(),onC,onD){
             _pups.push_back(_urn+"device:controllee:1");
             _pups.push_back(_urn+"service:basicevent:1");
             _ubIP=IPAddress(239,255,255,250);

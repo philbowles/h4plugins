@@ -41,10 +41,10 @@ Next, add the sensors and tie them all to the `BinarySwitch` `h4onof`
 H4P_GPIOManager h4gm;
 
 void h4setup(){
-    h4gm.LatchingThing(0,INPUT,ACTIVE_LOW,15,&h4onof); // 15ms debounce timeout
-    h4gm.RetriggeringThing(4,INPUT,ACTIVE_HIGH,10000,&h4onof); // 10sec motion timeout
-    h4gm.DebouncedThing(5,INPUT,ACTIVE_HIGH,15,&h4onof); // door alarm
-    h4gm.DebouncedThing(5,INPUT,ACTIVE_HIGH,15,&h4onof); // window alarm
+    h4gm.LatchingThing(0,INPUT,ACTIVE_LOW,15); // 15ms debounce timeout
+    h4gm.RetriggeringThing(4,INPUT,ACTIVE_HIGH,10000); // 10sec motion timeout
+    h4gm.DebouncedThing(5,INPUT,ACTIVE_HIGH,15); // door alarm
+    h4gm.DebouncedThing(5,INPUT,ACTIVE_HIGH,15); // window alarm
 }
 ```
 

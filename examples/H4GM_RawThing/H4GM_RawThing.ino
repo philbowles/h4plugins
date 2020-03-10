@@ -52,5 +52,5 @@ void h4setup() { // H4 constructor starts Serial
     Serial.println("H4P_GPIOManager Raw Example v"H4P_VERSION);
     Serial.print("GPIO ");Serial.print(USER_BTN);Serial.print(" ACTIVE ");Serial.println(UB_ACTIVE ? "HIGH":"LOW");
 
-    h4gm.RawThing(USER_BTN,INPUT,UB_ACTIVE,&h4onof);
+    h4gm.RawThing(USER_BTN,INPUT,UB_ACTIVE);
 }

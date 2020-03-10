@@ -66,7 +66,7 @@ void H4P_TaskSniffer::_taskDump(H4_TASK_PTR t,const char c){
     if(hitList.count((t->uid)%100)) {
         reply("%d:%u:%c: ",h4.size(),micros(),c);
 #ifdef H4P_LOG_EVENTS        
-        H4P_SerialCmd::_dumpTask(t);
+        reply(CSTR(H4P_SerialCmd::_dumpTask(t)));
 #endif
     }
 }
