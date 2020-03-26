@@ -75,16 +75,15 @@ class H4P_WiFi: public H4Plugin{
 
                 void     clear();
                 void     change(string ssid,string psk);
-                void     getPersistentValue(string v,string prefix);
-                void     host(string h){ setPersistentValue(deviceTag(),h,true); }
-                void     setPersistentValue(string n,string v,bool reboot);
+                void     host(string h){ _setPersistentValue(deviceTag(),h,true); }
                 void     show() override { 
                     WiFi.printDiag(Serial);
                     Serial.printf("Status: %d\n",WiFi.status());
                     H4Plugin::show();
                 }
-        static  string   replaceParams(const string& s);
-        static  string 	 replaceParamsFile(const string &f){ return replaceParams(CSTR(H4P_SerialCmd::read(f))); }
+//          syscall only        
+                void     _getPersistentValue(string v,string prefix);
+                void     _setPersistentValue(string n,string v,bool reboot);
 };
     extern __attribute__((weak)) H4P_WiFi h4wifi;
 

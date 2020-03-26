@@ -46,10 +46,6 @@ A task ID can be one of:
 
 Allows user to name his own tasks so that they are more easily identifiable in the task dump
 
-## Unloadable
-
-NO: but `h4/snif/exclude/0-99` will stop any display. There will still be a performance "hit".
-
 ---
 
 # API

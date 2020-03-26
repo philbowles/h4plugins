@@ -47,10 +47,6 @@ None, but must be included *before* [**H4P_SerialCmd**](h4sc.md)
 
 none
 
-### Unloadable
-
-NO
-
 ---
 
 ## API

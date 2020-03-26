@@ -39,10 +39,6 @@ none, but must be created after [**H4P_SerialCmd**](h4sc.md) if using that plugi
 void onQueueWarning(bool) // called after switch state changes
 ```
 
-## Unloadable
-
-YES:    No further low-queue warnings will be received.
-
 ---
 
 # API

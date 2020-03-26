@@ -55,7 +55,7 @@ void H4P_WiFi::_hookIn(){ WiFi.onEvent(_wifiEvent); }
 void H4P_WiFi::_greenLight() { 
     _cb[chipTag()]=_getChipID();
     _cb[boardTag()]=replaceAll(H4_BOARD,"ESP8266_","");
-    getPersistentValue(deviceTag(),"H4_");
+    _getPersistentValue(deviceTag(),"H4_");
     start();
 }
 
@@ -73,21 +73,21 @@ void H4P_WiFi::_startAP(){
     _upHooks();
 }
 
-void H4P_WiFi::getPersistentValue(string v,string prefix){
+void H4P_WiFi::_getPersistentValue(string v,string prefix){
     string persistent=H4P_SerialCmd::read("/"+v);
     string cat=_cb[v]+persistent;
     if(persistent.size()) if(H4P_PREFER_PERSISTENT) _cb[v]=persistent;  
     if(!cat.size()) _cb[v]=string(prefix)+_cb[chipTag()];
 }
 
-void H4P_WiFi::setPersistentValue(string n,string v,bool reboot){
+void H4P_WiFi::_setPersistentValue(string n,string v,bool reboot){
     string oldvalue=_cb[n];
     if(oldvalue!=v){
         H4P_SerialCmd::write("/"+n,v);
         if(reboot) h4reboot();
     }
 }
-
+/*
 string H4P_WiFi::replaceParams(const string& s){ // oh for a working regex...
 	int i=0;
 	int j=0;
@@ -105,7 +105,7 @@ string H4P_WiFi::replaceParams(const string& s){ // oh for a working regex...
 	}
 	return rv.c_str();	
 }
-
+*/
 uint32_t H4P_WiFi::_host(vector<string> vs){
     return guard1(vs,[this](vector<string> vs){
         return ([this](string h){

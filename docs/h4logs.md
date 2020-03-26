@@ -103,10 +103,6 @@ none
 
 none
 
-## Unloadable
-
-NO
-
 ---
 
 ## API
@@ -140,10 +136,6 @@ Board must be compiled with an option to reserve an amount of SPIFFS
 * h4/show/log
 * h4/log/clear
 * h4/log/flush
-
-## Unloadable
-
-NO
 
 ---
 
@@ -215,9 +207,7 @@ H4P_AsyncMQTT
 
 none
 
-## Unloadable
-
-NO, but can use stop and start cmds
+---
 
 ## API
 
@@ -251,9 +241,7 @@ H4P_AsyncMQTT
 
 none
 
-## Unloadable
-
-NO, but can use stop and start cmds
+---
 
 # API
 
@@ -287,9 +275,7 @@ H4P_AsyncMQTT
 
 none
 
-## Unloadable
-
-NO, but can use stop and start cmds
+---
 
 # API
 

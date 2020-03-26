@@ -61,16 +61,6 @@ void onConnect(void);
 void onDisconnect(void);
 ```
 
-### Trusted Name
-
-*WIFI*
-
-### Unloadable
-
-No, but can be stopped with `h4/wifi/stop` command.
-
----
-
 ## API
 
 ```cpp

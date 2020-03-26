@@ -70,10 +70,6 @@ void onDisconnect(void);
 uint32_t onMessage(vector<string>); // where "onMessage" is a user-defined topic handling function
 ```
 
-## Unloadable
-
-No, but can be stopped with `h4/mqtt/stop` command.
-
 ---
 
 # Message handling

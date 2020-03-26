@@ -38,10 +38,6 @@ none, but must be created *after* [**H4P_SerialCmd**](h4sc.md) if using that plu
 
 none *TODO* add dynamic command-line control
 
-## Unloadable
-
-NO:
-
 ---
 
 # A word about active-HIGH and active-LOW

@@ -61,10 +61,6 @@ y2 is the "to" y
 void onChange(uint32_t sweptValue); // called when swept value changes
 ```
 
-## Unloadable
-
-NO
-
 ---
 
 # API

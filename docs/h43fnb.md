@@ -52,10 +52,6 @@ Requires a GPIO pin to be connected to an LED (default is LED_BUILTIN) and a "ta
 
 none
 
-# Unloadable
-
-NO
-
 ---
 
 # API

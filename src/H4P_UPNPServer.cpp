@@ -34,11 +34,11 @@ void H4P_UPNPServer::_hookIn(){
     REQUIREBT;
 }
 
-void  H4P_UPNPServer::friendlyName(const string& name){ h4wifi.setPersistentValue(nameTag(),name,true); }
+void  H4P_UPNPServer::friendlyName(const string& name){ h4wifi._setPersistentValue(nameTag(),name,true); }
 
 uint32_t H4P_UPNPServer::_friendly(vector<string> vs){
     return guard1(vs,[this](vector<string> vs){
-        h4wifi.setPersistentValue(nameTag(),H4PAYLOAD,true);
+        h4wifi._setPersistentValue(nameTag(),H4PAYLOAD,true);
         return H4_CMD_OK;
     });
 }
@@ -92,16 +92,14 @@ string H4P_UPNPServer::__makeUSN(const string& s){
 
 string H4P_UPNPServer::__upnpCommon(const string& usn){
 	_cb["usn"]=__makeUSN(usn);
-	string rv=H4P_WiFi::replaceParams(_ucom);
+	string rv=replaceParams(_ucom);
 	return rv+"\r\n\r\n";
 }
 
 void H4P_UPNPServer::_start(){
-//    _cb[nameTag()]=_name;
-//    h4wifi.getPersistentValue(nameTag(),"upnp ");
     if(!(WiFi.getMode() & WIFI_AP)){
         _cb[nameTag()]=_name;
-        h4wifi.getPersistentValue(nameTag(),"upnp ");
+        h4wifi._getPersistentValue(nameTag(),"upnp ");
         _cb["age"]=stringFromInt(H4P_UDP_REFRESH/1000); // fix
 
         _cb["udn"]="Socket-1_0-upnp"+_cb[chipTag()];
@@ -110,8 +108,8 @@ void H4P_UPNPServer::_start(){
         _cb["usvc"]=_pups[3];
         _cb["usid"]=_urn+"serviceId:basicevent1";
 
-        _xml=H4P_WiFi::replaceParamsFile("/up.xml");
-        _ucom=H4P_WiFi::replaceParamsFile("/ucom.txt");
+        _xml=replaceParamsFile("/up.xml");
+        _ucom=replaceParamsFile("/ucom.txt");
         _soap=H4P_SerialCmd::read("/soap.xml");
 // erase redundant _cb?
         _cb.erase("age");
@@ -147,7 +145,7 @@ void H4P_UPNPServer::_upnp(AsyncWebServerRequest *request){ // redo
         if(_cb["gs"]=="Set") _btp->turn(_set);
 #endif
         _cb[stateTag()]=stringFromInt(_btp->_getState());
-        request->send(200, "text/xml", CSTR(H4P_WiFi::replaceParams(_soap))); // refac
+        request->send(200, "text/xml", CSTR(replaceParams(_soap))); // refac
     },request),nullptr, H4P_TRID_SOAP);
 }
 
@@ -165,4 +163,22 @@ void H4P_UPNPServer::_notify(const string& phase){ // chunker it up
         broadcast(H4P_UDP_JITTER,CSTR(nfy));
     });
 }
+string H4P_UPNPServer::replaceParams(const string& s){ // oh for a working regex...
+	int i=0;
+	int j=0;
+	string rv(s);
+	while((i=rv.find("%",i))!=string::npos){
+        if(j){
+            string var=rv.substr(j+1,i-j-1);
+            if(_cb.count(var)) {
+                rv.replace(j,i-j+1,_cb[var]); // FIX!!
+                rv.shrink_to_fit();
+            }
+            j=0;
+        } else j=i;    
+        ++i;
+	}
+	return rv.c_str();	
+}
+
 #endif

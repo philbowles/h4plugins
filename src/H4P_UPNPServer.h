@@ -61,20 +61,23 @@ class H4P_UPNPServer: public H4Plugin {
             string          _ucom;
             string          _xml;
 
-            string          __makeUSN(const string& s);
-            string          __upnpCommon(const string& usn);
-            void            __upnpSend(uint32_t mx,const string s,IPAddress ip,uint16_t port);
+                string          __makeUSN(const string& s);
+                string          __upnpCommon(const string& usn);
+                void            __upnpSend(uint32_t mx,const string s,IPAddress ip,uint16_t port);
 
-            void            broadcast(uint32_t mx,const string s){ __upnpSend(mx,s,_ubIP,1900); }
+                void            broadcast(uint32_t mx,const string s){ __upnpSend(mx,s,_ubIP,1900); }
 
-            void            _listenUDP();
-            void            _notify(const string& s);
-            void            _upnp(AsyncWebServerRequest *request);
+                void            _listenUDP();
+                void            _notify(const string& s);
+                void            _upnp(AsyncWebServerRequest *request);
 
-            void            _hookIn() override;
-            void            _start() override;
-            void            _stop() override;
-            void            _greenLight() override {}; // dont autostart!
+                void            _hookIn() override;
+                void            _start() override;
+                void            _stop() override;
+                void            _greenLight() override {}; // dont autostart!
+
+        static  string          replaceParams(const string& s);
+        static  string 	        replaceParamsFile(const string &f){ return replaceParams(CSTR(H4P_SerialCmd::read(f))); }
     public:                
         H4P_UPNPServer(const string& name="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): _name(name),H4Plugin(upnpTag(),onC,onD){
             _pups.push_back(_urn+"device:controllee:1");
@@ -88,7 +91,8 @@ class H4P_UPNPServer: public H4Plugin {
         }
 
              void           friendlyName(const string& name);
-             void           listenUSN(const string& usn,H4P_FN_USN f){ _detect[usn]=f; }
+//          _syscall only
+             void           _listenUSN(const string& usn,H4P_FN_USN f){ _detect[usn]=f; }
 };
     extern __attribute__((weak)) H4P_UPNPServer h4upnp;
 #endif

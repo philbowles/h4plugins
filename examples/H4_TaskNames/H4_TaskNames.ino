@@ -1,4 +1,6 @@
-#include <H4.h>
+#include<H4Plugins.h>
+H4_USE_PLUGINS
+
 H4 h4(115200); // setes Serial to 115200, default to 20 tasks
 /*
 
@@ -19,11 +21,12 @@ const char* giveTaskName(uint32_t n){
   return mydata.count(n) ? mydata[n].c_str():"ANON";
 }
 // if you don't want task naming, just delete the above
+H4P_SerialCmd h4sc;
 
 void h4setup() {
     h4.everyRandom(5000,10000,[](){ 
     Serial.print(millis());Serial.println(" RUDE INTERRUPTION");
-    h4.dumpQ();
+    h4sc.dumpQ();
   },nullptr,4);
 
   h4.every(1000,[]{ Serial.print(millis());Serial.println(" PING "); },nullptr,1);  

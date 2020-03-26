@@ -9,7 +9,7 @@
 *All plugins depend upon the presence of the [H4 library](https://github.com/philbowles/H4), which must be installed first.*
 
 ---
-Version **0.4.0** [Release Notes](changelog.txt) **MUST UPGRADE TO [H4 library](https://github.com/philbowles/H4) v0.4.1 first!**
+Version **0.5.0** [Release Notes](changelog.txt) **MUST UPGRADE TO [H4 library](https://github.com/philbowles/H4) v0.5.0 first!**
 
 ## **NEW in 0.4.0: Remote MySQL logging with example nodejs / express  webserver & MySQL Schema** [documentation](docs/mysql.md)
 
@@ -18,7 +18,7 @@ Version **0.4.0** [Release Notes](changelog.txt) **MUST UPGRADE TO [H4 library](
 
 Think of this as "IOT Lego" or an "IOT Swiss Army Knife" (or both) for [**H4**](https://github.com/philbowles/H4) - and if you are not already using H4's advanced scheduling and timing features, why not? Get it now from the link above, as you will need it to use the H4Plugins system.
 
-H4Plugins includes modules for WiFi + OTA, Webserver, MQTT, 15 different types of GPIO handling, voice control, ligging to remote MySQL server and extensive diagnostics. By "plugging " together only the required modules, you can rapidly build your own custom firmware or IOT app. Everything you build will be stable and responsive: the plugins work together to allow multiple simultaneous processes to run, so ***no more WDT resets***! As your experience grows you can extend your app / firmware with H4Plugins' well-documented API and runtime command system. Let's see H4Plugins being used as replacement firmware for a SONOFF Basic switch.
+H4Plugins includes modules for WiFi + OTA, Webserver, MQTT, 16 different types of GPIO handling, voice control, logging to remote MySQL server and extensive diagnostics. By "plugging " together only the required modules, you can rapidly build your own custom firmware or IOT app. Everything you build will be stable and responsive: the plugins work together to allow multiple simultaneous processes to run, so ***no more WDT resets***! As your experience grows you can extend your app / firmware with H4Plugins' well-documented API and runtime command system. Let's see H4Plugins being used as replacement firmware for a SONOFF Basic switch.
 
 What follows is the *entire H4Plugins code* - despite the fact it might look like there is something missing, there is not. The code as shown compiles to produce firmware that can be uploaded directly to any / all of your SONOFF devices and provides:
 
@@ -36,16 +36,16 @@ What follows is the *entire H4Plugins code* - despite the fact it might look lik
 ```cpp
 #include<H4Plugins.h>
 H4_USE_PLUGINS
-
 H4 h4(115200);
 H4P_SerialCmd h4sc;
 H4P_GPIOManager h4gm;
 H4P_FlasherController h4fc;
-H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","h4plugins");
-H4P_AsyncMQTT h4mqtt("192.168.1.4",1883);
+H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","h104");
 H4P_AsyncWebServer h4asws("admin","admin");
-H4P_UPNPSwitch h4upnp("Demo Switch",RELAY_BUILTIN,ACTIVE_HIGH,OFF);
-H4P_ThreeFunctionButton h43fb(&h4upnp,15,BUTTON_BUILTIN,INPUT,ACTIVE_LOW,LED_BUILTIN,ACTIVE_LOW);
+H4P_AsyncMQTT h4mqtt("192.168.1.4",1883);
+H4P_BinarySwitch h4onof(RELAY_BUILTIN,ACTIVE_HIGH,OFF);
+H4P_UPNPServer h4upnp("Demo Switch");
+H4P_ThreeFunctionButton h43fb(BUTTON_BUILTIN,INPUT,ACTIVE_LOW,15,LED_BUILTIN,ACTIVE_LOW);
 ```
 
 As you can see, all you need to do is list the modules you want (in the right order) and provide a few necessary values such as ssid / passwords etc and the plugins link up with each other, exchange messages betwen themselves and "stitch" everything together into a seamless piece of stable firmware. If you know of anything easier for both beginners and seasoned developers, please let us know.
@@ -92,8 +92,7 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 
 ---
 
-# Current Plugins (as of v0.3.4 - Feb 2020)
-
+# Plugins
 ## Core IOT functionality
 
 * [**H4P_SerialCmd**](docs/h4sc.md): Send commands from multiple sources to H4 and/or plugins to control and/or diagnose
@@ -103,11 +102,14 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 * [**H4P_AsyncWebServer**](docs/h4asws.md): Fully Asynchronous Webserver
 * [**H4P_AsyncMQTT**](docs/h4mqtt.md): Automatic Connection/ reconnection MQTT client alows remote control of H4
 * [**H4P_BinarySwitch**](docs/things.md): GPIO object that allows control by commands from multiple sources
-* [**H4P_BinaryThing**](docs/xxx.md): functional object that allows control by commands from multiple sources  **NEW in v0.3.4**
-* [**H4P_UPNPSwitch**](docs/things.md): Extends [H4P_BinarySwitch](docs/things.md) into full UPNP device with Alexa voice control
-* [**H4P_UPNPThing**](docs/things.md): Extends [H4P_BinaryThing](docs/things.md) into full UPNP device with Alexa voice control  **NEW in v0.3.4**
+* [**H4P_BinaryThing**](docs/xxx.md): functional object that allows control by commands from multiple sources
+* [**H4P_UPNPServer**](docs/things.md): Extends [H4P_BinaryThing](docs/things.md) into full UPNP device with Alexa voice control, Windows10 Desktop integration
 * [**H4P_ThreeFunctionButton**](docs/h43fnb.md): Multi-function physical control on/off,reboot,factory reset depending on hold time. Binds to xSwitch or xThing
-* [**H4P_PersistentStorage**](docs/h4stor.md): Save name/value pairs across reboots (requires SPIFFS)  **NEW in v0.3.5**
+* [**H4P_PersistentStorage**](docs/h4stor.md): Save name/value pairs across reboots (requires SPIFFS)
+* [**H4P_IPDetector**](docs/pres.md): Execute function when specific IP address joins / leaves network
+* [**H4P_IPDetectorThing**](docs/pres.md): Switch default "Thing" when specific IP address joins / leaves network
+* [**H4P_UPNPDetector**](docs/pres.md): Execute function when specific UPNP device USN joins / leaves network
+* [**H4P_UPNPDetectorThing**](docs/pres.md): Switch default "Thing" when specific UPNP device USN joins / leaves network
 
 ## Diagnostic / Development tools:
 
@@ -116,10 +118,10 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 * [**H4P_TaskSniffer**](docs/h4ts.md): Low-level task / queue dumper for H4 + Plugins
 * [**H4P_SerialLogger**](docs/h4logs.md): Event logging to serial monitor
 * [**H4P_LocalLogger**](docs/h4logs.md): Event logging to SPIFFS file
-* [**H4P_MQTTLogger**](docs/h4logs.md): Event logging to MQTT Server **NEW in v0.3.4**
-* [**H4P_MQTTHeapLogger**](docs/h4logs.md): Specialised H4P_MQTTLogger which periodically logs value of FreeHEap **NEW in v0.3.4**
-* [**H4P_MQTTQueueLogger**](docs/h4logs.md): Specialised H4P_MQTTLogger which periodically logs size of Queue **NEW in v0.4.0**
-* [**H4P_HttpMySQLLogger**](docs/mysql.md): log to remote webserver to update MySQL log db (server example provided) **NEW in v0.4.0**
+* [**H4P_MQTTLogger**](docs/h4logs.md): Event logging to MQTT Serve
+* [**H4P_MQTTHeapLogger**](docs/h4logs.md): Specialised H4P_MQTTLogger which periodically logs value of free heap
+* [**H4P_MQTTQueueLogger**](docs/h4logs.md): Specialised H4P_MQTTLogger which periodically logs size of Queue
+* [**H4P_HttpMySQLLogger**](docs/mysql.md): log to remote webserver to update MySQL log db (server example provided)
   
 ## Specialist Device Drivers
 
@@ -157,14 +159,15 @@ First you need to install the  [**H4**](https://github.com/philbowles/H4) librar
 
 Next install the 3rd-party libraries:
 
-* [Arduino pubsubclient library](https://github.com/knolleary/pubsubclient)
-If targetting ESP8266:
+* [Async MQTT client library](https://github.com/marvinroger/async-mqtt-client)
+  
+If targeting ESP8266:
 * [ESP8266 ESPAsyncUDP Library](https://github.com/me-no-dev/ESPAsyncUDP)
 * [ESP8266 ESPAsyncTCP Library](https://github.com/me-no-dev/ESPAsyncTCP)
-If targetting ESP32:
+If targeting ESP32:
 * [ESP32 AsyncTCP Library](https://github.com/me-no-dev/AsyncTCP)
 
-The above libraries coexist quite happily if you download all of them to enbale targetting both ESP8266 and ESP32.
+The above libraries coexist quite happily if you download all of them to enable targetting both ESP8266 and ESP32.
 
 And:
 
@@ -174,12 +177,6 @@ And:
 (* The standard ESPAyncWebServer library has a long-standing bug in its basic web authentication. I have raised the issue at least twice, but the last time I looked they sill hadn't fixed it, so until then you need to use the patched version from the link above.)
 
 If using WiFi, you will need to install either the [ESP8266 sketch data uploader](https://github.com/esp8266/arduino-esp8266fs-plugin) or the [ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin) (or both) depending on which platform you compile for. 
-
-## Note for PlatformIO users
-
-Unfortunately PlatformIO has (had?) several issues that prevent *some* valid Arduino libraries from being installed correctly. I am happy to provide support for H4Plugins code if you manage to get an installation working, providing that none of the files are changed in any way. Sadly, until PlatformIO get the issues fixed, I am unable to provide any support for the installation / build process.
-
-I would be very interested in hearing from anyone who can get it going on PIO - I'd love to remove this message! See contact details below.
 
 # Tools / Build Guidelines
 

@@ -73,7 +73,6 @@ class H4P_AsyncMQTT: public H4Plugin, public AsyncMqttClient{
                 void        change(const string& broker,uint16_t port);
                 void        publishDevice(const string& topic,const string& payload="");
                 void        publishDevice(const string& topic,uint32_t payload){ publishDevice(topic,stringFromInt(payload)); }
-//                void        showGrid(){ for(auto const& g:_grid) reply("%s\n",CSTR(g)); }
                 void        subscribeDevice(string topic,H4_FN_MSG f);
                 void        unsubscribeDevice(string topic);
 

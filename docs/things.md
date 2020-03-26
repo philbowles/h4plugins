@@ -154,10 +154,6 @@ H4P_BinarySwitch h4onof;
 
 If [H4P_AsyncMQTT](h4mqtt.md) is also used, this plugin publishes `h4/< your device name >/state` with a payload set to the current state whenever the state changes
 
-## Unloadable
-
-No
-
 ---
 
 # API

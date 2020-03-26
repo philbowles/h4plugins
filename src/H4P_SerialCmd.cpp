@@ -30,7 +30,6 @@ SOFTWARE.
 #include<H4P_CmdErrors.h>
 
 H4P_SerialCmd::H4P_SerialCmd(): H4Plugin(scmdTag()){
-//    _hook=[this](){ _run(); };
     _cmds={
         {h4Tag(),      { 0, H4PC_ROOT, nullptr}},
         {"help",       { 0, 0, CMD(help) }},
@@ -47,7 +46,7 @@ H4P_SerialCmd::H4P_SerialCmd(): H4Plugin(scmdTag()){
         {"config",     { H4PC_SHOW, 0, CMD(config) }},
         {"q",          { H4PC_SHOW, 0, CMD(dumpQ) }},
         {"plugins",    { H4PC_SHOW, 0, CMD(plugins) }},
-
+//        {"test",       { 0, 0, CMDVS(_test) }},
 #ifndef ARDUINO_ARCH_STM32
         {"heap",       { H4PC_SHOW, 0, CMD(heap) }},
         {"spif",       { H4PC_SHOW, 0, CMD(showSPIFFS)}},
@@ -65,19 +64,24 @@ void H4P_SerialCmd::_hookIn(){
 #endif
 }
 
-void H4P_SerialCmd::_run(){ // halting loop optimise
+//uint32_t runRate=500;
+
+void H4P_SerialCmd::_run(){
     static string cmd="";
 	static int	c;
-
-    if((c=Serial.read()) != -1){
-        if (c == '\n') {
-            h4.queueFunction(bind([this](string cmd){
-                uint32_t err=_simulatePayload(cmd);
-                if(err) reply("%s\n",CSTR(_errorString(err)));
-            },cmd),nullptr,H4P_TRID_SCMD);
-            cmd="";
-        } else cmd+=c;		
-    }	
+//    static int rate=runRate;
+//    if(--rate < 0){
+        if((c=Serial.read()) != -1){
+            if (c == '\n') {
+                h4.queueFunction(bind([this](string cmd){
+                    uint32_t err=_simulatePayload(cmd);
+                    if(err) reply("%s\n",CSTR(_errorString(err)));
+                },cmd),nullptr,H4P_TRID_SCMD);
+                cmd="";
+            } else cmd+=c;
+        }
+//        rate=runRate;
+//    }
 }
 //
 H4_CMD_MAP_I H4P_SerialCmd::__exactMatch(const string& cmd,uint32_t owner){
@@ -276,6 +280,7 @@ void  H4P_SerialCmd::plugins(){
     }
 }
 
+//uint32_t H4P_SerialCmd::_test(vector<string> vs){ return guardInt1(vs,[](int i){ runRate=i; });
 
 #ifndef ARDUINO_ARCH_STM32
 uint32_t H4P_SerialCmd::_dump(vector<string> vs){

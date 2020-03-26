@@ -34,14 +34,9 @@ void __attribute__((weak)) onFactoryReset(){}
 
 vector<H4_FN_VOID>  H4Plugin::_factoryChain;
 
-//bool h4bootfail=false;
-
 void h4StartPlugins(){
-//    Serial.printf(" p->_startup()\n");
     for(auto const& p:H4Plugin::_plugins) p->_startup();
-//    Serial.printf(" p->_hookIn()\n");
     for(auto const& p:H4Plugin::_plugins) p->_hookIn();
-//    Serial.printf(" p->_greenLight()\n");
     for(auto const& p:H4Plugin::_plugins) p->_greenLight();
     reverse(H4Plugin::_factoryChain.begin(),H4Plugin::_factoryChain.end());
     H4Plugin::_hookFactory(onFactoryReset);

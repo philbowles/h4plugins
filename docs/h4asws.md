@@ -50,10 +50,6 @@ void onDisconnect(void); // webserver is down
 void h4AddAwsHandlers(void) // called after adding its own handlers, adds your in here
 ```
 
-## Unloadable
-
-No, but can be stopped with `h4/asws/stop` command.
-
 ---
 
 # API

@@ -79,10 +79,6 @@ void onFail(int error); // called when connection fails. error code is one of:
 #define HTTPCODE_TIMEOUT             (-11)
 ```
 
-## Unloadable
-
-NO
-
 ---
 
 ## API

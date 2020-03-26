@@ -93,7 +93,7 @@ void H4P_AsyncWebServer::_start(){
 	    }
         h4wifi.change(rp[ssidTag()],rp[pskTag()]);
         if(isLoaded(upnpTag())){
-            h4wifi.setPersistentValue(nameTag(),rp[nameTag()],false);
+            h4wifi._setPersistentValue(nameTag(),rp[nameTag()],false);
         }
         h4wifi.host(rp[deviceTag()]);
     });

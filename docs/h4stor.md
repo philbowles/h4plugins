@@ -42,10 +42,6 @@ Board must be compiled with an amount of SPIFSS space
 void onChange(string name,string value) // called after stored item changes
 ```
 
-## Unloadable
-
-NO:
-
 ---
 
 # API

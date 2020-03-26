@@ -38,10 +38,6 @@ none
 
 h4/show/pins
 
-## Unloadable
-
-YES: No GPIO activity is futher handled. This cannot be undone.
-
 ---
 
 ## Introduction

@@ -57,6 +57,7 @@ class H4P_SerialCmd: public H4Plugin {
         VSCMD(_svcState);
         VSCMD(_svcStart);
         VSCMD(_svcStop);
+        VSCMD(_test);
 
         H4_CMD_MAP_I    __exactMatch(const string& cmd,uint32_t owner);
         void            __flatten(function<void(string)> fn);
