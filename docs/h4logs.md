@@ -24,28 +24,29 @@ Writing your own logger is seriously easy (see below)
 
 The important thing to note is that each logger is called in turn, thus you can log to several destinations at a time for a single message. The serial logger is a useful diagnostic aid, as it shows what is getting logged to other - less visible - destinations, e.g. remote servers.
 
-Also note that the main interface `h4sc.logEvent("some message",...)` (which operates like `printf` with variable number of parameters) will simply do nothing if no loggers are installed. This allows it to be left in the code and "switched on or off" by commenting out the loggers, which can be flipped back in at a stroke for testing.
+Also note that the main interface `h4sc.logEventType(H4P_LOG_TYPE,const string& src,const string& tgt,const string& fmt,...)` (which operates like `printf` with variable number of parameters) will simply do nothing if no loggers are installed. This allows it to be left in the code and "switched on or off" by commenting out the loggers, which can be flipped back in at a stroke for testing.
 
-Better still. there is a macro EVENT("some message",...) which simply calls `h4sc.logEvent` but can be "compiled out" by removing the `#define H4P_LOG_EVENTS` entry in `H4PConfig.h`, then there is zero overhead.
+Better still. there is a macro `h4UserEvent("printf-style %s",...)` which simply calls `h4sc.logEventType` "under the hood" but can be "compiled out" by removing the `#define H4P_LOG_EVENTS` entry in `H4PConfig.h`, which reduces the size of the binary. Unless you have good reason (which will be rare) then you should always use `h4UserEvent`.
 
 Finally, most loggers have  `filter` parameter which allows the logger to operate on only certain event types:
 
 ```cpp
 enum H4P_LOG_TYPE {
-    H4P_LOG_H4=1, // reserved for H4 plugins own use
-    H4P_LOG_SVC_UP=2,// internal H4 event on service UP
-    H4P_LOG_SVC_DOWN=4,// internal H4 event on service DOWN
-    H4P_LOG_CMD=8,// command from any source (see below)
-    H4P_LOG_USER=16,// arbitrary message from user code
-//    H4P_LOG_DEPENDFAIL=32,// dependent plugin omitted by user
-    H4P_LOG_MQTT_HEAP=64, // value of current heap
-    H4P_LOG_MQTT_Q=128, // size of queue
+    H4P_LOG_H4=1,
+    H4P_LOG_SVC_UP=2,
+    H4P_LOG_SVC_DOWN=4,
+    H4P_LOG_CMD=8,
+    H4P_LOG_USER=16,
+    H4P_LOG_MQTT_HEAP=64,
+    H4P_LOG_MQTT_Q=128,
+    H4P_LOG_PD_ENTER=256,
+    H4P_LOG_PD_LEAVE=512,
     H4P_LOG_ALL=0xffffffff,
     H4P_LOG_ERROR=H4P_LOG_ALL
 };
 ```
 
-The values are chosen such that logical operations can be use , e.g. `H4P_LOG_SVC_UP | H4P_LOG_SVC_DOWN` will react only to those two service events. The default filter is `H4P_LOG_ALL`;
+The values are chosen such that logical operations can be use , e.g. `H4P_LOG_SVC_UP | H4P_LOG_SVC_DOWN` will react only to those two service events. Another example is `H4P_LOG_ALL & ~H4P_LOG_SVC_UP &~ H4P_LOG_SVC_DOWN` which will *exclude* service events. The default filter is `H4P_LOG_ALL`;
 
 ---
 
@@ -67,24 +68,17 @@ For `H4P_LOG_CMD` it is the sub-system that initiated the cmd
     * "upnp" when from a UPNP device e.g. Amazon Alexa
     * "user" when called directly from user code
 
-* Target: will usually be empty or "self" when sent by anything other than MQTT. For subscribed topics, it will be the prefix of the MQTT publish as described in [H4P_AsyncMQTT](h4mqtt.md). In summary, one of:
-    
-    * all
-    * < your board type > e.g. "WEMOS_D1MINI"
-    * < the device chip ID > e.g. "17D858"
-    * < your device name > e.g. "myIOTdevice"
+* Target: will usually be empty or "H4" when sent by anything other than MQTT. For subscribed topics, it will be the prefix of the MQTT publish as described in [H4P_AsyncMQTT](h4mqtt.md). In summary, one of:
+  * all
+  * < your board type > e.g. "WEMOS_D1MINI"
+  * < the device chip ID > e.g. "17D858"
+  * < your device name > e.g. "myIOTdevice"
 
 ---
 
 # Loggers
 
-*N.B.* All loggers offer a minimum command set: in the following, `xxxx` should be replaced by the name of the logger
-
-* h4/xxxx/restart
-* h4/xxxx/start
-* h4/xxxx/stop
-
-Most also implement h4/xxxx/msg/any old message to put any message you choose into the log
+Most loggers implement `h4/xxxx/msg/any old message` to put any message you choose into the log
 
 # H4P_SerialLogger (name "slog")
 
@@ -93,13 +87,14 @@ Most also implement h4/xxxx/msg/any old message to put any message you choose in
 ```cpp
 #include<H4Plugins.h>
 H4_USE_PLUGINS
-H4P_SerialLogger h4ll(...
+H4P_SerialLogger h4sl(...
 ```
+
 ## Prequisites
 
 none
 
-## Additional Commnds
+## Additional Commands
 
 none
 
@@ -124,16 +119,15 @@ H4P_LocalLogger reserves a user-defind amount of free SPIFFS space to create a l
 ```cpp
 #include<H4Plugins.h>
 H4_USE_PLUGINS
-H4P_LocalLogger h4sl;
+H4P_LocalLogger h4ll;
 ```
 
 ## Prequisistes
 
 Board must be compiled with an option to reserve an amount of SPIFFS
 
-## Additional Commnds
+## Additional Commands
 
-* h4/show/log
 * h4/log/clear
 * h4/log/flush
 
@@ -180,10 +174,11 @@ void show();
 
 [Example Code](../examples/H4P_Loggers/H4P_Loggers.ino)
 
-----
+---
+
 # H4P_MQTTLogger (name: see text) [ ESP8266 / ESP32 only ]
 
-H4P_MQTTLogger differs from all other plugins, as it allows multiple instances in the same sketch - each differentiated byt the topic is publishes. The topic is alos use for the name in any command handling.
+H4P_MQTTLogger differs from other plugins, as it allows multiple instances in the same sketch - each differentiated byt the topic is publishes. The topic is alos use for the name in any command handling.
 
 ## Usage
 
@@ -203,7 +198,7 @@ H4P_MQTTLogger h4m1("first",...
 H4P_WiFi
 H4P_AsyncMQTT
 
-## Additional Commnds
+## Additional Commands
 
 none
 
@@ -217,7 +212,7 @@ H4P_MQTTLogger(const string& topic,uint32_t filter=H4P_LOG_ALL);
 
 [Example Code](../examples/H4P_MQTTLogger/H4P_MQTTLogger.ino)
 
-----
+---
 
 # H4P_MQTTHeapLogger (name "heap") [ ESP8266 / ESP32 only ]
 
@@ -237,7 +232,7 @@ H4P_MQTTHeapLogger h4hl(...
 H4P_WiFi
 H4P_AsyncMQTT
 
-## Additional Commnds
+## Additional Commands
 
 none
 
@@ -255,7 +250,7 @@ H4P_MQTTHeapLogger(uint32_t frequency,uint32_t filter=H4P_LOG_ALL); // frequency
 
 # H4P_MQTTQueueLogger (name "qlog") [ ESP8266 / ESP32 only ]
 
-H4P_MQTTHeapLogger is a specalised version of H4P_MQTTLogger which periodically publishes the `qlog` topic with a payload of H4 queue size
+H4P_MQTTQueueLogger is a specalised version of H4P_MQTTLogger which periodically publishes the `qlog` topic with a payload of H4 queue size
 
 ## Usage
 
@@ -263,7 +258,7 @@ H4P_MQTTHeapLogger is a specalised version of H4P_MQTTLogger which periodically 
 #include<H4Plugins.h>
 H4_USE_PLUGINS
 ...
-H4P_MQTTQueueLogger h4hl(...
+H4P_MQTTQueueLogger h4ql(...
 ```
 
 ## Prequisistes
@@ -286,7 +281,7 @@ H4P_MQTTQueueLogger(uint32_t frequency,uint32_t filter=H4P_LOG_ALL); // frequenc
 
 [Example Code](../examples/H4P_MQTTHeapLogger/H4P_MQTTHeapLogger.ino)
 
-----
+---
 
 # Advanced topics
 

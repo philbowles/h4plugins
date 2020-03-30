@@ -1,6 +1,6 @@
 ![H4P Flyer](/assets/GPIOLogo.jpg) 
 
-# Switches and "Things" (shortname="onof")
+# BinarySwitch and BinarySource (shortname="onof")
 
 ## Link on/off/toggle commands to a GPIO or functional object for H4 Universal Scheduler/Timer.
 
@@ -10,17 +10,34 @@
 
 # What do they do?
 
-Let's not forget that "IOT" is the Internet of *Things*. So what is a "Thing"? The answer is: *anything you want it to be*. In H4 Plugins terms, it is an object that holds an interal `state` of `ON` or `OFF` and reacts to commands `on`,`off`,`toggle` and `switch`. If you are using the  [H4P_AsyncMQTT plugin](h4mqtt.md) it publishes the `state` topic whenever the state changes. A Switch is a just a Thing with a predefined output function linked to a single GPIO.
+Let's not forget that "IOT" is the Internet of *Sources*. So what is a "Source"? The answer is: *anything you want it to be*. In H4 Plugins terms, it is an object that holds an interal `state` of `ON` or `OFF` and reacts to commands `on`,`off`,`toggle` and `switch`. If you are using the  [H4P_AsyncMQTT plugin](h4mqtt.md) it publishes the `state` topic whenever the state changes. A Switch is a just a Source with a predefined output function linked to a single GPIO.
 
-There can only be one *output* Thing (or Switch) in a sketch/app: it is effectively the default handler for the above commands. It is what your device does when any source ( [Serial](h4sc.md), [MQTT](h4mqtt.md), [HTTP REST](h4asws.md) or [linked GPIO input connector](h5gpio.md) ) sends an `on`,`off`,`toggle` or `switch` command.
+There can only be one *output* Source (or Switch) in a sketch/app and it must be named as `h4onof`. It is effectively the default handler for the above commands. It is what your device does when any source ( [Serial](h4sc.md), [MQTT](h4mqtt.md), [HTTP REST](h4asws.md), Amazon Alexa voice command or [linked GPIO input connector](h5gpio.md) ) sends an `on`,`off`,`toggle` or `switch` command.
 
-You can have many *input* [linked GPIO input connector](h5gpio.md)s all linked to the single *output* Thing. 
+You can have many *input* [linked GPIO input connector](h5gpio.md)s all linked to the single *output* `h4onof`. Each of these behaves exactly like its non-Source counterpart except that instead of calling back your code when its state changes, it automatically sends its ON or OFF state to the `h4onof` handler, either a BinarySwitch or a BinarySource.
+
+* AnalogThresholdSource [Example Code](../examples/H4GM_AnalogThresholdSource/H4GM_AnalogThresholdSource.ino)
+* DebouncedSource [Example Code](../examples/H4GM_DebouncedSource/H4GM_DebouncedSource.ino)
+* EncoderSource [Example Code](../examples/H4GM_EncoderSource/H4GM_EncoderSource.ino)
+* LatchingSource [Example Code](../examples/H4GM_LatchingSource/H4GM_LatchingSource.ino)
+* PolledSource [Example Code](../examples/H4GM_PolledSource/H4GM_PolledSource.ino)
+* RawSource [Example Code](../examples/H4GM_RawSource/H4GM_RawSource.ino)
+* RetriggeringSource [Example Code](../examples/H4GM_RetriggeringSource/H4GM_RetriggeringSource.ino)
+
+In addition, you may also have:
+* [H4P_ThreeFunctionButton](h43fnb.md) [Example Code](../examples/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
+* H4P_UPNPServer [Example Code](../examples/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
+
+The [H4P_ThreeFunctionButton](h43fnb.md) provides an easy way to switch your Source/Switch with a physical button, reboot it or factory reset it, depending on how long you hold it down.
+
+`H4P_UPNPServer` adds Amazon Alexa voice control and Windows10 desktop integration. It requires only a "friendly name" e.g. "Kitchen Light" - this is the name by which Alexa will turn it on or off and the name show on the Windows10 desktop.
 
 ## Simple Example
 
-Assume you have an output GPIO on pin 12 wired to a relay that controls security light
+Assume you have an output GPIO on pin 12 wired to a relay that controls a security light
 
 Now add some inputs:
+
 * Pushbutton on GPIO0
 * PIR sensor on GPIO4
 * Magnetic reed switches on front door (GPIO5) and window (GPIO6)
@@ -41,10 +58,10 @@ Next, add the sensors and tie them all to the `BinarySwitch` `h4onof`
 H4P_GPIOManager h4gm;
 
 void h4setup(){
-    h4gm.LatchingThing(0,INPUT,ACTIVE_LOW,15); // 15ms debounce timeout
-    h4gm.RetriggeringThing(4,INPUT,ACTIVE_HIGH,10000); // 10sec motion timeout
-    h4gm.DebouncedThing(5,INPUT,ACTIVE_HIGH,15); // door alarm
-    h4gm.DebouncedThing(5,INPUT,ACTIVE_HIGH,15); // window alarm
+    h4gm.LatchingSource(0,INPUT,ACTIVE_LOW,15); // 15ms debounce timeout
+    h4gm.RetriggeringSource(4,INPUT,ACTIVE_HIGH,10000); // 10sec motion timeout
+    h4gm.DebouncedSource(5,INPUT,ACTIVE_HIGH,15); // door alarm
+    h4gm.DebouncedSource(6,INPUT,ACTIVE_HIGH,15); // window alarm
 }
 ```
 
@@ -64,8 +81,6 @@ The light will go off when:
 * The PIR "times out" after 10 seconds.
 * OFF command recived from any source, e.g. MQTT etc
 
-Not bad for 5 lines of code, eh?
-
 ## More advanced example
 
 Now assume that instead of the light going ON you want your device to send you an SMS
@@ -75,48 +90,10 @@ Now assume that instead of the light going ON you want your device to send you a
 
 That's it - the rest is the same.
 
-## xThing vs xSwitch Summary
+## BinarySource vs BinarySwitch Summary
 
-* xThing calls a user-defined function with `bool` value when `on`,`off`,`toggle` or `switch` command is received
-* xSwitch drives a GPIO HIGH or LOW when  `on`,`off`,`toggle` or `switch` command is received
-
----
-
-## UPNP variants
-
-Both **H4P_BinaryThing** and **H4P_BinarySwitch** have UPNP versions
-
-* H4P_UPNPThing
-* H4P_UPNPSwitch
-
-The add functionality to the non-UPNP versions
-
-* Amazon Alexa voice control ON or OFF
-* Windows10 desktop integration
-
-![upnp](../assets/upnpsmall.jpg)
-
----
-
-## Overall summary
-
-Your app can contain exactly one of these
-
-* H4P_BinaryThing
-* H4P_BinarySwitch
-* H4P_UPNPThing
-* H4P_UPNPSwitch
-
-And as many GPIO input connectors as you need, to make your app do whatever it needs to do
-
-* AnalogThresholdThing [Example Code](../examples/H4GM_AnalogThresholdThing/H4GM_AnalogThresholdThing.ino)
-* DebouncedThing [Example Code](../examples/H4GM_DebouncedThing/H4GM_DebouncedThing.ino)
-* EncoderThing [Example Code](../examples/H4GM_EncoderThing/H4GM_EncoderThing.ino)
-* LatchingThing [Example Code](../examples/H4GM_LatchingThing/H4GM_LatchingThing.ino)
-* PolledThing [Example Code](../examples/H4GM_PolledThing/H4GM_PolledThing.ino)
-* RawThing [Example Code](../examples/H4GM_RawThing/H4GM_RawThing.ino)
-* RetriggeringThing [Example Code](../examples/H4GM_RetriggeringThing/H4GM_RetriggeringThing.ino)
-* [H4P_ThreeFunctionButton](h43fnb.md) [Example Code](../examples/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
+* BinarySource calls a user-defined function with `bool` value when `on`,`off`,`toggle` or `switch` command is received
+* BinarySwitch drives a GPIO HIGH or LOW when  `on`,`off`,`toggle` or `switch` command is received
 
 ---
 
@@ -128,11 +105,11 @@ And as many GPIO input connectors as you need, to make your app do whatever it n
 #include<H4Plugins.h>
 H4_USE_PLUGINS
 H4P_GPIOManager h4gm;
-// H4P_AsyncWebServer h4asws(... if using the UPNP variants
+// H4P_AsyncWebServer h4asws(... if using H4P_UPNPServer
 H4P_BinarySwitch h4onof;
-// OR H4P_UPNPSwitch h4onof;
 // OR H4P_BinaryThing h4onof;
-// OR H4P_UPNPThing h4onof;
+// Optionally:
+// H4P_UPNPServer("Lounge Floor Lamp");
 ```
 
 ## Dependencies
@@ -147,7 +124,7 @@ H4P_BinarySwitch h4onof;
 * h4/toggle (invert current state)
 * h4/state // report state
 
-// UPNP variants only
+// H4P_UPNPServer only
 * h4/upnp/name/N (payload N= new UPNP "friendly name")
   
 ## Topics automatically published
@@ -159,48 +136,49 @@ If [H4P_AsyncMQTT](h4mqtt.md) is also used, this plugin publishes `h4/< your dev
 # API
 
 ```cpp
-/* Constructor
+/* Constructors
 pin is the GPIO output which gets "switched" when the state changes
 sense is ACTIVE_HIGH or ACTIVE_LOW depending on the device
 inital is the starting state ON or OFF
 onChange is the name of  a user function that gets called after the state change with b set to the current state see GPIOManager plugins for more details
-btp is a r
+onConnect is called when UPNP_Server is fully "up"
+onDisconnect is called when UPNP_Server goes "down"
+timer ("AutoOFF") causes the device to turn off automatically after n milliseconds. When 0, stays ON till commanded OFF
 */
-H4P_BinarySwitch(uint8_t pin,H4GM_SENSE sense, uint8_t initial,H4BS_FN_SWITCH onChange=[](bool){});
-H4P_UPNPSwitch(string& upnpName,uint8_t pin,H4GM_SENSE sense, uint8_t initial,H4BS_FN_SWITCH onChange=[](bool){});
-H4P_BinaryThing(uint8_t pin,H4GM_SENSE sense, uint8_t initial);
-H4P_UPNPSwitch(string& upnpName,uint8_t pin,H4GM_SENSE sense, uint8_t initial);
+H4P_BinarySwitch(uint8_t pin,H4GM_SENSE sense, uint32_t initial,H4BS_FN_SWITCH f=nullptr,uint32_t timer=0)
+H4P_BinaryThing(H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0);
 
 void turnOff();
 void turnOn();
 void toggle(); // invert state
 void turn(bool b); // b = new state: 1 or 0; true/false; ON/OFF
 
-// UPNP variants
+// H4P_UPNPServer
+H4P_UPNPServer(const string& name="",H4_FN_VOID onConnect=nullptr,H4_FN_VOID onDisconnect=nullptr);
 void friendlyName(const string& name); // sets UPNP friendly name. Causes a reboot
 
 ```
 
 # Output Examples
 
-[Example Sketch - BinaryThing](../examples/H4P_BinaryThing/H4P_BinaryThing.ino)
+[Example Sketch - BinarySource](../examples/H4P_BinaryThing/H4P_BinaryThing.ino)
 [Example Sketch - BinarySwitch](../examples/H4P_BinarySwitch/H4P_BinarySwitch.ino)
 [Example Sketch - BinarySwitch with 3-function button](../examples/H4P_BinarySwitch3fnb/H4P_BinarySwitch3fnb.ino)
 [Example Sketch - BinarySwitch with MQTT](../examples/H4P_BinarySwitchMQTT/H4P_BinarySwitchMQTT.ino)
-[Example Sketch - UPNPSwitch with MQTT](../examples/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
+[Example Sketch - UPNPServer with MQTT](../examples/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
 
 ---
 # Input Examples
 
 You need to read the [H4P_GPIOManager](h4gm.md) documentation before using these
 
-[Example Sketch - AnalogThresholdThing](../examples/H4GM_DebouncedThing/H4GM_DebouncedThing.ino)
-[Example Sketch - DebouncedThing](../examples/H4GM_DebouncedThing/H4GM_DebouncedThing.ino)
-[Example Sketch - EncoderThing](../examples/H4GM_EncoderThing/H4GM_EncoderThing.ino)
-[Example Sketch - LatchingThing](../examples/H4GM_LatchingThing/H4GM_LatchingThing.ino)
-[Example Sketch - PolledThing](../examples/H4GM_PolledThing/H4GM_PolledThing.ino)
-[Example Sketch - RawThing](../examples/H4GM_RawThing/H4GM_RawThing.ino)
-[Example Sketch - RetriggeringThing](../examples/H4GM_RetriggeringThing/H4GM_RetriggeringThing.ino)
+[Example Sketch - AnalogThresholdSource](../examples/H4GM_DebouncedSource/H4GM_DebouncedSource.ino)
+[Example Sketch - DebouncedSource](../examples/H4GM_DebouncedSource/H4GM_DebouncedSource.ino)
+[Example Sketch - EncoderSource](../examples/H4GM_EncoderSource/H4GM_EncoderSource.ino)
+[Example Sketch - LatchingSource](../examples/H4GM_LatchingSource/H4GM_LatchingSource.ino)
+[Example Sketch - PolledSource](../examples/H4GM_PolledSource/H4GM_PolledSource.ino)
+[Example Sketch - RawSource](../examples/H4GM_RawSource/H4GM_RawSource.ino)
+[Example Sketch - RetriggeringSource](../examples/H4GM_RetriggeringSource/H4GM_RetriggeringSource.ino)
 
 ---
 
@@ -224,7 +202,7 @@ The files you will need are in the `src` subfolder
 
 ---
 
-## Device naming of UPNP variants
+## Device naming of UPNPServer
 
 If no name is given in the constructor, it defaults to "upnp XXXXXX" where XXXXXX is the unique chip ID of the device (usually the last 6 characters of the MAC address).
 

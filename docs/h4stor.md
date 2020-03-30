@@ -8,7 +8,7 @@
 ---
 # What does it do?
 
-Provides a mechanism for storing named / value pairs which are persisted across reboots (via SPIFFS) and automatically available on next boot.
+Provides a mechanism for storing name / value pairs which are persisted across reboots (via SPIFFS) and are automatically available on next boot.
 
 All saved values will be lost on factory reset.
 
@@ -20,7 +20,7 @@ All saved values will be lost on factory reset.
 #include<H4Plugins.h>
 H4_USE_PLUGINS
 H4P_SerialCmd h4sc;
-H4P_persistentStorage h4ps(...
+H4P_PersistentStorage h4ps(...
 ```
 
 ## Dependencies
@@ -31,7 +31,6 @@ Board must be compiled with an amount of SPIFSS space
 
 ## Commands Added
 
-* h4/show/stor
 * h4/stor/clear  (erases all stores values)
 * h4/stor/get/x (payload x = name of a stored value)
 * h4/stor/set/x,y (payload x = name of a stored value,y=new value)
@@ -66,12 +65,12 @@ int  getint(const string& name); // get named int value
 void inc(const string& name) // decrement stored int value: no effect on string value
 void setstring(const string& name,const string& value); // set name = value
 void setint(const string& name,int value); // set name = value for integers
-void showStore(){ for(auto const& p:psRam); // displays all name/value pairs
 ```
 
 [Example code](../examples/H4P_persistentStorage/H4P_persistentStorage.ino)
 
-----
+---
+
 (c) 2020 Phil Bowles h4plugins@gmail.com
 
 * [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)

@@ -32,15 +32,15 @@ SOFTWARE.
 #include<H4P_WiFiSelect.h>
 #include<H4P_WiFi.h>
 #include<H4P_AsyncMQTT.h>
-#ifndef H4P_NO_WIFI
+//#ifndef H4P_NO_WIFI
 
 void H4P_ThreeFunctionButton::progress(H4GPIOPin* ptr){ // run this as each stage changes
     H4GM_PIN(Multistage); // Create the correct pointer type in 'pin'
     switch(pin->stage){
-        case 1: // over 2 seconds, medium flash
+        case 1: // over 2 seconds, slow flash
             h4fc.flashLED(H43F_MEDIUM,_led,_active);     
             break;
-        case 2: // over 5 seconds, fast flash
+        case 2: // over 5 seconds, medium flash
             h4fc.flashLED(H43F_FAST,_led,_active);     
             break;
         default: // do nothing if less than 2 seconds
@@ -49,19 +49,22 @@ void H4P_ThreeFunctionButton::progress(H4GPIOPin* ptr){ // run this as each stag
 }
 
 void H4P_ThreeFunctionButton::_start(){
-    if(WiFi.getMode() & WIFI_AP) h4fc.flashPWM(1000,10,_led,_active); 
-    else h4fc.stopLED(_led); 
+    if(isLoaded(wifiTag())){
+        if(WiFi.getMode() & WIFI_AP) h4fc.flashPWM(1000,10,_led,_active); 
+        else h4fc.stopLED(_led); 
+    }
 }
 
 void H4P_ThreeFunctionButton::_stop(){
-    if(WiFi.getMode() & WIFI_AP) h4fc.stopLED(_led); 
-    else h4fc.flashMorse("... --- ...   ",H43F_TIMEBASE,_led,_active);
+    if(isLoaded(wifiTag())){
+        if(WiFi.getMode() & WIFI_AP) h4fc.stopLED(_led); 
+        else h4fc.flashMorse("... --- ...   ",H43F_TIMEBASE,_led,_active);
+    }
 }
 
 void H4P_ThreeFunctionButton::_hookIn(){
     REQUIREBT;
-    REQUIRE(wink);
-    DEPEND(wifi);
+    DEPEND(wink);
     _createMS();
 
     if(isLoaded(mqttTag())){
@@ -75,4 +78,4 @@ H4P_ThreeFunctionButton::H4P_ThreeFunctionButton(uint8_t pin,uint8_t mode,H4GM_S
     H4GM_FN_EVENT cb=bind(&H4P_ThreeFunctionButton::progress,this,_1);
     _createMS=bind(&H4P_GPIOManager::Multistage,&h4gm,pin,mode,b_sense,dbTimeMs,_sm,cb);
 }
-#endif
+//#endif

@@ -45,8 +45,8 @@ You will probably need to adjust these values for you own device
         It can be used for both digital and analog values: when isAnalog == true; 'state' will contain raw
         analog value.
 
-        New in v0.0.3.4 is the "PolledThing" which "ties" or links" or "binds" the Polled pin to any kind
-        of xSwitch or xThing
+        New in v0.0.3.4 is the "PolledSource" which "ties" or links" or "binds" the Polled pin to any kind
+        of xSwitch or xSource
 
 */
 #define U_POLL_FREQ     5000
@@ -55,11 +55,11 @@ H4 h4(115200,20); //auto-start Serial @ 115200, Q size=20
 
 H4P_GPIOManager h4gm;
 H4P_BinarySwitch h4onof(LED_BUILTIN,UL_ACTIVE,OFF);
-// or e.g. H4P_BinaryThing, UPNPThing, UPNPSwitch - in fact any xSwitch or xThing
+// or e.g. H4P_BinaryThing, UPNPSource, UPNPServer - in fact any xSwitch or xSource
 
 void h4setup() { // H4 constructor starts Serial
     Serial.println("H4P_GPIOManager Polled Example v"H4P_VERSION);
     Serial.print("GPIO ");Serial.print(USER_BTN);Serial.print(" ACTIVE ");Serial.println(UB_ACTIVE ? "HIGH":"LOW");
 
-    h4gm.PolledThing(USER_BTN,INPUT,UB_ACTIVE,U_POLL_FREQ,false);
+    h4gm.PolledSource(USER_BTN,INPUT,UB_ACTIVE,U_POLL_FREQ,false);
 }

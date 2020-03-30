@@ -16,7 +16,8 @@ H4 h4(115200);
   #define UB_ACTIVE ACTIVE_HIGH
   #define UL_ACTIVE ACTIVE_HIGH
 #else
-  #define USER_BTN 0
+  // 16 for nodeMCU - change it for your device
+  #define USER_BTN 16
   #define UB_ACTIVE ACTIVE_LOW
   #define UL_ACTIVE ACTIVE_LOW
 #endif
@@ -29,7 +30,7 @@ H4P_FlasherController h4fc;
 H4P_BinarySwitch h4onof(LED_BUILTIN,UL_ACTIVE,OFF,[](bool b){
     Serial.print("STATE NOW ");Serial.println(b);
   });
-H4P_ThreeFunctionButton h43fb(&h4onof,U_DEBOUNCE,USER_BTN,INPUT,UB_ACTIVE,LED_BUILTIN,UL_ACTIVE);
+H4P_ThreeFunctionButton h43fb(USER_BTN,INPUT_PULLUP,UB_ACTIVE,U_DEBOUNCE,LED_BUILTIN,UL_ACTIVE);
 
 void onReboot(){
     Serial.println("Au Revoir");      

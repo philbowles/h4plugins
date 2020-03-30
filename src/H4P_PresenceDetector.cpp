@@ -39,7 +39,10 @@ extern "C" {
 
 bool                H4P_IPDetector::_inflight=false;
 struct ping_option  H4P_IPDetector::pop;
-
+unordered_map<string,H4P_MDNSDetector*> H4P_MDNSDetector::localList;
+//
+//      IP
+//
 void H4P_IPDetector::_hookIn() { DEPEND(wifi); }
 
 void H4P_IPDetector::_start(){
@@ -69,7 +72,7 @@ void H4P_IPDetector::_ping_recv_cb(void *arg, void *pdata){
         _inflight=false;
     },p,v));
 }
-H4P_IPDetectorThing::H4P_IPDetectorThing(const string& pid,const string& id): H4P_IPDetector(pid,id){
+H4P_IPDetectorSource::H4P_IPDetectorSource(const string& pid,const string& id): H4P_IPDetector(pid,id){
     H4P_BinaryThing* _btp;
     REQUIREBT;
     if(_btp){
@@ -83,6 +86,8 @@ H4P_IPDetectorThing::H4P_IPDetectorThing(const string& pid,const string& id): H4
     }
 }
 #endif
+//
+//      UPNP
 //
 void H4P_UPNPDetector::_hookIn() { 
     REQUIRE(onof);
@@ -98,7 +103,8 @@ void H4P_UPNPDetector::_start(){
     });
     _upHooks();
 }
-H4P_UPNPDetectorThing::H4P_UPNPDetectorThing(const string& pid,const string& id): H4P_UPNPDetector(pid,id){
+
+H4P_UPNPDetectorSource::H4P_UPNPDetectorSource(const string& pid,const string& id): H4P_UPNPDetector(pid,id){
     H4P_BinaryThing* _btp;
     REQUIREBT;
     if(_btp){
@@ -110,6 +116,41 @@ H4P_UPNPDetectorThing::H4P_UPNPDetectorThing(const string& pid,const string& id)
 #endif
         };
     }
+}
+//
+//      H4 (MDNS)
+//
+H4P_H4DetectorSource::H4P_H4DetectorSource(const string& id): H4P_H4Detector(id){
+    H4P_BinaryThing* _btp;
+    REQUIREBT;
+    if(_btp){
+        _f=[this,_btp](bool b){ 
+#ifdef H4P_LOG_EVENTS
+        _btp->_turn(b,_pName+string("("+_id+")"));
+#else
+        _btp->turn(b);
+#endif
+        };
+    }
+}
+//
+//      MDNS
+//
+void H4P_MDNSDetector::_hookIn() { 
+    REQUIRE(onof);
+    DEPEND(wifi);
+}
+
+void H4P_MDNSDetector::_start(){
+    MDNS.installServiceQuery(CSTR(_service),CSTR(_protocol), H4P_MDNSDetector::MDNSServiceQueryCallback);
+    _upHooks();
+}
+
+H4P_MDNSDetector::H4P_MDNSDetector(const string& friendly,const string& service,const string& protocol,H4BS_FN_SWITCH f):
+    _service(service),
+    _protocol(protocol),
+    H4PDetector(friendly,friendly,f){ 
+        localList[friendly]=this;
 }
 
 #endif

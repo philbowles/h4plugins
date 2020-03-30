@@ -15,10 +15,12 @@ class myLogger: public H4PLogService {
 H4 h4(115200);
 H4P_CmdErrors h4ce;
 H4P_SerialCmd h4sc;
-H4P_SerialLogger h4sl;
+//H4P_SerialLogger h4sl;
 myLogger lumberjack;
 
 void h4setup(){
+  static uint32_t pingCount=0;
   h4UserEvent("test1 %d\n",666);
   h4UserEvent("Ztest2");
+  h4.every(1000,[](){ h4UserEvent("ping %d",pingCount++); });
 }

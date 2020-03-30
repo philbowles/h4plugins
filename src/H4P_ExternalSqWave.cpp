@@ -85,7 +85,7 @@ H4P_ExternalSqWave::H4P_ExternalSqWave(uint8_t rx,uint8_t tx,uint32_t initialF,u
         {"set",     { _subCmd, H4PC_ESW_SET, nullptr}},
         {"d",       { H4PC_ESW_SET, 0, CMDVS(_dset)}},
         {"f",       { H4PC_ESW_SET, 0, CMDVS(_fset)}},
-        {"stop",    { _subCmd, 0, CMD(stop)}},            
+        {"end",    { _subCmd, 0, CMD(end)}},            
         {"sweep",   { _subCmd, H4PC_ESW_SWEEP, nullptr}},
         {"f",       { H4PC_ESW_SWEEP, 0, CMDVS(_fsweep)}},
         {"d",       { H4PC_ESW_SWEEP, 0, CMDVS(_dsweep)}}

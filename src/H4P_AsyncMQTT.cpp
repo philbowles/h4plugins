@@ -56,37 +56,37 @@ void H4P_AsyncMQTT::_hookIn() {
         subscribe(CSTR(string(device+"/"+cmdhash())),0);
         subscribe(CSTR(string(_cb[chipTag()]+"/"+cmdhash())),0);
         subscribe(CSTR(string(_cb[boardTag()]+"/"+cmdhash())),0);
-        publish("online",0,false,CSTR(device));
+        publish("h4/online",0,false,CSTR(device));
         _upHooks();
+        H4EVENT("MQTT CNX");
     });
+/*
+  TCP_DISCONNECTED = 0,
 
+  MQTT_UNACCEPTABLE_PROTOCOL_VERSION = 1,
+  MQTT_IDENTIFIER_REJECTED = 2,
+  MQTT_SERVER_UNAVAILABLE = 3,
+  MQTT_MALFORMED_CREDENTIALS = 4,
+  MQTT_NOT_AUTHORIZED = 5,
+
+  ESP8266_NOT_ENOUGH_SPACE = 6,
+
+  TLS_BAD_FINGERPRINT = 7
+*/
     onDisconnect([this](AsyncMqttClientDisconnectReason reason){
         if(!_discoDone){
             _discoDone=true;
             _downHooks();
-            if(autorestart && WiFi.status()==WL_CONNECTED) h4.every(H4MQ_RETRY,[this](){ start(); },nullptr,H4P_TRID_MQRC,true);
+            H4EVENT("MQTT DCX %d",reason);
+            if(autorestart && WiFi.status()==WL_CONNECTED) h4.every(H4MQ_RETRY,[this](){ connect(); },nullptr,H4P_TRID_MQRC,true);
         }
     });
 }
-/*
-uint32_t H4P_AsyncMQTT::_offline(vector<string> vs){
-    return guard1(vs,[this](vector<string> vs){
-        if(H4PAYLOAD!=device) _grid.erase(H4PAYLOAD);
-        return H4_CMD_OK;
-    }); 
-}
 
-uint32_t H4P_AsyncMQTT::_online(vector<string> vs){
-    return guard1(vs,[this](vector<string> vs){
-        if(H4PAYLOAD!=device) _grid.insert(H4PAYLOAD);
-        return H4_CMD_OK;
-    });    
-}
-*/
 void H4P_AsyncMQTT::_setup(){
     device=_cb[deviceTag()];
     setClientId(CSTR(device));
-    setWill("offline",0,false,CSTR(device));
+    setWill("h4/offline",0,false,CSTR(device));
 
     string broker=_cb[brokerTag()];
     uint16_t port=atoi(CSTR(_cb[portTag()]));

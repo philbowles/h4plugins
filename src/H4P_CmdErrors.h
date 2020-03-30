@@ -43,7 +43,6 @@ class H4P_CmdErrors: public H4Plugin {
             {H4_CMD_OUT_OF_BOUNDS,"Value out of range"},
             {H4_CMD_NAME_UNKNOWN,"Name not known"},
             {H4_CMD_PAYLOAD_FORMAT,"Incorrect Payload Format"}
-//            {H4_CMD_PROHIBITED,"Prohibited from here"}
         };
 //
         H4_INT_MAP  logTypes={
@@ -52,7 +51,6 @@ class H4P_CmdErrors: public H4Plugin {
             {H4P_LOG_SVC_DOWN,"SVC DOWN"},
             {H4P_LOG_CMD,"CMD"},
             {H4P_LOG_USER,"USER"},
-//            {H4P_LOG_DEPENDFAIL,"DEPEND FAIL"},
             {H4P_LOG_MQTT_HEAP,"MQTT HEAP"},
             {H4P_LOG_MQTT_Q,"MQTT Q"},
             {H4P_LOG_PD_ENTER,"PD ENTER"},
@@ -99,7 +97,8 @@ class H4P_CmdErrors: public H4Plugin {
             {H4P_TRID_QLOG,"QLOG"},
             {H4P_TRID_MLRQ,"MLRQ"},
             {H4P_TRID_BTTO,"BTTO"},
-            {H4P_TRID_IPPD,"IPPD"}
+            {H4P_TRID_IPPD,"IPPD"},
+            {H4P_TRID_MDPD,"IPPD"}
         };
         virtual void        _greenLight(){ start(); }
     public:

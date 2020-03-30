@@ -53,8 +53,8 @@ You will probably need to adjust these values for you own device
 
         Now though, you can just tweak dbTimeMs until you only ever get 1x ON and 1x OFF per button press
 
-        New in v0.0.3.4 is the "LatchingThing" which "ties" or links" or "binds" the Latching pin to any kind
-        of xSwitch or xThing
+        New in v0.0.3.4 is the "LatchingSource" which "ties" or links" or "binds" the Latching pin to any kind
+        of xSwitch or xSource
 
 */
 // Debouncing time in mS
@@ -63,11 +63,11 @@ You will probably need to adjust these values for you own device
 H4 h4(115200,20); //auto-start Serial @ 115200, Q size=20 
 H4P_GPIOManager h4gm;
 H4P_BinarySwitch h4onof(LED_BUILTIN,UL_ACTIVE,OFF);
-// or e.g. H4P_BinaryThing, UPNPThing, UPNPSwitch - in fact any xSwitch or xThing
+// or e.g. H4P_BinaryThing, UPNPSource, UPNPServer - in fact any xSwitch or xSource
 
 void h4setup() { // H4 constructor starts Serial
-    Serial.println("H4P_GPIOManager LatchingThing Example v"H4P_VERSION);
+    Serial.println("H4P_GPIOManager LatchingSource Example v"H4P_VERSION);
     Serial.print("GPIO ");Serial.print(USER_BTN);Serial.print(" ACTIVE ");Serial.println(UB_ACTIVE ? "HIGH":"LOW");
 
-    h4gm.LatchingThing(USER_BTN,INPUT,UB_ACTIVE,U_DBTIME_MS);
+    h4gm.LatchingSource(USER_BTN,INPUT,UB_ACTIVE,U_DBTIME_MS);
 }

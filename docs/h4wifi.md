@@ -22,7 +22,7 @@ You can then connect to H4_XXXXXX and open a browser to http://192.168.4.1 where
 
 Fill in the details, click "connect" and the device will boot into STA mode using the new credentials for the rest of its days until you force a "factory reset". 
 
-N.B. The "name" field is only relevant if you are also using the [H4P_UPNPSwitch](/things.md) plugin, when it will become the "friendly name" of the device as shown in Windows Network Explorer. Is is also the name by which Amazon Alexa will control it via voice commands "switch on < name >" and "switch off < name >"
+N.B. The "name" field is only relevant if you are also using the [H4P_UPNPServer](/things.md) plugin, when it will become the "friendly name" of the device as shown in Windows Network Explorer. Is is also the name by which Amazon Alexa will control it via voice commands "switch on < name >" and "switch off < name >"
 
 ![upnp](/assets/upnp.jpg) 
 
@@ -40,19 +40,15 @@ H4P_WiFi h4wifi(...
 
 * [H4P_AsyncWebServer](h4asws.md) Plugin
 
-* You must copy the `data` sub-folder to your sketch folder and upload to SPIFSS. To do this you will need to intall either the [ESP8266 sketch data uploader](https://github.com/esp8266/arduino-esp8266fs-plugin) or the [ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin) (or both) depending on which platform you compile for. 
+* You must copy the `data` sub-folder to your sketch folder and upload to SPIFFS. To do this you will need to intall either the [ESP8266 sketch data uploader](https://github.com/esp8266/arduino-esp8266fs-plugin) or the [ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin) (or both) depending on which platform you compile for. 
 
 
 ### Commands Added
 
 * h4/factory (clear credentials + reboot: forces AP mode)
-* h4/show/wifi
 * h4/wifi/change/x,y (payload x,y = newssid,newpassword)
 * h4/wifi/clear (use with caution = "factory reset")
 * h4/wifi/host/x (payload x = new device name. Causes a reboot. Remains until factory reset)
-* h4/wifi/restart
-* h4/wifi/start
-* h4/wifi/stop
 
 ### Callbacks
 
@@ -60,6 +56,8 @@ H4P_WiFi h4wifi(...
 void onConnect(void);
 void onDisconnect(void);
 ```
+
+---
 
 ## API
 
@@ -74,10 +72,6 @@ H4P_WiFi(string ssid,string psk,string device="",H4_FN_VOID onConnect=[](){},H4_
 void change(string ssid,string psk); // connect to new SSID
 void clear(); // erase any previoulsy stored credentials - think: "factory reset"
 void host() // change device name. Causes a reboot
-void restart(); // does stop then a start 
-void show(); // Display current settings
-void start();
-void stop();
 ```
 
 ## Advanced Topics

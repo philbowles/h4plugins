@@ -11,6 +11,7 @@
 
 Asynchronous Web Server provide bot an AP mode server to allow first-time / factory reset configuration, but also an STA mode server that provides a REST-like command interface.
 
+---
 
 ## AP Mode
 
@@ -18,7 +19,7 @@ Asynchronous Web Server provide bot an AP mode server to allow first-time / fact
 
 Fill in the details, click "connect" and the device will boot into STA mode using the new credentials for the rest of its days until you force a "factory reset". 
 
-N.B. The "name" field is only relevant if you are also using the [H4P_UPNPSwitch](/things.md) plugin, when it will become the "friendly name" of the device as shown in Windows Network Explorer. Is is also the name by which Amazon Alexa will control it via voice commands "switch on < name >" and "switch off < name >"
+N.B. The "name" field is only relevant if you are also using the [H4P_UPNPServer](/things.md) plugin, when it will become the "friendly name" of the device as shown in Windows Network Explorer. Is is also the name by which Amazon Alexa will control it via voice commands "switch on < name >" and "switch off < name >"
 
 ---
 
@@ -32,7 +33,6 @@ H4P_WiFi h4asws(...
 
 ## Dependencies
 
-
 * [H4P_WiFi](h4wifi.md) Plugin
 
 * You must copy the `data` sub-folder to your sketch folder and upload to SPIFSS. To do this you will need to intall either the [ESP8266 sketch data uploader](https://github.com/esp8266/arduino-esp8266fs-plugin) or the [ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin) (or both) depending on which platform you compile for. 
@@ -42,6 +42,10 @@ H4P_WiFi h4asws(...
 
 None, but provides HTTP REST interface with JSON replies
 
+---
+
+# API
+
 ## Callbacks
 
 ```cpp
@@ -50,9 +54,6 @@ void onDisconnect(void); // webserver is down
 void h4AddAwsHandlers(void) // called after adding its own handlers, adds your in here
 ```
 
----
-
-# API
 
 H4P_AsyncWebserver is a "wrapper" around the [ESPAsyncWebServer](https://github.com/philbowles/ESPAsyncWebServer) library and therefore any funtions offered by that library can be called on `h4asws.` for example `h4.asws.on(...)` to add your own handler inside the `h4AddAwsHandlers` callback.
 
@@ -73,6 +74,7 @@ H4P_AsyncWebServer(string admin="admin",string passwd="admin",H4_FN_VOID onConne
 // onDisconnect = user callback when webserver is down
 
 // Command and control
+void restart();
 void start();
 void stop();
 ```
@@ -121,22 +123,24 @@ When "prettified" it looks like this:
 }
 ```
 
-* res is the response code
+* `res` is the response code
 
 ```cpp
-{0,"OK"},
-{1,"Unknown cmd"},
-{2,"Too few parameters"},
-{3,"Too many parameters"},
-{4,"Numeric value expected"},
-{5,"Value out of range"},
-{6,"Name not known"},
-{7,"Incorrect Payload Format"},
-{8,"Prohibited from here"}
+H4_INT_MAP  cmdErrors={
+    {H4_CMD_OK,"OK"},
+    {H4_CMD_UNKNOWN,"Unknown cmd"},
+    {H4_CMD_TOO_FEW_PARAMS,"Too few parameters"},
+    {H4_CMD_TOO_MANY_PARAMS,"Too many parameters"},
+    {H4_CMD_NOT_NUMERIC,"Numeric value expected"},
+    {H4_CMD_OUT_OF_BOUNDS,"Value out of range"},
+    {H4_CMD_NAME_UNKNOWN,"Name not known"},
+    {H4_CMD_PAYLOAD_FORMAT,"Incorrect Payload Format"}
+};
+
 ```
 
-* msg is the corresponding error message if [H4P_CmdErrors](h4ce.md) is used
-*  lines is an array of the same output that would have been sent a line at a time to the serial console
+* `msg` is the corresponding error message if [H4P_CmdErrors](h4ce.md) is used
+* `lines` is an array of the same output that would have been sent a line at a time to the serial console
 
 ---
 

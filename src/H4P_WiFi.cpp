@@ -39,12 +39,10 @@ void H4P_WiFi::_gotIP(){
     string host=_cb[deviceTag()];
 
     h4.every(H4WF_OTA_RATE,[](){ ArduinoOTA.handle(); },nullptr,H4P_TRID_HOTA,true);
-    //WiFi.hostname(CSTR(host));
     _setHost(host);
   	ArduinoOTA.setHostname(CSTR(host));
 	ArduinoOTA.setRebootOnSuccess(false);	
 	ArduinoOTA.begin();
-
     _cb.erase("opts"); // lose any old AP ssids
     H4EVENT("IP=%s",CSTR(_cb["ip"]));
     _upHooks();
@@ -87,25 +85,7 @@ void H4P_WiFi::_setPersistentValue(string n,string v,bool reboot){
         if(reboot) h4reboot();
     }
 }
-/*
-string H4P_WiFi::replaceParams(const string& s){ // oh for a working regex...
-	int i=0;
-	int j=0;
-	string rv(s);
-	while((i=rv.find("%",i))!=string::npos){
-        if(j){
-            string var=rv.substr(j+1,i-j-1);
-            if(_cb.count(var)) {
-                rv.replace(j,i-j+1,_cb[var]); // FIX!!
-                rv.shrink_to_fit();
-            }
-            j=0;
-        } else j=i;    
-        ++i;
-	}
-	return rv.c_str();	
-}
-*/
+
 uint32_t H4P_WiFi::_host(vector<string> vs){
     return guard1(vs,[this](vector<string> vs){
         return ([this](string h){
@@ -128,6 +108,18 @@ void H4P_WiFi::_lostIP(){
     if(!_discoDone){
         _downHooks();
         _discoDone=true;
+    }
+}
+
+void H4P_WiFi::_stopCore(){
+    h4.cancelSingleton({H4P_TRID_HOTA,H4P_TRID_WFAP});
+    if(WiFi.getMode() & WIFI_AP) {
+        if(_dnsServer){
+            _dnsServer->stop();
+            delete _dnsServer;
+            _dnsServer=nullptr;
+            _downHooks();
+        }
     }
 }
 
@@ -169,22 +161,16 @@ void H4P_WiFi::_startSTA(){
 }
 
 void H4P_WiFi::_start(){
+    // if ssid supplied in constructor, use it
     if(WiFi.SSID()=="") {
         stop();
         _startAP();
-    } else if(WiFi.getMode()==WIFI_OFF) _startSTA();
+    } 
+    else if(WiFi.getMode()==WIFI_OFF) _startSTA();
 }
 
 void H4P_WiFi::_stop(){
-    h4.cancelSingleton({H4P_TRID_HOTA,H4P_TRID_WFAP});
-    if(WiFi.getMode() & WIFI_AP) {
-        if(_dnsServer){
-            _dnsServer->stop();
-            delete _dnsServer;
-            _dnsServer=nullptr;
-            _downHooks();
-        }
-    }
+    _stopCore();
 	WiFi.mode(WIFI_OFF);
 }
 /*
@@ -219,9 +205,7 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
 //
 //      ESP32
 //
-void H4P_WiFi::_setHost(const string& host){
-    WiFi.setHostname(CSTR(host));
-}
+void H4P_WiFi::_setHost(const string& host){ WiFi.setHostname(CSTR(host)); }
 string H4P_WiFi::_getChipID(){
     uint64_t macAddress = ESP.getEfuseMac();
     uint64_t macAddressTrunc = macAddress << 40;
@@ -252,16 +236,8 @@ void H4P_WiFi::_startSTA(){
     WiFi.begin(CSTR(_cb[ssidTag()]),CSTR(_cb[pskTag()]));
 }
 
-void H4P_WiFi::_start(){ if(WiFi.begin()) if(WiFi.SSID()=="" && WiFi.psk()=="") _startAP(); }
-
-void H4P_WiFi::_stopCore(){
-    h4.cancelSingleton({H4P_TRID_HOTA,H4P_TRID_WFAP}); 
-    if(_dnsServer){
-        _dnsServer->stop();
-        delete _dnsServer;
-        _dnsServer=nullptr;
-        _downHooks();
-    }
+void H4P_WiFi::_start(){ 
+    if(WiFi.begin()) if(WiFi.SSID()=="") _startAP(); 
 }
 
 void H4P_WiFi::_stop(){

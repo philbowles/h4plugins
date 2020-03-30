@@ -1,8 +1,6 @@
-#include <H4.h>
-#include <H4P_SerialCmd.h>
-#include <H4P_CmdErrors.h>
-#include <H4P_WiFi.h>
-#include <H4P_AsyncMQTT.h>
+#include<H4Plugins.h>
+H4_USE_PLUGINS
+
 
 H4 h4(115200);
 
@@ -42,10 +40,6 @@ uint32_t myCallback(vector<string> vs){
 
     h4/show/mqtt
     h4/mqtt/change // payload = newbroker,newport,newusername,newpassword
-    h4/mqtt/grid // show all local H4 devices
-    h4/mqtt/restart
-    h4/mqtt/start
-    h4/mqtt/stop
 
     Using any MQTT client MQTTSpy, NODE RED etc etc, subscribe to testbed/# 
     to see all the messages from this device:

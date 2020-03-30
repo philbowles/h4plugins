@@ -79,6 +79,7 @@ class H4P_SerialCmd: public H4Plugin {
             H4Plugin::_stop();
         }
     public:
+        H4P_SerialCmd();
 #ifndef ARDUINO_ARCH_STM32
         static  string          read(const string& fn);
         static  uint32_t        write(const string& fn,const string& data,const char* mode="w");
@@ -98,7 +99,6 @@ class H4P_SerialCmd: public H4Plugin {
                 void            dumpQ(){}
         static  string          _dumpTask(task*){}
 #endif
-        H4P_SerialCmd();
 //      user
                 void            addCmd(const string& name,uint32_t owner, uint32_t levID,H4_FN_MSG f=nullptr){ _addCmd(name, {owner,levID,f}); }
                 void            help();

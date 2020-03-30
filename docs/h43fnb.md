@@ -9,9 +9,9 @@
 ---
 ## What does it do?
 
-Allows the user to control a switch plugin, a [H4P_BinarySwitch](things.md) [H4P_BinaryThing](things.md), [H4P_UPNPSwitch](things.md)  or a [H4P_UPNPThing](things.md) by pressing and holding a simple non-latching 'tact' button. The button causes 3 different actions to occur depending on how long it held down.
+Allows the user to control a [H4P_BinarySwitch](things.md) or a[H4P_BinaryThing](things.md) by pressing and holding a simple non-latching 'tact' button. The button causes 3 different actions to occur depending on how long it held down.
 
-In essence it links an output GPIO (defined by the xSwitch or xThing plugin) to an input GPIO connector and uses an LED to signal its changing state the longer the button is held.
+In essence it links an output GPIO (defined by the xSwitch or xSource plugin) to an input GPIO connector and uses an LED to signal its changing state the longer the button is held.
 
 A "short" press (less than 2 seconds**) simply switches the device to the opposite state as a "normal" press of any button might do. The resulting action depends on the definition of the linked switch plugin.
 
@@ -29,17 +29,16 @@ A "long" press - anything over 5 seconds** - starts the LED flashing extremely r
 
 # Usage
 
-H4P_ThreeFunctionButton is a specialised example of an IOT "Thing" - you should read ["Things vs Switches"](things.md) before continuing
+H4P_ThreeFunctionButton is a specialised example of an IOT "Source" - you should read ["Sources vs Switches"](things.md) before continuing
 
 ```cpp
 #include<H4Plugins.h>
 H4_USE_PLUGINS
 
 H4P_GPIOManager h4gm;
-// one of
-//H4P_UPNPSwitch h4onof(...
-//H4P_UPNPThing h4onof(...
+// either
 //H4P_BinarySwitch h4onof(...
+or
 //H4P_BinaryThing h4onof(...
 H4P_ThreeFunctionButton h4onof(...
 ```
@@ -59,7 +58,7 @@ none
 ```cpp
 /* constructor: */
 H4P_ThreeFunctionButton(
-    H4P_BinarySwitch* bsp,  //a reference to a previoulsy defined H4P_BinarySwitch or H4P_UPNPSwitch
+    H4P_BinarySwitch* bsp,  //a reference to a previoulsy defined H4P_BinarySwitch or H4P_UPNPServer
     uint32_t dbTimeMs, // the switch debounce value in milliseconds: depends on the individual switch
     //          the input button
     uint8_t pin,

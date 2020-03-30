@@ -35,9 +35,13 @@ H4P_BinarySwitch	KEYWORD1
 H4P_BinaryThing	KEYWORD1
 H4P_ThreeFunctionButton	KEYWORD1
 H4P_IPDetector	KEYWORD1
-H4P_IPDetectorThing	KEYWORD1
+H4P_IPDetectorSource	KEYWORD1
 H4P_UPNPDetector	KEYWORD1
-H4P_UPNPDetectorThing	KEYWORD1
+H4P_UPNPDetectorSource	KEYWORD1
+H4P_H4Detector	KEYWORD1
+H4P_H4DetectorSource	KEYWORD1
+H4P_MDNSDetector	KEYWORD1
+H4P_MDNSDetectorSource	KEYWORD1
 
 #######################################
 # Methods and Functions (	KEYWORD2)
@@ -46,20 +50,20 @@ H4P_UPNPDetectorThing	KEYWORD1
 addCmd	KEYWORD2
 all	KEYWORD2
 AnalogThreshold	KEYWORD2
-AnalogThresholdThing	KEYWORD2
+AnalogThresholdSource	KEYWORD2
 change	KEYWORD2
 Circular	KEYWORD2
 clear	KEYWORD2
 config	KEYWORD2
 Debounced	KEYWORD2
-DebouncedThing	KEYWORD2
+DebouncedSource	KEYWORD2
 dec	KEYWORD2
 dSet	KEYWORD2
 dSweep	KEYWORD2
 dumpQ	KEYWORD2
 Encoder	KEYWORD2
 EncoderAuto	KEYWORD2
-EncoderThing	KEYWORD2
+EncoderSource	KEYWORD2
 exclude	KEYWORD2
 exists	KEYWORD2
 factoryReset	KEYWORD2
@@ -95,7 +99,7 @@ isFlashing	KEYWORD2
 isLoaded	KEYWORD2
 isPresent	KEYWORD2
 Latching	KEYWORD2
-LatchingThing	KEYWORD2
+LatchingSource	KEYWORD2
 logEvent	KEYWORD2
 logicalRead	KEYWORD2
 logicalWrite	KEYWORD2
@@ -104,18 +108,18 @@ Output	KEYWORD2
 pcent	KEYWORD2
 plugins	KEYWORD2
 Polled	KEYWORD2
-PolledThing	KEYWORD2
+PolledSource	KEYWORD2
 publishDevice	KEYWORD2
 pulseLED	KEYWORD2
 Qstats	KEYWORD2
 Raw	KEYWORD2
-RawThing	KEYWORD2
+RawSource	KEYWORD2
 read	KEYWORD2
 Repeating	KEYWORD2
 removeCmd	KEYWORD2
 restart	KEYWORD2
 Retriggering	KEYWORD2
-RetriggeringThing	KEYWORD2
+RetriggeringSource	KEYWORD2
 Sequenced	KEYWORD2
 setCenter	KEYWORD2
 setint	KEYWORD2

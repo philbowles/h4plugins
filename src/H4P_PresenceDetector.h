@@ -76,9 +76,9 @@ class H4P_IPDetector: public H4PDetector {
     public:
         H4P_IPDetector(const string& friendly,const string& ip,H4BS_FN_SWITCH f=nullptr): H4PDetector(friendly,ip,f){}
 };
-class H4P_IPDetectorThing: public H4P_IPDetector{
+class H4P_IPDetectorSource: public H4P_IPDetector{
     public:
-        H4P_IPDetectorThing(const string& pid,const string& id);
+        H4P_IPDetectorSource(const string& pid,const string& id);
 };
 #endif
 class H4P_UPNPDetector: public H4PDetector {
@@ -88,9 +88,39 @@ class H4P_UPNPDetector: public H4PDetector {
     public:
         H4P_UPNPDetector(const string& friendly,const string& usn,H4BS_FN_SWITCH f=nullptr): H4PDetector(friendly,usn,f){}
 };
-class H4P_UPNPDetectorThing: public H4P_UPNPDetector{
+class H4P_UPNPDetectorSource: public H4P_UPNPDetector{
     public:
-        H4P_UPNPDetectorThing(const string& pid,const string& id);
+        H4P_UPNPDetectorSource(const string& pid,const string& id);
+};
+
+class H4P_MDNSDetector: public H4PDetector {
+        string _service;
+        string _protocol;
+        
+        static unordered_map<string,H4P_MDNSDetector*> localList;
+        
+        static void MDNSServiceQueryCallback(MDNSResponder::MDNSServiceInfo serviceInfo, MDNSResponder::AnswerType answerType, bool p_bSetContent) {
+            if(answerType ==  MDNSResponder::AnswerType::IP4Address){
+                Serial.printf("MDNSServiceQueryCallback %s\n",serviceInfo.hostDomain());
+                string who=replaceAll(serviceInfo.hostDomain(),".local","");
+                if(localList.count(who)){ localList[who]->_inout(p_bSetContent); }
+            }
+        }   
+    protected:
+                void        _hookIn() override;
+                void        _start() override;
+    public:
+        H4P_MDNSDetector(const string& friendly,const string& service,const string& protocol,H4BS_FN_SWITCH f=nullptr);
+};
+
+class H4P_H4Detector: public H4P_MDNSDetector {
+    public:
+        H4P_H4Detector(const string& local,H4BS_FN_SWITCH f=nullptr): H4P_MDNSDetector(local,"arduino","tcp",f){}
+};
+
+class H4P_H4DetectorSource: public H4P_H4Detector{
+    public:
+        H4P_H4DetectorSource(const string& local);
 };
 
 #endif

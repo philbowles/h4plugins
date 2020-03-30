@@ -55,7 +55,8 @@ void        pcent(uint32_t pc); // Set new "safe" percentage
 
 [Example code](../examples/H4P_QueueWarn/H4P_QueueWarn.ino)
 
-----
+---
+
 (c) 2020 Phil Bowles h4plugins@gmail.com
 
 * [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)

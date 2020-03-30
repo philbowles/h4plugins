@@ -182,7 +182,8 @@ enum trustedIds {
   H4P_TRID_QLOG,
   H4P_TRID_MLRQ,
   H4P_TRID_BTTO,
-  H4P_TRID_IPPD
+  H4P_TRID_IPPD,
+  H4P_TRID_MDPD
 };
 
 enum H4PC_CMD_ID{

@@ -56,7 +56,7 @@ Generally, each plugin also provides functions that correspond to the command-li
 h4sc.dumpQ();
 ```
 
-Has the same effect as typing "h4/show/q" at the console, MQTT publishing a topic of "h4/show/Q" or receiving `http://< some ip >/rest/h4/show/q`. The only difference is that the resulting dump of the H4 queue is sent back to the originating source, respectively the console, MQTT server, or the web browser.
+Has the same effect as typing "h4/show/q" at the console, MQTT publishing a topic of "h4/show/q" or receiving `http://< some ip >/rest/h4/show/q`. The only difference is that the resulting dump of the H4 queue is sent back to the originating source, respectively the console, MQTT server, or the web browser.
 
 ---
 
@@ -70,11 +70,11 @@ H4P_SerialCmd h4sc;
 
 ## Dependencies
 
-none, but when preceded by [H4P_CmdErrors](h4ce.md) numeric cides are translated to meaningful messages
+none, but when preceded by [H4P_CmdErrors](h4ce.md) numeric codes are translated to meaningful messages
 
 ---
 
-## Service control
+# Service control
 
 All H4Plugins act as "services" which means that each plugin can be stopped or started by the user. In some cases this can have a major effect on how your app behaves, so use these with caution and only after you fully understand how each plugin works.
 
@@ -82,7 +82,7 @@ In all cases, the payload `pppp` is the name of the plugin
 
 * h4/svc/restart/pppp // ...stop/ppp followed by .../start/pppp
 * h4/svc/start/pppp 
-* h4/svc/state/pppp // shows different information relating to each specific plugin 
+* h4/svc/state/pppp // shows different information relating to each specific plugin (previously was h4/show/xxxx )
 * h4/svc/stop/pppp
 
 ## Commands Added by SerialCmd
@@ -144,12 +144,20 @@ Otherwise a simple code is returned:
 * h4/svc/state/scmd 
 * h4/svc/stop/scmd 
 * 
-SerialCmd can be safely stopped - it will continue to provide command functionality to other plugins that depend upon it. e.g. [**H4P_AsyncWebServer** (http "REST")](h4asws.md) and [**H4P_AsyncMQTT**](h4mqtt.md) but it will no longer accept serial commands on its own behalf. Thus it can only be done once and cannot be undone. Unloading SCMD will show a huge performance improvement, so it it worth considering once testing is complete, especially for devices that will be deployed remotely.and will never be able to recive serial commands.
+SerialCmd can be safely stopped - it will continue to provide command functionality to other plugins that depend upon it. e.g. [**H4P_AsyncWebServer** (http "REST")](h4asws.md) and [**H4P_AsyncMQTT**](h4mqtt.md) but it will no longer accept serial commands on its own behalf. Thus it can only be done once from the serial console*. Unloading `scmd` will show a huge performance improvement, so it is worth considering once testing is complete, especially for devices that will be deployed remotely and will never be able to recive serial commands.
+
+(* It can be restarted remotely, e.g. via MQTT or http/REST)
 
 ---
 
 # API
 
+## Global Callbacks
+
+```cpp
+void onFactoryReset(void);
+void onReboot(void);
+```
 
 ## Command functions
 
@@ -158,7 +166,7 @@ void all();
 void config();
 void dumpQ();
 void h4reboot(); //** provided by h4, use h4.h4reboot(), NOT h4sc.h4reboot()
-void h4reboot(); //** provided by h4, use h4.h4reboot(), NOT h4sc.h4reboot()
+void h4FactoryReset();
 void help();
 void plugins();
 void showSPIFFS();
@@ -185,8 +193,6 @@ Shows the contents of H4's internal queue. Useful for debugging, but will probab
 ### h4FactoryReset()
 
 #### Equivalent command-line: h4/factory
-
-**NOTE** This command is provided by H4 itself, not SerialCmd so it is available even if SerialCmd is not loaded. It is included here because of SerialCmd's h4/factory command. If calling it directly, the correct form is:
 
 ```cpp
 h4FactoryReset();
@@ -230,8 +236,8 @@ Some plugins depend on others ( see for example [**H4P_CmdErrors**](h4ce.md) ), 
 uint32_t invokeCmd(string,string="",const char* src="user");
 uint32_t invokeCmd(string,uint32_t,const char* src="user"); // for single integer payloads
 Both variants return the error code - if any - or zero on success. (see below)
-void logEvent(const string& msg); // see Logging documentation https://github.com/philbowles/h4plugins/blob/master/docs/h4slogs.md
-void unload(const char* pid); // see the unload command below
+void logEventType(H4P_LOG_TYPE,const string& src,const string& tgt,const string& fmt,...);
+// see Logging documentation https://github.com/philbowles/h4plugins/blob/master/docs/h4slogs.md
 //          SPIFFS
 string read(const string& fn); // reads contents of SPIFFS file into string
 uint32_t write(const string& fn,const string& data,const char* mode="w"); // "w"rites or "a"ppends string to SPIFFS file, return file size.
@@ -241,7 +247,7 @@ void removeCmd(const string& name);
 
 ```
 
-----
+---
 
 (c) 2020 Phil Bowles h4plugins@gmail.com
 

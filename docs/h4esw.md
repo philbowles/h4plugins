@@ -78,7 +78,7 @@ void dSet(uint32_t d); // Set Duty Cycle
 void dSweep(uint32_t timer,uint32_t fromF,uint32_t toF,uint32_t inc,function<void(uint32_t)> onChange=[](uint32_t){});
 void fSet(uint32_t f); // Set Frequency
 void fSweep(uint32_t timer,uint32_t fromF,uint32_t toF,uint32_t inc,function<void(uint32_t)> onChange=[](uint32_t){});
-void stop(); // cancels any sweep in progress
+void end(); // cancels any sweep in progress
 ```
 
 [Example code](../examples/H4ESW/H4P_ESWSimple/H4P_ESWSimple.ino)

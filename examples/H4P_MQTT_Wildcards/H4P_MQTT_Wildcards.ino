@@ -1,8 +1,5 @@
-#include <H4.h>
-#include <H4P_SerialCmd.h>
-#include <H4P_CmdErrors.h>
-#include <H4P_WiFi.h>
-#include <H4P_AsyncMQTT.h>
+#include<H4Plugins.h>
+H4_USE_PLUGINS
 
 H4 h4(115200);
 //
@@ -57,7 +54,7 @@ uint32_t myCallback(vector<string> vs){
     Serial.printf("Wildcard handler suit is %s, card is %s\n",(CSTR(suit)),CSTR(vs.back()));
     if(suit=="hearts" || suit=="clubs" || suit=="diamonds" || suit=="spades"){
       Serial.printf("You chose the %s of %s\n",CSTR(vs.back()),CSTR(suit));
-      h4mqtt.publish("dealt",CSTR(string(vs.back()+" of "+suit)));
+      h4mqtt.publishDevice("dealt",CSTR(string(vs.back()+" of "+suit)));
       return H4_CMD_OK;
     } 
     else {
@@ -77,15 +74,6 @@ uint32_t myCallback(vector<string> vs){
   #define U_BOARD_NAME ARDUINO_BOARD
 #endif
 /*
-    Open Serial monitor and try typing any of the following:
-
-    h4/show/mqtt
-    h4/mqtt/change // payload = newbroker,newport,newusername,newpassword
-    h4/mqtt/grid // show all local H4 devices
-    h4/mqtt/restart
-    h4/mqtt/start
-    h4/mqtt/stop
-
     Using any MQTT client MQTTSpy, NODE RED etc etc, subscribe to testbed/# 
     to see all the messages from this device:
 
@@ -96,27 +84,3 @@ uint32_t myCallback(vector<string> vs){
 void h4setup() {
     Serial.println("\nH4 Plugins MQTT example v"H4P_VERSION);
 }
-/*
- Sample output
- 
-H4 Plugins MQTT example v0.0.1
-USER: MQTT connected
-v: hearts
-v: 4
-Wildcard handler suit is hearts, card is 4
-You chose the 4 of hearts
-v: hearts
-v: Z
-Wildcard handler suit is hearts, card is Z
-You chose the Z of hearts
-v: hearts
-Count of 1 sub-items is obviously an error
-scmd: Incorrect Payload Format cards/hearts
-v: a
-v: load
-v: of
-v: crap
-Count of 4 sub-items is obviously an error
-scmd: Incorrect Payload Format cards/a/load/of/crap
-
- */

@@ -56,6 +56,7 @@ class H4P_BinaryThing: public H4Plugin{
                 void        _start() override { 
                     H4Plugin::_start();
                     if(_f) _f(_state);
+                    turn(_state);
                 }
     public:
         H4P_BinaryThing(H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): _f(f),_state(initial),_timeout(timer), H4Plugin(onofTag()) {

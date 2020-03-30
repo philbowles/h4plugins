@@ -44,8 +44,6 @@ class H4P_AsyncMQTT: public H4Plugin, public AsyncMqttClient{
             string          device;
 
         VSCMD(_change);
-        VSCMD(_offline);
-        VSCMD(_online);
 
                 void        _setup();
                 void        _start() override;
@@ -65,9 +63,6 @@ class H4P_AsyncMQTT: public H4Plugin, public AsyncMqttClient{
             _cmds={
                 {_pName,    { H4PC_ROOT, _subCmd, nullptr}},
                 {"change",  { _subCmd, 0, CMDVS(_change) }}
-//                {"grid",    { _subCmd, 0, CMD(showGrid) }},
-//                {"offline", { _subCmd, 0, CMDVS(_offline) }},
-//                {"online",  { _subCmd, 0, CMDVS(_online) }}
             };       
         }
                 void        change(const string& broker,uint16_t port);

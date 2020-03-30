@@ -4,13 +4,15 @@
         dumpQ / trustednames fully decoupled from H4 - requires upgrade to H4/0.5.0
         (dumpQ + many others now compile-outable)
         H4P_AsyncMQTT replaces H4P_MQTT: pubsubclient removed, fixing 5-sec lockout delay on reconnect "feature"
-        UPNP Switch / Thing removed: replaced by free-standing UPNPServer
+            you will need to download the new library
+        UPNP Switch / Source removed: replaced by free-standing UPNPServer
+        All xSource GPIO connectors no longer have BinarySource* as final parameter, they are automatically bound to h4onof
     new
         Presence detection
             IP
-            IPThing
+            IPSource
             USN
-            USNThing
+            USNSource
         Service management cmds: h4/svc/{start|stop|restart}/XXXX
         h4/show/heap
         H4P_CmdErrors
@@ -47,7 +49,7 @@
     new
         GPIO types
         AnalogThreshold + new example
-        AnalogThresholdThing + new example
+        AnalogThresholdSource + new example
 2020/02/19  0.3.5
     breaking changes:
         h4/factory moved to serialcmd from wifi // update docs!
@@ -63,17 +65,17 @@
         added loggers:
             H4P_MQTTLogger
             H4P_MQTTHeapLogger
-    2. Thing/Switch paradigm
+    2. Source/Switch paradigm
         BasicSwitch renamed to BinarySwitch
-        added   BinaryThing
-                UPNPThing
+        added   BinarySource
+                UPNPSource
         GPIOManager heavily modified
-            added   DebouncedThing
-                    EncoderThing
-                    LatchingThing
-                    PolledThing
-                    RawThing
-                    RetriggeringThing
+            added   DebouncedSource
+                    EncoderSource
+                    LatchingSource
+                    PolledSource
+                    RawSource
+                    RetriggeringSource
 
 2020/02/12  0.2.1
     patch - put back in ip display on got ip
@@ -90,12 +92,17 @@
 
 TODO:
 SOONER
+    FR chain: add removerService mdns H4
+    no auto AP mode if ssid / psk extant
+    3fb -> FOUR fb
 SHORTTERM
+    state MQTT bcast to all, add obey[h4] cmd
     coalesce wifif scan 8266/32
     event on PS changed
     centrlaise / globalise onof?
 MEDIUMTERM
     decent tabulated gpio pin dump
+    MDNS/local domain detector
 LONGTERM
     ethernet module stm32
     ESP32 bluetooth PD

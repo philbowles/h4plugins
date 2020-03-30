@@ -41,7 +41,7 @@ SOFTWARE.
 
 #include<H4P_BinaryThing.h>
 
-#ifndef H4P_NO_WIFI
+//#ifndef H4P_NO_WIFI
 
 extern void h4FactoryReset();
 class H4P_ThreeFunctionButton: public H4Plugin{
@@ -78,5 +78,5 @@ class H4P_ThreeFunctionButton: public H4Plugin{
 
 extern __attribute__((weak)) H4P_ThreeFunctionButton h43fb;
 
-#endif
+//#endif
 #endif // H4P_ThreeFunctionButton_H

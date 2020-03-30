@@ -30,7 +30,6 @@ none, but must be created *after* [**H4P_SerialCmd**](h4sc.md) if using that plu
 
 ## Commands Added
 
-* h4/show/snif
 * h4/snif/exclude/< task ID(s) >
 * h4/snif/include/< task ID(s) >
 
@@ -72,7 +71,8 @@ void show(); // Display current "hit list"
 
 [Example Code](../examples/H4P_TaskSniffer/H4P_TaskSniffer.ino)
 
-----
+---
+
 (c) 2020 Phil Bowles h4plugins@gmail.com
 
 * [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)

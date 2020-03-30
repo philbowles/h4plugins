@@ -100,16 +100,16 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 * [**H4P_GPIOManager**](docs/h4gm.md): One-line coding of debouncing, retriggering, rotary encoding plus numerous other GPIO strategies
 * [**H4P_WiFi**](docs/h4wifi.md): Automatic Connection / reconnection manager + AP configuration + OTA + HTTP REST
 * [**H4P_AsyncWebServer**](docs/h4asws.md): Fully Asynchronous Webserver
-* [**H4P_AsyncMQTT**](docs/h4mqtt.md): Automatic Connection/ reconnection MQTT client alows remote control of H4
+* [**H4P_AsyncMQTT**](docs/h4mqtt.md): Automatic Connection/ reconnection MQTT client allows remote control of H4
 * [**H4P_BinarySwitch**](docs/things.md): GPIO object that allows control by commands from multiple sources
 * [**H4P_BinaryThing**](docs/xxx.md): functional object that allows control by commands from multiple sources
-* [**H4P_UPNPServer**](docs/things.md): Extends [H4P_BinaryThing](docs/things.md) into full UPNP device with Alexa voice control, Windows10 Desktop integration
-* [**H4P_ThreeFunctionButton**](docs/h43fnb.md): Multi-function physical control on/off,reboot,factory reset depending on hold time. Binds to xSwitch or xThing
+* [**H4P_UPNPServer**](docs/things.md): provides full UPNP device with Alexa voice control, Windows10 Desktop integration
+* [**H4P_ThreeFunctionButton**](docs/h43fnb.md): Multi-function physical control of H4P_BinarySwitch giving on/off, reboot,factory reset depending on hold time short/medium/long
 * [**H4P_PersistentStorage**](docs/h4stor.md): Save name/value pairs across reboots (requires SPIFFS)
 * [**H4P_IPDetector**](docs/pres.md): Execute function when specific IP address joins / leaves network
-* [**H4P_IPDetectorThing**](docs/pres.md): Switch default "Thing" when specific IP address joins / leaves network
+* [**H4P_IPDetectorSource**](docs/pres.md): Switch default "Source" when specific IP address joins / leaves network
 * [**H4P_UPNPDetector**](docs/pres.md): Execute function when specific UPNP device USN joins / leaves network
-* [**H4P_UPNPDetectorThing**](docs/pres.md): Switch default "Thing" when specific UPNP device USN joins / leaves network
+* [**H4P_UPNPDetectorSource**](docs/pres.md): Switch default "Source" when specific UPNP device USN joins / leaves network
 
 ## Diagnostic / Development tools:
 
@@ -146,25 +146,22 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 
 H4Plugins is tested using
 
-* ArduinoIDE 1.8.10 
+* ArduinoIDE 1.8.12 
 * ESP8266 core 2.6.3
 * ESP32 core 1.0.4
-* STM32-NUCLEO core 1.7.0
+* STM32-NUCLEO core 1.8.0
 
 Use the ArduinoIDE boards manager to install those versions. Earlier version *may* work, but am only able to offer support on the above.
 
 H4Plugins is a standard Arduino library. The simplest method is to download the zip form the link above and then use the menu command: `Sketch / Include Library / Add .ZIP Library...`
 
-First you need to install the  [**H4**](https://github.com/philbowles/H4) library. 
+First you need to install the  [H4](https://github.com/philbowles/H4) library. 
 
 Next install the 3rd-party libraries:
 
 * [Async MQTT client library](https://github.com/marvinroger/async-mqtt-client)
-  
-If targeting ESP8266:
 * [ESP8266 ESPAsyncUDP Library](https://github.com/me-no-dev/ESPAsyncUDP)
 * [ESP8266 ESPAsyncTCP Library](https://github.com/me-no-dev/ESPAsyncTCP)
-If targeting ESP32:
 * [ESP32 AsyncTCP Library](https://github.com/me-no-dev/AsyncTCP)
 
 The above libraries coexist quite happily if you download all of them to enable targetting both ESP8266 and ESP32.

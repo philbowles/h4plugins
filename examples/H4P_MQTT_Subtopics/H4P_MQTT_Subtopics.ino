@@ -1,8 +1,5 @@
-#include <H4.h>
-#include <H4P_SerialCmd.h>
-#include <H4P_CmdErrors.h>
-#include <H4P_WiFi.h>
-#include <H4P_AsyncMQTT.h>
+#include<H4Plugins.h>
+H4_USE_PLUGINS
 
 H4 h4(115200);
 
@@ -56,11 +53,12 @@ uint32_t myCallback(vector<string> vs){
     Using any MQTT client MQTTSpy, NODE RED etc etc, subscribe to testbed/# 
     to see all the messages from this device:
 
-    Then, publish topic
+    Then, publish topics
 
-    testbed/mytopic with a payload of "good" and again with a different payload
-
+    testbed/a
+    testbed/a/b
+    testbed/a/b/c
 */
 void h4setup() {
-    Serial.println("\nH4 Plugins MQTT example v"H4P_VERSION);
+    Serial.println("\nH4 Plugins MQTT subtopics example v"H4P_VERSION);
 }
