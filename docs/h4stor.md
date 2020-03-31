@@ -18,9 +18,7 @@ All saved values will be lost on factory reset.
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS
-H4P_SerialCmd h4sc;
-H4P_PersistentStorage h4ps(...
+H4_USE_PLUGINS(115200,false)H4P_PersistentStorage h4ps(...
 ```
 
 ## Dependencies

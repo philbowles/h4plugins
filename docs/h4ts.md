@@ -20,13 +20,13 @@ It requires detailed knowledge of H4 "internals" which are beyond the scope of t
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,false)
 H4P_TaskSniffer h4ts;
 ```
 
 ## Dependencies
 
-none, but must be created *after* [**H4P_SerialCmd**](h4sc.md) if using that plugin
+none, but must be created *after* [**H4P_SerialCmd**](h4cmd.md) if using that plugin
 
 ## Commands Added
 

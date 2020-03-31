@@ -1,5 +1,5 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,false)
 /*
     This i based on the QueueWarn example: you should run that first.
 
@@ -27,11 +27,12 @@ H4 h4(115200,SMALL_Q); //auto-start Serial @ 115200, small Q of 10 to force a wa
 void qIsLow(bool inDanger){ 
   if(inDanger) {
     Serial.println("Warning, Will Robinson - low Q!!!"); // See 1960s TV SciFi series "Lost in Space" :)
-    h4sc.dumpQ();
+    h4cmd.dumpQ();
   }
 }
 
-H4P_SerialCmd h4sc;
+
+
 H4P_QueueWarn h4qw(qIsLow,50); // call qIsLow when free Q drops below 50%
 H4P_TaskSniffer h4ts;
 /*

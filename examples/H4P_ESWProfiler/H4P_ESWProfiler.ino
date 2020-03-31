@@ -1,7 +1,5 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS
-
-H4 h4(115200);
+H4_USE_PLUGINS(115200,false)
 //
 #ifdef ARDUINO_ARCH_ESP32
   #define D7 27
@@ -10,7 +8,8 @@ H4 h4(115200);
 #endif
 
 H4P_CmdErrors h4ce;
-H4P_SerialCmd h4sc;
+
+
 H4P_ExternalSqWave h4esw(D6,D5,99,49);
 H4P_GPIOManager h4gm;
 

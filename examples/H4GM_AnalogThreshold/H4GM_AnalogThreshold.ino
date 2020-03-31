@@ -1,5 +1,5 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,false)
 /*
 My major testing devices were nodeMCU which has builtin button on GPIO0 which is ACTIVE_LOW
 and STM32NUCLEO-F429ZI whuch has a user button that is ACTIVE_HIGH
@@ -46,7 +46,8 @@ You will probably need to adjust these values for you own device
         analog value.
 */
 
-H4 h4(115200); //auto-start Serial @ 115200, Q size=20 
+
+
 H4P_GPIOManager h4gm;
 
 #define U_POLL_FREQ     5000

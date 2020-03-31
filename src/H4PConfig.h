@@ -43,7 +43,7 @@ SOFTWARE.
 #define H4ESW_MAX_D            100
 #define H4ESW_TIMEOUT           50
 
-#define H4FC_MORSE_SUPPORT  false
+//#define H4FC_MORSE_SUPPORT  false
 
 #define H4MQ_RETRY            5000
 
@@ -51,8 +51,9 @@ SOFTWARE.
 #define H4P_UDP_REFRESH     300000
 #define H4P_UDP_REPEAT           2
 
-#define H43F_MEDIUM            175
-#define H43F_FAST               50
+#define H43F_SLOW              250
+#define H43F_MEDIUM            125
+#define H43F_FAST               25
 #define H43F_TIMEBASE          175
 #define H43F_REBOOT           2000
 #define H43F_FACTORY          5000

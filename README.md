@@ -34,10 +34,8 @@ What follows is the *entire H4Plugins code* - despite the fact it might look lik
 * Alexa voice control
 
 ```cpp
-#include<H4Plugins.h>
-H4_USE_PLUGINS
-H4 h4(115200);
-H4P_SerialCmd h4sc;
+H4_USE_PLUGINS(115200,false)
+
 H4P_GPIOManager h4gm;
 H4P_FlasherController h4fc;
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","h104");
@@ -45,7 +43,7 @@ H4P_AsyncWebServer h4asws("admin","admin");
 H4P_AsyncMQTT h4mqtt("192.168.1.4",1883);
 H4P_BinarySwitch h4onof(RELAY_BUILTIN,ACTIVE_HIGH,OFF);
 H4P_UPNPServer h4upnp("Demo Switch");
-H4P_ThreeFunctionButton h43fb(BUTTON_BUILTIN,INPUT,ACTIVE_LOW,15,LED_BUILTIN,ACTIVE_LOW);
+H4P_MultiFunctionButton h43fb(BUTTON_BUILTIN,INPUT,ACTIVE_LOW,15,LED_BUILTIN,ACTIVE_LOW);
 ```
 
 As you can see, all you need to do is list the modules you want (in the right order) and provide a few necessary values such as ssid / passwords etc and the plugins link up with each other, exchange messages betwen themselves and "stitch" everything together into a seamless piece of stable firmware. If you know of anything easier for both beginners and seasoned developers, please let us know.
@@ -95,7 +93,7 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 # Plugins
 ## Core IOT functionality
 
-* [**H4P_SerialCmd**](docs/h4sc.md): Send commands from multiple sources to H4 and/or plugins to control and/or diagnose
+* [**H4P_SerialCmd**](docs/h4cmd.md): Send commands from multiple sources to H4 and/or plugins to control and/or diagnose
 * [**H4P_FlasherController**](docs/h4fc.md): One-line coding of multiple simultaneous LED flashing by Square Wave, PWM, abitrary pattern and Morse code
 * [**H4P_GPIOManager**](docs/h4gm.md): One-line coding of debouncing, retriggering, rotary encoding plus numerous other GPIO strategies
 * [**H4P_WiFi**](docs/h4wifi.md): Automatic Connection / reconnection manager + AP configuration + OTA + HTTP REST
@@ -104,12 +102,16 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 * [**H4P_BinarySwitch**](docs/things.md): GPIO object that allows control by commands from multiple sources
 * [**H4P_BinaryThing**](docs/xxx.md): functional object that allows control by commands from multiple sources
 * [**H4P_UPNPServer**](docs/things.md): provides full UPNP device with Alexa voice control, Windows10 Desktop integration
-* [**H4P_ThreeFunctionButton**](docs/h43fnb.md): Multi-function physical control of H4P_BinarySwitch giving on/off, reboot,factory reset depending on hold time short/medium/long
+* [**H4P_MultiFunctionButton**](docs/h4mfnb.md): Multi-function physical control of H4P_BinarySwitch giving on/off, reboot,factory reset depending on hold time short/medium/long
 * [**H4P_PersistentStorage**](docs/h4stor.md): Save name/value pairs across reboots (requires SPIFFS)
-* [**H4P_IPDetector**](docs/pres.md): Execute function when specific IP address joins / leaves network
-* [**H4P_IPDetectorSource**](docs/pres.md): Switch default "Source" when specific IP address joins / leaves network
-* [**H4P_UPNPDetector**](docs/pres.md): Execute function when specific UPNP device USN joins / leaves network
-* [**H4P_UPNPDetectorSource**](docs/pres.md): Switch default "Source" when specific UPNP device USN joins / leaves network
+* [**H4P_H4Detector**](docs/h4pd.md): Execute function when specific H4 device address joins / leaves network
+* [**H4P_H4DetectorSource**](docs/h4pd.md): Switch default BinarySwitch/Thing when specific H4Device address joins / leaves network
+* [**H4P_MDNSDetector**](docs/h4pd.md): Execute function when specific MDNS service/protocol found / lost on network
+* [**H4P_MDNSDetectorSource**](docs/h4pd.md): Switch default BinarySwitch/Thing when specific MDNS service/protocol found / lost on network
+* [**H4P_IPDetector**](docs/h4pd.md): Execute function when specific IP address joins / leaves network
+* [**H4P_IPDetectorSource**](docs/h4pd.md): Switch default BinarySwitch/Thing when specific IP address joins / leaves network
+* [**H4P_UPNPDetector**](docs/h4pd.md): Execute function when specific UPNP device USN joins / leaves network
+* [**H4P_UPNPDetectorSource**](docs/h4pd.md): Switch default BinarySwitch/Thing when specific UPNP device USN joins / leaves network
 
 ## Diagnostic / Development tools:
 

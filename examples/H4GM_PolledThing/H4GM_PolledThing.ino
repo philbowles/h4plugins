@@ -1,5 +1,5 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,false)
 /*
 My major testing devices were nodeMCU which has builtin button on GPIO0 which is ACTIVE_LOW
 and STM32NUCLEO-F429ZI whuch has a user button that is ACTIVE_HIGH

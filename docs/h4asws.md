@@ -27,7 +27,7 @@ N.B. The "name" field is only relevant if you are also using the [H4P_UPNPServer
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,false)
 H4P_WiFi h4asws(...
 ```
 

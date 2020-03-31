@@ -117,22 +117,7 @@ H4P_UPNPDetectorSource::H4P_UPNPDetectorSource(const string& pid,const string& i
         };
     }
 }
-//
-//      H4 (MDNS)
-//
-H4P_H4DetectorSource::H4P_H4DetectorSource(const string& id): H4P_H4Detector(id){
-    H4P_BinaryThing* _btp;
-    REQUIREBT;
-    if(_btp){
-        _f=[this,_btp](bool b){ 
-#ifdef H4P_LOG_EVENTS
-        _btp->_turn(b,_pName+string("("+_id+")"));
-#else
-        _btp->turn(b);
-#endif
-        };
-    }
-}
+#ifdef ARDUINO_ARCH_ESP8266
 //
 //      MDNS
 //
@@ -153,4 +138,19 @@ H4P_MDNSDetector::H4P_MDNSDetector(const string& friendly,const string& service,
         localList[friendly]=this;
 }
 
+H4P_H4DetectorSource::H4P_H4DetectorSource(const string& id): H4P_H4Detector(id){
+    H4P_BinaryThing* _btp;
+    REQUIREBT;
+    if(_btp){
+        _f=[this,_btp](bool b){ 
+#ifdef H4P_LOG_EVENTS
+        _btp->_turn(b,_pName+string("("+_id+")"));
+#else
+        _btp->turn(b);
 #endif
+        };
+    }
+}
+#endif // 8266
+
+#endif // wifi

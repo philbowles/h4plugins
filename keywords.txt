@@ -33,7 +33,7 @@ H4P_UPNPServer	KEYWORD1
 H4P_PresenceDetector	KEYWORD1
 H4P_BinarySwitch	KEYWORD1
 H4P_BinaryThing	KEYWORD1
-H4P_ThreeFunctionButton	KEYWORD1
+H4P_MultiFunctionButton	KEYWORD1
 H4P_IPDetector	KEYWORD1
 H4P_IPDetectorSource	KEYWORD1
 H4P_UPNPDetector	KEYWORD1

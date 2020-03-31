@@ -27,8 +27,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_ThreeFunctionButton_HO
-#define H4P_ThreeFunctionButton_HO
+#ifndef H4P_MultiFunctionButton_HO
+#define H4P_MultiFunctionButton_HO
 
 /*
 #ifndef LED_BUILTIN
@@ -41,10 +41,8 @@ SOFTWARE.
 
 #include<H4P_BinaryThing.h>
 
-//#ifndef H4P_NO_WIFI
-
 extern void h4FactoryReset();
-class H4P_ThreeFunctionButton: public H4Plugin{
+class H4P_MultiFunctionButton: public H4Plugin{
             H4P_BinaryThing*    _btp;
             uint8_t             _led;
             H4GM_SENSE          _active;
@@ -56,6 +54,9 @@ class H4P_ThreeFunctionButton: public H4Plugin{
 #endif
                 {H43F_REBOOT,[](H4GPIOPin*){ h4reboot(); }},
                 {H43F_FACTORY,[](H4GPIOPin*){ h4FactoryReset(); }}
+#ifndef H4P_NO_WIFI
+                ,{10000,[](H4GPIOPin*){ h4wifi.forceAP(); }}
+#endif
             };    
             H4_FN_VOID      _createMS;
 
@@ -65,7 +66,7 @@ class H4P_ThreeFunctionButton: public H4Plugin{
             
             void progress(H4GPIOPin* ptr);
     public:
-        H4P_ThreeFunctionButton(
+        H4P_MultiFunctionButton(
 //          the input button            
             uint8_t pin,
             uint8_t mode,
@@ -76,7 +77,7 @@ class H4P_ThreeFunctionButton: public H4Plugin{
             H4GM_SENSE l_sense);
 };
 
-extern __attribute__((weak)) H4P_ThreeFunctionButton h43fb;
+extern __attribute__((weak)) H4P_MultiFunctionButton h43fb;
 
 //#endif
-#endif // H4P_ThreeFunctionButton_H
+#endif // H4P_MultiFunctionButton_H

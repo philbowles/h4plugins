@@ -1,11 +1,13 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,false)
 //  Starts OFF, commanded ON after 5sec then turns OFF automatically after AUTO_OFF milliseconds
 
 #define AUTO_OFF  10000
 
-H4 h4(115200);
-H4P_SerialCmd h4sc;
+
+
+
+
 H4P_SerialLogger h4sl;
 H4P_BinaryThing h4onof([](bool b){ Serial.print("I am now ");Serial.println(b ? "ON":"OFF"); },ON,AUTO_OFF);
 

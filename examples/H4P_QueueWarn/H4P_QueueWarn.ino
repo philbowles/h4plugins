@@ -1,5 +1,5 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,false)
 
 #define SMALL_Q       10
 #define Q_WARN_PCENT  50
@@ -16,7 +16,8 @@ void qIsLow(bool inDanger){
     else Serial.println("Disaster Averted"); 
 }
 
-H4P_SerialCmd h4sc;
+
+
 H4P_QueueWarn h4qw(qIsLow,50); // call qIsLow when free Q drops below 50%
 /*
     Open Serial monitor and try typing any of the following:

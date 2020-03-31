@@ -33,11 +33,16 @@ void __attribute__((weak)) h4AddAwsHandlers(){}
 void __attribute__((weak)) onFactoryReset(){}
 
 vector<H4_FN_VOID>  H4Plugin::_factoryChain;
-
+//
+//
+//
+bool stringIsAlpha(const string& s){ return !(std::find_if(s.begin(), s.end(),[](char c) { return !std::isalpha(c); }) != s.end()); }
+//
 void h4StartPlugins(){
-    for(auto const& p:H4Plugin::_plugins) p->_startup();
-    for(auto const& p:H4Plugin::_plugins) p->_hookIn();
-    for(auto const& p:H4Plugin::_plugins) p->_greenLight();
+//    Serial.printf("STARTING %d plugins\n",H4Plugin::_plugins.size());
+    for(auto const& p:H4Plugin::_plugins) { p->_startup(); }
+    for(auto const& p:H4Plugin::_plugins) { p->_hookIn(); }
+    for(auto const& p:H4Plugin::_plugins) { p->_greenLight(); }
     reverse(H4Plugin::_factoryChain.begin(),H4Plugin::_factoryChain.end());
     H4Plugin::_hookFactory(onFactoryReset);
 }
@@ -89,11 +94,13 @@ void H4Plugin::reply(const char* fmt,...){ // find pub sub size
 }
 
 void H4Plugin::_startup(){
+//    Serial.printf("H4Plugin::_startup %s state=%d\n",CSTR(_pName),state()); 
     _commands.insert(_cmds.begin(),_cmds.end());
     _cmds.clear();
 }
 
-void H4Plugin::start() { 
+void H4Plugin::start() {
+//    Serial.printf("H4Plugin::start %s state=%d\n",CSTR(_pName),state()); 
     if(!state()){
         H4EVENT("svc start %s",CSTR(_pName));
         _start(); // call the overrideable
@@ -122,6 +129,6 @@ void H4Plugin::_downHooks(){
 //      H4PlogService
 //
 void H4PLogService::_hookIn(){
-    REQUIRE(scmd);
-    h4sc._hookLogChain(bind(&H4PLogService::_filterLog,this,_1,_2,_3,_4));
+    //REQUIRE(scmd);
+    h4cmd._hookLogChain(bind(&H4PLogService::_filterLog,this,_1,_2,_3,_4));
 }

@@ -111,9 +111,11 @@ class H4P_CmdErrors: public H4Plugin {
         string      getLogType(uint32_t e){
             return logTypes.count(e) ? logTypes[e]:string("No such type (")+stringFromInt(e)+")";
         }
+
         string      getTaskType(uint32_t e){
             return taskTypes.count(e) ? taskTypes[e]:stringFromInt(e,"?%02d?");
         }
+        
         string      getTaskName(uint32_t e){
             return taskNames.count(e) ? taskNames[e]:giveTaskName(e);
         }

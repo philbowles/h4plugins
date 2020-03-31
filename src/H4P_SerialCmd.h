@@ -54,7 +54,7 @@ extern void h4FactoryReset();
 class H4P_SerialCmd: public H4Plugin {
         vector<H4P_FN_LOG>  _logChain;
         VSCMD(_svcRestart);
-        VSCMD(_svcState);
+        VSCMD(_svcInfo);
         VSCMD(_svcStart);
         VSCMD(_svcStop);
         VSCMD(_test);
@@ -79,7 +79,7 @@ class H4P_SerialCmd: public H4Plugin {
             H4Plugin::_stop();
         }
     public:
-        H4P_SerialCmd();
+        H4P_SerialCmd(bool autoStop=false);
 #ifndef ARDUINO_ARCH_STM32
         static  string          read(const string& fn);
         static  uint32_t        write(const string& fn,const string& data,const char* mode="w");
@@ -112,9 +112,8 @@ class H4P_SerialCmd: public H4Plugin {
                 void            _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target);
                 uint32_t        _executeCmd(string topic, string pload);
                 uint32_t        _simulatePayload(string flat,const char* src=scmdTag());
-//
 };
 
-extern __attribute__((weak)) H4P_SerialCmd h4sc;
- 
+extern __attribute__((weak)) H4P_SerialCmd h4cmd;
+
 #endif // H4SerialCmd_H

@@ -26,7 +26,7 @@ Perhaps the best part though is that once you have your code working on one type
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,false)
 H4P_GPIOManager h4gm;
 ```
 

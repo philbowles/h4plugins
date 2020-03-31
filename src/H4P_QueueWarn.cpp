@@ -47,7 +47,7 @@ uint32_t H4P_QueueWarn::_qwPcent(vector<string> vs){ return guardInt1(vs,bind(&H
 H4P_QueueWarn::H4P_QueueWarn(function<void(bool)> _f,uint32_t _limit): H4Plugin(qwrnTag()){
     h4._hookLoop([this](){ _run(); },_subCmd);
     _cmds={
-        {_pName,     {H4PC_ROOT, _subCmd, nullptr}},
+        {_pName,     {H4PC_H4, _subCmd, nullptr}},
         {"pcent",  {_subCmd,   0, CMDVS(_qwPcent)}}
     };
     f=_f;  

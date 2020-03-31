@@ -34,7 +34,7 @@ The following external events all cause the same action: rebooting the device
 * Typing `http://your.ip.addr.ess/rest/h4/reboot` in a browser
 * Publishing `your-device-name/h4/reboot` to the MQTT server
 * Calling `h4reboot()` in your code
-* Calling `h4sc.InvokeCmd("h4/reboot")` in your code
+* Calling `h4cmd.InvokeCmd("h4/reboot")` in your code
 
 ## Direct invocation of commands from code
 
@@ -45,7 +45,7 @@ Any command that can be typed on the console, received from MQTT or the http RES
 SerialCmd provides the `invokeCmd` function which takes parameters for topic and payload. Using the above example, you could call it thus:
 
 ```cpp
-h4sc.invokeCmd("h4/some/cmd/with/many/levels","42,666");
+h4cmd.invokeCmd("h4/some/cmd/with/many/levels","42,666");
 ```
 
 * Direct call
@@ -53,7 +53,7 @@ h4sc.invokeCmd("h4/some/cmd/with/many/levels","42,666");
 Generally, each plugin also provides functions that correspond to the command-line equivalent, but are more efficient than the invokeCmd method. For example, calling
 
 ```cpp
-h4sc.dumpQ();
+h4cmd.dumpQ();
 ```
 
 Has the same effect as typing "h4/show/q" at the console, MQTT publishing a topic of "h4/show/q" or receiving `http://< some ip >/rest/h4/show/q`. The only difference is that the resulting dump of the H4 queue is sent back to the originating source, respectively the console, MQTT server, or the web browser.
@@ -64,8 +64,8 @@ Has the same effect as typing "h4/show/q" at the console, MQTT publishing a topi
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS
-H4P_SerialCmd h4sc;
+H4_USE_PLUGINS(115200,false)
+H4P_SerialCmd h4cmd(... // optional autoStop true/false parameter: true=peformance++ (see later)
 ```
 
 ## Dependencies
@@ -144,7 +144,7 @@ Otherwise a simple code is returned:
 * h4/svc/state/scmd 
 * h4/svc/stop/scmd 
 * 
-SerialCmd can be safely stopped - it will continue to provide command functionality to other plugins that depend upon it. e.g. [**H4P_AsyncWebServer** (http "REST")](h4asws.md) and [**H4P_AsyncMQTT**](h4mqtt.md) but it will no longer accept serial commands on its own behalf. Thus it can only be done once from the serial console*. Unloading `scmd` will show a huge performance improvement, so it is worth considering once testing is complete, especially for devices that will be deployed remotely and will never be able to recive serial commands.
+SerialCmd can be safely stopped - it will continue to provide command functionality to other plugins that depend upon it. e.g. [**H4P_AsyncWebServer** (http "REST")](h4asws.md) and [**H4P_AsyncMQTT**](h4mqtt.md) but it will no longer accept serial commands on its own behalf. Thus it can only be done once from the serial console*. Unloading `scmd` will show a huge performance improvement (+50% ish), so it is worth considering once testing is complete, especially for devices that will be deployed remotely and will never be able to recive serial commands. (see autoStop parameter below)
 
 (* It can be restarted remotely, e.g. via MQTT or http/REST)
 
@@ -159,13 +159,22 @@ void onFactoryReset(void);
 void onReboot(void);
 ```
 
+# API
+
+```cpp
+/* Constructor
+autoStop = true will stop the servce form receiving serial commnds and improve performance by about +50%
+*/
+H4P_SerialCmd(bool autoStop=true);
+```
+
 ## Command functions
 
 ```cpp
 void all();
 void config();
 void dumpQ();
-void h4reboot(); //** provided by h4, use h4.h4reboot(), NOT h4sc.h4reboot()
+void h4reboot(); //** provided by h4, use h4.h4reboot(), NOT h4cmd.h4reboot()
 void h4FactoryReset();
 void help();
 void plugins();
@@ -198,7 +207,7 @@ Shows the contents of H4's internal queue. Useful for debugging, but will probab
 h4FactoryReset();
 ```
 
-i.e. *do not* precede it with `h4sc.`
+i.e. *do not* precede it with `h4cmd.`
 
 **WARNING** *this will delete all saved configuration data before doing a reboot - use with caution!*
 
@@ -212,7 +221,7 @@ Does exactly what it says on the tin! **NOTE** This command is provided by H4 it
 h4reboot();
 ```
 
-i.e. *do not* precede it with `h4sc.`
+i.e. *do not* precede it with `h4cmd.`
 
 ### help()
 

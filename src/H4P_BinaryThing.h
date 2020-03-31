@@ -38,37 +38,75 @@ SOFTWARE.
 #endif
 
 class H4P_BinaryThing: public H4Plugin{
-        uint32_t         _timeout;
+        uint32_t        _timeout;
+        unordered_set<string>   _slaves;
     protected:
         bool            _state=false;
         H4BS_FN_SWITCH  _f;
         
         #ifdef H4P_NO_WIFI
             void            _publish(bool b){}
+            void            _setSlaves(bool b){}
         #else                
-            virtual void    _hookIn() override { if(isLoaded(mqttTag())) h4mqtt.hookConnect([this](){ _publish(_getState()); }); }
+            virtual void    _hookIn() override { 
+                if(isLoaded(mqttTag())) {
+                    h4mqtt.hookConnect([this](){ _publish(_getState()); }); 
+                    //h4cmd.addCmd("slave/#", H4PC_H4, 0, CMDVS(_slave));
+                    h4mqtt.subscribeDevice("slave/#",CMDVS(_slave),H4PC_H4);
+                }
+            }
+                    void    _setSlaves(bool b){
+                        for(auto s:_slaves){
+                            string t=s+"/h4/switch";
+                            h4mqtt.publish(CSTR(t),0,false,CSTR(stringFromInt(b)));
+                        }
+                    }
                     void    _publish(bool b){ if(isLoaded(mqttTag())) h4mqtt.publishDevice(stateTag(),b); }
         #endif
 
-        virtual void        _setState(bool b) { _state=b; }
-
-                uint32_t    _switch(vector<string> vs){ return guardInt1(vs,bind(&H4P_BinaryThing::turn,this,_1)); }
-                void        _start() override { 
-                    H4Plugin::_start();
-                    if(_f) _f(_state);
-                    turn(_state);
-                }
+            virtual void    _setState(bool b) {
+                        _state=b;
+                        _setSlaves(b);
+                    }
+                
+                    uint32_t _slave(vector<string> vs){
+                        H4_CMD_ERROR e=H4_CMD_PAYLOAD_FORMAT;
+                        if(vs.size()<2) return H4_CMD_TOO_FEW_PARAMS;
+                        if(vs.size()>2) return H4_CMD_TOO_MANY_PARAMS;
+                        if(!stringIsAlpha(vs[0])) return H4_CMD_PAYLOAD_FORMAT;
+                        if(!isNumeric(H4PAYLOAD)) return H4_CMD_NOT_NUMERIC;
+                        if(H4PAYLOAD_INT > 1) return H4_CMD_OUT_OF_BOUNDS;
+                        if(H4PAYLOAD_INT) _slaves.insert(vs[0]);
+                        else _slaves.erase(vs[0]);
+                        H4EVENT("%s slave %s",H4PAYLOAD_INT ? "Added":"Removed",CSTR(vs[0]));
+                        show();
+                        return H4_CMD_OK;
+                    }
+                
+                    void     _start() override { 
+                        H4Plugin::_start();
+                        if(_f) _f(_state);
+                        turn(_state);
+                    }
+                    uint32_t _switch(vector<string> vs){ return guardInt1(vs,bind(&H4P_BinaryThing::turn,this,_1)); }
     public:
         H4P_BinaryThing(H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): _f(f),_state(initial),_timeout(timer), H4Plugin(onofTag()) {
             _cmds={
-                {"on",     {H4PC_ROOT, 0, CMD(turnOn)}},
-                {"off",    {H4PC_ROOT, 0, CMD(turnOff)}},
-                {"state",  {H4PC_ROOT, 0, CMD(show)}},
-                {"switch", {H4PC_ROOT, 0, CMDVS(_switch)}},
-                {"toggle", {H4PC_ROOT, 0, CMD(toggle)}}
+                {"on",     {H4PC_H4, 0, CMD(turnOn)}},
+                {"off",    {H4PC_H4, 0, CMD(turnOff)}},
+                {"state",  {H4PC_H4, 0, CMD(show)}},
+                {"switch", {H4PC_H4, 0, CMDVS(_switch)}},
+                {"toggle", {H4PC_H4, 0, CMD(toggle)}}
             };
         }
-        virtual  void show() override { reply("State: %s",_getState() ? "ON":"OFF"); }
+
+        virtual  void show() override { 
+            reply("State: %s",_getState() ? "ON":"OFF");
+            for(auto s :_slaves) reply("Slave: %s",CSTR(s));
+        }
+
+        void slave(const string& otherh4){ _slaves.insert(otherh4); }
+
         bool state() { return _getState(); }
         void turnOff(){ turn(false); }
         void turnOn(){ turn(true); }

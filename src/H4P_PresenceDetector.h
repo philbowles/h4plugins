@@ -92,7 +92,7 @@ class H4P_UPNPDetectorSource: public H4P_UPNPDetector{
     public:
         H4P_UPNPDetectorSource(const string& pid,const string& id);
 };
-
+#ifdef ARDUINO_ARCH_ESP8266
 class H4P_MDNSDetector: public H4PDetector {
         string _service;
         string _protocol;
@@ -122,7 +122,8 @@ class H4P_H4DetectorSource: public H4P_H4Detector{
     public:
         H4P_H4DetectorSource(const string& local);
 };
+#endif // esp8266
 
-#endif
+#endif // wifi
 
 #endif // H4P_PresenceDetector_H

@@ -1,6 +1,6 @@
 ![H4P Flyer](/assets/GPIOLogo.jpg) 
 
-## Three Function Button (short name="tfnb")
+## Three Function Button (short name="mfnb")
 
 ### Adds 3-function* GPIO button to H4 Universal Scheduler/Timer
 
@@ -29,18 +29,18 @@ A "long" press - anything over 5 seconds** - starts the LED flashing extremely r
 
 # Usage
 
-H4P_ThreeFunctionButton is a specialised example of an IOT "Source" - you should read ["Sources vs Switches"](things.md) before continuing
+H4P_MultiFunctionButton is a specialised example of an IOT "Source" - you should read ["Sources vs Switches"](things.md) before continuing
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,false)
 
 H4P_GPIOManager h4gm;
 // either
 //H4P_BinarySwitch h4onof(...
 or
 //H4P_BinaryThing h4onof(...
-H4P_ThreeFunctionButton h4onof(...
+H4P_MultiFunctionButton h4onof(...
 ```
 
 # Dependencies
@@ -57,7 +57,7 @@ none
 
 ```cpp
 /* constructor: */
-H4P_ThreeFunctionButton(
+H4P_MultiFunctionButton(
     H4P_BinarySwitch* bsp,  //a reference to a previoulsy defined H4P_BinarySwitch or H4P_UPNPServer
     uint32_t dbTimeMs, // the switch debounce value in milliseconds: depends on the individual switch
     //          the input button

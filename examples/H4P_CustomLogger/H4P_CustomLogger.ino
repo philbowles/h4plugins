@@ -1,5 +1,5 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,false)
 
 class myLogger: public H4PLogService {
         void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target){
@@ -12,9 +12,11 @@ class myLogger: public H4PLogService {
         myLogger(): H4PLogService("mylog"){}
 };
 
-H4 h4(115200);
+
+
 H4P_CmdErrors h4ce;
-H4P_SerialCmd h4sc;
+
+
 //H4P_SerialLogger h4sl;
 myLogger lumberjack;
 

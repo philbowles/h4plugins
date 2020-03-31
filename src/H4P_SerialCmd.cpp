@@ -29,19 +29,19 @@ SOFTWARE.
 #include<H4P_SerialCmd.h>
 #include<H4P_CmdErrors.h>
 
-H4P_SerialCmd::H4P_SerialCmd(): H4Plugin(scmdTag()){
+H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Plugin(scmdTag()){
     _cmds={
-        {h4Tag(),      { 0, H4PC_ROOT, nullptr}},
+        {h4Tag(),      { 0, H4PC_H4, nullptr}},
         {"help",       { 0, 0, CMD(help) }},
-        {"reboot",     { H4PC_ROOT, 0, CMD(h4reboot) }},
-        {"factory",    { H4PC_ROOT, 0, CMD(h4FactoryReset) }},
-        {"svc",        { H4PC_ROOT, H4PC_SVC, nullptr}},
+        {"info",       { H4PC_SVC,  0, CMDVS(_svcInfo) }},
+        {"reboot",     { H4PC_H4, 0, CMD(h4reboot) }},
+        {"factory",    { H4PC_H4, 0, CMD(h4FactoryReset) }},
+        {"svc",        { H4PC_H4, H4PC_SVC, nullptr}},
         {"restart",    { H4PC_SVC,  0, CMDVS(_svcRestart) }},
         {"start",      { H4PC_SVC,  0, CMDVS(_svcStart) }},
-        {"state",      { H4PC_SVC,  0, CMDVS(_svcState) }},
         {"stop",       { H4PC_SVC,  0, CMDVS(_svcStop) }},
 #ifdef H4P_LOG_EVENTS
-        {"show",       { H4PC_ROOT, H4PC_SHOW, nullptr}},
+        {"show",       { H4PC_H4, H4PC_SHOW, nullptr}},
         {"all",        { H4PC_SHOW, 0, CMD(all) }},
         {"config",     { H4PC_SHOW, 0, CMD(config) }},
         {"q",          { H4PC_SHOW, 0, CMD(dumpQ) }},
@@ -50,11 +50,14 @@ H4P_SerialCmd::H4P_SerialCmd(): H4Plugin(scmdTag()){
 #ifndef ARDUINO_ARCH_STM32
         {"heap",       { H4PC_SHOW, 0, CMD(heap) }},
         {"spif",       { H4PC_SHOW, 0, CMD(showSPIFFS)}},
-        {"dump",       { H4PC_ROOT, 0, CMDVS(_dump)}},
+        {"dump",       { H4PC_H4, 0, CMDVS(_dump)}},
 #endif
-
 #endif
     }; 
+    if(autoStop) h4.queueFunction([this](){ 
+        stop();
+        H4EVENT("SCMD AUTOSTOPPED");
+    });
 }
 
 void H4P_SerialCmd::_hookIn(){
@@ -163,7 +166,7 @@ uint32_t H4P_SerialCmd::_svcControl(H4P_SVC_CONTROL svc,vector<string> vs){
 
 uint32_t H4P_SerialCmd::_svcRestart(vector<string> vs){ return _svcControl(H4PSVC_RESTART,vs); }
 uint32_t H4P_SerialCmd::_svcStart(vector<string> vs){ return _svcControl(H4PSVC_START,vs); }
-uint32_t H4P_SerialCmd::_svcState(vector<string> vs){ return _svcControl(H4PSVC_STATE,vs); }
+uint32_t H4P_SerialCmd::_svcInfo(vector<string> vs){ return _svcControl(H4PSVC_STATE,vs); }
 uint32_t H4P_SerialCmd::_svcStop(vector<string> vs){ return _svcControl(H4PSVC_STOP,vs); }
 
 void H4P_SerialCmd::_logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target){
@@ -274,7 +277,7 @@ void H4P_SerialCmd::dumpQ(){
 
 void  H4P_SerialCmd::plugins(){ 
     for(auto const& p:H4Plugin::_plugins){
-        reply("h4/svc/state/%s %s ID=%d",CSTR(p->_pName),p->_state() ? "UP":"DN",p->_subCmd);
+        reply("h4/svc/info/%s %s ID=%d",CSTR(p->_pName),p->_state() ? "UP":"DN",p->_subCmd);
         p->show();
         reply("");
     }

@@ -12,7 +12,7 @@
 
 Let's not forget that "IOT" is the Internet of *Sources*. So what is a "Source"? The answer is: *anything you want it to be*. In H4 Plugins terms, it is an object that holds an interal `state` of `ON` or `OFF` and reacts to commands `on`,`off`,`toggle` and `switch`. If you are using the  [H4P_AsyncMQTT plugin](h4mqtt.md) it publishes the `state` topic whenever the state changes. A Switch is a just a Source with a predefined output function linked to a single GPIO.
 
-There can only be one *output* Source (or Switch) in a sketch/app and it must be named as `h4onof`. It is effectively the default handler for the above commands. It is what your device does when any source ( [Serial](h4sc.md), [MQTT](h4mqtt.md), [HTTP REST](h4asws.md), Amazon Alexa voice command or [linked GPIO input connector](h5gpio.md) ) sends an `on`,`off`,`toggle` or `switch` command.
+There can only be one *output* Source (or Switch) in a sketch/app and it must be named as `h4onof`. It is effectively the default handler for the above commands. It is what your device does when any source ( [Serial](h4cmd.md), [MQTT](h4mqtt.md), [HTTP REST](h4asws.md), Amazon Alexa voice command or [linked GPIO input connector](h5gpio.md) ) sends an `on`,`off`,`toggle` or `switch` command.
 
 You can have many *input* [linked GPIO input connector](h5gpio.md)s all linked to the single *output* `h4onof`. Each of these behaves exactly like its non-Source counterpart except that instead of calling back your code when its state changes, it automatically sends its ON or OFF state to the `h4onof` handler, either a BinarySwitch or a BinarySource.
 
@@ -25,10 +25,10 @@ You can have many *input* [linked GPIO input connector](h5gpio.md)s all linked t
 * RetriggeringSource [Example Code](../examples/H4GM_RetriggeringSource/H4GM_RetriggeringSource.ino)
 
 In addition, you may also have:
-* [H4P_ThreeFunctionButton](h43fnb.md) [Example Code](../examples/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
+* [H4P_MultiFunctionButton](h4mfnb.md) [Example Code](../examples/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
 * H4P_UPNPServer [Example Code](../examples/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
 
-The [H4P_ThreeFunctionButton](h43fnb.md) provides an easy way to switch your Source/Switch with a physical button, reboot it or factory reset it, depending on how long you hold it down.
+The [H4P_MultiFunctionButton](h4mfnb.md) provides an easy way to switch your Source/Switch with a physical button, reboot it or factory reset it, depending on how long you hold it down.
 
 `H4P_UPNPServer` adds Amazon Alexa voice control and Windows10 desktop integration. It requires only a "friendly name" e.g. "Kitchen Light" - this is the name by which Alexa will turn it on or off and the name show on the Windows10 desktop.
 
@@ -46,11 +46,11 @@ You define the output GPIO12 as a BinarySwitch:
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,false)
 H4P_BinarySwitch h4onof(12,ACTIVE_HIGH,OFF);
 ```
 
-Even before adding anything else you can now switch on the light  when any source ( [Serial](h4sc.md), [MQTT](h4mqtt.md), [HTTP REST](h4asws.md) or [linked GPIO input connector](h5gpio.md) ) sends an `on`,`off`,`toggle` or `switch` command.
+Even before adding anything else you can now switch on the light  when any source ( [Serial](h4cmd.md), [MQTT](h4mqtt.md), [HTTP REST](h4asws.md) or [linked GPIO input connector](h5gpio.md) ) sends an `on`,`off`,`toggle` or `switch` command.
 
 Next, add the sensors and tie them all to the `BinarySwitch` `h4onof`
 
@@ -103,7 +103,7 @@ That's it - the rest is the same.
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,false)
 H4P_GPIOManager h4gm;
 // H4P_AsyncWebServer h4asws(... if using H4P_UPNPServer
 H4P_BinarySwitch h4onof;
@@ -163,7 +163,7 @@ void friendlyName(const string& name); // sets UPNP friendly name. Causes a rebo
 
 [Example Sketch - BinarySource](../examples/H4P_BinaryThing/H4P_BinaryThing.ino)
 [Example Sketch - BinarySwitch](../examples/H4P_BinarySwitch/H4P_BinarySwitch.ino)
-[Example Sketch - BinarySwitch with 3-function button](../examples/H4P_BinarySwitch3fnb/H4P_BinarySwitch3fnb.ino)
+[Example Sketch - BinarySwitch with 3-function button](../examples/H4P_BinarySwitchmfnb/H4P_BinarySwitchmfnb.ino)
 [Example Sketch - BinarySwitch with MQTT](../examples/H4P_BinarySwitchMQTT/H4P_BinarySwitchMQTT.ino)
 [Example Sketch - UPNPServer with MQTT](../examples/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
 

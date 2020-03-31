@@ -1,7 +1,5 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS
-
-H4 h4(115200);
+H4_USE_PLUGINS(115200,false)
 /*
  * Try Serial commands
  * 
@@ -24,13 +22,14 @@ H4 h4(115200);
 
 #define U_DEBOUNCE  15
 
-H4P_SerialCmd h4sc;
+
+
 H4P_GPIOManager h4gm;
 H4P_FlasherController h4fc;
 H4P_BinarySwitch h4onof(LED_BUILTIN,UL_ACTIVE,OFF,[](bool b){
     Serial.print("STATE NOW ");Serial.println(b);
   });
-H4P_ThreeFunctionButton h43fb(USER_BTN,INPUT_PULLUP,UB_ACTIVE,U_DEBOUNCE,LED_BUILTIN,UL_ACTIVE);
+H4P_MultiFunctionButton h43fb(USER_BTN,INPUT_PULLUP,UB_ACTIVE,U_DEBOUNCE,LED_BUILTIN,UL_ACTIVE);
 
 void onReboot(){
     Serial.println("Au Revoir");      

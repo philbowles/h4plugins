@@ -1,13 +1,12 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS
-
-H4 h4(115200);
+H4_USE_PLUGINS(115200,false)
 
 void onElvisDetect(bool b){
   Serial.printf("Elvis has %s the building\n",b ? "entered":"left");
 }
 
-H4P_SerialCmd h4sc;
+
+
 H4P_GPIOManager h4gm;
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","detector");
 H4P_AsyncWebServer h4asws("admin","admin");

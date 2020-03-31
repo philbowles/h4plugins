@@ -41,10 +41,12 @@ class H4P_WiFi: public H4Plugin{
 //
                 VSCMD(_change);
                 VSCMD(_host);
+                VSCMD(_host2);
 //
                 string      _getChipID();
                 void        _gotIP();
                 void        _lostIP();
+                void        _mcuStart();
                 void        _scan();
                 void        _setHost(const string& host);
                 void        _startSTA();
@@ -66,7 +68,8 @@ class H4P_WiFi: public H4Plugin{
 
             _hookFactory([this](){ clear(); });
             _cmds={
-                {_pName,    { H4PC_ROOT, _subCmd, nullptr}},
+                {_pName,    { H4PC_H4, _subCmd, nullptr}},
+                {"apmode",  { _subCmd, 0, CMD(forceAP)}},
                 {"clear",   { _subCmd, 0, CMD(clear)}},
                 {"change",  { _subCmd, 0, CMDVS(_change)}},
                 {"host",    { _subCmd, 0, CMDVS(_host)}}
@@ -75,11 +78,12 @@ class H4P_WiFi: public H4Plugin{
 
                 void     clear();
                 void     change(string ssid,string psk);
-                void     host(string h){ _setPersistentValue(deviceTag(),h,true); }
+                void     forceAP();
+                void     host(const string& host){ _setPersistentValue(deviceTag(),host,true); }
+                void     setBothNames(const string& host,const string& friendly);
                 void     show() override { 
                     WiFi.printDiag(Serial);
-                    Serial.printf("Status: %d\n",WiFi.status());
-                    H4Plugin::show();
+                    reply("Device %s Status: %d",CSTR(_cb[deviceTag()]),WiFi.status());
                 }
 //          syscall only        
                 void     _getPersistentValue(string v,string prefix);

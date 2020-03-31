@@ -59,6 +59,7 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
         static String       aswsReplace(const String& var);
 //          syscall only
                 void        _reply(string msg) override { lines.push_back(msg); };
+                void        _setBothNames(const string& host,const string& friendly);
 };
 
 extern __attribute__((weak)) H4P_AsyncWebServer h4asws;

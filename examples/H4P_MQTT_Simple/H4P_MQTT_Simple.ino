@@ -1,8 +1,6 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,false)
 
-
-H4 h4(115200);
 
 void onMQTTConnect(){
     Serial.print("USER: MQTT connected\n");
@@ -13,7 +11,8 @@ void onMQTTDisconnect(){
     Serial.print("USER: MQTT Disconnected\n");
 }
 
-H4P_SerialCmd h4sc;
+
+
 H4P_CmdErrors h4ce;
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","testbed");
 H4P_AsyncMQTT h4mqtt("192.168.1.4",1883,"","",onMQTTConnect,onMQTTDisconnect); // no username / pword

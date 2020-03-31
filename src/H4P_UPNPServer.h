@@ -85,12 +85,12 @@ class H4P_UPNPServer: public H4Plugin {
             _ubIP=IPAddress(239,255,255,250);
             _hookFactory([this](){ SPIFFS.remove(CSTR(string("/"+string(nameTag())))); });
             _cmds={ 
-                {upnpTag(),{H4PC_ROOT, _subCmd, nullptr}},
-                {nameTag(),{_subCmd, 0, CMDVS(_friendly)}}
+                {upnpTag(),{H4PC_H4, 0, CMDVS(_friendly)}}
                 };
         }
 
              void           friendlyName(const string& name);
+             void           show() override { reply("Friendly Name: %s",CSTR(_cb[nameTag()])); }
 //          _syscall only
              void           _listenUSN(const string& usn,H4P_FN_USN f){ _detect[usn]=f; }
 };

@@ -1,6 +1,8 @@
 
 2020/02/19  0.5.0
     breaking changes
+        Three - > Multi FunctionButton
+        ap mode
         dumpQ / trustednames fully decoupled from H4 - requires upgrade to H4/0.5.0
         (dumpQ + many others now compile-outable)
         H4P_AsyncMQTT replaces H4P_MQTT: pubsubclient removed, fixing 5-sec lockout delay on reconnect "feature"
@@ -13,14 +15,18 @@
             IPSource
             USN
             USNSource
+            MDNS
         Service management cmds: h4/svc/{start|stop|restart}/XXXX
         h4/show/heap
         H4P_CmdErrors
             new getTaskType / getTaskName to blend with new decoupled dumpQ
+        h4/wifi/apmode
     changed
         Huge code refactor / tidy / optimise (sonoff example now 445152) / Free Heap increased
             ALL plugins now operate as services, new svc control commands common to all
         much "show" type functionality moved into #ifdef H4P_LOG_EVENTS optional compilation blocks
+        scmd autostop
+        mfnb -> 4fnb
     deleted
         many service start/restart/stop cmds, replaced by: Service management cmds
         unload concept disappears: h4/svc/stop now unhooks what used to be unloadable
@@ -82,27 +88,21 @@
     move AP mode ssid lists delete to STA got IP
 2020/02/11  0.2.0
 1   SPIFFS functions moved to SerialCmd from WiFi
-2   h4sc.logEvent added
+2   h4cmd.logEvent added
 3   added new plugins LocalLogger and SerialLogger 
 4   various other code changes to support logging
-5   introduce mandatory requirement to follow H4Plugins.h with H4_USE_PLUGINS
+5   introduce mandatory requirement to follow H4Plugins.h with H4_USE_PLUGINS(115200,false)
     to banish forever the "initialisation hell" that is cause by different static
     initialisation in different compilers. Its horrible, but it works and it's easier
     than a ground-up rewrite :)
 
 TODO:
 SOONER
-    FR chain: add removerService mdns H4
-    no auto AP mode if ssid / psk extant
-    3fb -> FOUR fb
+    DOCS H4USE_PLUGINS / autoserial, mqtt upnp cmd names changed DOX
 SHORTTERM
-    state MQTT bcast to all, add obey[h4] cmd
-    coalesce wifif scan 8266/32
-    event on PS changed
-    centrlaise / globalise onof?
 MEDIUMTERM
-    decent tabulated gpio pin dump
-    MDNS/local domain detector
+    ESp32 MDNS detector
+    ESP32 bluetooth detector
 LONGTERM
     ethernet module stm32
     ESP32 bluetooth PD

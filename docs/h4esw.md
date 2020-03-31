@@ -27,7 +27,7 @@ Provides
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,false)
 H4P_ExternalSqWave h4esw(...
 ```
 
@@ -36,7 +36,7 @@ H4P_ExternalSqWave h4esw(...
 If using STM32-NUCLEUO you must install the following HardwareSerial library
 * https://github.com/plerup/espsoftwareserial
 
-H4P_ExternalSqWave must be created after [**H4P_SerialCmd**](h4sc.md) if using that plugin
+H4P_ExternalSqWave must be created after [**H4P_SerialCmd**](h4cmd.md) if using that plugin
 
 ## Commands Added
 

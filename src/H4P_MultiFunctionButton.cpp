@@ -26,7 +26,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include<H4P_ThreeFunctionButton.h>
+#include<H4P_MultiFunctionButton.h>
 #include<H4P_FlasherController.h>
 
 #include<H4P_WiFiSelect.h>
@@ -34,13 +34,16 @@ SOFTWARE.
 #include<H4P_AsyncMQTT.h>
 //#ifndef H4P_NO_WIFI
 
-void H4P_ThreeFunctionButton::progress(H4GPIOPin* ptr){ // run this as each stage changes
+void H4P_MultiFunctionButton::progress(H4GPIOPin* ptr){ // run this as each stage changes
     H4GM_PIN(Multistage); // Create the correct pointer type in 'pin'
     switch(pin->stage){
         case 1: // over 2 seconds, slow flash
-            h4fc.flashLED(H43F_MEDIUM,_led,_active);     
+            h4fc.flashLED(H43F_SLOW,_led,_active);     
             break;
         case 2: // over 5 seconds, medium flash
+            h4fc.flashLED(H43F_MEDIUM,_led,_active);     
+            break;
+        case 3: // over 10 seconds, medium flash
             h4fc.flashLED(H43F_FAST,_led,_active);     
             break;
         default: // do nothing if less than 2 seconds
@@ -48,21 +51,22 @@ void H4P_ThreeFunctionButton::progress(H4GPIOPin* ptr){ // run this as each stag
     }
 }
 
-void H4P_ThreeFunctionButton::_start(){
+#ifndef H4P_NO_WIFI
+void H4P_MultiFunctionButton::_start(){
     if(isLoaded(wifiTag())){
         if(WiFi.getMode() & WIFI_AP) h4fc.flashPWM(1000,10,_led,_active); 
         else h4fc.stopLED(_led); 
     }
 }
 
-void H4P_ThreeFunctionButton::_stop(){
+void H4P_MultiFunctionButton::_stop(){
     if(isLoaded(wifiTag())){
         if(WiFi.getMode() & WIFI_AP) h4fc.stopLED(_led); 
         else h4fc.flashMorse("... --- ...   ",H43F_TIMEBASE,_led,_active);
     }
 }
 
-void H4P_ThreeFunctionButton::_hookIn(){
+void H4P_MultiFunctionButton::_hookIn(){
     REQUIREBT;
     DEPEND(wink);
     _createMS();
@@ -72,10 +76,17 @@ void H4P_ThreeFunctionButton::_hookIn(){
         h4mqtt.hookDisconnect([this](){ h4fc.flashPattern("10100000",H43F_TIMEBASE,_led,_active); });
     }
 }
+#else
+void H4P_MultiFunctionButton::_hookIn(){
+    REQUIREBT;
+    DEPEND(wink);
+    _createMS();
+}
+#endif
 
-H4P_ThreeFunctionButton::H4P_ThreeFunctionButton(uint8_t pin,uint8_t mode,H4GM_SENSE b_sense,uint32_t dbTimeMs,uint8_t led,H4GM_SENSE l_sense):
-        _led(led),_active(l_sense),H4Plugin(tfnbTag()){
-    H4GM_FN_EVENT cb=bind(&H4P_ThreeFunctionButton::progress,this,_1);
+H4P_MultiFunctionButton::H4P_MultiFunctionButton(uint8_t pin,uint8_t mode,H4GM_SENSE b_sense,uint32_t dbTimeMs,uint8_t led,H4GM_SENSE l_sense):
+        _led(led),_active(l_sense),H4Plugin(mfnbTag()){
+    H4GM_FN_EVENT cb=bind(&H4P_MultiFunctionButton::progress,this,_1);
     _createMS=bind(&H4P_GPIOManager::Multistage,&h4gm,pin,mode,b_sense,dbTimeMs,_sm,cb);
 }
 //#endif

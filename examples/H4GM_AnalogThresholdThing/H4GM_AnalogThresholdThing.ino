@@ -1,11 +1,9 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,false)
 
 #define F_POLL      5000
 #define LIGHT       A0
 
-H4 h4(115200);
-H4P_SerialCmd h4sc;
 H4P_GPIOManager h4gm;
 
 H4P_BinarySwitch h4onof(LED_BUILTIN,ACTIVE_LOW,OFF);

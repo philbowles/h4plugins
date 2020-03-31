@@ -37,7 +37,10 @@ class H4P_BinarySwitch: public H4P_BinaryThing{
 //
     protected:
         OutputPin*          _pp;
-        virtual void        _setState(bool b) override { _pp->logicalWrite(_state=b); }
+        virtual void        _setState(bool b) override { 
+            _pp->logicalWrite(_state=b);
+            _setSlaves(b);
+        }
     public:
         H4P_BinarySwitch(uint8_t pin,H4GM_SENSE sense, uint32_t initial,H4BS_FN_SWITCH f=nullptr,uint32_t timer=0): H4P_BinaryThing(f,initial,timer){
             _pp=h4gm.Output(pin,sense,initial,[](H4GPIOPin* ptr){});

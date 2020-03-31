@@ -37,22 +37,13 @@ void  H4P_AsyncWebServer::_hookIn(){
     _cb["h4pv"]=H4P_VERSION;
 }
 
-bool H4P_AsyncWebServer::_webAuth(AsyncWebServerRequest *request){
-	if(_cb[userTag()]!=""){
-		if(!request->authenticate(CSTR(_cb["auser"]),CSTR(_cb["apasswd"]),NULL,false)) {
-			request->requestAuthentication(NULL,false);
-			return false;
-		}
-	} return true;
-}
-
 void H4P_AsyncWebServer::_rest(AsyncWebServerRequest *request){
 	if(!_webAuth(request)) return;
 	h4.queueFunction(bind([this](AsyncWebServerRequest *request){
         H4EVENT("_rest %s",request->client()->remoteIP().toString().c_str());
 		string chop=replaceAll(CSTR(request->url()),"/rest/","");
         string msg="";
-        uint32_t res=h4sc._simulatePayload(CSTR(chop),aswsTag());
+        uint32_t res=h4cmd._simulatePayload(CSTR(chop),aswsTag());
         if(isLoaded(cerrTag())) msg=h4ce.getErrorMessage(res);
         string j="{\"res\":"+stringFromInt(res)+",\"msg\":\""+msg+"\",\"lines\":[";
         string fl;
@@ -69,9 +60,9 @@ void H4P_AsyncWebServer::_rest(AsyncWebServerRequest *request){
 	},request),nullptr,H4P_TRID_ASWS);
 }
 
-String H4P_AsyncWebServer::aswsReplace(const String& var){
-    string v=CSTR(var);
-    return _cb.count(v) ? String(CSTR(_cb[v])):"?";
+void H4P_AsyncWebServer::_setBothNames(const string& host,const string& friendly){
+    if(isLoaded(upnpTag())) h4wifi._setPersistentValue(nameTag(),friendly,false);
+    h4wifi.host(host);
 }
 
 void H4P_AsyncWebServer::_start(){
@@ -92,10 +83,12 @@ void H4P_AsyncWebServer::_start(){
 		    rp[CSTR(p->name())]=CSTR(p->value());
 	    }
         h4wifi.change(rp[ssidTag()],rp[pskTag()]);
-        if(isLoaded(upnpTag())){
-            h4wifi._setPersistentValue(nameTag(),rp[nameTag()],false);
-        }
-        h4wifi.host(rp[deviceTag()]);
+        //
+        _setBothNames(rp[deviceTag()],rp[nameTag()]);
+//        if(isLoaded(upnpTag())){
+//            h4wifi._setPersistentValue(nameTag(),rp[nameTag()],false);
+//        }
+//        h4wifi.host(rp[deviceTag()]);
     });
 
 	on("/rest",HTTP_GET,[this](AsyncWebServerRequest *request){ _rest(request); });
@@ -110,6 +103,20 @@ void H4P_AsyncWebServer::_start(){
 void H4P_AsyncWebServer::_stop(){ 
     end();
     _downHooks();
+}
+
+bool H4P_AsyncWebServer::_webAuth(AsyncWebServerRequest *request){
+	if(_cb[userTag()]!=""){
+		if(!request->authenticate(CSTR(_cb["auser"]),CSTR(_cb["apasswd"]),NULL,false)) {
+			request->requestAuthentication(NULL,false);
+			return false;
+		}
+	} return true;
+}
+
+String H4P_AsyncWebServer::aswsReplace(const String& var){
+    string v=CSTR(var);
+    return _cb.count(v) ? String(CSTR(_cb[v])):"?";
 }
 
 #endif // H4_WIFI

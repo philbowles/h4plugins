@@ -137,6 +137,7 @@ void H4P_UPNPServer::_start(){
 void H4P_UPNPServer::_upnp(AsyncWebServerRequest *request){ // redo
   h4.queueFunction(bind([this](AsyncWebServerRequest *request) {
         string soap=stringFromBuff((const byte*) request->_tempObject,strlen((const char*) request->_tempObject));
+//        Serial.printf("%s\n",CSTR(soap));
         _cb["gs"]=(soap.find("Get")==string::npos) ? "Set":"Get";
         uint32_t _set=soap.find(">1<")==string::npos ? 0:1;
 #ifdef H4P_LOG_EVENTS
@@ -156,8 +157,8 @@ void H4P_UPNPServer::_stop(){
     _downHooks();
 }
 
-void H4P_UPNPServer::_notify(const string& phase){ // chunker it up
-    chunker<vector<string>>(_pups,[this,phase](vector<string>::const_iterator i){ 
+void H4P_UPNPServer::_notify(const string& phase){ // h4Chunker it up
+    h4Chunker<vector<string>>(_pups,[this,phase](vector<string>::const_iterator i){ 
         string NT=(*i).size() ? (*i):__makeUSN("");
         string nfy="NOTIFY * HTTP/1.1\r\nHOST:"+string(_ubIP.toString().c_str())+":1900\r\nNTS:ssdp:"+phase+"\r\nNT:"+NT+"\r\n"+__upnpCommon((*i));
         broadcast(H4P_UDP_JITTER,CSTR(nfy));

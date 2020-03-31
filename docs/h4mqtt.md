@@ -41,7 +41,7 @@ Most often you will use the last form to target one specific device.
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,false)
 
 H4P_WiFi h4wifi(...
 H4P_AsyncMQTT h4mqtt(...

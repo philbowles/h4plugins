@@ -24,9 +24,9 @@ Writing your own logger is seriously easy (see below)
 
 The important thing to note is that each logger is called in turn, thus you can log to several destinations at a time for a single message. The serial logger is a useful diagnostic aid, as it shows what is getting logged to other - less visible - destinations, e.g. remote servers.
 
-Also note that the main interface `h4sc.logEventType(H4P_LOG_TYPE,const string& src,const string& tgt,const string& fmt,...)` (which operates like `printf` with variable number of parameters) will simply do nothing if no loggers are installed. This allows it to be left in the code and "switched on or off" by commenting out the loggers, which can be flipped back in at a stroke for testing.
+Also note that the main interface `h4cmd.logEventType(H4P_LOG_TYPE,const string& src,const string& tgt,const string& fmt,...)` (which operates like `printf` with variable number of parameters) will simply do nothing if no loggers are installed. This allows it to be left in the code and "switched on or off" by commenting out the loggers, which can be flipped back in at a stroke for testing.
 
-Better still. there is a macro `h4UserEvent("printf-style %s",...)` which simply calls `h4sc.logEventType` "under the hood" but can be "compiled out" by removing the `#define H4P_LOG_EVENTS` entry in `H4PConfig.h`, which reduces the size of the binary. Unless you have good reason (which will be rare) then you should always use `h4UserEvent`.
+Better still. there is a macro `h4UserEvent("printf-style %s",...)` which simply calls `h4cmd.logEventType` "under the hood" but can be "compiled out" by removing the `#define H4P_LOG_EVENTS` entry in `H4PConfig.h`, which reduces the size of the binary. Unless you have good reason (which will be rare) then you should always use `h4UserEvent`.
 
 Finally, most loggers have  `filter` parameter which allows the logger to operate on only certain event types:
 
@@ -86,7 +86,7 @@ Most loggers implement `h4/xxxx/msg/any old message` to put any message you choo
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,false)
 H4P_SerialLogger h4sl(...
 ```
 
@@ -118,7 +118,7 @@ H4P_LocalLogger reserves a user-defind amount of free SPIFFS space to create a l
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,false)
 H4P_LocalLogger h4ll;
 ```
 
@@ -184,7 +184,7 @@ H4P_MQTTLogger differs from other plugins, as it allows multiple instances in th
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,false)
 ...
 H4P_MQTTLogger h4m1("first",...
 // optional: H4P_MQTTLogger h4m2("2nd",...
@@ -222,7 +222,7 @@ H4P_MQTTHeapLogger is a specalised version of H4P_MQTTLogger which periodically 
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,false)
 ...
 H4P_MQTTHeapLogger h4hl(...
 ```
@@ -256,7 +256,7 @@ H4P_MQTTQueueLogger is a specalised version of H4P_MQTTLogger which periodically
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,false)
 ...
 H4P_MQTTQueueLogger h4ql(...
 ```

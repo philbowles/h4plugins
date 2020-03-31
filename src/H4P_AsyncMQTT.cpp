@@ -28,25 +28,20 @@ SOFTWARE.
 */
 #include<H4P_AsyncMQTT.h>
 #ifndef H4P_NO_WIFI
+
 uint32_t H4P_AsyncMQTT::_change(vector<string> vs){
-    return guardString2(vs,[this](string a,string b){ 
-        if(isNumeric(b)){
-            change(a,atoi(CSTR(b))); 
-        }
-    });
+    return guardString2(vs,[this](string a,string b){ if(isNumeric(b)) change(a,atoi(CSTR(b))); });
 }
 
-void H4P_AsyncMQTT::_hookIn() {
-    DEPEND(wifi);
+void H4P_AsyncMQTT::_greenLight(){
     _setup();
-
     onMessage([this](char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t length, size_t index, size_t total){
+        //Serial.printf("INCOMING! %s\n",topic);
         h4.queueFunction(
             bind([](string topic, string pload){ 
-                h4sc._executeCmd(CSTR(string(mqttTag()).append("/").append(topic)),pload); 
+                h4cmd._executeCmd(CSTR(string(mqttTag()).append("/").append(topic)),pload); 
             },string(topic),stringFromBuff((byte*) payload,length)),
         nullptr,H4P_TRID_MQMS);
-
     });	
     
     onConnect([this](bool b){
@@ -83,6 +78,8 @@ void H4P_AsyncMQTT::_hookIn() {
     });
 }
 
+void H4P_AsyncMQTT::_hookIn() { DEPEND(wifi); }
+
 void H4P_AsyncMQTT::_setup(){
     device=_cb[deviceTag()];
     setClientId(CSTR(device));
@@ -98,37 +95,6 @@ void H4P_AsyncMQTT::_setup(){
     setCredentials(CSTR(_cb["muser"]),CSTR(_cb["mpasswd"]));
 }
 
-void H4P_AsyncMQTT::change(const string& broker,uint16_t port){ // add creds
-    stop();
-    _cb[brokerTag()]=broker;
-    _cb[portTag()]=stringFromInt(port);
-    _setup();
-    start();
-}
-
-void H4P_AsyncMQTT::publishDevice(const string& topic,const string& payload){ 
-    publish(CSTR(string("h4/"+device+"/"+topic)),0,false,CSTR(payload));
-}
-
-void H4P_AsyncMQTT::subscribeDevice(string topic,H4_FN_MSG f){
-    string fullTopic=device+"/"+topic;
-    if(topic.back()=='#'){
-        topic.pop_back();
-        topic.pop_back();
-    }
-    h4sc.addCmd(topic,0,0,f);
-    subscribe(CSTR(fullTopic),0);
-}
-void H4P_AsyncMQTT::unsubscribeDevice(string topic){
-    string fullTopic=device+"/"+topic; // refactor
-    if(topic.back()=='#'){
-        topic.pop_back();
-        topic.pop_back();
-    }
-    h4sc.removeCmd(topic);
-    unsubscribe(CSTR(fullTopic));
-}
-
 void H4P_AsyncMQTT::_start(){ 
     if(!(WiFi.getMode() & WIFI_AP)) {
         autorestart=true;
@@ -141,5 +107,38 @@ void H4P_AsyncMQTT::_stop(){
         autorestart=false;
         disconnect(true);
     }
+}
+
+void H4P_AsyncMQTT::change(const string& broker,uint16_t port){ // add creds
+    stop();
+    _cb[brokerTag()]=broker;
+    _cb[portTag()]=stringFromInt(port);
+    _setup();
+    start();
+}
+
+void H4P_AsyncMQTT::publishDevice(const string& topic,const string& payload){ 
+    publish(CSTR(string("h4/"+device+"/"+topic)),0,false,CSTR(payload));
+}
+
+void H4P_AsyncMQTT::subscribeDevice(string topic,H4_FN_MSG f,H4PC_CMD_ID root){
+    string fullTopic=device+"/"+topic;
+    if(topic.back()=='#'){
+        topic.pop_back();
+        topic.pop_back();
+    }
+    h4cmd.addCmd(topic,root,0,f);
+    subscribe(CSTR(fullTopic),0);
+    H4EVENT("Subscribed to %s",CSTR(topic));
+}
+void H4P_AsyncMQTT::unsubscribeDevice(string topic){
+    string fullTopic=device+"/"+topic; // refactor
+    if(topic.back()=='#'){
+        topic.pop_back();
+        topic.pop_back();
+    }
+    h4cmd.removeCmd(topic);
+    unsubscribe(CSTR(fullTopic));
+    H4EVENT("Unsubscribed from %s\n",CSTR(topic));
 }
 #endif

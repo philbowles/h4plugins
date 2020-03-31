@@ -25,14 +25,13 @@ LEDs flash independently at different rates using one of four methods:
 # Usage
 
 ```cpp
-#include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,false)
 H4P_FlasherController h4fc;
 ```
 
 ## Dependencies
 
-none, but must be created *after* [**H4P_SerialCmd**](h4sc.md) if using that plugin. Also if [**H4P_GPIOManager**](h4gm.md) is in use, the relevant pin will be automatically set as output - otherwise it is up to the user to call `pinMode` before any API function below and to manage its logical / physical and active high /active low states. The simplest solution is to always also include [**H4P_GPIOManager**](h4gm.md) before H4P_FlasherController.
+none, but must be created *after* [**H4P_SerialCmd**](h4cmd.md) if using that plugin. Also if [**H4P_GPIOManager**](h4gm.md) is in use, the relevant pin will be automatically set as output - otherwise it is up to the user to call `pinMode` before any API function below and to manage its logical / physical and active high /active low states. The simplest solution is to always also include [**H4P_GPIOManager**](h4gm.md) before H4P_FlasherController.
 
 ## Commands Added
 

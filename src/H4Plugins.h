@@ -30,12 +30,16 @@
 
 #include<H4P_BinaryThing.h>
 #include<H4P_BinarySwitch.h>
-#include<H4P_ThreeFunctionButton.h>
+#include<H4P_MultiFunctionButton.h>
 
 //force  static initialisation
-#define H4_USE_PLUGINS std::vector<H4Plugin*>   H4Plugin::_plugins; \
+
+#define H4_USE_PLUGINS(s,b) \
+    H4 h4(s); \
+    std::vector<H4Plugin*>   H4Plugin::_plugins; \
+    H4_CMD_MAP          H4Plugin::_commands; \
+    H4P_SerialCmd h4cmd(b); \
     H4GM_PINMAP         H4P_GPIOManager::pins; 
     uint32_t            H4Plugin::_nxtSubCmd=H4PC_MAX-1; \
-    H4P_CONFIG_BLOCK    H4Plugin::_cb; \ 
-    H4_CMD_MAP          H4Plugin::_commands;
+    H4P_CONFIG_BLOCK    H4Plugin::_cb; 
 #endif

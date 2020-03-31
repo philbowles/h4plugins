@@ -32,7 +32,7 @@ H4_INT_MAP  cmdErrors={
 };
 ```
 
-Merely installing the plugin before [**H4P_SerialCmd**](h4sc.md) automatically provides the translation without any further ado.
+Merely installing the plugin before [**H4P_SerialCmd**](h4cmd.md) automatically provides the translation without any further ado.
 
 ---
 
@@ -40,14 +40,15 @@ Merely installing the plugin before [**H4P_SerialCmd**](h4sc.md) automatically p
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,false)
 H4P_CmdErrors h4ce; // must be created BEFORE H4P_SerialCmd
-H4P_SerialCmd h4sc;
+
+
 ```
 
 ## Dependencies
 
-None, but must be included *before* [**H4P_SerialCmd**](h4sc.md)
+None, but must be included *before* [**H4P_SerialCmd**](h4cmd.md)
 
 ## Commands Added
 

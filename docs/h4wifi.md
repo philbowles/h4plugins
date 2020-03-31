@@ -32,7 +32,7 @@ N.B. The "name" field is only relevant if you are also using the [H4P_UPNPServer
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,false)
 H4P_WiFi h4wifi(...
 ```
 
@@ -46,6 +46,7 @@ H4P_WiFi h4wifi(...
 ### Commands Added
 
 * h4/factory (clear credentials + reboot: forces AP mode)
+* h4/wifi/apmode (factoryReset, force AP mode)
 * h4/wifi/change/x,y (payload x,y = newssid,newpassword)
 * h4/wifi/clear (use with caution = "factory reset")
 * h4/wifi/host/x (payload x = new device name. Causes a reboot. Remains until factory reset)
@@ -70,6 +71,7 @@ H4P_WiFi(string ssid,string psk,string device="",H4_FN_VOID onConnect=[](){},H4_
 
 // Command and control
 void change(string ssid,string psk); // connect to new SSID
+void forceAP(); // performs factoryReset and boots into AP Mode
 void clear(); // erase any previoulsy stored credentials - think: "factory reset"
 void host() // change device name. Causes a reboot
 ```
