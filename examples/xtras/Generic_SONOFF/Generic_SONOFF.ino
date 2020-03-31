@@ -8,7 +8,7 @@ retained MQTT messages and the h4/wifi/host2 command
 
 */
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,false)
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 //H4P_CmdErrors h4ce;
 H4P_SerialCmd h4cmd(true); // careful: can't control from serial console unless false or missing
 //H4P_SerialLogger h4sl;

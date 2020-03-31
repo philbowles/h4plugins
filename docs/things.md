@@ -46,7 +46,7 @@ You define the output GPIO12 as a BinarySwitch:
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,false)
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 H4P_BinarySwitch h4onof(12,ACTIVE_HIGH,OFF);
 ```
 
@@ -103,7 +103,7 @@ That's it - the rest is the same.
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,false)
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 H4P_GPIOManager h4gm;
 // H4P_AsyncWebServer h4asws(... if using H4P_UPNPServer
 H4P_BinarySwitch h4onof;

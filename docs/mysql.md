@@ -47,7 +47,7 @@ These fields are described in the [general logging documenatation](h4logs.md)
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,false)
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 H4P_WiFi(...
 H4P_HttpMySQLLogger h4mysql(...
 ```

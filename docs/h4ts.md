@@ -20,7 +20,7 @@ It requires detailed knowledge of H4 "internals" which are beyond the scope of t
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,false)
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 H4P_TaskSniffer h4ts;
 ```
 

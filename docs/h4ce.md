@@ -40,7 +40,7 @@ Merely installing the plugin before [**H4P_SerialCmd**](h4cmd.md) automatically 
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,false)
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 H4P_CmdErrors h4ce; // must be created BEFORE H4P_SerialCmd
 
 

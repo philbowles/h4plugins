@@ -34,8 +34,8 @@
 
 //force  static initialisation
 
-#define H4_USE_PLUGINS(s,b) \
-    H4 h4(s); \
+#define H4_USE_PLUGINS(s,q,b) \
+    H4 h4(s,q); \
     std::vector<H4Plugin*>   H4Plugin::_plugins; \
     H4_CMD_MAP          H4Plugin::_commands; \
     H4P_SerialCmd h4cmd(b); \

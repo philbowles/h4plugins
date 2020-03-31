@@ -1,35 +1,7 @@
 
 2020/02/19  0.5.0
     breaking changes
-        Three - > Multi FunctionButton
-        ap mode
-        dumpQ / trustednames fully decoupled from H4 - requires upgrade to H4/0.5.0
-        (dumpQ + many others now compile-outable)
-        H4P_AsyncMQTT replaces H4P_MQTT: pubsubclient removed, fixing 5-sec lockout delay on reconnect "feature"
-            you will need to download the new library
-        UPNP Switch / Source removed: replaced by free-standing UPNPServer
-        All xSource GPIO connectors no longer have BinarySource* as final parameter, they are automatically bound to h4onof
-    new
-        Presence detection
-            IP
-            IPSource
-            USN
-            USNSource
-            MDNS
-        Service management cmds: h4/svc/{start|stop|restart}/XXXX
-        h4/show/heap
-        H4P_CmdErrors
-            new getTaskType / getTaskName to blend with new decoupled dumpQ
-        h4/wifi/apmode
-    changed
-        Huge code refactor / tidy / optimise (sonoff example now 445152) / Free Heap increased
-            ALL plugins now operate as services, new svc control commands common to all
-        much "show" type functionality moved into #ifdef H4P_LOG_EVENTS optional compilation blocks
-        scmd autostop
-        mfnb -> 4fnb
     deleted
-        many service start/restart/stop cmds, replaced by: Service management cmds
-        unload concept disappears: h4/svc/stop now unhooks what used to be unloadable
         trustednames concept disappears, see new getTaskType / getTaskName
 2020/02/19  0.4.0
     fixed
@@ -91,7 +63,7 @@
 2   h4cmd.logEvent added
 3   added new plugins LocalLogger and SerialLogger 
 4   various other code changes to support logging
-5   introduce mandatory requirement to follow H4Plugins.h with H4_USE_PLUGINS(115200,false)
+5   introduce mandatory requirement to follow H4Plugins.h with H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
     to banish forever the "initialisation hell" that is cause by different static
     initialisation in different compilers. Its horrible, but it works and it's easier
     than a ground-up rewrite :)

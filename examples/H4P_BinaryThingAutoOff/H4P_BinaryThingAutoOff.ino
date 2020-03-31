@@ -1,5 +1,5 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,false)
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 //  Starts OFF, commanded ON after 5sec then turns OFF automatically after AUTO_OFF milliseconds
 
 #define AUTO_OFF  10000

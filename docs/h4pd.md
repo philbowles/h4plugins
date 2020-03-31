@@ -44,7 +44,7 @@ Assume you have a mobile phone with the name "Elvis" and fixed IP address of 192
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,false)
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 ...
 H4P_IPDetector ippdElvis("Elvis","192.168.1.31",[](bool b){ Serial.printf("Elvis has %s the building\n",b ? "entered":"left"); });
 ...
@@ -54,7 +54,7 @@ Now imagine instead that you have a [BinarySwitch](things.md) on, say, GPIO12 an
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,false)
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 ...
 H4P_BinarySwitch h4onof(12,ACTIVE_HIGH,OFF); // security light
 H4P_IPDetectorSource ippdElvis("Elvis","192.168.1.31"); // switch light on when in range
@@ -64,7 +64,7 @@ Finally, assume you would like your device to turn on / off when another h4 join
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,false)
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 ...
 H4P_BinarySwitch h4onof(12,ACTIVE_HIGH,OFF); // security light
 H4P_H4Detect linked("anotherH4"); // switch light on when anotherH4 is on network

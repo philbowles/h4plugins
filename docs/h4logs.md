@@ -86,7 +86,7 @@ Most loggers implement `h4/xxxx/msg/any old message` to put any message you choo
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,false)
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 H4P_SerialLogger h4sl(...
 ```
 
@@ -118,7 +118,7 @@ H4P_LocalLogger reserves a user-defind amount of free SPIFFS space to create a l
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,false)
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 H4P_LocalLogger h4ll;
 ```
 
@@ -184,7 +184,7 @@ H4P_MQTTLogger differs from other plugins, as it allows multiple instances in th
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,false)
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 ...
 H4P_MQTTLogger h4m1("first",...
 // optional: H4P_MQTTLogger h4m2("2nd",...
@@ -222,7 +222,7 @@ H4P_MQTTHeapLogger is a specalised version of H4P_MQTTLogger which periodically 
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,false)
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 ...
 H4P_MQTTHeapLogger h4hl(...
 ```
@@ -256,7 +256,7 @@ H4P_MQTTQueueLogger is a specalised version of H4P_MQTTLogger which periodically
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,false)
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 ...
 H4P_MQTTQueueLogger h4ql(...
 ```

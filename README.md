@@ -34,7 +34,7 @@ What follows is the *entire H4Plugins code* - despite the fact it might look lik
 * Alexa voice control
 
 ```cpp
-H4_USE_PLUGINS(115200,false)
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 
 H4P_GPIOManager h4gm;
 H4P_FlasherController h4fc;

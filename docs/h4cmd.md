@@ -64,7 +64,7 @@ Has the same effect as typing "h4/show/q" at the console, MQTT publishing a topi
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,false)
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 H4P_SerialCmd h4cmd(... // optional autoStop true/false parameter: true=peformance++ (see later)
 ```
 

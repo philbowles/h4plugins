@@ -25,7 +25,7 @@ LEDs flash independently at different rates using one of four methods:
 # Usage
 
 ```cpp
-H4_USE_PLUGINS(115200,false)
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 H4P_FlasherController h4fc;
 ```
 
