@@ -1,6 +1,6 @@
 ![H4P Flyer](/assets/GPIOLogo.jpg) 
 
-# Release Notes v0.5.0 31st March 2020
+# Release Notes v0.5.1 31st March 2020
 
 ## Introduction
 
@@ -98,7 +98,7 @@ Finally, the "handle" to the SerialCmd service has been changed from `h4sc` to `
 
 Previously, some plugins such as WiFi and MQTT ran as "services" meaning they could be started nd stopped and othersiwe controlled in a standard manner. This has been extended to *all* plugins so that there is a standard interface for everything and far fewer individual commands.
 
-This means you *must* read the section on [command handling](h4cmd.md) before digging deeper into v0.5.0
+This means you *must* read the section on [command handling](h4cmd.md) before digging deeper into v0.5.1
 
 ---
 
@@ -163,7 +163,7 @@ Given these options, it was felt that there was no strong reason for ever bootin
 
 ### MQTT library changed
 
-H4?plugins now use the [MQTT Async Client library]() in place of `PubSubClient`. You must donwload and install the Async lib before compiling any v0.5.0 programs
+H4?plugins now use the [MQTT Async Client library]() in place of `PubSubClient`. You must donwload and install the Async lib before compiling any v0.5.1 programs
 
 ---
 

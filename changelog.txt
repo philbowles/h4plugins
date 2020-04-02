@@ -1,5 +1,5 @@
 
-2020/02/19  0.5.0
+2020/02/19  0.5.1
     breaking changes
     deleted
         trustednames concept disappears, see new getTaskType / getTaskName
