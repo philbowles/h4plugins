@@ -76,13 +76,11 @@ void clear(); // erase any previoulsy stored credentials - think: "factory reset
 void host() // change device name. Causes a reboot
 ```
 
-## Advanced Topics
-
 ### Device naming
 
 If no device name is given in the constructor, it defaults to H4_XXXXXX where XXXXXX is the unique chip ID of the device (usually the last 6 characters of the MAC address).
 
-This is useful to enable a single generic sketch to be uploaded to numerous devices without change. Each device should then be sent a `h4/wifi/host` command to give it a "sensible" name. This can be done by any MQTT client using stored messages (or e.g. NODE-RED), so that each device gets its own new name every time it reboots.
+This is useful to enable a single generic sketch to be uploaded to numerous devices without change. See [Advanced Topics](advanced.md)
 
 #### Precedence
 

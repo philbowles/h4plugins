@@ -130,7 +130,7 @@ class H4GPIOPin{
 
         virtual void        sendEvent(){
                 ++nEvents;
-                if(onEvent) onEvent(this); //h4.queueFunction([this](){ onEvent(this); });
+                if(onEvent) onEvent(this);
             }
 
             H4GPIOPin(            

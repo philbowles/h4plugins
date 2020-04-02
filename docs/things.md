@@ -206,7 +206,7 @@ The files you will need are in the `src` subfolder
 
 If no name is given in the constructor, it defaults to "upnp XXXXXX" where XXXXXX is the unique chip ID of the device (usually the last 6 characters of the MAC address).
 
-This is useful to enable a single generic sketch to be uploaded to numerous devices without change. Each device should then be sent a `h4/upnp/name` command to give it a "sensible" name. This can be done by any MQTT client using stored messages (or e.g. NODE-RED), so that each device gets its own new name every time it reboots.
+This is useful to enable a single generic sketch to be uploaded to numerous devices without change. Each device should then be sent a `h4/upnp/name` command to give it a "sensible" name. This can be done by any MQTT client using stored messages (or e.g. NODE-RED), so that each device gets its own new name every time it reboots. See [Advanced Topics](advanced.md)
 
 ## Precedence
 

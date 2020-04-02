@@ -60,6 +60,7 @@ class H4P_MultiFunctionButton: public H4Plugin{
             };    
             H4_FN_VOID      _createMS;
 
+            void            _greenLight() override {} // no autostart
             void            _hookIn() override;
             void            _start() override;
             void            _stop() override;

@@ -290,7 +290,7 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
         case SYSTEM_EVENT_STA_STOP:
         case SYSTEM_EVENT_STA_LOST_IP:
 			if(!(WiFi.getMode() & WIFI_AP)) h4.queueFunction([](){ h4wifi._lostIP(); }); // ? if?
-			h4.queueFunction([](){ h4wifi._lostIP(); }); // ? if?
+			//h4.queueFunction([](){ h4wifi._lostIP(); }); // ? if?
             break;
 		case SYSTEM_EVENT_STA_GOT_IP:
 			h4.queueFunction([](){ h4wifi._gotIP(); });

@@ -24,7 +24,9 @@ CHIP_MAP  chips={
  {"F9198C",{"landing","Landing Floor Lamp",{}}},//12
  {"F9198B",{"middle","Middle Earth Floor Lamp",{}}},//13
  {"0BC939",{"fourteen","Lab phoenix",{}}},//14
- {"8EC098",{"mailbox","Mailbox",{}}}//15
+ {"8EC098",{"mailbox","Mailbox",{}}},//15
+ {"0BAC73",{"S120","Ess one twenty",{}}},
+ {"5ACB8C",{"S126","Ess one twenty six",{}}}
 };
 
 void onMqttConnect(){

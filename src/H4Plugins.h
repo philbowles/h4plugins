@@ -24,6 +24,7 @@
         #include<H4P_MQTTQueueLogger.h>
         #include<H4P_HttpMySQLLogger.h>
     #endif
+    #include<H4P_RemoteUpdate.h>
     #include<H4P_UPNPServer.h>
     #include<H4P_PresenceDetector.h>
 #endif

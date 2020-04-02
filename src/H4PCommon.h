@@ -96,7 +96,7 @@ enum H4P_LOG_TYPE {
 //
 #define STAG(x) constexpr char* x##Tag(){ return #x; }
 
-constexpr const char* cmdhash(){ return "h4/#"; }
+constexpr const char* cmdhash(){ return "/h4/#"; }
 
 STAG(asws);
 STAG(board)
@@ -116,6 +116,7 @@ STAG(onof);
 STAG(port);
 STAG(psk);
 STAG(qwrn);
+STAG(rupd);
 STAG(scmd);
 STAG(snif);
 STAG(src);
@@ -138,6 +139,7 @@ STAG(wifi);
 #define CMDNULL ([this](vector<string>)->uint32_t{ return H4_CMD_OK; })
 #define CMDVS(x) ([this](vector<string> vs)->uint32_t{ return x(vs); })
 #define VSCMD(x) uint32_t x(vector<string>)
+#define QTHIS(f) h4.queueFunction([this]{ f(); })
 
 #ifdef H4P_LOG_EVENTS
     #define SYSEVENT(e,s,t,x,...) { h4cmd.logEventType(e,s,t,x, ##__VA_ARGS__); }

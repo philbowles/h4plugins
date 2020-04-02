@@ -137,7 +137,6 @@ void H4P_UPNPServer::_start(){
 void H4P_UPNPServer::_upnp(AsyncWebServerRequest *request){ // redo
   h4.queueFunction(bind([this](AsyncWebServerRequest *request) {
         string soap=stringFromBuff((const byte*) request->_tempObject,strlen((const char*) request->_tempObject));
-//        Serial.printf("%s\n",CSTR(soap));
         _cb["gs"]=(soap.find("Get")==string::npos) ? "Set":"Get";
         uint32_t _set=soap.find(">1<")==string::npos ? 0:1;
 #ifdef H4P_LOG_EVENTS

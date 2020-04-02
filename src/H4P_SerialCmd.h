@@ -53,11 +53,12 @@ using H4P_FN_LOG = function<void(const string &msg,H4P_LOG_TYPE type,const strin
 extern void h4FactoryReset();
 class H4P_SerialCmd: public H4Plugin {
         vector<H4P_FN_LOG>  _logChain;
+
+//        VSCMD(_global);
         VSCMD(_svcRestart);
         VSCMD(_svcInfo);
         VSCMD(_svcStart);
         VSCMD(_svcStop);
-        VSCMD(_test);
 
         H4_CMD_MAP_I    __exactMatch(const string& cmd,uint32_t owner);
         void            __flatten(function<void(string)> fn);
@@ -100,14 +101,13 @@ class H4P_SerialCmd: public H4Plugin {
         static  string          _dumpTask(task*){}
 #endif
 //      user
-                void            addCmd(const string& name,uint32_t owner, uint32_t levID,H4_FN_MSG f=nullptr){ _addCmd(name, {owner,levID,f}); }
+                void            addCmd(const string& name,uint32_t owner, uint32_t levID,H4_FN_MSG f=nullptr){  _commands.insert(make_pair(name,command {owner,levID,f})); }
                 void            help();
                 uint32_t        invokeCmd(string,string="",const char* src=userTag());			
                 uint32_t        invokeCmd(string,uint32_t,const char* src=userTag()); 
                 void            logEventType(H4P_LOG_TYPE,const string& src,const string& tgt,const string& fmt,...);
                 void            removeCmd(const string& name,uint32_t _subCmd=0); 
 //      syscall only
-                void            _addCmd(const string& name,struct command cmd){ _commands.insert(make_pair(name,cmd)); }
                 void            _hookLogChain(H4P_FN_LOG f){ _logChain.push_back(f); }
                 void            _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target);
                 uint32_t        _executeCmd(string topic, string pload);

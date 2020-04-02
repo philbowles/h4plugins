@@ -47,10 +47,10 @@ void H4P_AsyncMQTT::_greenLight(){
     onConnect([this](bool b){
         h4.cancelSingleton(H4P_TRID_MQRC);
         _discoDone=false;
-        subscribe(CSTR(string("all/").append(cmdhash())),0);
-        subscribe(CSTR(string(device+"/"+cmdhash())),0);
-        subscribe(CSTR(string(_cb[chipTag()]+"/"+cmdhash())),0);
-        subscribe(CSTR(string(_cb[boardTag()]+"/"+cmdhash())),0);
+        subscribe(CSTR(string("all").append(cmdhash())),0);
+        subscribe(CSTR(string(device+cmdhash())),0);
+        subscribe(CSTR(string(_cb[chipTag()]+cmdhash())),0);
+        subscribe(CSTR(string(_cb[boardTag()]+cmdhash())),0);
         publish("h4/online",0,false,CSTR(device));
         _upHooks();
         H4EVENT("MQTT CNX");

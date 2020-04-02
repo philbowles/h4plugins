@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+   <head>
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title id="ptit">%device% AP MODE</title>
+	<link rel="stylesheet" type="text/css" href="h4.css">
+   </head>
+   <body>
+   <div id="main">
+      <div id="header">
+         <img src="H4PLogo.jpg">
+      </div>
+      <div id="cmds">
+         <a href="/rest/h4/reboot"><img src="boot.png"></a>
+         <a href="/rest/h4/factory"><img src="fact.png"></a>
+      </div>
+
+      <div id="h4v" class="line">
+         <div class="title">H4 Version</div>
+         <div class="data">%h4v%</div>
+      </div>
+      <div id="h4pv" class="line">
+         <div class="title">Plugins Version</div>
+         <div class="data">%h4pv%</div>
+      </div>
+      <div id="device" class="line">
+         <div class="title">Device</div>
+         <div class="data">%device%.local</div>
+      </div>
+      <div id="chip" class="line">
+         <div class="title">Board</div>
+         <div class="data">%board%</div>
+      </div>
+      <div id="chip" class="line">
+         <div class="title">Chip</div>
+         <div class="data">%chip%</div>
+      </div>
+      <div id="ip" class="line">
+         <div class="title">IP Address</div>
+         <div class="data">%ip%</div>
+      </div>
+
+      <div id="creds">
+      <form type="application/url-encoded" method="POST">
+         <div class="fline">
+            <div class="title">SSID</div>
+            <div class="data">
+               <select name="ssid">
+                  %opts%
+               </select>
+            </div>
+         </div>         
+         <div class="fline">
+            <div class="title">Password</div>
+            <div class="data">
+               <input type="password" name="psk" />
+            </div>
+         </div>
+         <div class="fline">
+            <div class="title">Device</div>
+            <div class="data">
+               <input name="device" value="%device%"/>
+            </div>
+         </div>
+         <div class="fline">
+            <div class="title">Name</div>
+            <div class="data">
+               <input name="name" value="%name%"/>
+            </div>
+         </div>
+
+         <div class="btn">
+            <button type="submit">Connect</button>
+         </div>
+ 
+      </form>
+      </div>
+      <div id="footer">
+         <div id="donate" class="box">
+               Buying me a coffee helps keep me motivated to keep H4Plugins bug-free and er ...plain "free". It's a lot of work.
+               If it has helped you, I'd appreciate a small sign
+               <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+                  <input type="hidden" name="cmd" value="_s-xclick" />
+                  <input type="hidden" name="hosted_button_id" value="NVJKW6HEH5AES" />
+                  <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit"
+                     title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
+                  <img alt="" border="0" src="https://www.paypal.com/en_GB/i/scr/pixel.gif" width="1" height="1" />
+               </form>
+               <div>
+                  <div class="lnk"><a href="https://www.github.com/philbowles" rel="noopener" target="_blank">Github Repository</a></div>
+                  <div class="lnk"><a href="https://www.facebook.com/groups/444344099599131/" rel="noopener" target="_blank">Facebook Help Forum</a></div>
+                  <div class="lnk"><a href="https://8266iot.blogspot.com" rel="noopener" target="_blank">Blog</a></div>
+                  <div class="lnk"><a href="https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g" rel="noopener"
+                        target="_blank">Youtube channel (instructional videos)</a></div>
+                  <div class="lnk"><a href="https://patreon.com/esparto" rel="noopener"
+                        target="_blank">Support me on Patreon</a></div>
+               </div>
+         </div>
+      </div>
+   </dive>
+   </body>
+</html>

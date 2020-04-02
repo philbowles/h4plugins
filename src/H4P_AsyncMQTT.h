@@ -72,9 +72,7 @@ class H4P_AsyncMQTT: public H4Plugin, public AsyncMqttClient{
 
     //          syscall only
                 void        _reply(string msg) override { publish(CSTR(string("h4/"+_cb[deviceTag()]+"/reply")),0,false,CSTR(msg)); }
-                void        show() override { 
-                    reply("Server: %s:%s %s",CSTR(_cb["broker"]),CSTR(_cb[portTag()]),connected() ? "CNX":"DCX");
-                }
+                void        show() override { reply("Server: %s:%s %s",CSTR(_cb["broker"]),CSTR(_cb[portTag()]),connected() ? "CNX":"DCX"); }
 };
 
     extern __attribute__((weak)) H4P_AsyncMQTT h4mqtt;

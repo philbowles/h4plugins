@@ -51,7 +51,6 @@ class H4P_BinaryThing: public H4Plugin{
             virtual void    _hookIn() override { 
                 if(isLoaded(mqttTag())) {
                     h4mqtt.hookConnect([this](){ _publish(_getState()); }); 
-                    //h4cmd.addCmd("slave/#", H4PC_H4, 0, CMDVS(_slave));
                     h4mqtt.subscribeDevice("slave/#",CMDVS(_slave),H4PC_H4);
                 }
             }
@@ -70,7 +69,6 @@ class H4P_BinaryThing: public H4Plugin{
                     }
                 
                     uint32_t _slave(vector<string> vs){
-                        H4_CMD_ERROR e=H4_CMD_PAYLOAD_FORMAT;
                         if(vs.size()<2) return H4_CMD_TOO_FEW_PARAMS;
                         if(vs.size()>2) return H4_CMD_TOO_MANY_PARAMS;
                         if(!stringIsAlpha(vs[0])) return H4_CMD_PAYLOAD_FORMAT;
