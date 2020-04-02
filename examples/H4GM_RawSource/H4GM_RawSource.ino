@@ -33,34 +33,21 @@ You will probably need to adjust these values for you own device
     uint32_t        cMax=UINT_MAX;          // max permitted cps (see "throttling");
     uint32_t        nEvents=UINT_MAX;       // sigma "Events" (meaning depends on inheriting strategy)
             
-    Additional members for Debounced:
+    Additional members for Raw:
 
     NONE
 
-        Debounced passes only "stable" LOGICAL transitions to the callback
-        "Stable" means here that any transtions after the first are ignored if they last for less than dbTimeMs
-        Choosing the correct vale for dbTimeMs depends on the switch in use. Getting the best balance between
-        a low value for the smallest latency and a high value for "noisy" buttons can be trial-and-error if you 
-        don't have a 'scope and EE experience. 
-
-        Now though, you can just tweak dbTimeMs until you only ever get 1x ON and 1x OFF per button press
-
-        New in v0.0.3.4 is the "DebouncedSource" which "ties" or links" or "binds" the Debounced pin to any kind
-        of xSwitch or xSource
-
+    Raw passes all transitions to the callback and does not "process" the signal in any way
 
 */
-// Debouncing time in mS
-#define U_DBTIME_MS    12
-
 H4 h4(115200,20); //auto-start Serial @ 115200, Q size=20 
 H4P_GPIOManager h4gm;
 H4P_BinarySwitch h4onof(LED_BUILTIN,UL_ACTIVE,OFF);
 // or e.g. H4P_BinaryThing, UPNPSource, UPNPServer - in fact any xSwitch or xSource
 
-void h4setup() { // H4 constructor starts Serial
-    Serial.println("H4P_GPIOManager Debounced Example v"H4P_VERSION);
+void h4setup() { // H4 constructor starts Serial 
+    Serial.println("H4P_GPIOManager Raw Example v"H4P_VERSION);
     Serial.print("GPIO ");Serial.print(USER_BTN);Serial.print(" ACTIVE ");Serial.println(UB_ACTIVE ? "HIGH":"LOW");
 
-    h4gm.DebouncedSource(USER_BTN,INPUT,UB_ACTIVE,U_DBTIME_MS);
+    h4gm.RawSource(USER_BTN,INPUT,UB_ACTIVE);
 }

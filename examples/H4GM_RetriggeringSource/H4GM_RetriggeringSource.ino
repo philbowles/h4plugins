@@ -33,24 +33,30 @@ You will probably need to adjust these values for you own device
     uint32_t        cMax=UINT_MAX;          // max permitted cps (see "throttling");
     uint32_t        nEvents=UINT_MAX;       // sigma "Events" (meaning depends on inheriting strategy)
             
-    Additional members for Raw:
+    Additional members for Retriggering:
 
-    NONE
+    none
 
-    Raw passes all transitions to the callback and does not "process" the signal in any way
+    Think of a PIR movement sensor: On first detection it goes ON and stays on for a chosen period (the "timeout").
+    Any *new* movement before the timout period expires will cause it to start all over again, staying ON and 
+    re-starting the clock or "re-triggering the timeout".
 
-    New in v0.0.3.4 is the "RawSource" which "ties" or links" or "binds" the Raw pin to any kind
-    of xSwitch or xSource
+    The Retriggering strategy behaves identically. You get a callback when the pin changes to ON and then again
+    to OFF when `timeout` milliseconds after the final physical retriggering event have elapsed. 
 
 */
+#define U_TIMEOUT       10000
+
+
 H4 h4(115200,20); //auto-start Serial @ 115200, Q size=20 
+
 H4P_GPIOManager h4gm;
 H4P_BinarySwitch h4onof(LED_BUILTIN,UL_ACTIVE,OFF);
 // or e.g. H4P_BinaryThing, UPNPSource, UPNPServer - in fact any xSwitch or xSource
 
-void h4setup() { // H4 constructor starts Serial 
-    Serial.println("H4P_GPIOManager Raw Example v"H4P_VERSION);
+void h4setup() { // H4 constructor starts Serial
+    Serial.println("H4P_GPIOManager Retriggering Example v"H4P_VERSION);
     Serial.print("GPIO ");Serial.print(USER_BTN);Serial.print(" ACTIVE ");Serial.println(UB_ACTIVE ? "HIGH":"LOW");
 
-    h4gm.RawSource(USER_BTN,INPUT,UB_ACTIVE);
+    h4gm.RetriggeringSource(USER_BTN,INPUT,UB_ACTIVE,U_TIMEOUT);
 }

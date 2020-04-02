@@ -31,8 +31,8 @@ SOFTWARE.
 #define H4P_RemoteUpdate_H
 
 #include<H4PCommon.h>
+#ifdef ARDUINO_ARCH_ESP8266
 #include<ESP8266httpUpdate.h>
-//VARIANT
 class H4P_RemoteUpdate: public H4Plugin {
                 //bool        _reboot=false;
                 string      _url;
@@ -64,5 +64,5 @@ class H4P_RemoteUpdate: public H4Plugin {
         void spiffs(){ _updateFromUrl(false,true); }
         void update(){ _updateFromUrl(true,true); }
 };
-
+#endif
 #endif // H4P_RemoteUpdate_H

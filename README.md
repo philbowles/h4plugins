@@ -1,19 +1,16 @@
 ![H4P Logo](/assets/H4PLogo.png)
 
-# Arduino IDE library targeting ESP8266, ESP32 and STM32-NUCLEOxx boards providing modular IOT functionality including WiFi, MQTT, GPIO management and diagnostic tools
+# Arduino IDE library targeting ESP8266, ESP32 and STM32-NUCLEOxx boards providing IOT functionality including WiFi, MQTT, GPIO management and diagnostic tools
 
 ## (WiFi and dependent plugins not available on STM32-NUCLEOxx series)
 
 *All plugins depend upon the presence of the [H4 library](https://github.com/philbowles/H4), which must be installed first.*
 
----
-## Version **0.5.1** is a major release with many changes, you *must* read the [Release Notes](docs/relnotes.md) and upgrade to [H4 library](https://github.com/philbowles/H4) v0.5.1 first.
+## Version **0.5.1** is a major release with many changes, you *must* read the [Release Notes](docs/relnotes.md) and upgrade to [H4 library](https://github.com/philbowles/H4) v0.5.1 first
 
+---![H4PluginsFF](/assets/h4plugins.jpg)
 
----
-![H4PluginsFF](/assets/h4plugins.jpg)
-
-Think of this as "IOT Lego" or an "IOT Swiss Army Knife" (or both) for [**H4**](https://github.com/philbowles/H4) - and if you are not already using H4's advanced scheduling and timing features, why not? Get it now from the link above, as you will need it to use the H4Plugins system.
+Think of H4 and its plugins as "IOT Lego" or an "IOT Swiss Army Knife" (or both) for [**H4**](https://github.com/philbowles/H4) - and if you are not already using H4's advanced scheduling and timing features, why not? Get it now from the link above, as you will need it to use the H4Plugins system.
 
 H4Plugins includes modules for WiFi + OTA, Webserver, MQTT, numerous common types of GPIO handling (e.g. debouncing, rotary encoders), Amazon Alexa voice control, logging to remote MySQL server and extensive diagnostics. By "plugging " together only the required modules, you can rapidly build your own custom firmware or IOT app. Everything you build will be stable and responsive: the plugins work together to allow multiple simultaneous processes to run, so ***no more WDT resets***! As your experience grows you can extend your app / firmware with H4Plugins' well-documented API and runtime command system. Let's see H4Plugins being used as replacement firmware for a SONOFF Basic switch.
 
@@ -145,7 +142,7 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 
 H4Plugins is tested using
 
-* ArduinoIDE 1.8.12 
+* ArduinoIDE 1.8.12
 * ESP8266 core 2.6.3
 * ESP32 core 1.0.4
 * STM32-NUCLEO core 1.8.0
@@ -177,6 +174,8 @@ If using WiFi, you will need to install either the [ESP8266 sketch data uploader
 To reduce the footprint of the binary code and provide best WiFi / MQTT performance, the following IDE options
 are recommended (if available for the chosen board):
 
+See [Advanced Topics](docs/advanced.md) for how to simply add H4 optimised board definitions that will ensure you get the smallest possible binary (and therefore most likelyto be OTA-able)
+
 ## For ALL sketches
 
 * Debug Level: NoAssert-NDEBUG
@@ -197,10 +196,10 @@ WiFI sketches must reserve SPIFFS space to hold the AP Mode web pages. These tak
 * NTP time sync
 * Ethernet manager (for STM32 NUCLEO)
 * Web-driven OTA (by file upload)
-* Server-pull OTA
-* NODE-RED nodes for H4 devices
-* NODE-RED GUI controller for management of grid of H4 devices
 * wifiClient http / https
+* ESP32 Bluetooth detector
+* ESP32 MDNSDetector
+* ESP32 RemoteUpdate
 
 Plus of course any others you think may be useful. Let me know using one of the links below
 

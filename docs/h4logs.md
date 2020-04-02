@@ -12,12 +12,12 @@
 
 H4Plugins loggers can send messages to a variety of destinations, depending on which logger you choose. There are currently 
 
-* H4P_HttpMySQLLogger which sends logged events to a remote Webserver for storage in a MySQL database **NEW in v0.4.0**
+* H4P_HttpMySQLLogger which sends logged events to a remote Webserver for storage in a MySQL database
   **N.B. H4P_HttpMySQLLogger is experimental and has [its own documentation page](h4mysql.md)**
 
-* H4P_MQTTLogger sends log messages to MQTT Server **NEW in v0.3.4**
-* H4P_MQTTHeapLogger a specialised H4P_MQTTLogger which periodically logs value of FreeHeap to MQTT **NEW in v0.3.4**
-* H4P_MQTTQueueLogger a specialised H4P_MQTTLogger which periodically logs size of queue to MQTT **NEW in v0.4.0**
+* H4P_MQTTLogger sends log messages to MQTT Server
+* H4P_MQTTHeapLogger a specialised H4P_MQTTLogger which periodically logs value of FreeHeap to MQTT
+* H4P_MQTTQueueLogger a specialised H4P_MQTTLogger which periodically logs size of queue to MQTT
 * H4P_SerialLogger which does exactly what it says on the tin
 
 Writing your own logger is seriously easy (see below)

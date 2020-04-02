@@ -45,9 +45,6 @@ You will probably need to adjust these values for you own device
         It can be used for both digital and analog values: when isAnalog == true; 'state' will contain raw
         analog value.
 
-        New in v0.0.3.4 is the "PolledSource" which "ties" or links" or "binds" the Polled pin to any kind
-        of xSwitch or xSource
-
 */
 #define U_POLL_FREQ     5000
 

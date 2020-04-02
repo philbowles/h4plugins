@@ -1,0 +1,15 @@
+
+TODO:
+SOONER
+SHORTTERM
+MEDIUMTERM
+    ESp32 MDNS detector
+    ESP32 bluetooth detector
+LONGTERM
+    ethernet module stm32
+    ESP32 bluetooth PD
+    remote client get
+    rf bridge
+    signal on no spiffs
+    fix switch.ps1 to use soap etc (revert a la esparto)
+    lots of const string&
