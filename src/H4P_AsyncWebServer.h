@@ -36,9 +36,14 @@ SOFTWARE.
 #include<H4P_WiFi.h>
 #include<H4P_CmdErrors.h>
 #include<H4P_SerialCmd.h>
+#include<H4P_BinaryThing.h>
 #include<ESPAsyncWebServer.h>
 
+#define H4P_ASWS_EVT_TIMEOUT    1000
+
 class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
+            H4P_BinaryThing*    _btp=nullptr;
+            AsyncEventSource*   _evts;
             H4_CMD_MAP          _local={};
 //
             vector<string>      lines={};
@@ -60,6 +65,10 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
 //          syscall only
                 void        _reply(string msg) override { lines.push_back(msg); };
                 void        _setBothNames(const string& host,const string& friendly);
+                void        _sendEvent(bool b){
+                    if(_up && _btp) _evts->send(_btp->state() ? "1":"0",onofTag(),millis()); // protect isloaded
+                    else Serial.printf("_sendEvent while DOWN!!!!!!!!!!!\n");
+                }
 };
 
 extern __attribute__((weak)) H4P_AsyncWebServer h4asws;

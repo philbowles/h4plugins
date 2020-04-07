@@ -208,19 +208,11 @@ If no name is given in the constructor, it defaults to "upnp XXXXXX" where XXXXX
 
 This is useful to enable a single generic sketch to be uploaded to numerous devices without change. Each device should then be sent a `h4/upnp/name` command to give it a "sensible" name. This can be done by any MQTT client using stored messages (or e.g. NODE-RED), so that each device gets its own new name every time it reboots. See [Advanced Topics](advanced.md)
 
-## Precedence
-
-The situation is a little different if the device has a name defined in the constructor. Assume this is "firstname". When given a `h4/upnp/name` command with a payload of "secondname", it will reboot as - no surprises - "secondname".
-
-By default, it will stay as "secondname.local" until the next factory reset. After that it will return again to "firstname" until either another host command changes it, or a new value is compiled in.
-
-In some circumstances, you may want it to always revert to the compiled in name "firstname" even after a `h4/upnp/name` command. The default behaviour described above can be changed by editing `H4PConfig.h` and setting `H4P_PREFER_PERSISTENT` to `false`.
-
 ---
 
 ## "Tweakables"
 
-The following values are defined in `H4PConfig.h` . They are chosen initally to set a good balance between stability, performance and memory / stack usage. *It is not advisable to change them unless you know exactly what you are doing and why*. 
+The following values are defined in `config.h` . They are chosen initally to set a good balance between stability, performance and memory / stack usage. *It is not advisable to change them unless you know exactly what you are doing and why*. 
 
 **N.B.** **Support will not be provided if any of these values are changed.**
 

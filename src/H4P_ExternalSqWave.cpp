@@ -51,7 +51,7 @@ void H4P_ExternalSqWave::__send(uint32_t c,uint32_t v){
     sv.push_back((char)c);
     sv.append(stringFromInt(v));
     print(CSTR(sv));
-    delay(H4ESW_TIMEOUT);    
+    delay(H4ESW_TIMEOUT);
 }
 
 uint32_t H4P_ExternalSqWave::__set(vector<string> vs,uint32_t c,uint32_t lim){

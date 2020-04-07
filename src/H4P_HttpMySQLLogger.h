@@ -36,10 +36,9 @@ SOFTWARE.
 #include<H4P_WiFi.h>
 #include <asyncHTTPrequest.h>
 
-#define H4P_MYSQL_HOLDOFF   1
+#define H4P_MYSQL_HOLDOFF   5
 
 using H4P_FN_HTTPFAIL = function<void(int)>;
-
 class H4P_HttpMySQLLogger: public H4PLogService {
         asyncHTTPrequest request;
         string          ip;
@@ -47,15 +46,14 @@ class H4P_HttpMySQLLogger: public H4PLogService {
         bool            inflight=false;
         bool            warning=false;
 
-        void requestCB(void* optParm, asyncHTTPrequest* request, int readyState){ 
-//            Serial.printf("RS=%d http Error code = %d txt=%s\n",readyState,request->responseHTTPcode(),CSTR(request->responseText()));
+        void        _requestCB(void* optParm, asyncHTTPrequest* request, int readyState){ 
             if(readyState == 4) {
                 inflight=false;
                 if(request->responseHTTPcode() < 0){
-                   if(!warning){
-                       warning=true;
+                    if(!warning){
+                        warning=true;
                         if(_fail) _fail(request->responseHTTPcode());
-                   }
+                    }
                 } else warning=false;
             }
         }
@@ -63,25 +61,23 @@ class H4P_HttpMySQLLogger: public H4PLogService {
         void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target){
             static  uint32_t _logseq=0;
             if(!inflight){
-//                if(request.open("POST",CSTR(ip))){
                 request.open("POST",CSTR(ip));
                 inflight=true;
                 char buf[256];
                 sprintf(buf,"device=%s&msg=%s&type=%d&source=%s&target=%s&seq=%u",CSTR(_cb[deviceTag()]),CSTR(msg),(int) type,CSTR(source),CSTR(target),_logseq++);
                 request.setReqHeader("Content-Type","application/x-www-form-urlencoded");
                 request.send(buf);
- //              } 
-            } else h4.once(H4P_MYSQL_HOLDOFF,bind(&H4P_HttpMySQLLogger::_logEvent,this,msg,type,source,target),nullptr,H4P_TRID_MLRQ);
+            } else h4.once(H4P_MYSQL_HOLDOFF,bind(&H4P_HttpMySQLLogger::_filterLog,this,msg,type,source,target),nullptr,H4P_TRID_MLRQ);
         }
+
+        void _greenLight() override {} // prevetn autostart - wait until wifi up
 
         void _hookIn() override { // protect
             DEPEND(wifi);
             H4PLogService::_hookIn();
-//          request.setDebug(true);
-            request.onReadyStateChange(bind(&H4P_HttpMySQLLogger::requestCB,this,_1,_2,_3));
+//            request.setDebug(true);
+            request.onReadyStateChange(bind(&H4P_HttpMySQLLogger::_requestCB,this,_1,_2,_3));
         }
-    protected:
-        void _greenLight() override {} // prevetn autostart - wait until wifi up
     public:
         H4P_HttpMySQLLogger(const string& ipaddress,H4P_FN_HTTPFAIL fnFail=nullptr,uint32_t filter=H4P_LOG_ALL): 
             _fail(fnFail),ip(ipaddress),H4PLogService("mysql",filter){

@@ -103,10 +103,10 @@ void H4P_AsyncMQTT::_start(){
 }
 
 void H4P_AsyncMQTT::_stop(){
-    if(!(WiFi.getMode() & WIFI_AP)) {
+//    if(!(WiFi.getMode() & WIFI_AP)) {
         autorestart=false;
         disconnect(true);
-    }
+//    }
 }
 
 void H4P_AsyncMQTT::change(const string& broker,uint16_t port){ // add creds

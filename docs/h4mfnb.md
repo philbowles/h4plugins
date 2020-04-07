@@ -76,7 +76,7 @@ H4P_MultiFunctionButton(
 
 # Tweakables
 
-The following values are defined in `H4PConfig.h` . They are chosen initally to set a good balance between stability, performance and memory / stack usage. *It is not advisable to change them unless you know exactly what you are doing and why*. 
+The following values are defined in `config.h` . They are chosen initally to set a good balance between stability, performance and memory / stack usage. *It is not advisable to change them unless you know exactly what you are doing and why*. 
 
 **N.B.** **Support will not be provided if any of these values are changed.**
 

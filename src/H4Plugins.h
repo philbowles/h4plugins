@@ -1,12 +1,12 @@
 #ifndef H4P_PLUGINS_H
 #define H4P_PLUGINS_H
 
-#include<H4PConfig.h>
+#include<config.h>
 
 #include<H4P_CmdErrors.h>
 #include<H4P_SerialCmd.h>
 #include<H4P_SerialLogger.h>
-#include<H4P_ExternalSqWave.h>
+//#include<H4P_ExternalSqWave.h>
 #include<H4P_TaskSniffer.h>
 #include<H4P_QueueWarn.h>
 #include<H4P_GPIOManager.h>
@@ -42,5 +42,7 @@
     H4P_SerialCmd h4cmd(b); \
     H4GM_PINMAP         H4P_GPIOManager::pins; 
     uint32_t            H4Plugin::_nxtSubCmd=H4PC_MAX-1; \
-    H4P_CONFIG_BLOCK    H4Plugin::_cb; 
+    H4P_CONFIG_BLOCK    H4Plugin::_cb={{"date",string(__DATE__)+"/"+string(__TIME__)}, \
+                                       {"h4v",string(H4_VERSION)}, \
+                                       {"h4pv",string(H4P_VERSION)}};
 #endif

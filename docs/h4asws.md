@@ -100,7 +100,7 @@ When "prettified" it looks like this:
       "user=",
       "gs=Get",
       "auser=admin",
-      "h4pv=0.0.1",
+      "h4pv=0.5.1",
       "state=0",
       "udn=Socket-1_0-upnp17D848",
       "muser=",

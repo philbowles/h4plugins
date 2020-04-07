@@ -39,7 +39,6 @@ SOFTWARE.
 #include<AsyncMqttClient.h>
 
 class H4P_AsyncMQTT: public H4Plugin, public AsyncMqttClient{
-//        unordered_set<string>   _grid;
             bool            autorestart=true;
             string          device;
 

@@ -57,6 +57,7 @@ void H4P_MultiFunctionButton::_start(){
         if(WiFi.getMode() & WIFI_AP) h4fc.flashPWM(1000,10,_led,_active); 
         else h4fc.stopLED(_led); 
     }
+    _upHooks();
 }
 
 void H4P_MultiFunctionButton::_stop(){
@@ -64,6 +65,7 @@ void H4P_MultiFunctionButton::_stop(){
         if(WiFi.getMode() & WIFI_AP) h4fc.stopLED(_led); 
         else h4fc.flashMorse("... --- ...   ",H43F_TIMEBASE,_led,_active);
     }
+    _downHooks();
 }
 
 void H4P_MultiFunctionButton::_hookIn(){

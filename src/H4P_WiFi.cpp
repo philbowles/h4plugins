@@ -36,10 +36,8 @@ SOFTWARE.
 uint32_t H4P_WiFi::_change(vector<string> vs){ return guardString2(vs,[this](string a,string b){ change(a,b); }); }
 
 void H4P_WiFi::_getPersistentValue(string v,string prefix){
-    string persistent=H4P_SerialCmd::read("/"+v);
-    string cat=_cb[v]+persistent;
-    if(persistent.size()) if(H4P_PREFER_PERSISTENT) _cb[v]=persistent;  
-    if(!cat.size()) _cb[v]=string(prefix)+_cb[chipTag()];
+    string persistent=replaceAll(H4P_SerialCmd::read("/"+v),"\r\n","");
+    _cb[v]=persistent.size() ? persistent:string(prefix)+_cb[chipTag()];
 }
 
 void H4P_WiFi::_gotIP(){
@@ -65,6 +63,7 @@ void H4P_WiFi::_greenLight() {
     _cb[chipTag()]=_getChipID();
     _cb[boardTag()]=replaceAll(H4_BOARD,"ESP8266_","");
     _getPersistentValue(deviceTag(),"H4-");
+    _getPersistentValue("h4sv","*");
     if(isLoaded(upnpTag())) h4cmd.addCmd("host2",_subCmd,0,CMDVS(_host2));
     start();
 }

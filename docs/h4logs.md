@@ -26,7 +26,7 @@ The important thing to note is that each logger is called in turn, thus you can 
 
 Also note that the main interface `h4cmd.logEventType(H4P_LOG_TYPE,const string& src,const string& tgt,const string& fmt,...)` (which operates like `printf` with variable number of parameters) will simply do nothing if no loggers are installed. This allows it to be left in the code and "switched on or off" by commenting out the loggers, which can be flipped back in at a stroke for testing.
 
-Better still. there is a macro `h4UserEvent("printf-style %s",...)` which simply calls `h4cmd.logEventType` "under the hood" but can be "compiled out" by removing the `#define H4P_LOG_EVENTS` entry in `H4PConfig.h`, which reduces the size of the binary. Unless you have good reason (which will be rare) then you should always use `h4UserEvent`.
+Better still. there is a macro `h4UserEvent("printf-style %s",...)` which simply calls `h4cmd.logEventType` "under the hood" but can be "compiled out" by removing the `#define H4P_LOG_EVENTS` entry in `config.h`, which reduces the size of the binary. Unless you have good reason (which will be rare) then you should always use `h4UserEvent`.
 
 Finally, most loggers have  `filter` parameter which allows the logger to operate on only certain event types:
 

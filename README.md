@@ -6,7 +6,7 @@
 
 *All plugins depend upon the presence of the [H4 library](https://github.com/philbowles/H4), which must be installed first.*
 
-## Version **0.5.1** is a major release with many changes, you *must* read the [Release Notes](docs/relnotes.md) and upgrade to [H4 library](https://github.com/philbowles/H4) v0.5.1 first
+## Version **0.5.1** is a major release with many changes, you *must* read the [Release Notes](docs/rn051.md) and upgrade to [H4 library](https://github.com/philbowles/H4) v0.5.1 first
 
 ---![H4PluginsFF](/assets/h4plugins.jpg)
 

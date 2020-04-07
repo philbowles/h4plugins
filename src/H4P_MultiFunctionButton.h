@@ -30,16 +30,14 @@ SOFTWARE.
 #ifndef H4P_MultiFunctionButton_HO
 #define H4P_MultiFunctionButton_HO
 
-/*
-#ifndef LED_BUILTIN
-    #define LED_BUILTIN 2
-#endif
-*/
-
 #include<H4PCommon.h>
 #include<H4P_GPIOManager.h>
-
 #include<H4P_BinaryThing.h>
+
+#include<H4P_WiFiSelect.h>
+#ifndef H4P_NO_WIFI
+    #include<H4P_WiFi.h>
+#endif
 
 extern void h4FactoryReset();
 class H4P_MultiFunctionButton: public H4Plugin{

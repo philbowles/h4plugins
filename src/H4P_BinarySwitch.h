@@ -38,8 +38,8 @@ class H4P_BinarySwitch: public H4P_BinaryThing{
     protected:
         OutputPin*          _pp;
         virtual void        _setState(bool b) override { 
-            _pp->logicalWrite(_state=b);
-            _setSlaves(b);
+            H4P_BinaryThing::_setState(b);
+            _pp->logicalWrite(_state);
         }
     public:
         H4P_BinarySwitch(uint8_t pin,H4GM_SENSE sense, uint32_t initial,H4BS_FN_SWITCH f=nullptr,uint32_t timer=0): H4P_BinaryThing(f,initial,timer){

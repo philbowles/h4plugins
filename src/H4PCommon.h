@@ -34,7 +34,7 @@ SOFTWARE.
 
 #include<H4.h>
 #include<H4Utils.h>
-#include<H4PConfig.h>
+#include"config.h"
 
 #include<unordered_set>
 #include<cstdarg>
@@ -224,8 +224,7 @@ class H4Plugin {
                 if(!vs.size()) return H4_CMD_TOO_FEW_PARAMS;
                 return vs.size()>1 ? H4_CMD_TOO_MANY_PARAMS:f(vs);
             }
-                void        _upHooks();
-                void        _downHooks();
+//                void        _downHooks();
 
         virtual void        _restart(){ stop();start(); }
         virtual void        _start() { _upHooks(); }
@@ -268,17 +267,16 @@ class H4Plugin {
 //      syscall only
         virtual void        _reply(string msg) { Serial.println(CSTR(msg)); }
         static  void        _hookFactory(H4_FN_VOID f){ if(f) _factoryChain.push_back(f); } 
+                void        _downHooks();
+                void        _upHooks();
 
 //        static void         dumpCommands(H4_CMD_MAP cm=_commands){ for(auto const c:cm) Serial.printf("%16s o=%2d l=%2d\n",CSTR(c.first),c.second.owner,c.second.levID); }
 };
 
 class H4PLogService: public H4Plugin {
                 uint32_t    _filter=0;
-            
-                void        _filterLog(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target){
-                    if(_up){ if(type & _filter) _logEvent(msg,type,source,target); }
-                }
     protected:
+                void        _filterLog(const string &m,H4P_LOG_TYPE t,const string& s,const string& tg){ if(_up && (t & _filter)) _logEvent(m,t,s,tg); }
         virtual void        _hookIn() override;
         virtual void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target)=0;
     public:

@@ -116,19 +116,16 @@ void H4Plugin::stop() {
 
 void H4Plugin::_upHooks(){ 
     _up=true;
-    SYSEVENT(H4P_LOG_SVC_UP,"svc",_pName,"");
+    SYSEVENT(H4P_LOG_SVC_UP,"svc",_pName,"UP");
     for(auto const& c:_connected) c();
 }
 
 void H4Plugin::_downHooks(){ 
     for(auto const& c:_disconnected) c();
-    SYSEVENT(H4P_LOG_SVC_DOWN,"svc",_pName,"");
+    SYSEVENT(H4P_LOG_SVC_DOWN,"svc",_pName,"DN");
     _up=false;
 }
 //
 //      H4PlogService
 //
-void H4PLogService::_hookIn(){
-    //REQUIRE(scmd);
-    h4cmd._hookLogChain(bind(&H4PLogService::_filterLog,this,_1,_2,_3,_4));
-}
+void H4PLogService::_hookIn(){ h4cmd._hookLogChain(bind(&H4PLogService::_filterLog,this,_1,_2,_3,_4)); }

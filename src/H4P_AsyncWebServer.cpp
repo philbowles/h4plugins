@@ -26,15 +26,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include<H4P_AsyncWebServer.h>
 #ifndef H4P_NO_WIFI
+#include<H4P_AsyncWebServer.h>
+#include<H4P_BinaryThing.h>
 
 extern  void h4AddAwsHandlers();
 
-void  H4P_AsyncWebServer::_hookIn(){
+void  H4P_AsyncWebServer::_hookIn(){ 
     DEPEND(wifi);
-    _cb["h4v"]=H4_VERSION;
-    _cb["h4pv"]=H4P_VERSION;
+    H4Plugin* p=isLoaded(onofTag());
+    if(p) _btp=reinterpret_cast<H4P_BinaryThing*>(p);
 }
 
 void H4P_AsyncWebServer::_rest(AsyncWebServerRequest *request){
@@ -67,7 +68,17 @@ void H4P_AsyncWebServer::_setBothNames(const string& host,const string& friendly
 
 void H4P_AsyncWebServer::_start(){
 	reset();
-
+    // if onof
+    if(isLoaded(onofTag())){
+        _cb[onofTag()]="1";
+        _evts=new AsyncEventSource("/evt");
+        _evts->onConnect([this](AsyncEventSourceClient *client){
+            H4EVENT("SSE Client %08x n=%d",client,client->lastId());
+            client->send(_btp->state() ? "1":"0",onofTag(),millis(),1000);
+        });
+        addHandler(_evts);
+    } else _cb[onofTag()]="0";
+    // enif ono
     on("/",HTTP_GET, [this](AsyncWebServerRequest *request){ 
         H4EVENT("Root %s",request->client()->remoteIP().toString().c_str());
         string rootweb=WiFi.getMode() & WIFI_AP ? "/ap.htm":"/sta.htm"; // streeamline - even fn change
@@ -85,10 +96,6 @@ void H4P_AsyncWebServer::_start(){
         h4wifi.change(rp[ssidTag()],rp[pskTag()]);
         //
         _setBothNames(rp[deviceTag()],rp[nameTag()]);
-//        if(isLoaded(upnpTag())){
-//            h4wifi._setPersistentValue(nameTag(),rp[nameTag()],false);
-//        }
-//        h4wifi.host(rp[deviceTag()]);
     });
 
 	on("/rest",HTTP_GET,[this](AsyncWebServerRequest *request){ _rest(request); });

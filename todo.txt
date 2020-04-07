@@ -1,6 +1,7 @@
 
 TODO:
 SOONER
+
 SHORTTERM
 MEDIUMTERM
     ESp32 MDNS detector

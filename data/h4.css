@@ -37,16 +37,22 @@ img{
   grid-column: 2;
   width: 280px;
 }
-#cmds{
-  grid-column: 3;
-  margin-top: 15px;
-  cursor: pointer;
+#cmdf{
+    grid-column: 3;
+    margin-top: 15px;
+    cursor: pointer;
+  }
+#cmdr{
+    grid-column: 1;
+    grid-row: 1;
+    margin-top: 15px;
+    cursor: pointer;
 }
 .line {
-  display: inline-flex;
-  text-align: left;
-  grid-column: 2;   
-  }
+display: inline-flex;
+text-align: left;
+grid-column: 2;   
+}
 .fline {
   display: inline-flex;
 }
