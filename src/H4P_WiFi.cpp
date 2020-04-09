@@ -42,7 +42,6 @@ void H4P_WiFi::_getPersistentValue(string v,string prefix){
 
 void H4P_WiFi::_gotIP(){
     _discoDone=false;
-    SPIFFS.remove("/ap");
     _cb["ip"]=WiFi.localIP().toString().c_str();
     _cb[ssidTag()]=CSTR(WiFi.SSID());
     _cb[pskTag()]=CSTR(WiFi.psk());
@@ -159,6 +158,7 @@ void H4P_WiFi::clear(){
 
 
 void H4P_WiFi::_startSTA(){
+    SPIFFS.remove("/ap");
     WiFi.mode(WIFI_STA);
 	WiFi.setSleepMode(WIFI_NONE_SLEEP);
     WiFi.enableAP(false); 

@@ -1,13 +1,12 @@
 
 TODO:
 SOONER
+    BORDS DOT LOWCALL!!!
     new pic=100 words in readme
     rerun cheztoi
     error ogne away in nodejs
     esp01s boards.local
 SHORTTERM
-    run menu on home page
-    lose ap.htm and automate via sse
 MEDIUMTERM
     ESp32 MDNS detector
 LONGTERM
