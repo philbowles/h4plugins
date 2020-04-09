@@ -1,7 +1,7 @@
 #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 
-H4 h4(115200,20); //auto-start Serial @ 115200, Q size=20 
+ //auto-start Serial @ 115200, Q size=20 
 
 H4P_GPIOManager h4gm;
 H4P_FlasherController h4fc;

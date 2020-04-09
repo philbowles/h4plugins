@@ -10,8 +10,13 @@
 
 # What does it do?
 
-Employs the `ESP8266httpUpdate.h` library to "pull" either SPIFFS or frimware update from remote server.
-Setting up the server is beyone the scope of this document but is discussed in [Generic Deployment](xtras.md)
+Employs the `ESP8266httpUpdate.h` (or `ESPhttpUpdate.h` for ESP32) library to "pull" either SPIFFS or latest firmware update from remote server.
+Setting up the server is beyond the scope of this document but is discussed in [Generic Deployment](xtras.md)
+
+Also, see the nodejs/express sever which does this for you, or the [NODE-RED H4 Updater flow](advanced.md) in the advanced documentation.
+
+[NodeJS/Express update server](../examples/H4P_HttpMySQLLogger/mysqlrest/h4.js)
+
 ---
 
 # Usage
@@ -39,8 +44,8 @@ If any of the above succeeds, i.e. there *is* a later version available which is
 # API
 
 ```cpp
-// Constructor
-H4P_RemoteUpdate(const string& url,bool runAtStart=false); // runAtStart checks/updates both on startup
+// Constructor url must contain :port if necessary, e.g. "http://192.168.1.4:1880/update"
+H4P_RemoteUpdate(const string& url); // runAtStart checks/updates both on startup
 
 
 void both(); // updates to later spiffs(if any) then fimware(if any)

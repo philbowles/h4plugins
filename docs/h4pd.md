@@ -107,7 +107,7 @@ bool isPresent(); // returns true/false depending on whether device is present /
 
 # Examples
 
-[Example Sketch - BinarySource](../examples/H4P_BinaryThing/H4P_BinaryThing.ino)
+[Example Sketch - BinaryThing](../examples/H4P_BinaryThing/H4P_BinaryThing.ino)
 [Example Sketch - BinarySwitch](../examples/H4P_BinarySwitch/H4P_BinarySwitch.ino)
 [Example Sketch - BinarySwitch with 3-function button](../examples/H4P_BinarySwitchmfnb/H4P_BinarySwitchmfnb.ino)
 [Example Sketch - BinarySwitch with MQTT](../examples/H4P_BinarySwitchMQTT/H4P_BinarySwitchMQTT.ino)

@@ -31,10 +31,7 @@ SOFTWARE.
 #define H4P_RemoteUpdate_H
 
 #include<H4PCommon.h>
-#ifdef ARDUINO_ARCH_ESP8266
-#include<ESP8266httpUpdate.h>
 #include<H4P_SerialCmd.h>
-#define H4P_RUPD_STRETCH    5
 /*
 enum HTTPUpdateResult {
     HTTP_UPDATE_FAILED,
@@ -42,32 +39,24 @@ enum HTTPUpdateResult {
     HTTP_UPDATE_OK
 };
 */
-class H4P_RemoteUpdate: public H4Plugin {
+#ifdef ARDUINO_ARCH_ESP8266
+    #include<ESP8266httpUpdate.h>
+class H4P_RemoteUpdate: public H4Plugin, public ESP8266HTTPUpdate {
+#else
+    #include<HTTPUpdate.h>
+class H4P_RemoteUpdate: public H4Plugin, public HTTPUpdate {
+#endif
+                WiFiClient  _c;
                 string      _url;
-
                 void        _entropise(H4_FN_VOID f){ h4.onceRandom(H4P_PJ_LO,H4P_PJ_HI * H4P_RUPD_STRETCH,f); }
                 void        _greenLight(){} // no autostart
-                void        _hookIn(){ 
-                    DEPEND(wifi);
-/*                    
-                    #ifdef H4P_LOG_EVENTS
-                    ESPhttpUpdate.onProgress([this](int a,int b){ 
-                        uint32_t pc=a*100/b;
-                        static uint32_t prev;
-                        if(!(pc%10)) {
-                            if(pc > prev){
-                                H4EVENT("%u",pc);
-                                prev=pc; 
-                            }
-                        }
-                    });
-                    #endif                    ESPhttpUpdate.rebootOnUpdate(false);
-*/
-                }
+                void        _hookIn(){ DEPEND(wifi); }
                 void        _updateFromUrl(bool fw,bool reboot){
-                    string updateUrl=replaceAll((_url+"/"+_cb[boardTag()]+"/"+_cb["date"])," ","_");
+                    String updateUrl=CSTR(replaceAll((_url+"/"+_cb[boardTag()]+"/"+_cb["date"])," ","_"));
+                    String version=fw ? H4P_VERSION:CSTR(_cb["h4sv"]);
+                    H4EVENT("%s [%s]",CSTR(updateUrl),CSTR(version));
                     h4wifi._downHooks();
-                     t_httpUpdate_return rv=fw ? ESPhttpUpdate.update(CSTR(updateUrl),H4P_VERSION):ESPhttpUpdate.updateSpiffs(CSTR(updateUrl),CSTR(_cb["h4sv"]));
+                    t_httpUpdate_return rv=fw ? update(_c,updateUrl,version):updateSpiffs(_c,updateUrl,version);
                     switch(rv){
                         case HTTP_UPDATE_OK:
                             if(reboot) h4reboot();
@@ -78,7 +67,7 @@ class H4P_RemoteUpdate: public H4Plugin {
                             break;
                         default:
                             h4wifi._upHooks();
-                            H4EVENT("FAIL %d: %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
+                            H4EVENT("FAIL %d: %s", getLastError(), getLastErrorString().c_str());
                     }
                 }
     public:
@@ -87,16 +76,16 @@ class H4P_RemoteUpdate: public H4Plugin {
                 {_pName,       { H4PC_H4,_subCmd  , nullptr}},
                 {"both",       { _subCmd, 0, CMD(both)}},
                 {"spiffs",     { _subCmd, 0, CMD(spiffs)}},
-                {"update",     { _subCmd, 0, CMD(update)}}
+                {"update",     { _subCmd, 0, CMD(firmware)}}
             }; 
         }
         void both(){
             _entropise([this]{ _updateFromUrl(false,false); }); // spiffs, no reboot
-            update();
+            firmware();
         }
         void show() override { reply("url: %s",CSTR(_url)); }
         void spiffs(){ _entropise([this]{ _updateFromUrl(false,true); }); }
-        void update(){ _entropise([this]{ _updateFromUrl(true,true); }); }
+        void firmware(){ _entropise([this]{ _updateFromUrl(true,true); }); }
 };
-#endif
+
 #endif // H4P_RemoteUpdate_H

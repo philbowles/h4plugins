@@ -40,7 +40,7 @@ You will probably need to adjust these values for you own device
     Raw passes all transitions to the callback and does not "process" the signal in any way
 
 */
-H4 h4(115200,20); //auto-start Serial @ 115200, Q size=20 
+ //auto-start Serial @ 115200, Q size=20 
 H4P_GPIOManager h4gm;
 H4P_BinarySwitch h4onof(LED_BUILTIN,UL_ACTIVE,OFF);
 // or e.g. H4P_BinaryThing, UPNPSource, UPNPServer - in fact any xSwitch or xSource

@@ -95,7 +95,7 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 * [**H4P_BinarySwitch**](docs/things.md): GPIO object that allows control by commands from multiple sources
 * [**H4P_BinaryThing**](docs/xxx.md): user-defined functional object that allows control by commands from multiple sources
 * [**H4P_UPNPServer**](docs/things.md): provides full UPNP device with Alexa voice control, Windows10 Desktop integration
-* [**H4P_MultiFunctionButton**](docs/h4mfnb.md): Physical tact-switch control giving on/off, reboot,factory reset and forced AP Mode depending on hold time
+* [**H4P_MultiFunctionButton**](docs/h4mfnb.md): Tact-button giving on/off, reboot,factory reset and forced AP Mode depending on hold time
 * [**H4P_PersistentStorage**](docs/h4stor.md): Save name/value pairs across reboots (requires SPIFFS)
 * [**H4P_H4Detector**](docs/h4pd.md): Execute function when specific H4 device joins / leaves network
 * [**H4P_H4DetectorSource**](docs/h4pd.md): Switch default BinarySwitch/Thing when specific H4 device joins / leaves network

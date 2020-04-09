@@ -20,13 +20,14 @@ CHIP_MAP  chips={
  {"A006CD",{"solar2","Solar 2",{}}},//8
  {"FABFEA",{"click-l","Landing clicker",{}}},//9
  {"F90E13",{"princess","Princess Suite",{}}},//10
- {"F906B3",{"master","Master Bedroom Floor Lamp",{}}},//11
- {"F9198C",{"landing","Landing Floor Lamp",{}}},//12
+ {"F9198C",{"master","Master Bedroom Floor Lamp",{}}},//11
+ {"F906B3",{"landing","Landing Floor Lamp",{}}},//12
  {"F9198B",{"middle","Middle Earth Floor Lamp",{}}},//13
  {"0BC939",{"fourteen","Lab phoenix",{}}},//14
  {"8EC098",{"mailbox","Mailbox",{}}},//15
+ {"BF713C",{"devkit","Devkit Thirty Two",{}}}
  {"0BAC73",{"S120","Ess one twenty",{}}},
- {"5ACB8C",{"S126","Ess one twenty six",{}}}
+ {"5ACB8C",{"S126","Ess one twenty six",{}}},
 };
 
 void onMqttConnect(){

@@ -20,10 +20,10 @@ router.post('/', function(req, res, next) {
         return myTable.insert(fields).values(values).execute();
     })
     .catch(function (err) { console.warn(err) });
+    res.send()
 });
 
 function sendFile(res,f){
-//    console.warn("send file "+f)
     fs.stat(f,function(err,s) {
         res.append('Content-Length', s.size)
         res.append('Content-Type', 'application/octet-stream')
@@ -32,7 +32,6 @@ function sendFile(res,f){
 }
 
 function send304(res){
-//    console.warn("send 304")
     res.statusCode=304
     res.send()
 }
@@ -43,8 +42,28 @@ router.get('/update*',function(req,res,next){
     let params=req.params['0'].split("/")
     // [0]=empty [1]=MCU type [2] = compile date [3] = compile time
     let h=req.headers
-    if(h["x-esp8266-mode"]==="sketch") { // decode variant
+    let mode
+    let chipsize
+    let version
+    if(h["x-esp8266-mode"]){
+        mode=h["x-esp8266-mode"]
+        chipsize=h['x-esp8266-chip-size']
+        version=h["x-esp8266-version"];
+    }
+    else {
+        mode=h["x-esp32-mode"]
+        chipsize=h['x-esp32-chip-size']
+        version=h["x-esp32-version"];
+    }
+
+    if(mode==="sketch") { // decode variant
         switch(params[1]){
+            case 'ESP32_DEV':
+                bin="esp32"
+                break;
+            case 'GENERIC':
+                bin="generic";
+                break;
             case 'SONOFF_BASIC':
             case 'SONOFF_S20':
             case 'SONOFF_SV':
@@ -52,9 +71,6 @@ router.get('/update*',function(req,res,next){
                 break;
             case 'WEMOS_D1MINI':
                 bin="d1_mini";
-                break;
-            case 'GENERIC':
-                bin="generic";
                 break;
             default:
                 bin="XXX";
@@ -68,8 +84,7 @@ router.get('/update*',function(req,res,next){
         })
     }
     else {
-        let sz=parseInt(h['x-esp8266-chip-size'])/1048576;
-        let version=h["x-esp8266-version"];
+        let sz=parseInt(chipsize)/1048576;
         let files = fs.readdirSync(repo).filter(fn => fn.endsWith(sz+"M.bin"));
         files.sort().reverse() // latest first
         let latest=files[0].substring(7,12) // chop out version

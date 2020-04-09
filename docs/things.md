@@ -1,6 +1,6 @@
 ![H4P Flyer](/assets/GPIOLogo.jpg) 
 
-# BinarySwitch and BinarySource (shortname="onof")
+# BinarySwitch and BinaryThing (shortname="onof")
 
 ## Link on/off/toggle commands to a GPIO or functional object for H4 Universal Scheduler/Timer.
 
@@ -14,7 +14,7 @@ Let's not forget that "IOT" is the Internet of *Sources*. So what is a "Source"?
 
 There can only be one *output* Source (or Switch) in a sketch/app and it must be named as `h4onof`. It is effectively the default handler for the above commands. It is what your device does when any source ( [Serial](h4cmd.md), [MQTT](h4mqtt.md), [HTTP REST](h4asws.md), Amazon Alexa voice command or [linked GPIO input connector](h5gpio.md) ) sends an `on`,`off`,`toggle` or `switch` command.
 
-You can have many *input* [linked GPIO input connector](h5gpio.md)s all linked to the single *output* `h4onof`. Each of these behaves exactly like its non-Source counterpart except that instead of calling back your code when its state changes, it automatically sends its ON or OFF state to the `h4onof` handler, either a BinarySwitch or a BinarySource.
+You can have many *input* [linked GPIO input connector](h5gpio.md)s all linked to the single *output* `h4onof`. Each of these behaves exactly like its non-Source counterpart except that instead of calling back your code when its state changes, it automatically sends its ON or OFF state to the `h4onof` handler, either a BinarySwitch or a BinaryThing.
 
 * AnalogThresholdSource [Example Code](../examples/H4GM_AnalogThresholdSource/H4GM_AnalogThresholdSource.ino)
 * DebouncedSource [Example Code](../examples/H4GM_DebouncedSource/H4GM_DebouncedSource.ino)
@@ -25,7 +25,7 @@ You can have many *input* [linked GPIO input connector](h5gpio.md)s all linked t
 * RetriggeringSource [Example Code](../examples/H4GM_RetriggeringSource/H4GM_RetriggeringSource.ino)
 
 In addition, you may also have:
-* [H4P_MultiFunctionButton](h4mfnb.md) [Example Code](../examples/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
+* H4P_MultiFunctionButton [Example Code](../examples/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
 * H4P_UPNPServer [Example Code](../examples/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
 
 The [H4P_MultiFunctionButton](h4mfnb.md) provides an easy way to switch your Source/Switch with a physical button, reboot it or factory reset it, depending on how long you hold it down.
@@ -90,9 +90,9 @@ Now assume that instead of the light going ON you want your device to send you a
 
 That's it - the rest is the same.
 
-## BinarySource vs BinarySwitch Summary
+## BinaryThing vs BinarySwitch Summary
 
-* BinarySource calls a user-defined function with `bool` value when `on`,`off`,`toggle` or `switch` command is received
+* BinaryThing calls a user-defined function with `bool` value when `on`,`off`,`toggle` or `switch` command is received
 * BinarySwitch drives a GPIO HIGH or LOW when  `on`,`off`,`toggle` or `switch` command is received
 
 ---
@@ -124,7 +124,7 @@ H4P_BinarySwitch h4onof;
 * h4/toggle (invert current state)
 * h4/state // report state
 
-// H4P_UPNPServer only
+H4P_UPNPServer only
 * h4/upnp/name/N (payload N= new UPNP "friendly name")
   
 ## Topics automatically published
@@ -159,9 +159,11 @@ void friendlyName(const string& name); // sets UPNP friendly name. Causes a rebo
 
 ```
 
+For details on setting up Windows for the full UPNP experience, see [Advanced Topics](advanced.md)
+
 # Output Examples
 
-[Example Sketch - BinarySource](../examples/H4P_BinaryThing/H4P_BinaryThing.ino)
+[Example Sketch - BinaryThing](../examples/H4P_BinaryThing/H4P_BinaryThing.ino)
 [Example Sketch - BinarySwitch](../examples/H4P_BinarySwitch/H4P_BinarySwitch.ino)
 [Example Sketch - BinarySwitch with 3-function button](../examples/H4P_BinarySwitchmfnb/H4P_BinarySwitchmfnb.ino)
 [Example Sketch - BinarySwitch with MQTT](../examples/H4P_BinarySwitchMQTT/H4P_BinarySwitchMQTT.ino)
@@ -179,34 +181,6 @@ You need to read the [H4P_GPIOManager](h4gm.md) documentation before using these
 [Example Sketch - PolledSource](../examples/H4GM_PolledSource/H4GM_PolledSource.ino)
 [Example Sketch - RawSource](../examples/H4GM_RawSource/H4GM_RawSource.ino)
 [Example Sketch - RetriggeringSource](../examples/H4GM_RetriggeringSource/H4GM_RetriggeringSource.ino)
-
----
-
-# Advanced Topics
-
-## Installation of Windows components for UPNP variants
-
-***N.B.** It seems Windows has a bug(!) in handling Wemo UPNP devices. Until this is fixed or a workaraound is found, the only way to activate your H4 device using UPNP is indirectly via MQTT*
-
-Until such time as an installation script is written (soon, I promise :) ) getting the windows functionality is a bit of an ordeal, I'm afraid.
-
-The first thing you need to do is to locate you Arduino library installation folder for H4Plugins, it will be something like `C:\Users\phil\Documents\Arduino\libraries\H4Plugins`
-
-The files you will need are in the `src` subfolder
-
-1. Install Powershell if you dont already have it and set it up so that it can run code without needing admin rights More information [here](https://superuser.com/questions/106360/how-to-enable-execution-of-powershell-scripts) 
-
-2. Install [m2mqtt](https://github.com/eclipse/paho.mqtt.m2mqtt) You may find it easier to first install [nuget.exe](https://www.nuget.org/downloads) and run `nuget.exe install M2Mqtt -o c:\lib`
-
-3. Edit h4p.reg and change the location in the final to match your username  Then right-click on that file and select "Merge" to add it to the registry
-
----
-
-## Device naming of UPNPServer
-
-If no name is given in the constructor, it defaults to "upnp XXXXXX" where XXXXXX is the unique chip ID of the device (usually the last 6 characters of the MAC address).
-
-This is useful to enable a single generic sketch to be uploaded to numerous devices without change. Each device should then be sent a `h4/upnp/name` command to give it a "sensible" name. This can be done by any MQTT client using stored messages (or e.g. NODE-RED), so that each device gets its own new name every time it reboots. See [Advanced Topics](advanced.md)
 
 ---
 

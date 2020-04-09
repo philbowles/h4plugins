@@ -46,7 +46,7 @@ You will probably need to adjust these values for you own device
 #define ENCODER_A D7
 #define ENCODER_B D6
 
-H4 h4(115200,20); //auto-start Serial @ 115200, Q size=20 
+ //auto-start Serial @ 115200, Q size=20 
 H4P_GPIOManager h4gm;
 
 void h4setup() { // H4 constructor starts Serial
