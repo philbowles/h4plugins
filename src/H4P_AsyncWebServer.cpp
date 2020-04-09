@@ -69,7 +69,7 @@ void H4P_AsyncWebServer::_setBothNames(const string& host,const string& friendly
 
 void H4P_AsyncWebServer::_start(){
 	reset();
-    // if onof
+
     if(isLoaded(onofTag())){
         _cb[onofTag()]="1";
         _evts=new AsyncEventSource("/evt");
@@ -79,11 +79,11 @@ void H4P_AsyncWebServer::_start(){
         });
         addHandler(_evts);
     } else _cb[onofTag()]="0";
-    // enif ono
+
     on("/",HTTP_GET, [this](AsyncWebServerRequest *request){ 
         H4EVENT("Root %s",request->client()->remoteIP().toString().c_str());
-        string rootweb=WiFi.getMode() & WIFI_AP ? "/ap.htm":"/sta.htm"; // streeamline - even fn change
-        request->send(SPIFFS,CSTR(rootweb),String(),false,aswsReplace);
+        _cb["wifi"]=stringFromInt(WiFi.getMode());
+        request->send(SPIFFS,"/sta.htm",String(),false,aswsReplace);
     });
 
     on("/",HTTP_POST, [this](AsyncWebServerRequest *request){ 

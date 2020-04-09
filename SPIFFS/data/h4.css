@@ -29,6 +29,7 @@ width: 280px;
 #creds{
 grid-column: 2;
 width: 280px;
+display: none;
 }
 #cmdf{
 grid-column: 3;
