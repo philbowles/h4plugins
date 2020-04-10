@@ -32,11 +32,10 @@ SOFTWARE.
 #include<H4P_SerialCmd.h>
 
 H4P_Timekeeper::H4P_Timekeeper(const char* ntp1,const char* ntp2,int tzo,H4_FN_VOID onC,H4_FN_VOID onD): _ntp1(ntp1),_ntp2(ntp2),_tzo(tzo),H4Plugin(timeTag(),onC,onD){
-//    h4._hookLoop([this](){ _run(); },_subCmd);
-    _rebootHook=[this](){ reply("FREE SOME RESOURCES\n"); };
-    _factoryHook=[this](){ reply("CLEAN UP SOME SHIT\n"); };
     _cmds={
         {_pName,   { H4PC_H4, _subCmd, nullptr}}, // root for this plugin, e.g. h4/ME...
+        {"at",     { _subCmd,       0, CMDVS(_at)}},
+        {"daily",  { _subCmd,       0, CMDVS(_daily)}},
         {"sync",   { _subCmd,       0, CMD(sync)}}
     };
     _useNTP(tzo,ntp1,ntp2); 
@@ -59,6 +58,13 @@ ip_addr_t * H4P_Timekeeper::__ntpSetServer(int n,const char* ntp){
 	return nullptr;
 }
 
+uint32_t H4P_Timekeeper::_at(vector<string> vs){
+    dumpvs(vs);
+}
+uint32_t H4P_Timekeeper::_daily(vector<string> vs){
+    dumpvs(vs);
+}
+
 void H4P_Timekeeper::_hookIn(){ DEPEND(wifi); }
 
 void H4P_Timekeeper::_start(){
@@ -66,7 +72,7 @@ void H4P_Timekeeper::_start(){
 //    for some reason it never seems to sync first time
     h4.repeatWhile([this]{ return !hasRTC(); },
         H4P_TIME_HOLDOFF,
-        [this]{ sync(); },
+        [this]{ H4EVENT("%u TRY SYNC",millis());sync(); },
         [this]{ H4EVENT("%u time %s",millis(),CSTR(clockTime())); },
         H4P_TRID_TIME,true
     );
@@ -85,7 +91,13 @@ void H4P_Timekeeper::_useNTP(int offset,const char* srv1,const char* srv2){
 	if(s2) os_free(s2);
 }
 
-//string	H4P_Timekeeper::getDate(){ return _cb["date"]; }
+H4_TIMER H4P_Timekeeper::at(const char* when,H4_FN_VOID f,H4_FN_VOID fnc,uint32_t id){
+
+}
+
+H4_TIMER H4P_Timekeeper::daily(const char* when,H4_FN_VOID f,H4_FN_VOID fnc,uint32_t id){
+
+}
 
 uint32_t H4P_Timekeeper::parseTime(const string& ts){
 	//string t(ts);
@@ -109,17 +121,20 @@ string H4P_Timekeeper::strTime(uint32_t t){
 
 void H4P_Timekeeper::sync(){
 	long stamp=sntp_get_current_timestamp();
-	if(stamp > 28100){ // 28800 +leeway: default is GMT+8
-		H4EVENT("%u time %lu",stamp,millis());
+    Serial.printf("Raw stamp %lu\n",stamp);
+	if(stamp > 28100L){ // 28800 +leeway: default is GMT+8
+		H4EVENT("%u time %lu",millis(),stamp);
 		vector<string> dp=split(sntp_get_real_time(stamp)," ");
-		string year=dp.back();dp.pop_back();
-		string time=dp.back();dp.pop_back();
+		string year=dp.back();
+        dp.pop_back();
+		string time=dp.back();
+        dp.pop_back();
 		dp.push_back(year);
 		string date=join(dp," ");
 		date.pop_back();
-		//_cb["date"]=date; // why?
-        _ss00=parseTime(time);
-        H4EVENT("%s %s _ss00=%d",CSTR(date),CSTR(time),_ss00);
+		_cb["date"]=date; // why?
+        _mss00=parseTime(time);
+        H4EVENT("%s %s _mss00=%d",CSTR(date),CSTR(time),_mss00);
 //		onTimeSync(stamp);
 	} else H4EVENT("%u NO TIME AT ALL",millis());
 }

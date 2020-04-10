@@ -34,8 +34,6 @@ void __attribute__((weak)) onFactoryReset(){}
 
 vector<H4_FN_VOID>  H4Plugin::_factoryChain;
 //
-//
-//
 bool stringIsAlpha(const string& s){ return !(std::find_if(s.begin(), s.end(),[](char c) { return !std::isalpha(c); }) != s.end()); }
 //
 void h4StartPlugins(){

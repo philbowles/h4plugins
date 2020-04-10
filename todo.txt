@@ -4,6 +4,7 @@ SOONER
     error gone away in nodejs
     TK KW
 SHORTTERM
+    schedule in cheztoi
 MEDIUMTERM
     ESp32 MDNS detector
 LONGTERM
