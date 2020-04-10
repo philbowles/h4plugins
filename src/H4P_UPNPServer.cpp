@@ -76,9 +76,9 @@ void H4P_UPNPServer::_listenUDP(){
                         if (msg[0] == 'N') { //OTIFY
                             string usn=uhdrs["USN"];
                             if(_detect.count(usn)) _detect[usn](mx,uhdrs);
-                        }// else Serial.printf("WTF??? %s\n",CSTR(msg));
+                        }
                     } 
-                } else Serial.printf("msg fail too short!!! *%s*\n",CSTR(msg));
+                }
             },stringFromBuff(packet.data(), packet.length()),packet.remoteIP(), packet.remotePort()),nullptr, H4P_TRID_UDPM);
         });
     }

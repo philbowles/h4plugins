@@ -191,7 +191,6 @@ ESP8266
 */
 
 void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
-//    Serial.printf("_wifiEvent %d\n",event);
     switch(event) {
         case WIFI_EVENT_STAMODE_DISCONNECTED:
 			h4.queueFunction([](){ h4wifi._lostIP(); });

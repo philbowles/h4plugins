@@ -43,6 +43,7 @@ H4P_H4DetectorSource	KEYWORD1
 H4P_MDNSDetector	KEYWORD1
 H4P_MDNSDetectorSource	KEYWORD1
 H4P_RemoteUpdate	KEYWORD1
+H4P_Timekeeper	KEYWORD1
 
 #######################################
 # Methods and Functions (	KEYWORD2)

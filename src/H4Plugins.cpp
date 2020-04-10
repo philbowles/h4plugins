@@ -39,17 +39,21 @@ vector<H4_FN_VOID>  H4Plugin::_factoryChain;
 bool stringIsAlpha(const string& s){ return !(std::find_if(s.begin(), s.end(),[](char c) { return !std::isalpha(c); }) != s.end()); }
 //
 void h4StartPlugins(){
-//    Serial.printf("STARTING %d plugins\n",H4Plugin::_plugins.size());
     for(auto const& p:H4Plugin::_plugins) { p->_startup(); }
     for(auto const& p:H4Plugin::_plugins) { p->_hookIn(); }
+    for(auto const& p:H4Plugin::_plugins) {
+        H4Plugin::_factoryChain.push_back(p->_factoryHook);
+        h4.hookReboot(p->_rebootHook);
+    }
     for(auto const& p:H4Plugin::_plugins) { p->_greenLight(); }
     reverse(H4Plugin::_factoryChain.begin(),H4Plugin::_factoryChain.end());
-    H4Plugin::_hookFactory(onFactoryReset);
+    H4Plugin::_factoryChain.push_back(onFactoryReset);
 }
 
 void h4FactoryReset(){
+    H4::_runRebootChain();
     for(auto &c:H4Plugin::_factoryChain) c();
-    h4reboot();
+    h4rebootCore();
 }
 
 vector<uint32_t> H4Plugin::expectInt(string pl,const char* delim){
@@ -94,24 +98,22 @@ void H4Plugin::reply(const char* fmt,...){ // find pub sub size
 }
 
 void H4Plugin::_startup(){
-//    Serial.printf("H4Plugin::_startup %s state=%d\n",CSTR(_pName),state()); 
     _commands.insert(_cmds.begin(),_cmds.end());
     _cmds.clear();
 }
 
 void H4Plugin::start() {
-//    Serial.printf("H4Plugin::start %s state=%d\n",CSTR(_pName),state()); 
     if(!state()){
         H4EVENT("svc start %s",CSTR(_pName));
         _start(); // call the overrideable
-    } //else Serial.printf("%s already started\n",CSTR(_pName));
+    }
 }
 
 void H4Plugin::stop() { 
     if(state()){
         _stop(); // call the overrideable
         H4EVENT("svc stop %s",CSTR(_pName));
-    } //else Serial.printf("%s already stopped\n",CSTR(_pName));
+    }
 }
 
 void H4Plugin::_upHooks(){ 
@@ -120,7 +122,8 @@ void H4Plugin::_upHooks(){
     for(auto const& c:_connected) c();
 }
 
-void H4Plugin::_downHooks(){ 
+void H4Plugin::_downHooks(){
+    // reverse? 
     for(auto const& c:_disconnected) c();
     SYSEVENT(H4P_LOG_SVC_DOWN,"svc",_pName,"DN");
     _up=false;

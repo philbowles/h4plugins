@@ -101,7 +101,6 @@ class H4P_MDNSDetector: public H4PDetector {
         
         static void MDNSServiceQueryCallback(MDNSResponder::MDNSServiceInfo serviceInfo, MDNSResponder::AnswerType answerType, bool p_bSetContent) {
             if(answerType ==  MDNSResponder::AnswerType::IP4Address){
-                Serial.printf("MDNSServiceQueryCallback %s\n",serviceInfo.hostDomain());
                 string who=replaceAll(serviceInfo.hostDomain(),".local","");
                 if(localList.count(who)){ localList[who]->_inout(p_bSetContent); }
             }

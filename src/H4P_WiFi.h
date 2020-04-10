@@ -66,7 +66,9 @@ class H4P_WiFi: public H4Plugin{
             _cb[pskTag()]=psk;
             _cb[deviceTag()]=device;
 
-            _hookFactory([this](){ clear(); });
+            //_hookFactory([this](){ clear(); });
+            _factoryHook=[this](){ clear(); };
+
             _cmds={
                 {_pName,    { H4PC_H4, _subCmd, nullptr}},
                 {"apmode",  { _subCmd, 0, CMD(forceAP)}},

@@ -67,7 +67,6 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
                 void        _setBothNames(const string& host,const string& friendly);
                 void        _sendEvent(bool b){
                     if(_up && _btp) _evts->send(_btp->state() ? "1":"0",onofTag(),millis()); // protect isloaded
-                    else Serial.printf("_sendEvent while DOWN!!!!!!!!!!!\n");
                 }
 };
 

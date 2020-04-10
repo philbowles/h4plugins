@@ -123,7 +123,7 @@ void H4P_GPIOManager::_start(){
             ptr->Rpeak=std::max(ptr->Rpeak,ptr->rate);
             ptr->cps=0;
         }
-    },nullptr,H4P_TRID_SYNC,true);
+    },nullptr,H4P_TRID_GPIO,true);
     H4Plugin::_start();
 }
 

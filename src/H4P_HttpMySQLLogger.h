@@ -63,7 +63,6 @@ class H4P_HttpMySQLLogger: public H4PLogService, public asyncHTTPrequest {
             if(readyState == 4) {
                 inflight=false;
                 if(r->responseHTTPcode() < 0){
-//                    Serial.printf("HML %d\n",r->responseHTTPcode());
                     if(!warning){
                         warning=true;
                         if(_fail) _fail(r->responseHTTPcode());
@@ -80,7 +79,6 @@ class H4P_HttpMySQLLogger: public H4PLogService, public asyncHTTPrequest {
                 char buf[256];
                 sprintf(buf,"device=%s&msg=%s&type=%d&source=%s&target=%s&seq=%u",CSTR(_cb[deviceTag()]),CSTR(msg),(int) type,CSTR(source),CSTR(target),_logseq++);
                 setReqHeader("Content-Type","application/x-www-form-urlencoded");
-//                Serial.printf("HML %s\n",buf);
                 send(buf);
             } else h4.once(H4P_MYSQL_HOLDOFF,bind(&H4P_HttpMySQLLogger::_filterLog,this,msg,type,source,target),nullptr,H4P_TRID_MLRQ);
         }

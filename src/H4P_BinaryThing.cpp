@@ -66,6 +66,7 @@ uint32_t H4P_BinaryThing::_slave(vector<string> vs){
     return H4_CMD_OK;
 }
 #else
+void H4P_BinaryThing::_hookIn() {}
 void H4P_BinaryThing::_publish(bool b){}
 void H4P_BinaryThing::_setSlaves(bool b){}
 void H4P_BinaryThing::_setState(bool b) {

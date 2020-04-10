@@ -67,4 +67,7 @@ SOFTWARE.
 
 #define H4P_RUPD_STRETCH         5
 
+#define H4P_TIME_HOLDOFF      1000
+#define H4P_TIME_RESYNC 60*60*1000
+
 #endif

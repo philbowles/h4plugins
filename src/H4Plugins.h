@@ -6,7 +6,7 @@
 #include<H4P_CmdErrors.h>
 #include<H4P_SerialCmd.h>
 #include<H4P_SerialLogger.h>
-//#include<H4P_ExternalSqWave.h>
+#include<H4P_ExternalSqWave.h>
 #include<H4P_TaskSniffer.h>
 #include<H4P_QueueWarn.h>
 #include<H4P_GPIOManager.h>
@@ -27,6 +27,7 @@
     #include<H4P_RemoteUpdate.h>
     #include<H4P_UPNPServer.h>
     #include<H4P_PresenceDetector.h>
+    #include<H4P_Timekeeper.h>
 #endif
 
 #include<H4P_BinaryThing.h>

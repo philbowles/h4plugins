@@ -1,11 +1,8 @@
 
 TODO:
 SOONER
-    BORDS DOT LOWCALL!!!
-    new pic=100 words in readme
-    rerun cheztoi
-    error ogne away in nodejs
-    esp01s boards.local
+    error gone away in nodejs
+    TK KW
 SHORTTERM
 MEDIUMTERM
     ESp32 MDNS detector

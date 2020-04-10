@@ -36,7 +36,6 @@ uint32_t H4P_AsyncMQTT::_change(vector<string> vs){
 void H4P_AsyncMQTT::_greenLight(){
     _setup();
     onMessage([this](char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t length, size_t index, size_t total){
-        //Serial.printf("INCOMING! %s\n",topic);
         h4.queueFunction(
             bind([](string topic, string pload){ 
                 h4cmd._executeCmd(CSTR(string(mqttTag()).append("/").append(topic)),pload); 

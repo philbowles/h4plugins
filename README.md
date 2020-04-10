@@ -133,7 +133,6 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 * ESP8285 - any board e.g. Wemos D1 mini Lite
 * ESP32 - any board e.g. DevKit, Lolin D32
 * STM32-NUCLEO - "official" boards from ST - others may work too
-
 * SONOFF Basic, S20, SV others may work too if ESP8266 based
 
 ---
@@ -142,6 +141,7 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 
 H4Plugins is tested using
 
+* H4 0.5.4
 * ArduinoIDE 1.8.12
 * ESP8266 core 2.6.3
 * ESP32 core 1.0.4
@@ -151,7 +151,7 @@ Use the ArduinoIDE boards manager to install those versions. Earlier version *ma
 
 H4Plugins is a standard Arduino library. The simplest method is to download the zip form the link above and then use the menu command: `Sketch / Include Library / Add .ZIP Library...`
 
-First you need to install the  [H4](https://github.com/philbowles/H4) library. 
+First you need to install the [H4](https://github.com/philbowles/H4) library. 
 
 Next install the 3rd-party libraries:
 

@@ -87,7 +87,6 @@ class H4P_SerialCmd: public H4Plugin {
         void                    showSPIFFS();
         void                    heap(){ reply("Heap=%u",ESP.getFreeHeap()); }        
 #endif
-#ifdef H4P_LOG_EVENTS
                 void            all();
                 void            config(){ for(auto const& c:_cb) reply("%s=%s",CSTR(c.first),CSTR(c.second)); }        
                 void            plugins();
@@ -96,10 +95,6 @@ class H4P_SerialCmd: public H4Plugin {
 
                 void            dumpQ();
         static  string          _dumpTask(task*);
-#else
-                void            dumpQ(){}
-        static  string          _dumpTask(task*){}
-#endif
 //      user
                 void            addCmd(const string& name,uint32_t owner, uint32_t levID,H4_FN_MSG f=nullptr){  _commands.insert(make_pair(name,command {owner,levID,f})); }
                 void            help();

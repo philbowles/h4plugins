@@ -75,7 +75,7 @@ class H4P_CmdErrors: public H4Plugin {
             {H4P_TRID_PATN,"PATN"},
             {H4P_TRID_PP1x,"PP1X"},
             {H4P_TRID_PWM1,"PWM1"},
-            {H4P_TRID_SYNC,"SYNC"},
+            {H4P_TRID_GPIO,"GPIO"},
             {H4P_TRID_DBNC,"DBNC"},
             {H4P_TRID_RPTP,"RPTP"},
             {H4P_TRID_POLL,"POLL"},
@@ -98,7 +98,8 @@ class H4P_CmdErrors: public H4Plugin {
             {H4P_TRID_MLRQ,"MLRQ"},
             {H4P_TRID_BTTO,"BTTO"},
             {H4P_TRID_IPPD,"IPPD"},
-            {H4P_TRID_MDPD,"IPPD"}
+            {H4P_TRID_TIME,"TIME"},
+            {H4P_TRID_SYNC,"SYNC"},                        
         };
         virtual void        _greenLight(){ start(); }
     public:

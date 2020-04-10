@@ -107,6 +107,7 @@ STAG(esqw);
 STAG(gpio);
 STAG(h4);
 STAG(log);
+STAG(mfnb);
 STAG(mqtt);
 STAG(msg);
 STAG(name);
@@ -121,7 +122,7 @@ STAG(src);
 STAG(ssid);
 STAG(state);
 STAG(stor);
-STAG(mfnb);
+STAG(time);
 STAG(upnp);
 STAG(user);
 STAG(wink);
@@ -164,7 +165,7 @@ enum trustedIds {
   H4P_TRID_PATN = 50,
   H4P_TRID_PP1x,
   H4P_TRID_PWM1,
-  H4P_TRID_SYNC,
+  H4P_TRID_GPIO,
   H4P_TRID_DBNC,
   H4P_TRID_RPTP,
   H4P_TRID_POLL,
@@ -187,7 +188,8 @@ enum trustedIds {
   H4P_TRID_MLRQ,
   H4P_TRID_BTTO,
   H4P_TRID_IPPD,
-  H4P_TRID_MDPD
+  H4P_TRID_TIME,
+  H4P_TRID_SYNC
 };
 
 enum H4PC_CMD_ID{
@@ -222,14 +224,15 @@ class H4Plugin {
                 if(!vs.size()) return H4_CMD_TOO_FEW_PARAMS;
                 return vs.size()>1 ? H4_CMD_TOO_MANY_PARAMS:f(vs);
             }
-//                void        _downHooks();
 
         virtual void        _restart(){ stop();start(); }
         virtual void        _start() { _upHooks(); }
         virtual void        _stop() { _downHooks(); }
     public:
-        static  vector<H4Plugin*>   _plugins;
         static  vector<H4_FN_VOID>  _factoryChain;
+                H4_FN_VOID          _factoryHook=[this]{};
+                H4_FN_VOID          _rebootHook=[this]{ stop(); };
+        static  vector<H4Plugin*>   _plugins;
                 string              _pName;
                 uint32_t            _subCmd;
 //       
@@ -264,7 +267,6 @@ class H4Plugin {
                 void        reply(const char* fmt,...); // hoist protected
 //      syscall only
         virtual void        _reply(string msg) { Serial.println(CSTR(msg)); }
-        static  void        _hookFactory(H4_FN_VOID f){ if(f) _factoryChain.push_back(f); } 
                 void        _downHooks();
                 void        _upHooks();
 

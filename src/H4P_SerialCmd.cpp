@@ -43,7 +43,6 @@ H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Plugin(scmdTag()){
         {"restart",    { H4PC_SVC,  0, CMDVS(_svcRestart) }},
         {"start",      { H4PC_SVC,  0, CMDVS(_svcStart) }},
         {"stop",       { H4PC_SVC,  0, CMDVS(_svcStop) }},
-#ifdef H4P_LOG_EVENTS
         {"show",       { H4PC_H4, H4PC_SHOW, nullptr}},
         {"all",        { H4PC_SHOW, 0, CMD(all) }},
         {"config",     { H4PC_SHOW, 0, CMD(config) }},
@@ -54,7 +53,6 @@ H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Plugin(scmdTag()){
         {"heap",       { H4PC_SHOW, 0, CMD(heap) }},
         {"spif",       { H4PC_SHOW, 0, CMD(showSPIFFS)}},
         {"dump",       { H4PC_H4, 0, CMDVS(_dump)}},
-#endif
 #endif
     }; 
     if(autoStop) QTHIS(stop);
@@ -248,7 +246,6 @@ uint32_t H4P_SerialCmd::write(const string& fn,const string& data,const char* mo
 }
 #endif
 
-#ifdef H4P_LOG_EVENTS
 void H4P_SerialCmd::all(){
     __flatten([this](string s){ 
         vector<string> candidates=split(s,"/");
@@ -343,5 +340,3 @@ void H4P_SerialCmd::showSPIFFS(){
 #endif // 8266/32 spiffs
 
 #endif // not stm32
-
-#endif // logevents

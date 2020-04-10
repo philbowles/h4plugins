@@ -39,7 +39,8 @@ void H4P_PersistentStorage::_hookIn() {
         vector<string> nv=split(i,"=");
         psRam[nv[0]]=nv[1];
     }
-    _hookFactory([this](){ clear(); });
+//    _hookFactory([this](){ clear(); });
+    _factoryHook=[this](){ clear(); };
 }
 
 H4P_PersistentStorage::H4P_PersistentStorage(H4P_FN_PSCHANGE f): _f(f), H4Plugin(storTag()){
