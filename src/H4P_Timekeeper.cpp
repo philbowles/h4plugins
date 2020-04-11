@@ -169,6 +169,12 @@ void H4P_Timekeeper::daily(const string& when,bool onoff,H4BS_FN_SWITCH f){
     if(_btp) __alarmCore({when,stringFromInt(onoff)},true,f);
 }
 
+string H4P_Timekeeper::minutesFromNow(uint32_t m){ // optimise!
+    //clocktime strTime(msSinceMidnight() / 1000)
+    Serial.printf("MFN %d=%d ms au futur, mss00=%d => %d\n",m,m*60,msSinceMidnight(),msSinceMidnight()+(m*60));
+    return h4tk.strTime(msSinceMidnight()+(m*60));  
+}
+
 uint32_t H4P_Timekeeper::parseTime(const string& ts){
 	//string t(ts);
 	uint32_t  h=0;
@@ -181,12 +187,6 @@ uint32_t H4P_Timekeeper::parseTime(const string& ts){
 		h=atoi(CSTR(parts[0]));  
 		}
 	return 1000*(s+(m*60) + (h*3600));
-}
-
-const char* H4P_Timekeeper::secondsFromNow(uint32_t s){
-    static char buf[]="15:15";
-    //CSTR(h4tk.strTime(h4tk.parseTime(h4tk.msSinceMidnight()+30)))
-    return buf;  
 }
 
 void H4P_Timekeeper::show(){ 

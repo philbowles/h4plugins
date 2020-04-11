@@ -67,7 +67,7 @@ class H4P_Timekeeper: public H4Plugin {
                 uint32_t 	msSinceMidnight() { return _mss00 + millis(); }
                 uint32_t 	parseTime(const string& ts);
                 void        runAtMidnight(H4_FN_VOID f){}
-                const char* secondsFromNow(uint32_t s);
+                string      minutesFromNow(uint32_t s);
                 void        setSchedule(vector<pair<string,bool>>,H4BS_FN_SWITCH f){}
                 void        setScheduleSource(vector<pair<string,bool>>){}
                 void        show() override;
@@ -79,5 +79,5 @@ class H4P_Timekeeper: public H4Plugin {
 
 extern __attribute__((weak)) H4P_Timekeeper h4tk;
 
-#endif // esp8266 only
+#endif // esp8266 only*60
 #endif // H4P_Timekeeper_H
