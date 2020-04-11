@@ -32,44 +32,48 @@ SOFTWARE.
 
 #include<H4PCommon.h>
 #ifdef ARDUINO_ARCH_ESP8266
+#include<H4P_BinaryThing.h>
 #include "sntp.h"
 
 class H4P_Timekeeper: public H4Plugin {
-//        VSCMD(_at);
-//        VSCMD(_daily);
+        VSCMD(_change);
+        VSCMD(_tz);
+                H4P_BinaryThing*    _btp=nullptr;
 
                 uint32_t    _mss00=0;
                 int         _tzo;
                 string      _ntp1,_ntp2;
 
-                uint32_t    __alarmCore (vector<string> vs,bool daily);
+                uint32_t    __alarmCore (vector<string> vs,bool daily,H4BS_FN_SWITCH);
                ip_addr_t*   __ntpSetServer(int n,const char* ntp);
 
-                uint32_t    _at(vector<string> vs){ return __alarmCore(vs,false); }
-                uint32_t    _daily(vector<string> vs){ return __alarmCore(vs,true); }
+                uint32_t    _at(vector<string> vs);
+                uint32_t    _daily(vector<string> vs);
         virtual void        _hookIn() override;
         virtual void        _greenLight() override {}; // no autostart
-                uint32_t    _msDue(const char* rtc);
+                uint32_t    _msDue(const string& rtc);
         virtual void        _start() override;
         virtual void        _stop() override;
-                uint32_t    _tz(vector<string> vs){ return H4_CMD_OK; }
-                void        _useNTP(int offset,const char* srv1,const char* srv2);
+                void        _useNTP();
     public:
-        H4P_Timekeeper(const char* ntp1,const char* ntp2,int tzOffset=0,H4_FN_VOID onStart=nullptr,H4_FN_VOID onStop=nullptr);
+        H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzOffset=0,H4_FN_VOID onStart=nullptr,H4_FN_VOID onStop=nullptr);
 
-                H4_TIMER    at(const char* when,H4_FN_VOID f,H4_FN_VOID fnc=nullptr,uint32_t id=0);        
+                void        at(const string& when,bool onoff,H4BS_FN_SWITCH f);
+                void        change(const string& ntp1,const string& ntp2);
                 string 		clockTime() { return _mss00 ? strTime(msSinceMidnight() / 1000) : "0"; }
-                H4_TIMER    daily(const char* when,H4_FN_VOID f,H4_FN_VOID fnc=nullptr,uint32_t id=0);        
+                void        daily(const string& when,bool onoff,H4BS_FN_SWITCH f);
                 string		getDate(){ return _cb["date"]; };
                 bool 		hasRTC() { return _mss00; }
                 uint32_t 	msSinceMidnight() { return _mss00 + millis(); }
                 uint32_t 	parseTime(const string& ts);
                 void        runAtMidnight(H4_FN_VOID f){}
+                const char* secondsFromNow(uint32_t s);
                 void        setSchedule(vector<pair<string,bool>>,H4BS_FN_SWITCH f){}
                 void        setScheduleSource(vector<pair<string,bool>>){}
-                void        show() override { reply("TZO=%d\ntp1=%s\nntp2=%s\nUpTime: %s",_tzo,CSTR(_ntp1),CSTR(_ntp2),CSTR(upTime())); }
+                void        show() override;
                 string 		strTime(uint32_t t);
                 void        sync();
+                void        tz(uint32_t tzOffset);
                 string 		upTime();
 };
 

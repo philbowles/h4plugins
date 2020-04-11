@@ -57,7 +57,6 @@ void H4P_ExternalSqWave::__send(uint32_t c,uint32_t v){
 uint32_t H4P_ExternalSqWave::__set(vector<string> vs,uint32_t c,uint32_t lim){
     return guardInt1(vs,bind([c,lim,this](uint32_t v){
         __send(c,constrain(v,1,lim)); 
-        return H4_CMD_OK;
     },_1));
 }
 
