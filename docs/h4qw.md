@@ -20,13 +20,13 @@ It is intended purely for expert debugging and is not normally required or used.
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 H4P_QueueWarn h4qw(...
 ```
 
 ## Dependencies
 
-none, but must be created after [**H4P_SerialCmd**](h4sc.md) if using that plugin
+none, but must be created after [**H4P_SerialCmd**](h4cmd.md) if using that plugin
 
 ## Commands Added
 
@@ -38,10 +38,6 @@ none, but must be created after [**H4P_SerialCmd**](h4sc.md) if using that plugi
 ```cpp
 void onQueueWarning(bool) // called after switch state changes
 ```
-
-## Unloadable
-
-YES:    No further low-queue warnings will be received.
 
 ---
 
@@ -59,7 +55,8 @@ void        pcent(uint32_t pc); // Set new "safe" percentage
 
 [Example code](../examples/H4P_QueueWarn/H4P_QueueWarn.ino)
 
-----
+---
+
 (c) 2020 Phil Bowles h4plugins@gmail.com
 
 * [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)

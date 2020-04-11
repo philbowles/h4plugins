@@ -10,23 +10,29 @@
 
 # What does it do?
 
-Translates command-handling numeric error codes into meaningful messages:
+Translates numeric codes into meaningful messages for:
+
+* error codes
+* log types
+* task types
+* task names
+
+For example:
 
 ```cpp
-{0,"OK"},
-{1,"Unknown cmd"},
-{2,"Too few parameters"},
-{3,"Too many parameters"},
-{4,"Numeric value expected"},
-{5,"Value out of range"},
-{6,"Name not known"},
-{7,"Incorrect Payload Format"},
-{8,"Prohibited from here"}
+H4_INT_MAP  cmdErrors={
+    {H4_CMD_OK,"OK"},
+    {H4_CMD_UNKNOWN,"Unknown cmd"},
+    {H4_CMD_TOO_FEW_PARAMS,"Too few parameters"},
+    {H4_CMD_TOO_MANY_PARAMS,"Too many parameters"},
+    {H4_CMD_NOT_NUMERIC,"Numeric value expected"},
+    {H4_CMD_OUT_OF_BOUNDS,"Value out of range"},
+    {H4_CMD_NAME_UNKNOWN,"Name not known"},
+    {H4_CMD_PAYLOAD_FORMAT,"Incorrect Payload Format"}
+};
 ```
 
-Merely installing the plugin before [**H4P_SerialCmd**](h4sc.md) automatically provides the translation without any further ado.
-
-If required, it can be used manually after a direct call ( see  [**H4P_SerialCmd**](h4sc.md) ) by calling the single API function below supplying the error code retuned from `h4sc.invokeCmd(...);`
+Merely installing the plugin before [**H4P_SerialCmd**](h4cmd.md) automatically provides the translation without any further ado.
 
 ---
 
@@ -34,35 +40,35 @@ If required, it can be used manually after a direct call ( see  [**H4P_SerialCmd
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 H4P_CmdErrors h4ce; // must be created BEFORE H4P_SerialCmd
-H4P_SerialCmd h4sc;
+
+
 ```
 
 ## Dependencies
 
-None, but must be included *before* [**H4P_SerialCmd**](h4sc.md)
+None, but must be included *before* [**H4P_SerialCmd**](h4cmd.md)
 
 ## Commands Added
 
 none
-
-### Unloadable
-
-NO
 
 ---
 
 ## API
 
 ```cpp
-string      getErrorMessage(uint32_t errorCode);
-string      getLogType(uint32_t errorCode); // trnaslate logging type codes into human-readable form
+string  getErrorMessage(uint32_t errorCode); // errorCode returned from invokeCmd
+string  getLogType(uint32_t logType); // H4P_LOG_* value
+string  getTaskType(uint32_t taskType);
+string  getTaskName(uint32_t taskId); // any taskId
 ```
 
 [Example Code](../examples/H4P_CmdErrors/H4P_CmdErrors.ino)
 
-----
+---
+
 (c) 2020 Phil Bowles h4plugins@gmail.com
 
 * [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)

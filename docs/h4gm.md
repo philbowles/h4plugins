@@ -26,7 +26,7 @@ Perhaps the best part though is that once you have your code working on one type
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 H4P_GPIOManager h4gm;
 ```
 
@@ -36,11 +36,7 @@ none
 
 ## Commands Added
 
-h4/show/pins
-
-## Unloadable
-
-YES: No GPIO activity is futher handled. This cannot be undone.
+none
 
 ---
 
@@ -66,15 +62,15 @@ GPIOManager currently provides behaviours for:
 * Sequenced - Increments counter for each ON/OFF press
 * Timed - Reports how long button held ON
 
-You should also read [Things vs Switches](things.md) which explains how some of the above strategies can be autmatically tied/bound/linked to predefined output actions. In it you will find how to use these variants of the above, each of which send an ON or OFF command to a linked output handler
+You should also read [Sources vs Switches](things.md) which explains how some of the above strategies can be automatically tied/bound/linked to predefined output actions. In it you will find how to use these variants of the above, each of which send an ON or OFF command to a linked output handler: a "switch" or a "thing".
 
-* AnalogThresholdThing - binds a AnalogThreshold input to a BinarySwitch or UPNPSwitch output
-* DebouncedThing - binds a Debounced input to a BinarySwitch or UPNPSwitch output
-* EncoderThing - binds a Encoder input to a BinarySwitch or UPNPSwitch output
-* LatchingThing - binds a Latching input to a BinarySwitch or UPNPSwitch output
-* PolledThing - binds a Polled input to a BinarySwitch or UPNPSwitch output 
-* RawThing - binds a Raw input to a BinarySwitch or UPNPSwitch output
-* RetriggeringThing - binds a Retriggering input to a BinarySwitch or UPNPSwitch output
+* AnalogThresholdSource - binds a AnalogThreshold input to a BinarySwitch or UPNPServer output
+* DebouncedSource - binds a Debounced input to a BinarySwitch or UPNPServer output
+* EncoderSource - binds a Encoder input to a BinarySwitch or UPNPServer output
+* LatchingSource - binds a Latching input to a BinarySwitch or UPNPServer output
+* PolledSource - binds a Polled input to a BinarySwitch or UPNPServer output 
+* RawSource - binds a Raw input to a BinarySwitch or UPNPServer output
+* RetriggeringSource - binds a Retriggering input to a BinarySwitch or UPNPServer output
 
 Before we dive into the strategies, let's deal with the sometimes confusing concept of "Active High" and "Active Low" (experts can skip the next section)
 
@@ -179,23 +175,25 @@ Leave the callback function parameter as the default of "ptr" and the `H4GM_PIN`
 
 ## Specific Strategies
 
+These are shown in "dependency" order, rather than alphabetically as many expand on functions of previous strategies. It helps to understand how each strategy works if you read through them in "the right order".
+
 ### **Raw**
 
-Is more like a *non*-strategy: It passes every single change to the callback. It is a convenient base for your own scenarios (if any) not covered by GPIO manager. The benefit is you automatically get uS time of event, difference since previous (delta) etc and you can "throttle" the pin. This is explained in more detail later, but means you can set a maximum rate (cps) of events to handle per second.
+Is more like a *non*-strategy: It passes every single change to the callback. It is a convenient base for your own scenarios (if any) not covered by GPIO manager. The benefit is you automatically get uS time of every event, the difference since previous (delta) etc and you can "throttle" the pin. This is explained in more detail later, but means you can set a maximum rate (cps) of events to handle per second.
 [Example Code](../examples/H4GM_Raw/H4GM_Raw.ino)
 
 ---
 
 ### **Filtered**
 
-Works like **Debounced** but only sends all ONs or all OFFs , i.e. it filters out the ones you don't want.
+Works like **Debounced** but only sends only all ONs or all OFFs , i.e. it filters out the ones you don't want.
 [Example Code](../examples/H4GM_Filtered/H4GM_Filtered.ino)
 
 ---
 
 ### **Debounced**
 
-Probably one of the most useful: if you don't know what switch bounce is then you **need** this and you also need to read and understand [this link](http://www.ganssle.com/debouncing.htm). If you *do* know what switch bounce is, then you also need this, as it "just works". The callback receives only "clean" ON/OFF changes once you set the appropriate *millisecond* (mS) 1/1000 sec value for the particular switch / button.
+Probably one of the most useful: if you don't know what switch bounce is then you **need** this and you also need to read and understand [this link](http://www.ganssle.com/debouncing.htm). If you *do* know what switch bounce is, then you also need this, as it "just works". The callback receives only "clean" ON/OFF changes once you set the appropriate *millisecond* value for the particular switch / button.
 [Example Code](../examples/H4GM_Debounced/H4GM_Debounced.ino)
 
 ---
@@ -307,15 +305,15 @@ It also has a variant that takes the name of an `int` variable instead of a call
 
 ### **EncoderAuto**
 
-Think of this as an "absolute" encoder or **Encoder** on steroids. At creation time, you provide a minimum and a maximum value and an increment amount. By default the **EncoderAuto** will be set to a starting value of the mid-point between min and max, but you can set it anywhere you like within the valid range of min ans max. 
+Think of this as an "absolute" encoder or **Encoder** on steroids. At creation time, you provide a minimum and a maximum value and an increment amount. By default the **EncoderAuto** will be set to a starting value of the mid-point between min and max, but you can set it anywhere you like within the valid range of min and max.
 
 Each time it is clicked in the clockwise direction it wil add the increment to the current value, and subtract it when turned clockwise. For example if you choose min = 0, max = 100 and increment = 2 then the following will happen:
 
- - You will receeive a startup pseudo-event with additional field `autoValue` set to 50.
- - After one clockwise click you get a callback with  `autoValue`  set to 52
- - While you turn it back another 3 anti-clockwise clicks, you get a 3 more callbacks with  `autoValue`  set to 50, 48, and 46
- - Once you reach 0, no amount of anti-clockwise turns will change the value below 0
- - Once you reach 100, no amount of clockwise turns will change the value above 100
+* You will receeive a startup pseudo-event with additional field `autoValue` set to 50.
+* After one clockwise click you get a callback with  `autoValue`  set to 52
+* While you turn it back another 3 anti-clockwise clicks, you get a 3 more callbacks with  `autoValue`  set to 50, 48, and 46
+* Once you reach 0, no amount of anti-clockwise turns will change the value below 0
+* Once you reach 100, no amount of clockwise turns will change the value above 100
 
 Min and max may be negative: you could have Min=-273 and Max=-1
 
@@ -428,38 +426,37 @@ An example is a sound sensor: these can often cause tens of thousands of changes
 //  General-purpose
 //
 // returns 32bits not 8 as it can also do analogRead and state can hold raw analog value or digital 1/0
-uint32_t        logicalRead(uint8_t p);
-void            logicalWrite(uint8_t p,uint8_t l);
-void            throttle(uint8_t p,uint8_t v); // limit rate of throughput per second
-void            toggle(uint8_t p); // reverse current logical state
+uint32_t logicalRead(uint8_t p);
+void logicalWrite(uint8_t p,uint8_t l);
+void throttle(uint8_t p,uint8_t v); // limit rate of throughput per second
+void toggle(uint8_t p); // reverse current logical state
 //
 //      Strategies
 //
 AnalogThresholdPin* AnalogThreshold(uint8_t p,uint32_t freq,uint32_t threshold,H4GM_COMPARE compare,H4GM_FN_EVENT callback);//
-AnalogThresholdPin* AnalogThresholdThing(uint8_t p,uint32_t freq,uint32_t threshold,H4GM_COMPARE compare,H4P_BinaryThing* btp);//
+AnalogThresholdPin* AnalogThresholdSource(uint8_t p,uint32_t freq,uint32_t threshold,H4GM_COMPARE compare);//
 CircularPin*        Circular(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,uint32_t nStages,H4GM_FN_EVENT callback);//
 DebouncedPin*       Debounced(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback);//
-DebouncedPin*       DebouncedThing(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4P_BinaryThing* btp);//
+DebouncedPin*       DebouncedSource(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs);//
 EncoderPin*         Encoder(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE sense,H4GM_FN_EVENT);
 EncoderPin*         Encoder(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE sense,int&);
-EncoderPin*         EncoderThing(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE sense,H4P_BinaryThing* btp);
+EncoderPin*         EncoderSource(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE sense);
 EncoderAutoPin*     EncoderAuto(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE sense,int vMin,int vMax,int vSet,uint32_t vIncr,H4GM_FN_EVENT);
 EncoderAutoPin*     EncoderAuto(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE sense,int vMin,int vMax,int vSet,uint32_t vIncr,int&);
 FilteredPin*        Filtered(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint8_t filter,H4GM_FN_EVENT callback);//
 LatchingPin*        Latching(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback);//
-LatchingPin*        LatchingThing(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4P_BinaryThing* btp);//
+LatchingPin*        LatchingSource(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs);//
 MultistagePin*      Multistage(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_STAGE_MAP stageMap,H4GM_FN_EVENT callback);//
 OutputPin*          Output(uint8_t p,H4GM_SENSE sense,uint8_t initial,H4GM_FN_EVENT callback=nullptr);// FIX ptr type
 PolledPin*          Polled(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t frequency,uint32_t isAnalog,H4GM_FN_EVENT callback);//
-PolledPin*          PolledThing(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t frequency,uint32_t isAnalog,H4P_BinaryThing* btp);//
+PolledPin*          PolledSource(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t frequency,uint32_t isAnalog);//
 RawPin*             Raw(uint8_t p,uint8_t mode,H4GM_SENSE sense,H4GM_FN_EVENT callback);//
-RawPin*             RawThing(uint8_t p,uint8_t mode,H4GM_SENSE sense,H4P_BinaryThing*);//
+RawPin*             RawSource(uint8_t p,uint8_t mode,H4GM_SENSE sense);//
 RepeatingPin*       Repeating(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,uint32_t frequency,H4GM_FN_EVENT callback);//
 RetriggeringPin*    Retriggering(uint8_t _p, uint8_t _mode,H4GM_SENSE sense,uint32_t timeout, H4GM_FN_EVENT _callback);
-RetriggeringPin*    RetriggeringThing(uint8_t _p, uint8_t _mode,H4GM_SENSE sense,uint32_t timeout,H4P_BinaryThing* btp);
+RetriggeringPin*    RetriggeringSource(uint8_t _p, uint8_t _mode,H4GM_SENSE sense,uint32_t timeout);
 SequencedPin*       Sequenced(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback); //
 TimedPin*           Timed(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback); //
-//
 ```
 
 ---

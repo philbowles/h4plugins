@@ -33,8 +33,8 @@ uint32_t H4P_QueueWarn::__setLimit(uint32_t v){ return (h4._capacity()*v)/100; }
 //      cmd responders
 //
 void H4P_QueueWarn::show(){
-    reply("Qwarn: capacity=%d warn when size > %d\n",h4._capacity(),limit);
-    reply("Qwarn: max used=%d [%d%%]\n",maxq,(maxq*100)/h4._capacity());
+    reply("Qwarn: capacity=%d warn when size > %d",h4._capacity(),limit);
+    reply("Qwarn: max used=%d [%d%%]",maxq,(maxq*100)/h4._capacity());
 }
 
 void H4P_QueueWarn::pcent(uint32_t pc){
@@ -44,21 +44,17 @@ void H4P_QueueWarn::pcent(uint32_t pc){
 
 uint32_t H4P_QueueWarn::_qwPcent(vector<string> vs){ return guardInt1(vs,bind(&H4P_QueueWarn::pcent,this,_1)); }
 //
-//      H4P_QueueWarn
-//
-H4P_QueueWarn::H4P_QueueWarn(function<void(bool)> _f,uint32_t _limit){
-    _pid=qwrnTag();
-    _hook=[this](){ run(); };
+H4P_QueueWarn::H4P_QueueWarn(function<void(bool)> _f,uint32_t _limit): H4Plugin(qwrnTag()){
+    h4._hookLoop([this](){ _run(); },_subCmd);
     _cmds={
-        {_pid,     {H4PC_SHOW, 0, CMD(show)}},
-        {_pid,     {H4PC_ROOT, subid, nullptr}},
-        {"pcent",  {subid,   0, CMDVS(_qwPcent)}}
+        {_pName,     {H4PC_H4, _subCmd, nullptr}},
+        {"pcent",  {_subCmd,   0, CMDVS(_qwPcent)}}
     };
     f=_f;  
     limit=__setLimit(_limit);
 }
 
-void H4P_QueueWarn::run(){ // optimise a la throttle
+void H4P_QueueWarn::_run(){ // optimise a la throttle
     static bool warned=false;
     uint32_t qsize=h4.size();
     if(qsize > maxq) maxq=qsize;
@@ -71,7 +67,7 @@ void H4P_QueueWarn::run(){ // optimise a la throttle
     else {
         if(warned){
             f(false);
-            warned=false;            
+            warned=false;
         }
     }
 }

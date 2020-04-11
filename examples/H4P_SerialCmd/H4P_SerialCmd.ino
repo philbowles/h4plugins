@@ -1,9 +1,8 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 
-H4 h4(115200); //auto-start Serial @ 115200, default Q size=20 
 
-H4P_SerialCmd h4sc;
+
 /*
     Open Serial monitor and try typing any of the following:
 
@@ -19,12 +18,12 @@ H4P_SerialCmd h4sc;
 */
 void h4setup() { // H4 constructor starts Serial
     Serial.println("H4P_SerialCmd Example v"H4P_VERSION);
-    h4sc.invokeCmd("help"); // Automatically show help at startup
+    h4cmd.invokeCmd("help"); // Automatically show help at startup
     Serial.println("Show Q caused by invokeCmd");
-    h4sc.invokeCmd("h4/show/Q"); // Automatically show H4 queue at startup
+    h4cmd.invokeCmd("h4/show/Q"); // Automatically show H4 queue at startup
     Serial.println("Show Q caused by call to dumpQ()");
-    h4sc.dumpQ(); // same as above but more efficient
-    if(h4sc.invokeCmd("bogus/nonsense")) Serial.println("Invalid command invoked");
+    h4cmd.dumpQ(); // same as above but more efficient
+    if(h4cmd.invokeCmd("bogus/nonsense")) Serial.println("Invalid command invoked");
     Serial.println("Show all caused by call to all()");
-    h4sc.all(); // show everything
+    h4cmd.all(); // show everything
 }

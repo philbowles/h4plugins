@@ -32,21 +32,21 @@ SOFTWARE.
 
 #ifndef ARDUINO_ARCH_STM32
 #include <H4PCommon.h>
-#include <H4P_MQTT.h>
+#include <H4P_AsyncMQTT.h>
 
 class H4P_MQTTQueueLogger: public H4P_MQTTLogger {
         uint32_t _f;
-        void start() override { 
-            H4P_MQTTLogger::start();
-            h4.every(_f,[](){ SYSEVENT(H4P_LOG_MQTT_Q,"%u",h4.size()); },nullptr,H4P_TRID_QLOG,true);
+        void _start() override { 
+            H4P_MQTTLogger::_start();
+            h4.every(_f,[this](){ SYSEVENT(H4P_LOG_MQTT_Q,_pName,mqttTag(),"%u",h4.size()); },nullptr,H4P_TRID_QLOG,true);
         }
-        void stop() override {
-            H4P_MQTTLogger::stop();
+        void _stop() override {
+            H4P_MQTTLogger::_stop();
             h4.cancelSingleton(H4P_TRID_HLOG);
         }
-        void _greenLight() override { h4sc.removeCmd(msgTag(),subid); } // msg is meaningless - we only "see" H4P_LOG_MQTT_Q events
+        void _greenLight() override { h4cmd.removeCmd(msgTag(),_subCmd); } // msg is meaningless - we only "see" H4P_LOG_MQTT_Q events
     public:
-        H4P_MQTTQueueLogger(uint32_t f): _f(f),H4P_MQTTLogger("qlog",H4P_LOG_MQTT_Q){ _names={{H4P_TRID_QLOG,"QLOG"}}; }
+        H4P_MQTTQueueLogger(uint32_t f): _f(f),H4P_MQTTLogger("qlog",H4P_LOG_MQTT_Q){}
 };
 #endif
 #endif // H4P_MQTTLogger_H

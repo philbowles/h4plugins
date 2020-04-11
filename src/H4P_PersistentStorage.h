@@ -41,7 +41,7 @@ class H4P_PersistentStorage: public H4Plugin {
         VSCMD(_set);
         
         void         _hookIn() override;
-        void         _showItem(const string& n){ reply("%s=%s\n",CSTR(n),CSTR(psRam[n])); }
+        void         _showItem(const string& n){ reply("%s=%s",CSTR(n),CSTR(psRam[n])); }
     public:
         string& operator[](const string& name){
             return psRam[name];
@@ -57,7 +57,8 @@ class H4P_PersistentStorage: public H4Plugin {
         void          inc(const string& name){ if(isNumeric(psRam[name])) setint(name,getint(name)+1); }
         void          setstring(const string& name,const string& value);
         void          setint(const string& name,int value){ setstring(name,stringFromInt(value)); }
-        void          showStore(){ for(auto const& p:psRam) _showItem(p.first); }
+        
+        void          show() override { for(auto const& p:psRam) _showItem(p.first); }
 };
 
 extern __attribute__((weak)) H4P_PersistentStorage h4ps;

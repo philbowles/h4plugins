@@ -55,13 +55,12 @@ class H4Flasher{
                 void        stop();
 };
 
-constexpr const char* fTag(){ return "wink"; }
-
 class H4P_FlasherController: public H4Plugin {
         std::unordered_map<uint8_t,H4Flasher*> _flashMap;
         void            _flash(uint32_t period,uint8_t duty,uint8_t pin,uint8_t active=HIGH);
+//        void            _greenLight() override { start(); }
     public:
-        H4P_FlasherController();
+        H4P_FlasherController(): H4Plugin(winkTag()){}
              
 		void 			flashLED(uint32_t rate, uint8_t pin,uint8_t active=HIGH);
 		void 			flashMorse(const char *pattern, uint32_t timebase, uint8_t pin,uint8_t active=HIGH);

@@ -32,39 +32,42 @@ SOFTWARE.
 
 #include<H4PCommon.h>
 #include<H4P_WiFiSelect.h>
-#include<H4P_WiFi.h>
 #ifndef H4P_NO_WIFI
+#include<H4P_WiFi.h>
 #include<H4P_CmdErrors.h>
 #include<H4P_SerialCmd.h>
-    #include<ESPAsyncWebServer.h>
+#include<H4P_BinaryThing.h>
+#include<ESPAsyncWebServer.h>
 
-class H4P_AsyncWebServer: public AsyncWebServer, public H4PluginService {
+#define H4P_ASWS_EVT_TIMEOUT    1000
+
+class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
+            H4P_BinaryThing*    _btp=nullptr;
+            AsyncEventSource*   _evts;
             H4_CMD_MAP          _local={};
 //
             vector<string>      lines={};
 
-                void         _hookIn();
                 void         _rest(AsyncWebServerRequest *request);
                 bool         _webAuth(AsyncWebServerRequest *request);
-
+//      service essentials
+                void         _start() override;
+                void         _stop() override;
+                void         _hookIn() override;
+                void         _greenLight() override {} // do not autostart!
     public:
-        H4P_AsyncWebServer(string admin="admin",string passwd="admin",H4_FN_VOID onC=[](){},H4_FN_VOID onD=[](){}):
-            AsyncWebServer(80),
-            H4PluginService(onC,onD)
-        {
+        H4P_AsyncWebServer(string admin="admin",string passwd="admin",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr):
+            AsyncWebServer(80),H4Plugin(aswsTag(),onC,onD){
             _cb["auser"]=admin;
             _cb["apasswd"]=passwd;
-            _pid=aswsTag();
-            _names={{H4P_TRID_ASWS,uppercase(_pid)}};
-            _cmds={};
         }
-//      service essentials
-                void         start() override;
-                void         stop() override;
-//
         static String       aswsReplace(const String& var);
 //          syscall only
                 void        _reply(string msg) override { lines.push_back(msg); };
+                void        _setBothNames(const string& host,const string& friendly);
+                void        _sendEvent(bool b){
+                    if(_up && _btp) _evts->send(_btp->state() ? "1":"0",onofTag(),millis()); // protect isloaded
+                }
 };
 
 extern __attribute__((weak)) H4P_AsyncWebServer h4asws;

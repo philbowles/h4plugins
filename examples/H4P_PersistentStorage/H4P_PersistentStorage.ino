@@ -1,12 +1,11 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS
-
-H4 h4(115200); //auto-start Serial @ 115200, default Q size=20 
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 
 void onChange(const string& name,const string& value){
     Serial.printf("ITEM %s changed to %s\n",CSTR(name),CSTR(value));
 }
-H4P_SerialCmd h4sc;
+
+
 H4P_PersistentStorage h4ps(onChange);
 
 void h4setup() {
@@ -16,7 +15,7 @@ void h4setup() {
     easy=h4ps.getstring("peasy"); // and this
     Serial.printf("Using H4P_PersistentStorage is %s\n",CSTR(h4ps["peasy"]));
 
-    if(h4ps.exists("answer")){
+    if(!h4ps.exists("answer")){
         Serial.printf("What is the secret of %s?\n",CSTR(h4ps["secret"]));
         h4ps.setint("answer",42); // no short way to handle integers
         Serial.println("send h4/reboot to find out");

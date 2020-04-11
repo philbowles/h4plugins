@@ -37,9 +37,9 @@ SOFTWARE.
 
 class H4P_ExternalSqWave: public H4Plugin, public SoftwareSerial{
 //
-        uint32_t        __set(vector<string> vs,uint32_t c,uint32_t lim);
-        void            __send(uint32_t c,uint32_t v);
-        uint32_t        __sweep(vector<string> vs,uint32_t c,uint32_t lim);
+            uint32_t        __set(vector<string> vs,uint32_t c,uint32_t lim);
+            void            __send(uint32_t c,uint32_t v);
+            uint32_t        __sweep(vector<string> vs,uint32_t c,uint32_t lim);
 //
         VSCMD(_fset);
         VSCMD(_dset);
@@ -48,16 +48,17 @@ class H4P_ExternalSqWave: public H4Plugin, public SoftwareSerial{
     //
         function<void(uint32_t)> _default=[](uint32_t f){ Serial.print("F now ");Serial.println(f); }; // should be reply?
 
-        void            _Sweep(uint32_t c,uint32_t lim,uint32_t timer,uint32_t fromF,uint32_t toF,uint32_t inc,function<void(uint32_t)> onChange);
+            void            _Sweep(uint32_t c,uint32_t lim,uint32_t timer,uint32_t fromF,uint32_t toF,uint32_t inc,function<void(uint32_t)> onChange);
 
+            uint32_t        guardInt4(vector<string> vs,function<void(uint32_t,uint32_t,uint32_t,uint32_t)> f);
     public:
-        H4P_ExternalSqWave(uint8_t rx,uint8_t tx,uint32_t initialF=0,uint32_t initialD=0);                
+        H4P_ExternalSqWave(uint8_t rx,uint8_t tx,uint32_t initialF=0,uint32_t initialD=0);
 
-        void            dSet(uint32_t d){ __send('D',constrain(d,1,H4ESW_MAX_D)); }
-        void            dSweep(uint32_t timer,uint32_t fromF,uint32_t toF,uint32_t inc,function<void(uint32_t)> onChange=[](uint32_t){});
-        void            fSet(uint32_t f){ __send('F',constrain(f,1,H4ESW_MAX_F)); }
-        void            fSweep(uint32_t timer,uint32_t fromF,uint32_t toF,uint32_t inc,function<void(uint32_t)> onChange=[](uint32_t){});
-        void            stop(){ h4.cancelSingleton(H4P_TRID_SQWV); }
+            void            dSet(uint32_t d){ __send('D',constrain(d,1,H4ESW_MAX_D)); }
+            void            dSweep(uint32_t timer,uint32_t fromF,uint32_t toF,uint32_t inc,function<void(uint32_t)> onChange=[](uint32_t){});
+            void            fSet(uint32_t f){ __send('F',constrain(f,1,H4ESW_MAX_F)); }
+            void            fSweep(uint32_t timer,uint32_t fromF,uint32_t toF,uint32_t inc,function<void(uint32_t)> onChange=[](uint32_t){});
+            void            end() { h4.cancelSingleton(H4P_TRID_SQWV); }
 };
 
 extern __attribute__((weak)) H4P_ExternalSqWave h4esw;

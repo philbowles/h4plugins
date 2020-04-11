@@ -27,6 +27,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_ExternalSqWave.h>
+uint32_t H4P_ExternalSqWave::guardInt4(vector<string> vs,function<void(uint32_t,uint32_t,uint32_t,uint32_t)> f){
+    return guard1(vs,[f,this](vector<string> vs){
+        auto vi=expectInt(H4PAYLOAD);
+        if(vi.size()==4) return ([f](uint32_t v1,uint32_t v2,uint32_t v3,uint32_t v4){ f(v1,v2,v3,v4); return H4_CMD_OK; })(vi[0],vi[1],vi[2],vi[3]);
+        else return H4_CMD_NOT_NUMERIC;
+    });
+}
 
 void  H4P_ExternalSqWave::_Sweep(uint32_t c,uint32_t lim,uint32_t p,uint32_t l,uint32_t h,uint32_t i,function<void(uint32_t)> onChange){
     h4.every(p,bind([this](uint32_t c,uint32_t l,uint32_t h,uint32_t i,function<void(uint32_t)> f){
@@ -44,13 +51,12 @@ void H4P_ExternalSqWave::__send(uint32_t c,uint32_t v){
     sv.push_back((char)c);
     sv.append(stringFromInt(v));
     print(CSTR(sv));
-    delay(H4ESW_TIMEOUT);    
+    delay(H4ESW_TIMEOUT);
 }
 
 uint32_t H4P_ExternalSqWave::__set(vector<string> vs,uint32_t c,uint32_t lim){
     return guardInt1(vs,bind([c,lim,this](uint32_t v){
         __send(c,constrain(v,1,lim)); 
-        return H4_CMD_OK;
     },_1));
 }
 
@@ -70,25 +76,23 @@ uint32_t H4P_ExternalSqWave::_dsweep(vector<string> vs){ return __sweep(vs,'D',H
 //
 //      H4P_ExternalSqWave
 //
-H4P_ExternalSqWave::H4P_ExternalSqWave(uint8_t rx,uint8_t tx,uint32_t initialF,uint32_t initialD): SoftwareSerial(rx,tx){ 
-    _pid=esqwTag();
-    _names={ {H4P_TRID_SQWV,uppercase(_pid)} };
-    uint32_t H4PC_ESW_SET=++nextSubid;
-    uint32_t H4PC_ESW_SWEEP=++nextSubid;
+H4P_ExternalSqWave::H4P_ExternalSqWave(uint8_t rx,uint8_t tx,uint32_t initialF,uint32_t initialD): SoftwareSerial(rx,tx), H4Plugin(esqwTag()){ 
+    uint32_t H4PC_ESW_SET=++_nxtSubCmd;
+    uint32_t H4PC_ESW_SWEEP=++_nxtSubCmd;
     _cmds={
-        {_pid,      { H4PC_ROOT, subid, nullptr}},
-        {"set",     { subid, H4PC_ESW_SET, nullptr}},
+        {_pName,    { H4PC_H4, _subCmd, nullptr}},
+        {"set",     { _subCmd, H4PC_ESW_SET, nullptr}},
         {"d",       { H4PC_ESW_SET, 0, CMDVS(_dset)}},
         {"f",       { H4PC_ESW_SET, 0, CMDVS(_fset)}},
-        {"stop",    { subid, 0, CMD(stop)}},            
-        {"sweep",   { subid, H4PC_ESW_SWEEP, nullptr}},
+        {"end",     { _subCmd, 0, CMD(end)}},            
+        {"sweep",   { _subCmd, H4PC_ESW_SWEEP, nullptr}},
         {"f",       { H4PC_ESW_SWEEP, 0, CMDVS(_fsweep)}},
         {"d",       { H4PC_ESW_SWEEP, 0, CMDVS(_dsweep)}}
     };
     h4.queueFunction([initialF,initialD,this](){
         begin(9600);
         fSet(initialF);
-        dSet(initialD);            
+        dSet(initialD); 
     },nullptr,H4P_TRID_SQWV);
 }
 

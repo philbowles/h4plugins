@@ -28,10 +28,18 @@ SOFTWARE.
 */
 #include<H4PCommon.h>
 #include<H4P_WiFi.h>
-
-//extern uint32_t upat;
+#include <H4P_SerialCmd.h>
+#include<H4P_AsyncWebserver.h>
 
 #ifndef H4P_NO_WIFI
+
+uint32_t H4P_WiFi::_change(vector<string> vs){ return guardString2(vs,[this](string a,string b){ change(a,b); }); }
+
+void H4P_WiFi::_getPersistentValue(string v,string prefix){
+    string persistent=replaceAll(H4P_SerialCmd::read("/"+v),"\r\n","");
+    _cb[v]=persistent.size() ? persistent:string(prefix)+_cb[chipTag()];
+}
+
 void H4P_WiFi::_gotIP(){
     _discoDone=false;
     _cb["ip"]=WiFi.localIP().toString().c_str();
@@ -41,27 +49,70 @@ void H4P_WiFi::_gotIP(){
     string host=_cb[deviceTag()];
 
     h4.every(H4WF_OTA_RATE,[](){ ArduinoOTA.handle(); },nullptr,H4P_TRID_HOTA,true);
-    //WiFi.hostname(CSTR(host));
     _setHost(host);
   	ArduinoOTA.setHostname(CSTR(host));
 	ArduinoOTA.setRebootOnSuccess(false);	
 	ArduinoOTA.begin();
-
     _cb.erase("opts"); // lose any old AP ssids
-    H4EVENT(_cb["ip"],_pid);
-    h4pcConnected();
-}
-
-void H4P_WiFi::_hookIn(){ 
-    WiFi.onEvent(_wifiEvent);
-    H4PluginService::hookFactory([this](){ clear(); });
+    H4EVENT("IP=%s",CSTR(_cb["ip"]));
+    _upHooks();
 }
 
 void H4P_WiFi::_greenLight() { 
     _cb[chipTag()]=_getChipID();
     _cb[boardTag()]=replaceAll(H4_BOARD,"ESP8266_","");
-    getPersistentValue(deviceTag(),"H4_");
-    start();                     
+    _getPersistentValue(deviceTag(),"H4-");
+    _getPersistentValue("h4sv","*");
+    if(isLoaded(upnpTag())) h4cmd.addCmd("host2",_subCmd,0,CMDVS(_host2));
+    start();
+}
+
+void H4P_WiFi::_hookIn(){ WiFi.onEvent(_wifiEvent); }
+
+uint32_t H4P_WiFi::_host(vector<string> vs){
+    return guard1(vs,[this](vector<string> vs){
+        return ([this](string h){
+            host(h); 
+            return H4_CMD_OK;
+        })(H4PAYLOAD);
+    });
+}
+
+uint32_t H4P_WiFi::_host2(vector<string> vs){ return guardString2(vs,[this](string a,string b){ h4asws._setBothNames(a,b); }); }
+
+void H4P_WiFi::_lostIP(){
+    if(!_discoDone){
+        _downHooks();
+        _discoDone=true;
+    }
+}
+
+void H4P_WiFi::_scan(){ // check 4 common hoist
+    WiFi.enableSTA(true);
+    int n=WiFi.scanNetworks();
+
+    for (uint8_t i = 0; i < n; i++){
+        char buf[128];
+        snprintf(buf,127,"<option>%s</option>",CSTR(WiFi.SSID(i)));
+        _cb["opts"].append(buf); // delete later!!!
+    }
+    WiFi.scanDelete();
+    WiFi.enableSTA(false); // force AP only
+}
+
+void H4P_WiFi::_setPersistentValue(string n,string v,bool reboot){
+    string oldvalue=_cb[n];
+    if(oldvalue!=v){
+        H4P_SerialCmd::write("/"+n,v);
+        if(reboot) h4reboot();
+    }
+}
+
+void H4P_WiFi::_start(){
+    if(SPIFFS.exists("/ap")){
+        stop();
+        _startAP();
+    } else _mcuStart();
 }
 
 void H4P_WiFi::_startAP(){
@@ -75,64 +126,18 @@ void H4P_WiFi::_startAP(){
     h4.every(1000,[this](){ _dnsServer->processNextRequest(); },nullptr,H4P_TRID_WFAP,true);
     _cb["ip"]=WiFi.softAPIP().toString().c_str();
     _scan();
-    h4pcConnected();	        
+    _upHooks();
 }
 
-void H4P_WiFi::getPersistentValue(string v,string prefix){
-    string persistent=H4P_SerialCmd::read("/"+v);
-    string cat=_cb[v]+persistent;
-    if(persistent.size()) if(H4P_PREFER_PERSISTENT) _cb[v]=persistent;  
-    if(!cat.size()) _cb[v]=string(prefix)+_cb[chipTag()];
-}
-
-void H4P_WiFi::setPersistentValue(string n,string v,bool reboot){
-    string oldvalue=_cb[n];
-    if(oldvalue!=v){
-        H4P_SerialCmd::write("/"+n,v);
-        if(reboot) h4reboot();
-    }
-}
-
-string H4P_WiFi::replaceParams(const string& s){ // oh for a working regex...
-	int i=0;
-	int j=0;
-	string rv(s);
-	while((i=rv.find("%",i))!=string::npos){
-        if(j){
-            string var=rv.substr(j+1,i-j-1);
-            if(_cb.count(var)) {
-                rv.replace(j,i-j+1,_cb[var]); // FIX!!
-                rv.shrink_to_fit();
-            }
-            j=0;
-        } else j=i;    
-        ++i;
-	}
-	return rv.c_str();	
-}
-
-uint32_t H4P_WiFi::_host(vector<string> vs){
-    return guard1(vs,[this](vector<string> vs){
-        return ([this](string h){
-            host(h); 
-            return H4_CMD_OK;
-        })(PAYLOAD);
-    });
-}
-
-uint32_t H4P_WiFi::_change(vector<string> vs){ return guardString2(vs,[this](string a,string b){ change(a,b); }); }
-
-void H4P_WiFi::change(string ssid,string psk){ // add device / name?
-    stop();
-    _cb[ssidTag()]=ssid;
-    _cb[pskTag()]=psk;
-    _startSTA();
-}
-
-void H4P_WiFi::_lostIP(){
-    if(!_discoDone){
-        h4pcDisconnected();
-        _discoDone=true;
+void H4P_WiFi::_stopCore(){
+    h4.cancelSingleton({H4P_TRID_HOTA,H4P_TRID_WFAP});
+    if(WiFi.getMode() & WIFI_AP) {
+        if(_dnsServer){
+            _dnsServer->stop();
+            delete _dnsServer;
+            _dnsServer=nullptr;
+            _downHooks();
+        }
     }
 }
 
@@ -151,20 +156,9 @@ void H4P_WiFi::clear(){
     SPIFFS.remove(CSTR(string("/"+string(deviceTag()))));
 }
 
-void H4P_WiFi::_scan(){ // check 4 common hoist
-    WiFi.enableSTA(true);
-    int n=WiFi.scanNetworks();
-
-    for (uint8_t i = 0; i < n; i++){
-        char buf[128];
-        snprintf(buf,127,"<option>%s</option>",CSTR(WiFi.SSID(i)));
-        _cb["opts"].append(buf); // delete later!!!
-    }
-    WiFi.scanDelete();
-    WiFi.enableSTA(false); // force AP only
-}
 
 void H4P_WiFi::_startSTA(){
+    SPIFFS.remove("/ap");
     WiFi.mode(WIFI_STA);
 	WiFi.setSleepMode(WIFI_NONE_SLEEP);
     WiFi.enableAP(false); 
@@ -173,25 +167,10 @@ void H4P_WiFi::_startSTA(){
     WiFi.begin(CSTR(_cb[ssidTag()]),CSTR(_cb[pskTag()]));
 }
 
-void H4P_WiFi::start(){
-    if(WiFi.SSID()=="") {
-        stop();
-        _startAP();
-    }
-    else if(WiFi.getMode()==WIFI_OFF) _startSTA();
-}
-void H4P_WiFi::_stop(){} // dummy
+void H4P_WiFi::_mcuStart(){ if(WiFi.getMode()==WIFI_OFF || WiFi.SSID()=="") _startSTA(); }
 
-void H4P_WiFi::stop(){
-    h4.cancelSingleton({H4P_TRID_HOTA,H4P_TRID_WFAP});
-    if(WiFi.getMode() & WIFI_AP) {
-        if(_dnsServer){
-            _dnsServer->stop();
-            delete _dnsServer;
-            _dnsServer=nullptr;
-            h4pcDisconnected();
-        }
-    }
+void H4P_WiFi::_stop(){
+    _stopCore();
 	WiFi.mode(WIFI_OFF);
 }
 /*
@@ -217,7 +196,6 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
 			h4.queueFunction([](){ h4wifi._lostIP(); });
             break;    
 		case WIFI_EVENT_STAMODE_GOT_IP:
-//            upat=millis();
 			h4.queueFunction([](){ h4wifi._gotIP(); });
 			break;
 	}
@@ -226,19 +204,19 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
 //
 //      ESP32
 //
-void H4P_WiFi::_setHost(const string& host){
-    WiFi.setHostname(CSTR(host));
-}
+void H4P_WiFi::_setHost(const string& host){ WiFi.setHostname(CSTR(host)); }
+
 string H4P_WiFi::_getChipID(){
     uint64_t macAddress = ESP.getEfuseMac();
     uint64_t macAddressTrunc = macAddress << 40;
     return stringFromInt(macAddressTrunc >> 40,"%06X");
 }
+
 void H4P_WiFi::clear(){
     _stop();
 	WiFi.disconnect(true,true);
 }
-
+/*
 void H4P_WiFi::_scan(){ // coalescee
     int n=WiFi.scanNetworks();
 
@@ -250,7 +228,7 @@ void H4P_WiFi::_scan(){ // coalescee
     WiFi.scanDelete();
     WiFi.enableSTA(false); // force AP only
 }
-
+*/
 void H4P_WiFi::_startSTA(){
     WiFi.mode(WIFI_STA);
     WiFi.setSleep(false);
@@ -259,20 +237,10 @@ void H4P_WiFi::_startSTA(){
     WiFi.begin(CSTR(_cb[ssidTag()]),CSTR(_cb[pskTag()]));
 }
 
-void H4P_WiFi::start(){ if(WiFi.begin()) if(WiFi.SSID()=="" && WiFi.psk()=="") _startAP(); }
+void H4P_WiFi::_mcuStart(){ WiFi.begin(); }
 
 void H4P_WiFi::_stop(){
-    h4.cancelSingleton({H4P_TRID_HOTA,H4P_TRID_WFAP}); 
-    if(_dnsServer){
-        _dnsServer->stop();
-        delete _dnsServer;
-        _dnsServer=nullptr;
-        h4pcDisconnected();
-    }
-}
-
-void H4P_WiFi::stop(){
-    _stop();
+    _stopCore();
     WiFi.disconnect(true,false);
 }
 /* ESP32
@@ -319,14 +287,29 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
     switch(event) {
         case SYSTEM_EVENT_STA_STOP:
         case SYSTEM_EVENT_STA_LOST_IP:
-			if(!(WiFi.getMode() & WIFI_AP)) h4.queueFunction([](){ h4wifi._lostIP(); });
+			if(!(WiFi.getMode() & WIFI_AP)) h4.queueFunction([](){ h4wifi._lostIP(); }); // ? if?
+			//h4.queueFunction([](){ h4wifi._lostIP(); }); // ? if?
             break;
 		case SYSTEM_EVENT_STA_GOT_IP:
-//            upat=millis();
 			h4.queueFunction([](){ h4wifi._gotIP(); });
 			break;
 	}
 }
 #endif
+
+void H4P_WiFi::change(string ssid,string psk){ // add device / name?
+    stop();
+    _cb[ssidTag()]=ssid;
+    _cb[pskTag()]=psk;
+    _startSTA();
+}
+
+void H4P_WiFi::forceAP(){ 
+    H4EVENT("AP MODE FORCED");
+    h4cmd.write("/ap","");
+    h4FactoryReset();
+} // tagify?
+
+void H4P_WiFi::setBothNames(const string& host,const string& friendly){ h4asws._setBothNames(host,friendly); }
 
 #endif

@@ -27,69 +27,69 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
+#ifndef H4P_WiFi_H
+#define H4P_WiFi_H
 
 #include<H4PCommon.h>
 
-#ifndef H4P_WiFi_H
-#define H4P_WiFi_H
 #include<H4P_WiFiSelect.h>
 #ifndef ARDUINO_ARCH_STM32
 #include <H4P_SerialCmd.h>
 
-//extern void h4FactoryReset();
-
-class H4P_WiFi: public H4PluginService{
+class H4P_WiFi: public H4Plugin{
                 DNSServer* _dnsServer;
 //
                 VSCMD(_change);
                 VSCMD(_host);
+                VSCMD(_host2);
 //
                 string      _getChipID();
                 void        _gotIP();
-                void        _greenLight() override;
-                void        _hookIn() override;
                 void        _lostIP();
+                void        _mcuStart();
                 void        _scan();
                 void        _setHost(const string& host);
                 void        _startSTA();
                 void        _startAP();
-                void        _stop();
+                void        _stopCore();
         static  void        _wifiEvent(WiFiEvent_t event);
 
+                void        _start() override;
+                bool        _state() override { return WiFi.status() == WL_CONNECTED; }
+                void        _stop() override;
+                void        _greenLight() override;
+                void        _hookIn() override;
     public:
 //          included here against better wishes due to compiler bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89605
-        H4P_WiFi(string ssid,string psk,string device="",H4_FN_VOID onC=[](){},H4_FN_VOID onD=[](){}): H4PluginService(onC,onD){
+        H4P_WiFi(string ssid,string psk,string device="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): H4Plugin(wifiTag(),onC,onD){
             _cb[ssidTag()]=ssid;
             _cb[pskTag()]=psk;
             _cb[deviceTag()]=device;
 
-            _pid=wifiTag();
-            _names={ 
-                    {H4P_TRID_WFAP,"WFAP"},
-                    {H4P_TRID_HOTA,"HOTA"}
-            };
+            //_hookFactory([this](){ clear(); });
+            _factoryHook=[this](){ clear(); };
 
-            _local={
-                {"clear",   { subid, 0, CMD(clear)}},
-                {"change",  { subid, 0, CMDVS(_change)}},             
-                {"host",    { subid, 0, CMDVS(_host)}},             
-                {_pid,      { H4PC_SHOW, 0, CMD(show) }}
+            _cmds={
+                {_pName,    { H4PC_H4, _subCmd, nullptr}},
+                {"apmode",  { _subCmd, 0, CMD(forceAP)}},
+                {"clear",   { _subCmd, 0, CMD(clear)}},
+                {"change",  { _subCmd, 0, CMDVS(_change)}},
+                {"host",    { _subCmd, 0, CMDVS(_host)}}
             };
         }                
 
                 void     clear();
                 void     change(string ssid,string psk);
-                void     getPersistentValue(string v,string prefix);
-                void     host(string h){ setPersistentValue(deviceTag(),h,true); }
-                void     setPersistentValue(string n,string v,bool reboot);
-                void     start() override;
-                void     stop() override;
-                void     show() { 
+                void     forceAP();
+                void     host(const string& host){ _setPersistentValue(deviceTag(),host,true); }
+                void     setBothNames(const string& host,const string& friendly);
+                void     show() override { 
                     WiFi.printDiag(Serial);
-                    Serial.printf("Status: %d\n",WiFi.status());
+                    reply("Device %s Status: %d",CSTR(_cb[deviceTag()]),WiFi.status());
                 }
-        static  string   replaceParams(const string& s);
-        static  string 	 replaceParamsFile(const string &f){ return replaceParams(CSTR(H4P_SerialCmd::read(f))); }
+//          syscall only        
+                void     _getPersistentValue(string v,string prefix);
+                void     _setPersistentValue(string n,string v,bool reboot);
 };
     extern __attribute__((weak)) H4P_WiFi h4wifi;
 

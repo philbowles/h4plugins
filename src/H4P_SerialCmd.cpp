@@ -26,21 +26,47 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include<H4Plugins.h>
+#include<H4P_SerialCmd.h>
+#include<H4P_CmdErrors.h>
+//#ifndef H4P_NO_WIFI
+//    #include<H4P_AsyncMQTT.h>
+//#endif
 
-extern void h4FactoryReset();
-
-H4_CMD_MAP_I H4P_SerialCmd::__exactMatch(const string& cmd,uint32_t owner){
-    auto any=commands.equal_range(cmd);
-    for(auto i=any.first;i!=any.second;i++) if(i->second.owner==owner) return i;
-    return commands.end();
+H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Plugin(scmdTag()){
+    _cmds={
+        {h4Tag(),      { 0, H4PC_H4, nullptr}},
+        {"help",       { 0, 0, CMD(help) }},
+        {"info",       { H4PC_SVC,  0, CMDVS(_svcInfo) }},
+        {"reboot",     { H4PC_H4, 0, CMD(h4reboot) }},
+        {"factory",    { H4PC_H4, 0, CMD(h4FactoryReset) }},
+        {"svc",        { H4PC_H4, H4PC_SVC, nullptr}},
+        {"restart",    { H4PC_SVC,  0, CMDVS(_svcRestart) }},
+        {"start",      { H4PC_SVC,  0, CMDVS(_svcStart) }},
+        {"stop",       { H4PC_SVC,  0, CMDVS(_svcStop) }},
+        {"show",       { H4PC_H4, H4PC_SHOW, nullptr}},
+        {"all",        { H4PC_SHOW, 0, CMD(all) }},
+        {"config",     { H4PC_SHOW, 0, CMD(config) }},
+        {"q",          { H4PC_SHOW, 0, CMD(dumpQ) }},
+        {"plugins",    { H4PC_SHOW, 0, CMD(plugins) }},
+//        {"test",       { 0, 0, CMDVS(_test) }},
+#ifndef ARDUINO_ARCH_STM32
+        {"heap",       { H4PC_SHOW, 0, CMD(heap) }},
+        {"spif",       { H4PC_SHOW, 0, CMD(showSPIFFS)}},
+        {"dump",       { H4PC_H4, 0, CMDVS(_dump)}},
+#endif
+    }; 
+    if(autoStop) QTHIS(stop);
 }
 
-void H4P_SerialCmd::removeCmd(const string& s,uint32_t subid){ if(__exactMatch(s,subid)!=commands.end()) commands.erase(s); }
+H4_CMD_MAP_I H4P_SerialCmd::__exactMatch(const string& cmd,uint32_t owner){
+    auto any=_commands.equal_range(cmd);
+    for(auto i=any.first;i!=any.second;i++) if(i->second.owner==owner) return i;
+    return _commands.end();
+}
 
 void H4P_SerialCmd::__flatten(function<void(string)> fn){
     H4_CMD_MAP_I ptr;
-    for(ptr=commands.begin();ptr!=commands.end(); ptr++){
+    for(ptr=_commands.begin();ptr!=_commands.end(); ptr++){
         if(!(ptr->second.owner)){
             if(ptr->second.levID) _flattenCmds(fn,ptr->first,ptr->first,ptr->second.levID);    
             else fn(ptr->first);
@@ -53,73 +79,22 @@ uint32_t H4P_SerialCmd::_dispatch(vector<string> vs,uint32_t owner=0){
         H4_CMD_MAP_I i;
         string cmd=vs[0];
         i=__exactMatch(cmd,owner);
-        if(i!=commands.end()){
+        if(i!=_commands.end()){
             if(i->second.fn) return (bind(i->second.fn,CHOP_FRONT(vs)))();
             else return _dispatch(CHOP_FRONT(vs),i->second.levID);
         } else return H4_CMD_UNKNOWN;
     } else return H4_CMD_UNKNOWN;
 }
 
-void H4P_SerialCmd::_flattenCmds(function<void(string)> fn,string cmd,string prefix,uint32_t lev){
-    H4_CMD_MAP_I i=commands.find(cmd);
-    for(i=commands.begin();i!=commands.end();i++){
-        if(i->second.owner==lev){
-			string trim = prefix+"/"+i->first;
-			if(i->second.levID) _flattenCmds(fn,i->first,trim,i->second.levID);
-			else fn(trim);
-        }
-    }
-}
-
-uint32_t H4P_SerialCmd::_simulatePayload(string flat,const char* src){ // refac
-	vector<string> vs=split(flat,"/");
-    if(vs.size()){
-		string pload=CSTR(PAYLOAD);
-		vs.pop_back();
-		string topic=join(vs,"/");
-		return invokeCmd(topic,pload,src);			
-	}
-    else return H4_CMD_TOO_FEW_PARAMS; // really?
-}
-//
-
-uint32_t H4P_SerialCmd::_unload(vector<string> vs){ 
-    return guard1(vs,[this](vector<string> vs){
-        return ([this](string s){
-            H4Plugin* p=H4Plugin::isLoaded(s);
-            if(p) {
-                unload(p->subid);
-                showUnload();
-                return H4_CMD_OK;
-            }
-            return H4_CMD_NAME_UNKNOWN;
-        })(PAYLOAD);
-    });
-}
-//
-//      public
-//
-void H4P_SerialCmd::all(){
-    __flatten([this](string s){ 
-        vector<string> candidates=split(s,"/");
-        if(candidates.size()>1 && candidates[1]=="show" && candidates[2]!="all") invokeCmd(s,"",CSTR(_cb[srcTag()])); // snake / tail etc
-    });
-}
-
-void H4P_SerialCmd::_logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target){
-//    Serial.printf("H4P_SerialCmd::_logEvent %s -> %d loggers\n",CSTR(msg),_logChain.size());
-    for(auto const& l:_logChain) l(msg,type,source,target); // if 0 serial print
-}
+string H4P_SerialCmd::_errorString(uint32_t err){ return isLoaded(cerrTag()) ? h4ce.getErrorMessage(err):"Error: "+stringFromInt(err); }
 
 uint32_t H4P_SerialCmd::_executeCmd(string topic, string pload){
-//    Serial.printf("_executeCmd %s\n",CSTR(topic));
 	vector<string> vs=split(CSTR(topic),"/");
     _cb[srcTag()]=vs[0];
     _cb["target"]=vs[1];
 	vs.push_back(pload);
     vector<string> cmd(vs.begin()+2,vs.end());
     #ifdef H4P_LOG_EVENTS
-//        Serial.printf("_executeCmd 2 %s\n",CSTR(topic));
         _logEvent(join(cmd,"/"),H4P_LOG_CMD,vs[0],vs[1]);
     #endif	
     uint32_t rv=_dispatch(vector<string>(cmd)); // optimise?
@@ -129,11 +104,103 @@ uint32_t H4P_SerialCmd::_executeCmd(string topic, string pload){
     return rv;
 }
 
+void H4P_SerialCmd::_flattenCmds(function<void(string)> fn,string cmd,string prefix,uint32_t lev){
+    H4_CMD_MAP_I i=_commands.find(cmd);
+    for(i=_commands.begin();i!=_commands.end();i++){
+        if(i->second.owner==lev){
+			string trim = prefix+"/"+i->first;
+			if(i->second.levID) _flattenCmds(fn,i->first,trim,i->second.levID);
+			else fn(trim);
+        }
+    }
+}
+/*
+uint32_t H4P_SerialCmd::_global(vector<string> vs){
+    if(vs.size()<2) return H4_CMD_TOO_FEW_PARAMS;
+    if(vs.size()>2) return H4_CMD_TOO_MANY_PARAMS;
+    _cb[vs[0]]=H4PAYLOAD;
+    H4EVENT("Global %s=%s",CSTR(vs[0]),CSTR(H4PAYLOAD));
+    return H4_CMD_OK;
+}
+*/
+void H4P_SerialCmd::_hookIn(){
+#ifndef ARDUINO_ARCH_STM32    
+    SPIFFS.begin();
+//    if(isLoaded(mqttTag())) h4mqtt.hookConnect([this](){ h4mqtt.subscribeDevice("global/#",CMDVS(_global),H4PC_H4); }); 
+#endif
+}
+
+void H4P_SerialCmd::_logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target){
+    for(auto const& l:_logChain) l(msg,type,source,target); // if 0 serial print
+}
+
+//uint32_t runRate=500;
+
+void H4P_SerialCmd::_run(){
+    static string cmd="";
+	static int	c;
+//    static int rate=runRate;
+//    if(--rate < 0){
+        if((c=Serial.read()) != -1){
+            if (c == '\n') {
+                h4.queueFunction(bind([this](string cmd){
+                    uint32_t err=_simulatePayload(cmd);
+                    if(err) reply("%s\n",CSTR(_errorString(err)));
+                },cmd),nullptr,H4P_TRID_SCMD);
+                cmd="";
+            } else cmd+=c;
+        }
+//        rate=runRate;
+//    }
+}
+//
+
+uint32_t H4P_SerialCmd::_simulatePayload(string flat,const char* src){ // refac
+	vector<string> vs=split(flat,"/");
+    if(vs.size()){
+		string pload=CSTR(H4PAYLOAD);
+		vs.pop_back();
+		string topic=join(vs,"/");
+		return invokeCmd(topic,pload,src);			
+	} else return H4_CMD_TOO_FEW_PARAMS;
+}
+//
+uint32_t H4P_SerialCmd::_svcControl(H4P_SVC_CONTROL svc,vector<string> vs){
+    return guard1(vs,[this,svc](vector<string> vs){
+        return ([this,svc](string s){
+            H4Plugin* p=isLoaded(s);
+            if(p) {
+                switch(svc){
+                    case H4PSVC_START:
+                        p->start();
+                        break;
+                    case H4PSVC_STATE:
+                        p->show();
+                        break;
+                    case H4PSVC_STOP:
+                        p->stop();
+                        break;
+                    case H4PSVC_RESTART:
+                        p->restart();
+                        break;
+                }
+                return H4_CMD_OK;
+            }
+            return H4_CMD_NAME_UNKNOWN;
+        })(H4PAYLOAD);
+    });
+}
+
+uint32_t H4P_SerialCmd::_svcRestart(vector<string> vs){ return _svcControl(H4PSVC_RESTART,vs); }
+uint32_t H4P_SerialCmd::_svcStart(vector<string> vs){ return _svcControl(H4PSVC_START,vs); }
+uint32_t H4P_SerialCmd::_svcInfo(vector<string> vs){ return _svcControl(H4PSVC_STATE,vs); }
+uint32_t H4P_SerialCmd::_svcStop(vector<string> vs){ return _svcControl(H4PSVC_STOP,vs); }
+
 void H4P_SerialCmd::help(){ 
     vector<string> unsorted={};
     __flatten([&unsorted](string s){ unsorted.push_back(s); });
     sort(unsorted.begin(),unsorted.end());
-    for(auto const& s:unsorted) { reply("%s\n",CSTR(s)); }
+    for(auto const& s:unsorted) { reply(CSTR(s)); }
 }
 
 uint32_t H4P_SerialCmd::invokeCmd(string topic,string payload,const char* src){ 
@@ -144,86 +211,18 @@ uint32_t H4P_SerialCmd::invokeCmd(string topic,uint32_t payload,const char* src)
     return invokeCmd(topic,stringFromInt(payload),src);
 }
 
-void H4P_SerialCmd::unload(const uint32_t subid){
-    if(H4::unloadables.count(subid)) {
-        h4._unHook(H4::unloadables[subid]);
-        H4::unloadables.erase(subid);
-    }
-}	
-//
-//      H4P_SerialCmd
-//
-void H4P_SerialCmd::_hookIn(){
-#ifndef ARDUINO_ARCH_STM32    
-//    if(!SPIFFS.begin()) Serial.println("Warning: NO SPIFFS");
-    SPIFFS.begin();
-#endif
-}
-
-H4P_SerialCmd::H4P_SerialCmd(){
-    _pid=scmdTag();
-    _hook=[this](){ run(); };
-    _names={ {H4P_TRID_SCMD,uppercase(_pid)} };
-    _cmds={
-        {"h4",         { 0, H4PC_ROOT, nullptr}},
-        {"help",       { 0, 0, CMD(help) }},
-        {"reboot",     { H4PC_ROOT, 0, CMD(h4reboot) }},
-        {"factory",    { H4PC_ROOT, 0, CMD(h4FactoryReset) }},
-        {"show",       { H4PC_ROOT, H4PC_SHOW, nullptr}},
-        {"all",        { H4PC_SHOW, 0, CMD(all) }},
-        {"config",     { H4PC_SHOW, 0, CMD(config) }},
-        {"plugins",    { H4PC_SHOW, 0, CMD(plugins) }},
-#ifndef ARDUINO_ARCH_STM32
-        {"spif",       { H4PC_SHOW, 0, CMD(showSPIFFS)}},
-        {"dump",       { H4PC_ROOT, 0, CMDVS(_dump)}},
-#endif
-//      diag below here        
-        {"q",          { H4PC_SHOW, 0, CMD(dumpQ) }},
-        {"qstats",     { H4PC_SHOW, 0, CMD(Qstats) }},
-        {"tnames",     { H4PC_SHOW, 0, CMD(tnames) }},
-        {"unload",     { H4PC_SHOW, 0, CMD(showUnload) }},
-        {"unload",     { H4PC_ROOT, 0, CMDVS(_unload) }}
-    };
-};
-// diag
-void H4P_SerialCmd::dumpQ(){ h4.dumpQ(); }
-
-void H4P_SerialCmd::logEventType(H4P_LOG_TYPE t,const string& fmt,...){
+void H4P_SerialCmd::logEventType(H4P_LOG_TYPE t,const string& src,const string& tgt,const string& fmt,...){
     char buff[256];
     va_list ap; 
     va_start(ap, fmt); 
     vsnprintf(buff,255,CSTR(fmt),ap);
     va_end(ap);
-    _logEvent(buff,t,userTag(),"h4");
+    _logEvent(buff,t,src,tgt);
 }
 
-void H4P_SerialCmd::plugins(){ for(auto const& p:H4Plugin::_plugins) reply("P: %s ID=%d\n",CSTR(p->_pid),p->subid); }
+void H4P_SerialCmd::removeCmd(const string& s,uint32_t _subCmd){ if(__exactMatch(s,_subCmd)!=_commands.end()) _commands.erase(s); }
 
-void H4P_SerialCmd::Qstats(){ reply("Q capacity: %u size: %u\n",h4._capacity(),h4.size()); }
-
-void H4P_SerialCmd::showUnload(){ for(auto const& u:H4::unloadables) reply("U: %d=%s\n",u.first,CSTR(H4Plugin::pidFromSubid(u.first))); }
-
-void H4P_SerialCmd::tnames(){ for(auto const& n:H4::trustedNames) { reply("T: %d=%s\n",n.first,CSTR(n.second)); }}
-//
-string H4P_SerialCmd::_errorString(uint32_t err){
-    return H4Plugin::isLoaded(cerrTag()) ? h4ce.getErrorMessage(err):"Error: "+stringFromInt(err);
-}
-void H4P_SerialCmd::run(){ // halting loop optimise
-    static string cmd="";
-	static int	c;
-
-    if((c=Serial.read()) != -1){
-        if (c == '\n') {
-            h4.queueFunction(bind([this](string cmd){
-                uint32_t err=_simulatePayload(cmd);
-                if(err) reply("%s\n",CSTR(_errorString(err)));
-            },cmd),nullptr,H4P_TRID_SCMD);
-            cmd="";
-        } else cmd+=c;		
-    }	
-}
 #ifndef ARDUINO_ARCH_STM32
-
 string H4P_SerialCmd::read(const string& fn){
 	string rv="";
         File f=SPIFFS.open(CSTR(fn), "r");
@@ -245,36 +244,81 @@ uint32_t H4P_SerialCmd::write(const string& fn,const string& data,const char* mo
     b.close();
     return rv; 
 }
+#endif
 
+void H4P_SerialCmd::all(){
+    __flatten([this](string s){ 
+        vector<string> candidates=split(s,"/");
+        if(candidates.size()>1 && candidates[1]=="show" && candidates[2]!="all") {
+            reply(CSTR(s));
+            invokeCmd(s,"",CSTR(_cb[srcTag()])); // snake / tail etc
+            reply("");
+        }
+    });
+}
+
+const char* __attribute__((weak)) giveTaskName(uint32_t id){ return "ANON"; }
+string H4P_SerialCmd::_dumpTask(task* t){
+    H4Plugin* p=isLoaded(cerrTag()); // v inefficient, but...
+
+    char buf[128];
+    uint32_t type=t->uid/100;
+    uint32_t id=t->uid%100;
+    sprintf(buf,"%09lu %s/%s %s %9d %9d %9d",
+        t->at,
+        p ? CSTR(h4ce.getTaskType(type)):CSTR(stringFromInt(type,"%04u")),
+        p ? CSTR(h4ce.getTaskName(id)):CSTR(stringFromInt(id,"%04u")),
+        t->singleton ? "S":" ",
+        t->rmin,
+        t->rmax,
+        t->nrq);
+    return string(buf);
+}
+
+void H4P_SerialCmd::dumpQ(){
+	reply("Due @tick Type              Min       Max       nRQ");  
+    vector<task*> tlist=h4._copyQ();
+    sort(tlist.begin(),tlist.end(),[](const task* a, const task* b){ return a->at < b->at; });
+    for(auto const& t:tlist) reply(CSTR(_dumpTask(t)));
+}
+
+void  H4P_SerialCmd::plugins(){ 
+    for(auto const& p:H4Plugin::_plugins){
+        reply("h4/svc/info/%s %s ID=%d",CSTR(p->_pName),p->_state() ? "UP":"DN",p->_subCmd);
+        p->show();
+        reply("");
+    }
+}
+
+#ifndef ARDUINO_ARCH_STM32
 uint32_t H4P_SerialCmd::_dump(vector<string> vs){
     return guard1(vs,[this](vector<string> vs){
         return ([this](string h){ 
-            reply("DUMP FILE %s\n",CSTR(h));
-            reply("%s\n",CSTR(read("/"+h)));
+            reply("DUMP FILE %s",CSTR(h));
+            reply(CSTR(read("/"+h)));
             return H4_CMD_OK;
-        })(PAYLOAD);
+        })(H4PAYLOAD);
     });
 }
 
 #ifdef ARDUINO_ARCH_ESP8266
-
 void H4P_SerialCmd::showSPIFFS(){
     uint32_t sigma=0;
     uint32_t n=0;
 
     FSInfo info;
     SPIFFS.info(info);
-    reply("totalBytes %d\n",info.totalBytes);    
-    reply("usedBytes %d\n",info.usedBytes);    
+    reply("totalBytes %d",info.totalBytes);    
+    reply("usedBytes %d",info.usedBytes);    
     
     Dir dir = SPIFFS.openDir("/");
 
     while (dir.next()) {
         n++;
-        reply("FILE: %s %u\n",CSTR(dir.fileName()),dir.fileSize());
+        reply("%s (%u)",CSTR(dir.fileName()),dir.fileSize());
         sigma+=dir.fileSize();
     }
-    reply("\n %d file(s) %u bytes\n",n,sigma);
+    reply("%d file(s) %u bytes",n,sigma);
 }
 #else
 void H4P_SerialCmd::showSPIFFS(){
@@ -287,11 +331,12 @@ void H4P_SerialCmd::showSPIFFS(){
  
     while(file){
         n++;
-        reply("FILE: %s %u\n",file.name(),file.size());
+        reply("%s (%u)",file.name(),file.size());
         sigma+=file.size();
         file = root.openNextFile();
     }
-    reply("\n %d file(s) %u bytes\n",n,sigma);
+    reply("%d file(s) %u bytes",n,sigma);
 }
-#endif
-#endif
+#endif // 8266/32 spiffs
+
+#endif // not stm32

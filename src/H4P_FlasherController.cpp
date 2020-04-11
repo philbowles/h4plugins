@@ -63,16 +63,6 @@ std::unordered_map<char,string>	H4P_FlasherController::_morse={
 //
 //      H4P_FlasherController
 //
-H4P_FlasherController::H4P_FlasherController(){
-        _pid=winkTag(); 
-        _names={
-            {H4P_TRID_PP1x,uppercase(winkTag())},
-            {H4P_TRID_PATN,"PATN"},
-            {H4P_TRID_PWM1,"PWM1"}
-        };
-        _cmds={};
-}
-
 void H4P_FlasherController::_flash(uint32_t period,uint8_t duty,uint8_t pin,uint8_t active){
 	if(duty < 100){
 		h4fc.stopLED(pin);
@@ -135,7 +125,7 @@ H4Flasher::H4Flasher(uint8_t pin,const char* pattern,uint32_t timebase,uint8_t a
     flashPattern(timebase,pattern); 
 }
 
-void H4Flasher::autoOutput(){ if(H4Plugin::isLoaded(gpioTag())) h4gm.Output(_pin,a ? ACTIVE_HIGH:ACTIVE_LOW,OFF); }
+void H4Flasher::autoOutput(){ if(H4Plugin::isLoaded(gpioTag())) h4gm.Output(_pin,a ? ACTIVE_HIGH:ACTIVE_LOW,OFF); } // tidy
 
 void H4Flasher::_toggle() { digitalWrite(_pin,!digitalRead(_pin)); }
 

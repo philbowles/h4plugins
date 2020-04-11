@@ -27,7 +27,7 @@ Provides
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 H4P_ExternalSqWave h4esw(...
 ```
 
@@ -36,7 +36,7 @@ H4P_ExternalSqWave h4esw(...
 If using STM32-NUCLEUO you must install the following HardwareSerial library
 * https://github.com/plerup/espsoftwareserial
 
-H4P_ExternalSqWave must be created after [**H4P_SerialCmd**](h4sc.md) if using that plugin
+H4P_ExternalSqWave must be created after [**H4P_SerialCmd**](h4cmd.md) if using that plugin
 
 ## Commands Added
 
@@ -61,10 +61,6 @@ y2 is the "to" y
 void onChange(uint32_t sweptValue); // called when swept value changes
 ```
 
-## Unloadable
-
-NO
-
 ---
 
 # API
@@ -82,7 +78,7 @@ void dSet(uint32_t d); // Set Duty Cycle
 void dSweep(uint32_t timer,uint32_t fromF,uint32_t toF,uint32_t inc,function<void(uint32_t)> onChange=[](uint32_t){});
 void fSet(uint32_t f); // Set Frequency
 void fSweep(uint32_t timer,uint32_t fromF,uint32_t toF,uint32_t inc,function<void(uint32_t)> onChange=[](uint32_t){});
-void stop(); // cancels any sweep in progress
+void end(); // cancels any sweep in progress
 ```
 
 [Example code](../examples/H4ESW/H4P_ESWSimple/H4P_ESWSimple.ino)

@@ -1,5 +1,5 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 /*
     This i based on the QueueWarn example: you should run that first.
 
@@ -27,11 +27,12 @@ H4 h4(115200,SMALL_Q); //auto-start Serial @ 115200, small Q of 10 to force a wa
 void qIsLow(bool inDanger){ 
   if(inDanger) {
     Serial.println("Warning, Will Robinson - low Q!!!"); // See 1960s TV SciFi series "Lost in Space" :)
-    h4.dumpQ();
+    h4cmd.dumpQ();
   }
 }
 
-H4P_SerialCmd h4sc;
+
+
 H4P_QueueWarn h4qw(qIsLow,50); // call qIsLow when free Q drops below 50%
 H4P_TaskSniffer h4ts;
 /*
@@ -73,6 +74,6 @@ void h4setup() { // H4 constructor starts Serial
         h4.once(60000,[](){ Serial.println("60 seconds later"); },nullptr,6);// "tag" as UF60
         h4.once(70000,[](){ Serial.println("70 seconds later"); },nullptr,7);// "tag" as UF70
         h4.once(80000,[](){ Serial.println("80 seconds later"); },nullptr,8);// "tag" as UF80
-        h4.once(90000,[](){ Serial.println("80 seconds later"); });// no tag: anon
-        h4.once(95000,[](){ Serial.println("80 seconds later"); });// no tag: anon
+        h4.once(90000,[](){ Serial.println("90 seconds later"); });// no tag: anon
+        h4.once(95000,[](){ Serial.println("95 seconds later"); });// no tag: anon
 }

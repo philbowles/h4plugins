@@ -32,18 +32,16 @@ SOFTWARE.
 
 #ifndef ARDUINO_ARCH_STM32
 #include <H4PCommon.h>
-#include <H4P_MQTT.h>
+#include <H4P_AsyncMQTT.h>
 
 class H4P_MQTTLogger: public H4PLogService {
-        void _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target){ h4mqtt.publishDevice(_pid,msg); }
+        void _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target){ h4mqtt.publishDevice(_pName,msg); }
     protected:
-        void _hookIn() override {
-            if(H4Plugin::isLoaded(mqttTag())){
-                H4PLogService::_hookIn();
-                h4mqtt.hookConnect([this](){ start(); });
-                h4mqtt.hookDisconnect([this](){ stop(); });
-            } else { DEPENDFAIL(mqtt); }
+        virtual void _hookIn() override {
+            DEPEND(mqtt);
+            H4PLogService::_hookIn();
         }
+        virtual void _greenLight() override {} // dont autostart
     public:
         H4P_MQTTLogger(const string& topic,uint32_t filter=H4P_LOG_ALL): H4PLogService(topic,filter){}
 };

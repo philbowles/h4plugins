@@ -33,54 +33,47 @@ SOFTWARE.
 #include<H4PCommon.h>
 #include<H4P_SerialCmd.h>
 #include<H4P_WiFiSelect.h>
-#ifndef H4P_NO_WIFI
-    #include<H4P_MQTT.h>
-#endif
 
 class H4P_BinaryThing: public H4Plugin{
-//
+            uint32_t        _timeout;
+            unordered_set<string>   _slaves;
     protected:
-        bool            _state=false;
-        H4BS_FN_SWITCH  _f;
-        
-        #ifdef H4P_NO_WIFI
-            void         _publish(bool b){}
-        #else                
-            virtual void _hookIn() override { if(H4Plugin::isLoaded(mqttTag())) h4mqtt.hookConnect([this](){ _publish(_getState()); }); }
-                    void  _publish(bool b){ if(H4Plugin::isLoaded(mqttTag())) h4mqtt.publishDevice(stateTag(),b); }
-        #endif
+            bool            _state=false;
+            H4BS_FN_SWITCH  _f;
 
-        virtual bool        _getState() { return _state; }
-        virtual void        _setState(bool b) { _state=b; }
-
-                uint32_t    _showState(vector<string> vs){ reply("State: %s\n",_getState() ? "ON":"OFF"); return H4_CMD_OK; }
-                uint32_t    _switch(vector<string> vs){ return guardInt1(vs,bind(&H4P_BinaryThing::turn,this,_1)); }
-                void        _greenLight() override { _f(_state); }
+                    bool     _getState() { return _state; }
+            virtual void     _hookIn() override ;
+                    void     _publish(bool b);
+                    void     _setSlaves(bool b);
+            virtual void     _setState(bool b);               
+                    uint32_t _slave(vector<string> vs); //vscmd               
+                    void     _start() override;
+                    uint32_t _switch(vector<string> vs){ return guardInt1(vs,bind(&H4P_BinaryThing::turn,this,_1)); }
     public:
-        H4P_BinaryThing(H4BS_FN_SWITCH f=[](bool){},bool initial=OFF): _f(f),_state(initial){
-            _pid=onofTag();
+        H4P_BinaryThing(H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): _f(f),_state(initial),_timeout(timer), H4Plugin(onofTag()) {
             _cmds={
-                {"on",     {H4PC_ROOT, 0, CMD(turnOn)}},
-                {"off",    {H4PC_ROOT, 0, CMD(turnOff)}},
-                {"state",  {H4PC_ROOT, 0, CMDVS(_showState)}},
-                {"switch", {H4PC_ROOT, 0, CMDVS(_switch)}},
-                {"toggle", {H4PC_ROOT, 0, CMD(toggle)}}
+                {"on",     {H4PC_H4, 0, CMD(turnOn)}},
+                {"off",    {H4PC_H4, 0, CMD(turnOff)}},
+                {"state",  {H4PC_H4, 0, CMD(show)}},
+                {"switch", {H4PC_H4, 0, CMDVS(_switch)}},
+                {"toggle", {H4PC_H4, 0, CMD(toggle)}}
             };
         }
-        bool state(){ return _getState(); }
-        void turnOff(){ turn(false); }
-        void turnOn(){ turn(true); }
-        void toggle(){ turn(!_state); }
-        void turn(bool b){ _turn(b,userTag()); }
-        // syscall only
-        void _turn(bool b,const string& src){
-            if(b!=_getState()){
-                _setState(b);
-                _f(_state);
-                _publish(_state);
-                H4EVENT((_state ? "ON":"OFF"),src);
-            }
+
+        virtual  void show() override { 
+            reply("State: %s",_getState() ? "ON":"OFF");
+            for(auto s :_slaves) reply("Slave: %s",CSTR(s));
         }
+
+                    void    slave(const string& otherh4){ _slaves.insert(otherh4); }
+                    bool    state() { return _getState(); }
+                    void    turnOff(){ turn(false); }
+                    void    turnOn(){ turn(true); }
+                    void    toggle(){ turn(!_state); }
+                    void    turn(bool b);
+#ifdef H4P_LOG_EVENTS
+                    void    _turn(bool b,const string& src);
+#endif
 };
 
 #endif // H4P_BinaryThing_H

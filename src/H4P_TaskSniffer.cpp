@@ -27,18 +27,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_TaskSniffer.h>
+#include<H4P_SerialCmd.h>
 
 uint32_t H4P_TaskSniffer::__incexc(vector<string> vs,function<void(vector<uint32_t>)> f){
     return guard1(vs,[f,this](vector<string> vs){
-        auto vi=expectInt(PAYLOAD);
+        auto vi=expectInt(H4PAYLOAD);
         if(vi.size()) return ([f,this](vector<uint32_t> vu){ 
             f(vu);
             show(); 
             return H4_CMD_OK;
         })(vi);
         else {
-            if((PAYLOAD).find_first_of("-")!=string::npos){
-                vector<uint32_t> range=expectInt(PAYLOAD,"-");
+            if((H4PAYLOAD).find_first_of("-")!=string::npos){
+                vector<uint32_t> range=expectInt(H4PAYLOAD,"-");
                 if(range.size()==2 && range[0]<range[1]){
                     range[1]=std::min(range[1],(uint32_t) 99);
                     vector<uint32_t> expanded;
@@ -52,24 +53,11 @@ uint32_t H4P_TaskSniffer::__incexc(vector<string> vs,function<void(vector<uint32
     });    
 }
 
-void H4P_TaskSniffer::_alwaysExclude(){ // still need this?
-    exclude({
- //       H4P_TRID_SQWV,
-//        H4P_TRID_WIFI,
-//        H4P_TRID_MQTT,
-//        H4P_TRID_ASWS,
-//        H4P_TRID_UBSW
-    }); 
-}        
-
 void H4P_TaskSniffer::_common(){
-    _pid=snifTag();
-//    _names={ {H4P_TRID_SNIF,uppercase(_pid)} };
     _cmds={
-        {_pid,      {H4PC_SHOW, 0, CMD(show)}},
-        {_pid,      {H4PC_ROOT, subid, nullptr}},
-        {"include", {subid, 0, CMDVS(_tsInclude)}},
-        {"exclude", {subid, 0, CMDVS(_tsExclude)}}
+        {_pName,      {H4PC_H4, _subCmd, nullptr}},
+        {"include", {_subCmd, 0, CMDVS(_tsInclude)}},
+        {"exclude", {_subCmd, 0, CMDVS(_tsExclude)}}
     };
     h4._hookEvent(bind(&H4P_TaskSniffer::_taskDump,this,_1,_2));    
 }
@@ -77,11 +65,11 @@ void H4P_TaskSniffer::_common(){
 void H4P_TaskSniffer::_taskDump(H4_TASK_PTR t,const char c){
     if(hitList.count((t->uid)%100)) {
         reply("%d:%u:%c: ",h4.size(),micros(),c);
-        h4._dumpTask(t);
+#ifdef H4P_LOG_EVENTS        
+        reply(CSTR(H4P_SerialCmd::_dumpTask(t)));
+#endif
     }
 }
-//
-//      cmd responders
 //
 uint32_t H4P_TaskSniffer::_tsExclude(vector<string> vs){ return __incexc(vs,[this](vector<uint32_t> vi){ exclude(vi); }); }
 
@@ -98,18 +86,17 @@ void H4P_TaskSniffer::show(){
 //
 //      public 
 //
-H4P_TaskSniffer::H4P_TaskSniffer(){ 
+H4P_TaskSniffer::H4P_TaskSniffer(): H4Plugin(snifTag()){ 
     for(uint32_t i=0;i<100;i++) hitList.insert(i);
-    _alwaysExclude();
     _common();
 }
 
-H4P_TaskSniffer::H4P_TaskSniffer(uint32_t i){ 
+H4P_TaskSniffer::H4P_TaskSniffer(uint32_t i): H4Plugin(snifTag()){ 
     include(i);
     _common();
 }
 
-H4P_TaskSniffer::H4P_TaskSniffer(initializer_list<uint32_t> i){ 
+H4P_TaskSniffer::H4P_TaskSniffer(initializer_list<uint32_t> i): H4Plugin(snifTag()){ 
     include(i);
     _common();
 }

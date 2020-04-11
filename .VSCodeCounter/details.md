@@ -1,0 +1,162 @@
+# Details
+
+Date : 2020-04-10 00:21:44
+
+Directory c:\Users\phil\Documents\Arduino\libraries\h4plugins
+
+Total : 147 files,  9833 codes, 2780 comments, 2168 blanks, all 14781 lines
+
+[summary](results.md)
+
+## Files
+| filename | language | code | comment | blank | total |
+| :--- | :--- | ---: | ---: | ---: | ---: |
+| [README.md](/README.md) | Markdown | 146 | 0 | 73 | 219 |
+| [SPIFFS/data/ap.htm](/SPIFFS/data/ap.htm) | HTML | 90 | 0 | 1 | 91 |
+| [SPIFFS/data/h4.css](/SPIFFS/data/h4.css) | CSS | 65 | 0 | 0 | 65 |
+| [SPIFFS/data/h4.js](/SPIFFS/data/h4.js) | JavaScript | 25 | 0 | 2 | 27 |
+| [SPIFFS/data/soap.xml](/SPIFFS/data/soap.xml) | XML | 6 | 0 | 2 | 8 |
+| [SPIFFS/data/sta.htm](/SPIFFS/data/sta.htm) | HTML | 75 | 0 | 1 | 76 |
+| [SPIFFS/data/up.xml](/SPIFFS/data/up.xml) | XML | 32 | 0 | 0 | 32 |
+| [SPIFFS/data/wescp.xml](/SPIFFS/data/wescp.xml) | XML | 37 | 0 | 0 | 37 |
+| [SPIFFS/spiffs.bat](/SPIFFS/spiffs.bat) | Batch | 6 | 0 | 1 | 7 |
+| [data/ap.htm](/data/ap.htm) | HTML | 90 | 0 | 1 | 91 |
+| [data/h4.css](/data/h4.css) | CSS | 64 | 0 | 0 | 64 |
+| [data/h4.js](/data/h4.js) | JavaScript | 25 | 0 | 2 | 27 |
+| [data/soap.xml](/data/soap.xml) | XML | 6 | 0 | 2 | 8 |
+| [data/sta.htm](/data/sta.htm) | HTML | 75 | 0 | 1 | 76 |
+| [data/up.xml](/data/up.xml) | XML | 32 | 0 | 0 | 32 |
+| [data/wescp.xml](/data/wescp.xml) | XML | 37 | 0 | 0 | 37 |
+| [docs/advanced.md](/docs/advanced.md) | Markdown | 180 | 0 | 63 | 243 |
+| [docs/h4asws.md](/docs/h4asws.md) | Markdown | 112 | 0 | 46 | 158 |
+| [docs/h4ce.md](/docs/h4ce.md) | Markdown | 56 | 0 | 27 | 83 |
+| [docs/h4cmd.md](/docs/h4cmd.md) | Markdown | 177 | 0 | 95 | 272 |
+| [docs/h4esw.md](/docs/h4esw.md) | Markdown | 81 | 0 | 36 | 117 |
+| [docs/h4fc.md](/docs/h4fc.md) | Markdown | 65 | 0 | 37 | 102 |
+| [docs/h4gm.md](/docs/h4gm.md) | Markdown | 311 | 0 | 164 | 475 |
+| [docs/h4logs.md](/docs/h4logs.md) | Markdown | 217 | 0 | 111 | 328 |
+| [docs/h4mfnb.md](/docs/h4mfnb.md) | Markdown | 73 | 0 | 36 | 109 |
+| [docs/h4mqtt.md](/docs/h4mqtt.md) | Markdown | 196 | 0 | 93 | 289 |
+| [docs/h4pd.md](/docs/h4pd.md) | Markdown | 93 | 0 | 45 | 138 |
+| [docs/h4qw.md](/docs/h4qw.md) | Markdown | 47 | 0 | 24 | 71 |
+| [docs/h4ru.md](/docs/h4ru.md) | Markdown | 45 | 0 | 26 | 71 |
+| [docs/h4stor.md](/docs/h4stor.md) | Markdown | 56 | 0 | 27 | 83 |
+| [docs/h4ts.md](/docs/h4ts.md) | Markdown | 56 | 0 | 31 | 87 |
+| [docs/h4wifi.md](/docs/h4wifi.md) | Markdown | 69 | 0 | 42 | 111 |
+| [docs/mysql.md](/docs/mysql.md) | Markdown | 107 | 0 | 55 | 162 |
+| [docs/rn051.md](/docs/rn051.md) | Markdown | 124 | 0 | 85 | 209 |
+| [docs/things.md](/docs/things.md) | Markdown | 150 | 0 | 68 | 218 |
+| [examples/H4FC_ActiveLow/H4FC_ActiveLow.ino](/examples/H4FC_ActiveLow/H4FC_ActiveLow.ino) | C++ | 12 | 7 | 3 | 22 |
+| [examples/H4FC_Basic/H4FC_Basic.ino](/examples/H4FC_Basic/H4FC_Basic.ino) | C++ | 20 | 5 | 5 | 30 |
+| [examples/H4FC_Integrated/H4FC_Integrated.ino](/examples/H4FC_Integrated/H4FC_Integrated.ino) | C++ | 13 | 8 | 4 | 25 |
+| [examples/H4GM_AnalogThresholdSource/H4GM_AnalogThresholdSource.ino](/examples/H4GM_AnalogThresholdSource/H4GM_AnalogThresholdSource.ino) | C++ | 9 | 1 | 4 | 14 |
+| [examples/H4GM_AnalogThreshold/H4GM_AnalogThreshold.ino](/examples/H4GM_AnalogThreshold/H4GM_AnalogThreshold.ino) | C++ | 22 | 37 | 7 | 66 |
+| [examples/H4GM_Circular/H4GM_Circular.ino](/examples/H4GM_Circular/H4GM_Circular.ino) | C++ | 19 | 42 | 5 | 66 |
+| [examples/H4GM_DebouncedSource/H4GM_DebouncedSource.ino](/examples/H4GM_DebouncedSource/H4GM_DebouncedSource.ino) | C++ | 18 | 41 | 4 | 63 |
+| [examples/H4GM_Debounced/H4GM_Debounced.ino](/examples/H4GM_Debounced/H4GM_Debounced.ino) | C++ | 20 | 40 | 5 | 65 |
+| [examples/H4GM_EncoderAuto/H4GM_EncoderAuto.ino](/examples/H4GM_EncoderAuto/H4GM_EncoderAuto.ino) | C++ | 19 | 61 | 4 | 84 |
+| [examples/H4GM_EncoderSource/H4GM_EncoderSource.ino](/examples/H4GM_EncoderSource/H4GM_EncoderSource.ino) | C++ | 18 | 40 | 3 | 61 |
+| [examples/H4GM_Encoder/H4GM_Encoder.ino](/examples/H4GM_Encoder/H4GM_Encoder.ino) | C++ | 21 | 38 | 3 | 62 |
+| [examples/H4GM_Filtered/H4GM_Filtered.ino](/examples/H4GM_Filtered/H4GM_Filtered.ino) | C++ | 21 | 34 | 6 | 61 |
+| [examples/H4GM_LatchingSource/H4GM_LatchingSource.ino](/examples/H4GM_LatchingSource/H4GM_LatchingSource.ino) | C++ | 18 | 48 | 4 | 70 |
+| [examples/H4GM_Latching/H4GM_Latching.ino](/examples/H4GM_Latching/H4GM_Latching.ino) | C++ | 20 | 39 | 6 | 65 |
+| [examples/H4GM_Multistage/H4GM_Multistage.ino](/examples/H4GM_Multistage/H4GM_Multistage.ino) | C++ | 51 | 45 | 6 | 102 |
+| [examples/H4GM_PolledSource/H4GM_PolledSource.ino](/examples/H4GM_PolledSource/H4GM_PolledSource.ino) | C++ | 18 | 40 | 5 | 63 |
+| [examples/H4GM_Polled/H4GM_Polled.ino](/examples/H4GM_Polled/H4GM_Polled.ino) | C++ | 20 | 37 | 7 | 64 |
+| [examples/H4GM_RawSource/H4GM_RawSource.ino](/examples/H4GM_RawSource/H4GM_RawSource.ino) | C++ | 17 | 34 | 2 | 53 |
+| [examples/H4GM_Raw/H4GM_Raw.ino](/examples/H4GM_Raw/H4GM_Raw.ino) | C++ | 22 | 36 | 5 | 63 |
+| [examples/H4GM_Repeating/H4GM_Repeating.ino](/examples/H4GM_Repeating/H4GM_Repeating.ino) | C++ | 29 | 41 | 6 | 76 |
+| [examples/H4GM_RetriggeringSource/H4GM_RetriggeringSource.ino](/examples/H4GM_RetriggeringSource/H4GM_RetriggeringSource.ino) | C++ | 18 | 39 | 6 | 63 |
+| [examples/H4GM_Retriggering/H4GM_Retriggering.ino](/examples/H4GM_Retriggering/H4GM_Retriggering.ino) | C++ | 23 | 38 | 6 | 67 |
+| [examples/H4GM_Sequenced/H4GM_Sequenced.ino](/examples/H4GM_Sequenced/H4GM_Sequenced.ino) | C++ | 21 | 41 | 5 | 67 |
+| [examples/H4GM_Timed/H4GM_Timed.ino](/examples/H4GM_Timed/H4GM_Timed.ino) | C++ | 25 | 38 | 6 | 69 |
+| [examples/H4P_BinarySwitchMQTT/H4P_BinarySwitchMQTT.ino](/examples/H4P_BinarySwitchMQTT/H4P_BinarySwitchMQTT.ino) | C++ | 34 | 16 | 6 | 56 |
+| [examples/H4P_BinarySwitchMfnb/H4P_BinarySwitchMfnb.ino](/examples/H4P_BinarySwitchMfnb/H4P_BinarySwitchMfnb.ino) | C++ | 30 | 11 | 4 | 45 |
+| [examples/H4P_BinarySwitch/H4P_BinarySwitch.ino](/examples/H4P_BinarySwitch/H4P_BinarySwitch.ino) | C++ | 21 | 9 | 4 | 34 |
+| [examples/H4P_BinaryThingAutoOff/H4P_BinaryThingAutoOff.ino](/examples/H4P_BinaryThingAutoOff/H4P_BinaryThingAutoOff.ino) | C++ | 8 | 1 | 7 | 16 |
+| [examples/H4P_BinaryThing/H4P_BinaryThing.ino](/examples/H4P_BinaryThing/H4P_BinaryThing.ino) | C++ | 6 | 9 | 5 | 20 |
+| [examples/H4P_CmdErrors/H4P_CmdErrors.ino](/examples/H4P_CmdErrors/H4P_CmdErrors.ino) | C++ | 15 | 13 | 7 | 35 |
+| [examples/H4P_CustomLogger/H4P_CustomLogger.ino](/examples/H4P_CustomLogger/H4P_CustomLogger.ino) | C++ | 20 | 1 | 7 | 28 |
+| [examples/H4P_ESWProfiler/H4P_ESWProfiler.ino](/examples/H4P_ESWProfiler/H4P_ESWProfiler.ino) | C++ | 19 | 1 | 7 | 27 |
+| [examples/H4P_ESWSimple/H4P_ESWSimple.ino](/examples/H4P_ESWSimple/H4P_ESWSimple.ino) | C++ | 18 | 2 | 7 | 27 |
+| [examples/H4P_HttpMySQLLogger/H4P_HttpMySQLLogger.ino](/examples/H4P_HttpMySQLLogger/H4P_HttpMySQLLogger.ino) | C++ | 11 | 0 | 4 | 15 |
+| [examples/H4P_HttpMySQLLogger/mysqlrest/README.md](/examples/H4P_HttpMySQLLogger/mysqlrest/README.md) | Markdown | 57 | 0 | 21 | 78 |
+| [examples/H4P_HttpMySQLLogger/mysqlrest/h4.js](/examples/H4P_HttpMySQLLogger/mysqlrest/h4.js) | JavaScript | 19 | 4 | 4 | 27 |
+| [examples/H4P_HttpMySQLLogger/mysqlrest/mysqllogger.code-workspace](/examples/H4P_HttpMySQLLogger/mysqlrest/mysqllogger.code-workspace) | JSON with Comments | 8 | 0 | 0 | 8 |
+| [examples/H4P_HttpMySQLLogger/mysqlrest/package-lock.json](/examples/H4P_HttpMySQLLogger/mysqlrest/package-lock.json) | JSON | 1,193 | 0 | 1 | 1,194 |
+| [examples/H4P_HttpMySQLLogger/mysqlrest/package.json](/examples/H4P_HttpMySQLLogger/mysqlrest/package.json) | JSON | 23 | 0 | 1 | 24 |
+| [examples/H4P_HttpMySQLLogger/mysqlrest/routes/index.js](/examples/H4P_HttpMySQLLogger/mysqlrest/routes/index.js) | JavaScript | 89 | 1 | 7 | 97 |
+| [examples/H4P_Loggers/H4P_Loggers.ino](/examples/H4P_Loggers/H4P_Loggers.ino) | C++ | 10 | 0 | 3 | 13 |
+| [examples/H4P_MQTTHeapLogger/H4P_MQTTHeapLogger.ino](/examples/H4P_MQTTHeapLogger/H4P_MQTTHeapLogger.ino) | C++ | 7 | 0 | 3 | 10 |
+| [examples/H4P_MQTTLogger/H4P_MQTTLogger.ino](/examples/H4P_MQTTLogger/H4P_MQTTLogger.ino) | C++ | 21 | 0 | 6 | 27 |
+| [examples/H4P_MQTT_Simple/H4P_MQTT_Simple.ino](/examples/H4P_MQTT_Simple/H4P_MQTT_Simple.ino) | C++ | 31 | 14 | 8 | 53 |
+| [examples/H4P_MQTT_Subtopics/H4P_MQTT_Subtopics.ino](/examples/H4P_MQTT_Subtopics/H4P_MQTT_Subtopics.ino) | C++ | 37 | 19 | 7 | 63 |
+| [examples/H4P_MQTT_Wildcards/H4P_MQTT_Wildcards.ino](/examples/H4P_MQTT_Wildcards/H4P_MQTT_Wildcards.ino) | C++ | 40 | 39 | 5 | 84 |
+| [examples/H4P_PersistentStorage/H4P_PersistentStorage.ino](/examples/H4P_PersistentStorage/H4P_PersistentStorage.ino) | C++ | 23 | 0 | 5 | 28 |
+| [examples/H4P_PresenceDetectH4/H4P_PresenceDetectH4.ino](/examples/H4P_PresenceDetectH4/H4P_PresenceDetectH4.ino) | C++ | 7 | 0 | 3 | 10 |
+| [examples/H4P_PresenceDetectIP/H4P_PresenceDetectIP.ino](/examples/H4P_PresenceDetectIP/H4P_PresenceDetectIP.ino) | C++ | 11 | 0 | 7 | 18 |
+| [examples/H4P_PresenceDetectMDNS/H4P_PresenceDetectMDNS.ino](/examples/H4P_PresenceDetectMDNS/H4P_PresenceDetectMDNS.ino) | C++ | 8 | 0 | 3 | 11 |
+| [examples/H4P_PresenceDetectUPNP/H4P_PresenceDetectUPNP.ino](/examples/H4P_PresenceDetectUPNP/H4P_PresenceDetectUPNP.ino) | C++ | 7 | 1 | 4 | 12 |
+| [examples/H4P_QueueWarn/H4P_QueueWarn.ino](/examples/H4P_QueueWarn/H4P_QueueWarn.ino) | C++ | 33 | 13 | 8 | 54 |
+| [examples/H4P_RemoteUpdate/H4P_RemoteUpdate.ino](/examples/H4P_RemoteUpdate/H4P_RemoteUpdate.ino) | C++ | 11 | 9 | 0 | 20 |
+| [examples/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino](/examples/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino) | C++ | 10 | 14 | 2 | 26 |
+| [examples/H4P_SerialCmd/H4P_SerialCmd.ino](/examples/H4P_SerialCmd/H4P_SerialCmd.ino) | C++ | 13 | 13 | 4 | 30 |
+| [examples/H4P_TaskSniffer/H4P_TaskSniffer.ino](/examples/H4P_TaskSniffer/H4P_TaskSniffer.ino) | C++ | 42 | 31 | 6 | 79 |
+| [examples/H4_TaskNames/H4_TaskNames.ino](/examples/H4_TaskNames/H4_TaskNames.ino) | C++ | 35 | 20 | 5 | 60 |
+| [examples/xtras/ChezToiioT_Config/ChezToiioT_Config.ino](/examples/xtras/ChezToiioT_Config/ChezToiioT_Config.ino) | C++ | 47 | 1 | 5 | 53 |
+| [examples/xtras/Generic_SONOFF/Generic_SONOFF.ino](/examples/xtras/Generic_SONOFF/Generic_SONOFF.ino) | C++ | 11 | 9 | 0 | 20 |
+| [library.properties](/library.properties) | Properties | 10 | 0 | 1 | 11 |
+| [plugins.code-workspace](/plugins.code-workspace) | JSON with Comments | 10 | 0 | 0 | 10 |
+| [src/H4PCommon.h](/src/H4PCommon.h) | C++ | 210 | 46 | 30 | 286 |
+| [src/H4P_AsyncMQTT.cpp](/src/H4P_AsyncMQTT.cpp) | C++ | 88 | 44 | 12 | 144 |
+| [src/H4P_AsyncMQTT.h](/src/H4P_AsyncMQTT.h) | C++ | 41 | 30 | 9 | 80 |
+| [src/H4P_AsyncWebServer.cpp](/src/H4P_AsyncWebServer.cpp) | C++ | 86 | 30 | 14 | 130 |
+| [src/H4P_AsyncWebServer.h](/src/H4P_AsyncWebServer.h) | C++ | 39 | 32 | 6 | 77 |
+| [src/H4P_BinarySwitch.h](/src/H4P_BinarySwitch.h) | C++ | 17 | 30 | 3 | 50 |
+| [src/H4P_BinaryThing.cpp](/src/H4P_BinaryThing.cpp) | C++ | 73 | 29 | 7 | 109 |
+| [src/H4P_BinaryThing.h](/src/H4P_BinaryThing.h) | C++ | 44 | 29 | 6 | 79 |
+| [src/H4P_CmdErrors.h](/src/H4P_CmdErrors.h) | C++ | 87 | 30 | 9 | 126 |
+| [src/H4P_ExternalSqWave.cpp](/src/H4P_ExternalSqWave.cpp) | C++ | 63 | 34 | 10 | 107 |
+| [src/H4P_ExternalSqWave.h](/src/H4P_ExternalSqWave.h) | C++ | 25 | 33 | 8 | 66 |
+| [src/H4P_FlasherController.cpp](/src/H4P_FlasherController.cpp) | C++ | 115 | 34 | 18 | 167 |
+| [src/H4P_FlasherController.h](/src/H4P_FlasherController.h) | C++ | 40 | 30 | 11 | 81 |
+| [src/H4P_GPIOManager.cpp](/src/H4P_GPIOManager.cpp) | C++ | 310 | 56 | 45 | 411 |
+| [src/H4P_GPIOManager.h](/src/H4P_GPIOManager.h) | C++ | 373 | 47 | 54 | 474 |
+| [src/H4P_HttpMySQLLogger.h](/src/H4P_HttpMySQLLogger.h) | C++ | 49 | 46 | 7 | 102 |
+| [src/H4P_LocalLogger.cpp](/src/H4P_LocalLogger.cpp) | C++ | 25 | 32 | 6 | 63 |
+| [src/H4P_LocalLogger.h](/src/H4P_LocalLogger.h) | C++ | 19 | 29 | 6 | 54 |
+| [src/H4P_MQTTHeapLogger.h](/src/H4P_MQTTHeapLogger.h) | C++ | 20 | 29 | 2 | 51 |
+| [src/H4P_MQTTLogger.h](/src/H4P_MQTTLogger.h) | C++ | 18 | 29 | 2 | 49 |
+| [src/H4P_MQTTQueueLogger.h](/src/H4P_MQTTQueueLogger.h) | C++ | 21 | 29 | 2 | 52 |
+| [src/H4P_MultiFunctionButton.cpp](/src/H4P_MultiFunctionButton.cpp) | C++ | 57 | 30 | 8 | 95 |
+| [src/H4P_MultiFunctionButton.h](/src/H4P_MultiFunctionButton.h) | C++ | 43 | 32 | 7 | 82 |
+| [src/H4P_PersistentStorage.cpp](/src/H4P_PersistentStorage.cpp) | C++ | 50 | 30 | 7 | 87 |
+| [src/H4P_PersistentStorage.h](/src/H4P_PersistentStorage.h) | C++ | 29 | 29 | 9 | 67 |
+| [src/H4P_PresenceDetector.cpp](/src/H4P_PresenceDetector.cpp) | C++ | 106 | 39 | 12 | 157 |
+| [src/H4P_PresenceDetector.h](/src/H4P_PresenceDetector.h) | C++ | 85 | 29 | 16 | 130 |
+| [src/H4P_QueueWarn.cpp](/src/H4P_QueueWarn.cpp) | C++ | 37 | 32 | 4 | 73 |
+| [src/H4P_QueueWarn.h](/src/H4P_QueueWarn.h) | C++ | 18 | 33 | 9 | 60 |
+| [src/H4P_RemoteUpdate.h](/src/H4P_RemoteUpdate.h) | C++ | 53 | 36 | 3 | 92 |
+| [src/H4P_SerialCmd.cpp](/src/H4P_SerialCmd.cpp) | C++ | 264 | 49 | 34 | 347 |
+| [src/H4P_SerialCmd.h](/src/H4P_SerialCmd.h) | C++ | 74 | 32 | 13 | 119 |
+| [src/H4P_SerialLogger.h](/src/H4P_SerialLogger.h) | C++ | 17 | 29 | 3 | 49 |
+| [src/H4P_Skeleton.cpp](/src/H4P_Skeleton.cpp) | C++ | 30 | 31 | 10 | 71 |
+| [src/H4P_Skeleton.h](/src/H4P_Skeleton.h) | C++ | 21 | 29 | 7 | 57 |
+| [src/H4P_TaskSniffer.cpp](/src/H4P_TaskSniffer.cpp) | C++ | 63 | 32 | 8 | 103 |
+| [src/H4P_TaskSniffer.h](/src/H4P_TaskSniffer.h) | C++ | 25 | 31 | 9 | 65 |
+| [src/H4P_UPNPServer.cpp](/src/H4P_UPNPServer.cpp) | C++ | 139 | 30 | 15 | 184 |
+| [src/H4P_UPNPServer.h](/src/H4P_UPNPServer.h) | C++ | 55 | 30 | 14 | 99 |
+| [src/H4P_WiFi.cpp](/src/H4P_WiFi.cpp) | C++ | 178 | 104 | 34 | 316 |
+| [src/H4P_WiFi.h](/src/H4P_WiFi.h) | C++ | 57 | 33 | 9 | 99 |
+| [src/H4P_WiFiSelect.h](/src/H4P_WiFiSelect.h) | C++ | 16 | 0 | 0 | 16 |
+| [src/H4Plugins.cpp](/src/H4Plugins.cpp) | C++ | 81 | 38 | 13 | 132 |
+| [src/H4Plugins.h](/src/H4Plugins.h) | C++ | 40 | 2 | 6 | 48 |
+| [src/asyncHTTPrequest.cpp](/src/asyncHTTPrequest.cpp) | C++ | 558 | 86 | 82 | 726 |
+| [src/asyncHTTPrequest.h](/src/asyncHTTPrequest.h) | C++ | 153 | 25 | 32 | 210 |
+| [src/config.h](/src/config.h) | C++ | 25 | 33 | 12 | 70 |
+| [src/h4p.vbs](/src/h4p.vbs) | Visual Basic | 6 | 0 | 1 | 7 |
+| [src/switch.ps1](/src/switch.ps1) | PowerShell | 6 | 12 | 1 | 19 |
+| [src/xbuf.cpp](/src/xbuf.cpp) | C++ | 228 | 20 | 22 | 270 |
+| [src/xbuf.h](/src/xbuf.h) | C++ | 41 | 35 | 10 | 86 |
+
+[summary](results.md)

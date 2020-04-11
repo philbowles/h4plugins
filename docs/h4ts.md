@@ -20,17 +20,16 @@ It requires detailed knowledge of H4 "internals" which are beyond the scope of t
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 H4P_TaskSniffer h4ts;
 ```
 
 ## Dependencies
 
-none, but must be created *after* [**H4P_SerialCmd**](h4sc.md) if using that plugin
+none, but must be created *after* [**H4P_SerialCmd**](h4cmd.md) if using that plugin
 
 ## Commands Added
 
-* h4/show/snif
 * h4/snif/exclude/< task ID(s) >
 * h4/snif/include/< task ID(s) >
 
@@ -45,10 +44,6 @@ A task ID can be one of:
 `const char* giveTaskName(uint32_t n) // You get an ID, you return the name of the matching task`
 
 Allows user to name his own tasks so that they are more easily identifiable in the task dump
-
-## Unloadable
-
-NO: but `h4/snif/exclude/0-99` will stop any display. There will still be a performance "hit".
 
 ---
 
@@ -76,7 +71,8 @@ void show(); // Display current "hit list"
 
 [Example Code](../examples/H4P_TaskSniffer/H4P_TaskSniffer.ino)
 
-----
+---
+
 (c) 2020 Phil Bowles h4plugins@gmail.com
 
 * [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
