@@ -99,7 +99,9 @@ class H4P_CmdErrors: public H4Plugin {
             {H4P_TRID_BTTO,"BTTO"},
             {H4P_TRID_IPPD,"IPPD"},
             {H4P_TRID_TIME,"TIME"},
-            {H4P_TRID_SYNC,"SYNC"},                        
+            {H4P_TRID_SYNC,"SYNC"},
+            {H4P_TRID_DALY,"DALY"},
+            {H4P_TRID_SHOT,"AT_T"}
         };
         virtual void        _greenLight(){ start(); }
     public:

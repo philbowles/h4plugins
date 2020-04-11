@@ -30,7 +30,10 @@ SOFTWARE.
 #ifndef H4P_NO_WIFI
 
 uint32_t H4P_AsyncMQTT::_change(vector<string> vs){
-    return guardString2(vs,[this](string a,string b){ if(isNumeric(b)) change(a,atoi(CSTR(b))); });
+    return guardString2(vs,[this](string a,string b){ 
+        if(isNumeric(b)) change(a,atoi(CSTR(b)));
+//        else return H4_CMD_NOT_NUMERIC;
+    });
 }
 
 void H4P_AsyncMQTT::_greenLight(){

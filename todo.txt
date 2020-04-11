@@ -1,11 +1,16 @@
 
 TODO:
 SOONER
+    H4 bump!!!
+    conditional on BT at/daily cmds
+    atSource
+    dailySource
     error gone away in nodejs
     TK KW
 SHORTTERM
     schedule in cheztoi
 MEDIUMTERM
+    optimise / mAcrofy guardstring2
     ESp32 MDNS detector
 LONGTERM
     ethernet module stm32

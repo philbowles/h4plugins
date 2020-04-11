@@ -34,9 +34,10 @@ SOFTWARE.
 H4P_Timekeeper::H4P_Timekeeper(const char* ntp1,const char* ntp2,int tzo,H4_FN_VOID onC,H4_FN_VOID onD): _ntp1(ntp1),_ntp2(ntp2),_tzo(tzo),H4Plugin(timeTag(),onC,onD){
     _cmds={
         {_pName,   { H4PC_H4, _subCmd, nullptr}}, // root for this plugin, e.g. h4/ME...
-        {"at",     { _subCmd,       0, CMDVS(_at)}},
-        {"daily",  { _subCmd,       0, CMDVS(_daily)}},
-        {"sync",   { _subCmd,       0, CMD(sync)}}
+        {"at",     { _subCmd,       0, CMDVS(_at)}}, // dyn add
+        {"daily",  { _subCmd,       0, CMDVS(_daily)}}, // dyn add
+        {"sync",   { _subCmd,       0, CMD(sync)}},
+        {"tz",     { _subCmd,       0, CMDVS(_tz)}}
     };
     _useNTP(tzo,ntp1,ntp2); 
 /*    
@@ -46,6 +47,33 @@ H4P_Timekeeper::H4P_Timekeeper(const char* ntp1,const char* ntp2,int tzo,H4_FN_V
         },nullptr,nullptr,0,true
     );
 */
+}
+
+uint32_t H4P_Timekeeper::__alarmCore (vector<string> vs,bool daily){
+//    TIDY!! and invert! 
+    vector<string> vg=split(H4PAYLOAD,",");
+    if(vg.size()>2) return H4_CMD_TOO_MANY_PARAMS;
+    if(vg.size()<2) return H4_CMD_TOO_FEW_PARAMS;
+    string a=vg[0];
+    string b=vg[1];
+    if(!isNumeric(b)) return H4_CMD_NOT_NUMERIC;
+    vector<string> hhmm=split(a,":");
+    if(hhmm.size()!=2) return H4_CMD_PAYLOAD_FORMAT;
+    int hh=atoi(CSTR(hhmm[0]));
+    int mm=atoi(CSTR(hhmm[1]));
+    if(!(hh<24 && mm<60)) return H4_CMD_PAYLOAD_FORMAT;
+    if(_mss00){
+        H4EVENT("%s %s -> %s",daily ? "Daily":"S/Shot",CSTR((a)),CSTR(b)? "ON":"OFF");
+        uint32_t msDue=_msDue(CSTR((a)));
+        int onoff=atoi(CSTR(b));
+        //pq::add(H4_FN_VOID, uint32_t, uint32_t, H4_FN_COUNT, H4_FN_VOID, uint32_t, bool)
+        uint32_t u=daily ? H4P_TRID_DALY:H4P_TRID_SHOT;
+        h4.add([this,onoff]{ 
+            if(_mss00) Serial.printf("ALARM %s => %d\n",CSTR(clockTime()),onoff);
+            else H4EVENT("RTC ignored"); // don't fire if NTP not sync'ed 
+        },msDue,daily ? msDue:0,H4Countdown(1),nullptr,TAG(daily ? 7:3));
+        return H4_CMD_OK;
+    } else H4EVENT("Alarm ignored"); // don't set if NTP not sync'ed 
 }
 
 ip_addr_t * H4P_Timekeeper::__ntpSetServer(int n,const char* ntp){
@@ -58,22 +86,21 @@ ip_addr_t * H4P_Timekeeper::__ntpSetServer(int n,const char* ntp){
 	return nullptr;
 }
 
-uint32_t H4P_Timekeeper::_at(vector<string> vs){
-    dumpvs(vs);
-}
-uint32_t H4P_Timekeeper::_daily(vector<string> vs){
-    dumpvs(vs);
-}
-
 void H4P_Timekeeper::_hookIn(){ DEPEND(wifi); }
+
+uint32_t H4P_Timekeeper::_msDue(const char* rtc){
+    int msDue=parseTime(rtc)-msSinceMidnight(); // upcast
+    if(msDue < 0) msDue+=24*60*60*1000;
+    return static_cast<uint32_t>(msDue);
+}
 
 void H4P_Timekeeper::_start(){
 //    Serial.print(CSTR(_pName));Serial.println(" _start");
 //    for some reason it never seems to sync first time
-    h4.repeatWhile([this]{ return !hasRTC(); },
+    h4.repeatWhile([this]{ return !_mss00; },
         H4P_TIME_HOLDOFF,
-        [this]{ H4EVENT("%u TRY SYNC",millis());sync(); },
-        [this]{ H4EVENT("%u time %s",millis(),CSTR(clockTime())); },
+        [this]{ sync(); },
+        [this]{ H4EVENT("%u NTP %s",millis(),CSTR(clockTime())); },
         H4P_TRID_TIME,true
     );
     h4.every(H4P_TIME_RESYNC,[this]{ sync(); },nullptr,H4P_TRID_SYNC,true); // tweakables
@@ -122,7 +149,7 @@ string H4P_Timekeeper::strTime(uint32_t t){
 void H4P_Timekeeper::sync(){
 	long stamp=sntp_get_current_timestamp();
     Serial.printf("Raw stamp %lu\n",stamp);
-	if(stamp > 28100L){ // 28800 +leeway: default is GMT+8
+	if(stamp > 30000){ // 28800 +leeway: default is GMT+8
 		H4EVENT("%u time %lu",millis(),stamp);
 		vector<string> dp=split(sntp_get_real_time(stamp)," ");
 		string year=dp.back();
