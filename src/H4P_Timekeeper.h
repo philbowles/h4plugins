@@ -35,6 +35,15 @@ SOFTWARE.
 #include<H4P_BinaryThing.h>
 #include "sntp.h"
 
+using H4P_DURATION = pair<string,string>;
+using H4P_SCHEDULE = vector<H4P_DURATION>;
+/* e.g.
+H4P_SCHEDULE mySchedule={
+  {"07:00","09:00"}, // ON @ 0700, OFF @ 0900
+  {"13:00","14:00"}, // ON @ 1300, OFF @ 1400
+  {"18:00","23:00"}  // ON @ 1800, OFF @ 2300
+};
+*/
 class H4P_Timekeeper: public H4Plugin {
         VSCMD(_change);
         VSCMD(_tz);
@@ -51,25 +60,24 @@ class H4P_Timekeeper: public H4Plugin {
                 uint32_t    _daily(vector<string> vs);
         virtual void        _hookIn() override;
         virtual void        _greenLight() override {}; // no autostart
-                uint32_t    _msDue(const string& rtc);
         virtual void        _start() override;
         virtual void        _stop() override;
-                void        _useNTP();
     public:
         H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzOffset=0,H4_FN_VOID onStart=nullptr,H4_FN_VOID onStop=nullptr);
 
                 void        at(const string& when,bool onoff,H4BS_FN_SWITCH f);
+                void        atSource(const string& when,bool onoff);
                 void        change(const string& ntp1,const string& ntp2);
-                string 		clockTime() { return _mss00 ? strTime(msSinceMidnight() / 1000) : "0"; }
+                string 		clockTime() { return _mss00 ? strTime(msSinceMidnight()) : "0"; }
                 void        daily(const string& when,bool onoff,H4BS_FN_SWITCH f);
-                string		getDate(){ return _cb["date"]; };
+                void        dailySource(const string& when,bool onoff);
                 bool 		hasRTC() { return _mss00; }
                 uint32_t 	msSinceMidnight() { return _mss00 + millis(); }
-                uint32_t 	parseTime(const string& ts);
+                int      	parseTime(const string& ts);
                 void        runAtMidnight(H4_FN_VOID f){}
                 string      minutesFromNow(uint32_t s);
-                void        setSchedule(vector<pair<string,bool>>,H4BS_FN_SWITCH f){}
-                void        setScheduleSource(vector<pair<string,bool>>){}
+                void        setSchedule(H4P_SCHEDULE,H4BS_FN_SWITCH f);
+                void        setScheduleSource(H4P_SCHEDULE);
                 void        show() override;
                 string 		strTime(uint32_t t);
                 void        sync();
