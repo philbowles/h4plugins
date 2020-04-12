@@ -27,31 +27,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_QueueWarn_HO
-#define H4P_QueueWarn_HO
+#ifndef H4P_HeapWarn_HO
+#define H4P_HeapWarn_HO
 
 #include<H4PCommon.h>
 
-class H4P_QueueWarn: public H4Plugin {
-    //protected:
-        VSCMD(_qwPcent);
+class H4P_HeapWarn: public H4Plugin {
+    /*
+        VSCMD(_hwPcent);
 //
-        uint32_t                limit;
-        uint32_t                maxq=0;
+        function<void(bool)>    _f;
+        uint32_t                _initial;
+        uint32_t                _limit;
+        uint32_t                _minh=0;
 
-        function<void(bool)>    f;
-
-        uint32_t        __setLimit(uint32_t v);
-
+         void        _hookIn() override {}
+         void        _greenLight() override {}; // no autostart
+         void        _start() override {}
+         void        _stop() override {}
         void            _run();
-
+        uint32_t        _setLimit(uint32_t v);
+*/
     public:
-        H4P_QueueWarn(function<void(bool)> _f,uint32_t _limit=50);
+        H4P_HeapWarn(function<void(bool)> _f,uint32_t pcent=50);
 
-        void        show() override;
-        void        pcent(uint32_t pc);
+//        void        show() override;
+//        void        pcent(uint32_t pc);
 };
 
-extern __attribute__((weak)) H4P_QueueWarn h4qw;
+extern __attribute__((weak)) H4P_HeapWarn h4hw;
 
-#endif // H4P_QueueWarn_H
+#endif // H4P_HeapWarn_H

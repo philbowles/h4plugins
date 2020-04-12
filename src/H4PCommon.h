@@ -101,7 +101,7 @@ STAG(board)
 STAG(broker);
 STAG(cerr);
 STAG(chip);
-STAG(curl);
+//STAG(curl);
 STAG(device);
 STAG(esqw);
 STAG(gpio);

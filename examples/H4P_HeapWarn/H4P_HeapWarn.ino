@@ -1,8 +1,8 @@
+#include<H4Plugins.h>
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
+
 #define SMALL_Q       10
 #define Q_WARN_PCENT  50
-
-#include<H4Plugins.h>
-H4_USE_PLUGINS(115200,SMALL_Q,false) // Serial baud rate, Q size, SerialCmd autostop
 
 void qIsLow(bool inDanger){ 
     Serial.print("Q capacity is ");Serial.println(SMALL_Q);
@@ -13,7 +13,7 @@ void qIsLow(bool inDanger){
     else Serial.println("Disaster Averted"); 
 }
 
-H4P_QueueWarn h4qw(qIsLow,50); // call qIsLow when free Q drops below 50%
+H4P_HeapWarn h4hw(qIsLow,50); // call qIsLow when free Q drops below 50%
 /*
     Open Serial monitor and try typing any of the following:
     
@@ -22,10 +22,10 @@ H4P_QueueWarn h4qw(qIsLow,50); // call qIsLow when free Q drops below 50%
 
 */
 void h4setup() { // H4 constructor starts Serial
-    Serial.println("H4P_QueueWarn example v"H4P_VERSION);
+    Serial.println("H4P_HeapWarn example v"H4P_VERSION);
     h4qw.show(); // show limits
 //
-//  we need a lot of things in the queue
+//  we need a lot of things in the Heap
 //
     h4.once(30000,[](){ Serial.println("30 seconds later"); });
     h4.once(40000,[](){ 

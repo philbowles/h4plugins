@@ -9,7 +9,9 @@ void onElvisDetect(bool b){
 
 H4P_GPIOManager h4gm;
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","detector");
-H4P_AsyncWebServer h4asws("admin","admin");
+H4P_AsyncWebServer h4asws;
+
+
 
 H4P_BinarySwitch h4onof(RELAY_BUILTIN,ACTIVE_HIGH,OFF);
 

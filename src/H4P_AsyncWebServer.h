@@ -49,18 +49,13 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
             vector<string>      lines={};
 
                 void         _rest(AsyncWebServerRequest *request);
-                bool         _webAuth(AsyncWebServerRequest *request);
 //      service essentials
                 void         _start() override;
                 void         _stop() override;
                 void         _hookIn() override;
                 void         _greenLight() override {} // do not autostart!
     public:
-        H4P_AsyncWebServer(string admin="admin",string passwd="admin",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr):
-            AsyncWebServer(80),H4Plugin(aswsTag(),onC,onD){
-            _cb["auser"]=admin;
-            _cb["apasswd"]=passwd;
-        }
+        H4P_AsyncWebServer(H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): AsyncWebServer(80),H4Plugin(aswsTag(),onC,onD){}
         static String       aswsReplace(const String& var);
 //          syscall only
                 void        _reply(string msg) override { lines.push_back(msg); };

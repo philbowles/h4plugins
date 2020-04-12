@@ -1,30 +1,28 @@
 # Details
 
-Date : 2020-04-10 00:21:44
+Date : 2020-04-12 10:55:29
 
 Directory c:\Users\phil\Documents\Arduino\libraries\h4plugins
 
-Total : 147 files,  9833 codes, 2780 comments, 2168 blanks, all 14781 lines
+Total : 148 files,  10131 codes, 2851 comments, 2200 blanks, all 15182 lines
 
 [summary](results.md)
 
 ## Files
 | filename | language | code | comment | blank | total |
 | :--- | :--- | ---: | ---: | ---: | ---: |
-| [README.md](/README.md) | Markdown | 146 | 0 | 73 | 219 |
-| [SPIFFS/data/ap.htm](/SPIFFS/data/ap.htm) | HTML | 90 | 0 | 1 | 91 |
-| [SPIFFS/data/h4.css](/SPIFFS/data/h4.css) | CSS | 65 | 0 | 0 | 65 |
-| [SPIFFS/data/h4.js](/SPIFFS/data/h4.js) | JavaScript | 25 | 0 | 2 | 27 |
+| [README.md](/README.md) | Markdown | 147 | 0 | 72 | 219 |
+| [SPIFFS/data/h4.css](/SPIFFS/data/h4.css) | CSS | 110 | 0 | 0 | 110 |
+| [SPIFFS/data/h4.js](/SPIFFS/data/h4.js) | JavaScript | 54 | 2 | 1 | 57 |
 | [SPIFFS/data/soap.xml](/SPIFFS/data/soap.xml) | XML | 6 | 0 | 2 | 8 |
-| [SPIFFS/data/sta.htm](/SPIFFS/data/sta.htm) | HTML | 75 | 0 | 1 | 76 |
+| [SPIFFS/data/sta.htm](/SPIFFS/data/sta.htm) | HTML | 119 | 0 | 1 | 120 |
 | [SPIFFS/data/up.xml](/SPIFFS/data/up.xml) | XML | 32 | 0 | 0 | 32 |
 | [SPIFFS/data/wescp.xml](/SPIFFS/data/wescp.xml) | XML | 37 | 0 | 0 | 37 |
 | [SPIFFS/spiffs.bat](/SPIFFS/spiffs.bat) | Batch | 6 | 0 | 1 | 7 |
-| [data/ap.htm](/data/ap.htm) | HTML | 90 | 0 | 1 | 91 |
-| [data/h4.css](/data/h4.css) | CSS | 64 | 0 | 0 | 64 |
-| [data/h4.js](/data/h4.js) | JavaScript | 25 | 0 | 2 | 27 |
+| [data/h4.css](/data/h4.css) | CSS | 110 | 0 | 0 | 110 |
+| [data/h4.js](/data/h4.js) | JavaScript | 54 | 2 | 1 | 57 |
 | [data/soap.xml](/data/soap.xml) | XML | 6 | 0 | 2 | 8 |
-| [data/sta.htm](/data/sta.htm) | HTML | 75 | 0 | 1 | 76 |
+| [data/sta.htm](/data/sta.htm) | HTML | 119 | 0 | 1 | 120 |
 | [data/up.xml](/data/up.xml) | XML | 32 | 0 | 0 | 32 |
 | [data/wescp.xml](/data/wescp.xml) | XML | 37 | 0 | 0 | 37 |
 | [docs/advanced.md](/docs/advanced.md) | Markdown | 180 | 0 | 63 | 243 |
@@ -104,25 +102,26 @@ Total : 147 files,  9833 codes, 2780 comments, 2168 blanks, all 14781 lines
 | [examples/H4P_TaskSniffer/H4P_TaskSniffer.ino](/examples/H4P_TaskSniffer/H4P_TaskSniffer.ino) | C++ | 42 | 31 | 6 | 79 |
 | [examples/H4_TaskNames/H4_TaskNames.ino](/examples/H4_TaskNames/H4_TaskNames.ino) | C++ | 35 | 20 | 5 | 60 |
 | [examples/xtras/ChezToiioT_Config/ChezToiioT_Config.ino](/examples/xtras/ChezToiioT_Config/ChezToiioT_Config.ino) | C++ | 47 | 1 | 5 | 53 |
+| [examples/xtras/Generic_ESP01S/Generic_ESP01S.ino](/examples/xtras/Generic_ESP01S/Generic_ESP01S.ino) | C++ | 10 | 0 | 1 | 11 |
 | [examples/xtras/Generic_SONOFF/Generic_SONOFF.ino](/examples/xtras/Generic_SONOFF/Generic_SONOFF.ino) | C++ | 11 | 9 | 0 | 20 |
 | [library.properties](/library.properties) | Properties | 10 | 0 | 1 | 11 |
 | [plugins.code-workspace](/plugins.code-workspace) | JSON with Comments | 10 | 0 | 0 | 10 |
-| [src/H4PCommon.h](/src/H4PCommon.h) | C++ | 210 | 46 | 30 | 286 |
-| [src/H4P_AsyncMQTT.cpp](/src/H4P_AsyncMQTT.cpp) | C++ | 88 | 44 | 12 | 144 |
+| [src/H4PCommon.h](/src/H4PCommon.h) | C++ | 215 | 45 | 30 | 290 |
+| [src/H4P_AsyncMQTT.cpp](/src/H4P_AsyncMQTT.cpp) | C++ | 90 | 44 | 12 | 146 |
 | [src/H4P_AsyncMQTT.h](/src/H4P_AsyncMQTT.h) | C++ | 41 | 30 | 9 | 80 |
-| [src/H4P_AsyncWebServer.cpp](/src/H4P_AsyncWebServer.cpp) | C++ | 86 | 30 | 14 | 130 |
-| [src/H4P_AsyncWebServer.h](/src/H4P_AsyncWebServer.h) | C++ | 39 | 32 | 6 | 77 |
+| [src/H4P_AsyncWebServer.cpp](/src/H4P_AsyncWebServer.cpp) | C++ | 87 | 30 | 14 | 131 |
+| [src/H4P_AsyncWebServer.h](/src/H4P_AsyncWebServer.h) | C++ | 38 | 32 | 6 | 76 |
 | [src/H4P_BinarySwitch.h](/src/H4P_BinarySwitch.h) | C++ | 17 | 30 | 3 | 50 |
-| [src/H4P_BinaryThing.cpp](/src/H4P_BinaryThing.cpp) | C++ | 73 | 29 | 7 | 109 |
+| [src/H4P_BinaryThing.cpp](/src/H4P_BinaryThing.cpp) | C++ | 74 | 29 | 7 | 110 |
 | [src/H4P_BinaryThing.h](/src/H4P_BinaryThing.h) | C++ | 44 | 29 | 6 | 79 |
-| [src/H4P_CmdErrors.h](/src/H4P_CmdErrors.h) | C++ | 87 | 30 | 9 | 126 |
-| [src/H4P_ExternalSqWave.cpp](/src/H4P_ExternalSqWave.cpp) | C++ | 63 | 34 | 10 | 107 |
+| [src/H4P_CmdErrors.h](/src/H4P_CmdErrors.h) | C++ | 90 | 30 | 9 | 129 |
+| [src/H4P_ExternalSqWave.cpp](/src/H4P_ExternalSqWave.cpp) | C++ | 62 | 34 | 10 | 106 |
 | [src/H4P_ExternalSqWave.h](/src/H4P_ExternalSqWave.h) | C++ | 25 | 33 | 8 | 66 |
 | [src/H4P_FlasherController.cpp](/src/H4P_FlasherController.cpp) | C++ | 115 | 34 | 18 | 167 |
 | [src/H4P_FlasherController.h](/src/H4P_FlasherController.h) | C++ | 40 | 30 | 11 | 81 |
 | [src/H4P_GPIOManager.cpp](/src/H4P_GPIOManager.cpp) | C++ | 310 | 56 | 45 | 411 |
 | [src/H4P_GPIOManager.h](/src/H4P_GPIOManager.h) | C++ | 373 | 47 | 54 | 474 |
-| [src/H4P_HttpMySQLLogger.h](/src/H4P_HttpMySQLLogger.h) | C++ | 49 | 46 | 7 | 102 |
+| [src/H4P_HttpMySQLLogger.h](/src/H4P_HttpMySQLLogger.h) | C++ | 49 | 44 | 7 | 100 |
 | [src/H4P_LocalLogger.cpp](/src/H4P_LocalLogger.cpp) | C++ | 25 | 32 | 6 | 63 |
 | [src/H4P_LocalLogger.h](/src/H4P_LocalLogger.h) | C++ | 19 | 29 | 6 | 54 |
 | [src/H4P_MQTTHeapLogger.h](/src/H4P_MQTTHeapLogger.h) | C++ | 20 | 29 | 2 | 51 |
@@ -130,33 +129,35 @@ Total : 147 files,  9833 codes, 2780 comments, 2168 blanks, all 14781 lines
 | [src/H4P_MQTTQueueLogger.h](/src/H4P_MQTTQueueLogger.h) | C++ | 21 | 29 | 2 | 52 |
 | [src/H4P_MultiFunctionButton.cpp](/src/H4P_MultiFunctionButton.cpp) | C++ | 57 | 30 | 8 | 95 |
 | [src/H4P_MultiFunctionButton.h](/src/H4P_MultiFunctionButton.h) | C++ | 43 | 32 | 7 | 82 |
-| [src/H4P_PersistentStorage.cpp](/src/H4P_PersistentStorage.cpp) | C++ | 50 | 30 | 7 | 87 |
+| [src/H4P_PersistentStorage.cpp](/src/H4P_PersistentStorage.cpp) | C++ | 50 | 31 | 7 | 88 |
 | [src/H4P_PersistentStorage.h](/src/H4P_PersistentStorage.h) | C++ | 29 | 29 | 9 | 67 |
-| [src/H4P_PresenceDetector.cpp](/src/H4P_PresenceDetector.cpp) | C++ | 106 | 39 | 12 | 157 |
-| [src/H4P_PresenceDetector.h](/src/H4P_PresenceDetector.h) | C++ | 85 | 29 | 16 | 130 |
+| [src/H4P_PresenceDetector.cpp](/src/H4P_PresenceDetector.cpp) | C++ | 106 | 37 | 12 | 155 |
+| [src/H4P_PresenceDetector.h](/src/H4P_PresenceDetector.h) | C++ | 84 | 29 | 16 | 129 |
 | [src/H4P_QueueWarn.cpp](/src/H4P_QueueWarn.cpp) | C++ | 37 | 32 | 4 | 73 |
 | [src/H4P_QueueWarn.h](/src/H4P_QueueWarn.h) | C++ | 18 | 33 | 9 | 60 |
 | [src/H4P_RemoteUpdate.h](/src/H4P_RemoteUpdate.h) | C++ | 53 | 36 | 3 | 92 |
-| [src/H4P_SerialCmd.cpp](/src/H4P_SerialCmd.cpp) | C++ | 264 | 49 | 34 | 347 |
-| [src/H4P_SerialCmd.h](/src/H4P_SerialCmd.h) | C++ | 74 | 32 | 13 | 119 |
+| [src/H4P_SerialCmd.cpp](/src/H4P_SerialCmd.cpp) | C++ | 260 | 49 | 34 | 343 |
+| [src/H4P_SerialCmd.h](/src/H4P_SerialCmd.h) | C++ | 69 | 32 | 13 | 114 |
 | [src/H4P_SerialLogger.h](/src/H4P_SerialLogger.h) | C++ | 17 | 29 | 3 | 49 |
-| [src/H4P_Skeleton.cpp](/src/H4P_Skeleton.cpp) | C++ | 30 | 31 | 10 | 71 |
+| [src/H4P_Skeleton.cpp](/src/H4P_Skeleton.cpp) | C++ | 31 | 31 | 10 | 72 |
 | [src/H4P_Skeleton.h](/src/H4P_Skeleton.h) | C++ | 21 | 29 | 7 | 57 |
 | [src/H4P_TaskSniffer.cpp](/src/H4P_TaskSniffer.cpp) | C++ | 63 | 32 | 8 | 103 |
 | [src/H4P_TaskSniffer.h](/src/H4P_TaskSniffer.h) | C++ | 25 | 31 | 9 | 65 |
+| [src/H4P_Timekeeper.cpp](/src/H4P_Timekeeper.cpp) | C++ | 173 | 39 | 25 | 237 |
+| [src/H4P_Timekeeper.h](/src/H4P_Timekeeper.h) | C++ | 47 | 36 | 9 | 92 |
 | [src/H4P_UPNPServer.cpp](/src/H4P_UPNPServer.cpp) | C++ | 139 | 30 | 15 | 184 |
-| [src/H4P_UPNPServer.h](/src/H4P_UPNPServer.h) | C++ | 55 | 30 | 14 | 99 |
-| [src/H4P_WiFi.cpp](/src/H4P_WiFi.cpp) | C++ | 178 | 104 | 34 | 316 |
-| [src/H4P_WiFi.h](/src/H4P_WiFi.h) | C++ | 57 | 33 | 9 | 99 |
+| [src/H4P_UPNPServer.h](/src/H4P_UPNPServer.h) | C++ | 55 | 31 | 14 | 100 |
+| [src/H4P_WiFi.cpp](/src/H4P_WiFi.cpp) | C++ | 178 | 103 | 34 | 315 |
+| [src/H4P_WiFi.h](/src/H4P_WiFi.h) | C++ | 57 | 34 | 10 | 101 |
 | [src/H4P_WiFiSelect.h](/src/H4P_WiFiSelect.h) | C++ | 16 | 0 | 0 | 16 |
-| [src/H4Plugins.cpp](/src/H4Plugins.cpp) | C++ | 81 | 38 | 13 | 132 |
-| [src/H4Plugins.h](/src/H4Plugins.h) | C++ | 40 | 2 | 6 | 48 |
+| [src/H4Plugins.cpp](/src/H4Plugins.cpp) | C++ | 86 | 34 | 13 | 133 |
+| [src/H4Plugins.h](/src/H4Plugins.h) | C++ | 42 | 1 | 6 | 49 |
 | [src/asyncHTTPrequest.cpp](/src/asyncHTTPrequest.cpp) | C++ | 558 | 86 | 82 | 726 |
 | [src/asyncHTTPrequest.h](/src/asyncHTTPrequest.h) | C++ | 153 | 25 | 32 | 210 |
-| [src/config.h](/src/config.h) | C++ | 25 | 33 | 12 | 70 |
+| [src/config.h](/src/config.h) | C++ | 27 | 33 | 13 | 73 |
 | [src/h4p.vbs](/src/h4p.vbs) | Visual Basic | 6 | 0 | 1 | 7 |
 | [src/switch.ps1](/src/switch.ps1) | PowerShell | 6 | 12 | 1 | 19 |
-| [src/xbuf.cpp](/src/xbuf.cpp) | C++ | 228 | 20 | 22 | 270 |
 | [src/xbuf.h](/src/xbuf.h) | C++ | 41 | 35 | 10 | 86 |
+| [xbuf.cpp](/xbuf.cpp) | C++ | 228 | 20 | 22 | 270 |
 
 [summary](results.md)

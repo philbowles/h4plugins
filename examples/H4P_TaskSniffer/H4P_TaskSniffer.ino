@@ -1,5 +1,8 @@
+#define SMALL_Q       10
+#define Q_WARN_PCENT  50
+
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
+H4_USE_PLUGINS(115200,SMALL_Q,false) // Serial baud rate, Q size, SerialCmd autostop
 /*
     This i based on the QueueWarn example: you should run that first.
 
@@ -19,10 +22,6 @@ H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
       H4P_TaskSniffer h4ts({13,14,15}); dumps only tasks with IDs 13,14,15 ( equivalent to h4/include/13,14,15 )
 
 */
-#define SMALL_Q       10
-#define Q_WARN_PCENT  50
-
-H4 h4(115200,SMALL_Q); //auto-start Serial @ 115200, small Q of 10 to force a warning
 
 void qIsLow(bool inDanger){ 
   if(inDanger) {
@@ -30,8 +29,6 @@ void qIsLow(bool inDanger){
     h4cmd.dumpQ();
   }
 }
-
-
 
 H4P_QueueWarn h4qw(qIsLow,50); // call qIsLow when free Q drops below 50%
 H4P_TaskSniffer h4ts;

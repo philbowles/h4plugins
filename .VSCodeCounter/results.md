@@ -1,38 +1,38 @@
 # Summary
 
-Date : 2020-04-10 00:21:44
+Date : 2020-04-12 10:55:29
 
 Directory c:\Users\phil\Documents\Arduino\libraries\h4plugins
 
-Total : 147 files,  9833 codes, 2780 comments, 2168 blanks, all 14781 lines
+Total : 148 files,  10131 codes, 2851 comments, 2200 blanks, all 15182 lines
 
 [details](details.md)
 
 ## Languages
 | language | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| C++ | 102 | 5,386 | 2,763 | 934 | 9,083 |
-| Markdown | 21 | 2,418 | 0 | 1,205 | 3,623 |
+| C++ | 105 | 5,626 | 2,830 | 971 | 9,427 |
+| Markdown | 21 | 2,419 | 0 | 1,204 | 3,623 |
 | JSON | 2 | 1,216 | 0 | 2 | 1,218 |
-| HTML | 4 | 330 | 0 | 4 | 334 |
-| JavaScript | 4 | 158 | 5 | 15 | 178 |
+| HTML | 2 | 238 | 0 | 2 | 240 |
+| CSS | 2 | 220 | 0 | 0 | 220 |
+| JavaScript | 4 | 216 | 9 | 13 | 238 |
 | XML | 6 | 150 | 0 | 4 | 154 |
-| CSS | 2 | 129 | 0 | 0 | 129 |
 | JSON with Comments | 2 | 18 | 0 | 0 | 18 |
 | Properties | 1 | 10 | 0 | 1 | 11 |
-| Visual Basic | 1 | 6 | 0 | 1 | 7 |
 | Batch | 1 | 6 | 0 | 1 | 7 |
+| Visual Basic | 1 | 6 | 0 | 1 | 7 |
 | PowerShell | 1 | 6 | 12 | 1 | 19 |
 
 ## Directories
 | path | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| . | 147 | 9,833 | 2,780 | 2,168 | 14,781 |
-| SPIFFS | 8 | 336 | 0 | 7 | 343 |
-| SPIFFS\data | 7 | 330 | 0 | 6 | 336 |
-| data | 7 | 329 | 0 | 6 | 335 |
+| . | 148 | 10,131 | 2,851 | 2,200 | 15,182 |
+| SPIFFS | 7 | 364 | 2 | 5 | 371 |
+| SPIFFS\data | 6 | 358 | 2 | 4 | 364 |
+| data | 6 | 358 | 2 | 4 | 364 |
 | docs | 19 | 2,215 | 0 | 1,111 | 3,326 |
-| examples | 59 | 2,469 | 1,081 | 293 | 3,843 |
+| examples | 60 | 2,479 | 1,081 | 294 | 3,854 |
 | examples\H4FC_ActiveLow | 1 | 12 | 7 | 3 | 22 |
 | examples\H4FC_Basic | 1 | 20 | 5 | 5 | 30 |
 | examples\H4FC_Integrated | 1 | 13 | 8 | 4 | 25 |
@@ -86,9 +86,10 @@ Total : 147 files,  9833 codes, 2780 comments, 2168 blanks, all 14781 lines
 | examples\H4P_SerialCmd | 1 | 13 | 13 | 4 | 30 |
 | examples\H4P_TaskSniffer | 1 | 42 | 31 | 6 | 79 |
 | examples\H4_TaskNames | 1 | 35 | 20 | 5 | 60 |
-| examples\xtras | 2 | 58 | 10 | 5 | 73 |
+| examples\xtras | 3 | 68 | 10 | 6 | 84 |
 | examples\xtras\ChezToiioT_Config | 1 | 47 | 1 | 5 | 53 |
+| examples\xtras\Generic_ESP01S | 1 | 10 | 0 | 1 | 11 |
 | examples\xtras\Generic_SONOFF | 1 | 11 | 9 | 0 | 20 |
-| src | 51 | 4,318 | 1,699 | 677 | 6,694 |
+| src | 52 | 4,320 | 1,746 | 691 | 6,757 |
 
 [details](details.md)

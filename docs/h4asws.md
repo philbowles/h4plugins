@@ -54,7 +54,6 @@ void onDisconnect(void); // webserver is down
 void h4AddAwsHandlers(void) // called after adding its own handlers, adds your in here
 ```
 
-
 H4P_AsyncWebserver is a "wrapper" around the [ESPAsyncWebServer](https://github.com/philbowles/ESPAsyncWebServer) library and therefore any funtions offered by that library can be called on `h4asws.` for example `h4.asws.on(...)` to add your own handler inside the `h4AddAwsHandlers` callback.
 
 Do not register a handler for any of the following paths:
@@ -67,16 +66,9 @@ As those are use by the plugin itself
 
 ```cpp
 // Constructor
-H4P_AsyncWebServer(string admin="admin",string passwd="admin",H4_FN_VOID onConnect=[](){},H4_FN_VOID onDisconnect=[](){}):
-// admin is the authentication user name for browsers requireing the REST interfcae
-// passwd is the authentication password for browsers requireing the REST interfcae
+H4P_AsyncWebServer(H4_FN_VOID onConnect=[](){},H4_FN_VOID onDisconnect=[](){}):
 // onConnect = user callback when webserver is up
 // onDisconnect = user callback when webserver is down
-
-// Command and control
-void restart();
-void start();
-void stop();
 ```
 
 [Example Code](../examples/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
@@ -99,7 +91,6 @@ When "prettified" it looks like this:
    "lines":[ 
       "user=",
       "gs=Get",
-      "auser=admin",
       "h4pv=0.5.1",
       "state=0",
       "udn=Socket-1_0-upnp17D848",
@@ -114,7 +105,6 @@ When "prettified" it looks like this:
       "mpasswd=",
       "h4v=0.4.0",
       "chip=17D848",
-      "apasswd=admin",
       "ip=192.168.1.104",
       "board=WEMOS_D1MINI",
       "name=Demo Switch",

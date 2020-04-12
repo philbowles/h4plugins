@@ -8,6 +8,7 @@
 #include<H4P_SerialLogger.h>
 #include<H4P_ExternalSqWave.h>
 #include<H4P_TaskSniffer.h>
+#include<H4P_HeapWarn.h>
 #include<H4P_QueueWarn.h>
 #include<H4P_GPIOManager.h>
 #include<H4P_FlasherController.h>

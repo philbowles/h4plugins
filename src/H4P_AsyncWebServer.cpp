@@ -40,7 +40,6 @@ void  H4P_AsyncWebServer::_hookIn(){
 }
 
 void H4P_AsyncWebServer::_rest(AsyncWebServerRequest *request){
-	if(!_webAuth(request)) return;
 	h4.queueFunction(bind([this](AsyncWebServerRequest *request){
         H4EVENT("_rest %s",request->client()->remoteIP().toString().c_str());
 		string chop=replaceAll(CSTR(request->url()),"/rest/","");
@@ -112,15 +111,6 @@ void H4P_AsyncWebServer::_start(){
 void H4P_AsyncWebServer::_stop(){ 
     end();
     _downHooks();
-}
-
-bool H4P_AsyncWebServer::_webAuth(AsyncWebServerRequest *request){
-	if(_cb[userTag()]!=""){
-		if(!request->authenticate(CSTR(_cb["auser"]),CSTR(_cb["apasswd"]),NULL,false)) {
-			request->requestAuthentication(NULL,false);
-			return false;
-		}
-	} return true;
 }
 
 String H4P_AsyncWebServer::aswsReplace(const String& var){
