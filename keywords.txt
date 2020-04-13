@@ -43,13 +43,16 @@ H4P_H4DetectorSource	KEYWORD1
 H4P_MDNSDetector	KEYWORD1
 H4P_MDNSDetectorSource	KEYWORD1
 H4P_RemoteUpdate	KEYWORD1
+H4P_HeapWarn	KEYWORD1
+H4P_LoopCount	KEYWORD1
 H4P_Timekeeper	KEYWORD1
 
 #######################################
 # Methods and Functions (	KEYWORD2)
 #######################################
-
 addCmd	KEYWORD2
+at	KEYWORD2
+atSource	KEYWORD2
 all	KEYWORD2
 both	KEYWORD2
 AnalogThreshold	KEYWORD2
@@ -57,7 +60,10 @@ AnalogThresholdSource	KEYWORD2
 change	KEYWORD2
 Circular	KEYWORD2
 clear	KEYWORD2
+clockTime	KEYWORD2
 config	KEYWORD2
+daily	KEYWORD2
+dailySource	KEYWORD2
 Debounced	KEYWORD2
 DebouncedSource	KEYWORD2
 dec	KEYWORD2
@@ -106,8 +112,10 @@ LatchingSource	KEYWORD2
 logEvent	KEYWORD2
 logicalRead	KEYWORD2
 logicalWrite	KEYWORD2
+msSinceMidnight	KEYWORD2
 Multistage	KEYWORD2
 Output	KEYWORD2
+parseTime	KEYWORD2
 pcent	KEYWORD2
 plugins	KEYWORD2
 Polled	KEYWORD2
@@ -128,6 +136,8 @@ setCenter	KEYWORD2
 setint	KEYWORD2
 setMax	KEYWORD2
 setMin	KEYWORD2
+setSchedule	KEYWORD2
+setScheduleSource	KEYWORD2
 setPercent	KEYWORD2
 setstring	KEYWORD2
 setValue	KEYWORD2
@@ -138,6 +148,8 @@ start	KEYWORD2
 state	KEYWORD2
 stop	KEYWORD2
 stopLED	KEYWORD2
+strTime	KEYWORD2
+sync	KEYWORD2
 subscribeDevice	KEYWORD2
 throttle	KEYWORD2
 Timed	KEYWORD2
@@ -146,10 +158,11 @@ toggle	KEYWORD2
 turn	KEYWORD2
 turnOff	KEYWORD2
 turnOn	KEYWORD2
+tz	KEYWORD2
 unsubscribeDevice	KEYWORD2
 update	KEYWORD2
+upTime	KEYWORD2
 write	KEYWORD2
-	
 
 #######################################
 # Constants (	LITERAL11)
@@ -178,3 +191,6 @@ H4P_FN_PSCHANGE	LITERAL1
 H4GM_COMPARE	LITERAL1
 H4GM_LESS	LITERAL1
 H4GM_GREATER	LITERAL1
+
+H4P_DURATION	LITERAL1
+H4P_SCHEDULE	LITERAL1

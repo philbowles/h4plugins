@@ -53,6 +53,7 @@ grid-gap: 15px;
     color:white;
     width: 285px;
     height:160px;
+    cursor: pointer;
 }
 #header {
 grid-row-start: 1;

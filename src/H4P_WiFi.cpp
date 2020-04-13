@@ -54,6 +54,7 @@ void H4P_WiFi::_gotIP(){
 	ArduinoOTA.setRebootOnSuccess(false);	
 	ArduinoOTA.begin();
     _cb.erase("opts"); // lose any old AP ssids
+    Serial.printf("IP=%s\n",CSTR(_cb["ip"])); // unconditional
     H4EVENT("IP=%s",CSTR(_cb["ip"]));
     _upHooks();
 }

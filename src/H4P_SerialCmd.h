@@ -76,7 +76,7 @@ class H4P_SerialCmd: public H4Plugin {
             H4Plugin::_start();
         }
         void            _stop() override {
-            bool b=h4._unHook(_subCmd);
+            h4._unHook(_subCmd);
             H4Plugin::_stop();
         }
     public:

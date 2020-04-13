@@ -27,38 +27,35 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_QueueWarn_HO
-#define H4P_QueueWarn_HO
+#ifndef H4P_Skeleton_H
+#define H4P_Skeleton_H
 
 #include<H4PCommon.h>
 
-class H4P_QueueWarn: public H4Plugin {
-    //protected:
-        VSCMD(_qwPcent);
-//
-        uint32_t                limit;
-        uint32_t                maxq=0;
+STAG(skel);
 
-        function<void(bool)>    f;
+class H4P_Skeleton: public H4Plugin {
+        VSCMD(_bones);
 
-        uint32_t        __setLimit(uint32_t v);
-
-        void            _run();
-        void            _start() override {
-            h4._hookLoop([this](){ _run(); },_subCmd);
-            H4Plugin::_start();
-        }
-        void            _stop() override {
-            h4._unHook(_subCmd);
-            H4Plugin::_stop();
-        }
+                void        _hookIn() override;
+                void        _greenLight() override;
+                void        _start() override {
+                    h4._hookLoop([this](){ _run(); },_subCmd);
+                    H4Plugin::_start();
+                }
+                void        _stop() override {
+                    h4._unHook(_subCmd);
+                    H4Plugin::_stop();
+                }
+                bool        _state() override;
+                void        _run(); // rare
     public:
-        H4P_QueueWarn(function<void(bool)> _f,uint32_t _limit=50);
+        H4P_Skeleton(const string& name,H4_FN_VOID onStart=nullptr,H4_FN_VOID onStop=nullptr);
 
-        void        show() override;
-        void        pcent(uint32_t pc);
+        void rattle();
+        
+        void start();
+        void stop();
 };
 
-extern __attribute__((weak)) H4P_QueueWarn h4qw;
-
-#endif // H4P_QueueWarn_H
+#endif // H4P_Skeleton_H

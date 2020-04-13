@@ -27,30 +27,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_Skeleton_H
-#define H4P_Skeleton_H
+#ifndef H4P_LoopCount_HO
+#define H4P_LoopCount_HO
+
+extern __attribute__((weak)) uint32_t h4Nloops=0;
 
 #include<H4PCommon.h>
+/*
+        This will only work if you edit inc/H4.h in the H4 library to include:
 
-STAG(spine);
-STAG(hip);
-STAG(knee);
-STAG(ankle);
+        #define H4_COUNT_LOOPS true
 
-class H4P_Skeleton: public H4Plugin {
-        VSCMD(_bones);
-    protected:
-        virtual void        _hookIn() override;
-        virtual void        _greenLight() override;
-        virtual void        _start() override;
-        virtual bool        _state() override;
-        virtual void        _stop() override;
+        You will get a slightly better performance if you also include
 
-        void            _run(); // rare
+        #define H4_NO_USERLOOP      // improves performance
+
+        but h4UserLoop will not get called!
+
+*/
+class H4P_LoopCount: public H4Plugin {
+            uint32_t    _freq;
+
+            void        _start() override {
+                h4.every(_freq,[]{
+                    Serial.printf("%u\n",h4Nloops);
+                    h4Nloops=0;
+                },nullptr,H4P_TRID_LOOP,true);
+            }
+
+            void        _stop() override { h4.cancelSingleton(H4P_TRID_LOOP); }
+
     public:
-        H4P_Skeleton(const string& name,H4_FN_VOID onStart=nullptr,H4_FN_VOID onStop=nullptr);
-
-        void rattle();
+        H4P_LoopCount(uint32_t freq=1000): _freq(freq), H4Plugin("loop"){ h4Nloops=0; }
 };
 
-#endif // H4P_Skeleton_H
+#endif // H4P_LoopCount_H

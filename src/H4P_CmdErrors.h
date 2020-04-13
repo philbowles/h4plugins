@@ -101,7 +101,8 @@ class H4P_CmdErrors: public H4Plugin {
             {H4P_TRID_TIME,"TIME"},
             {H4P_TRID_SYNC,"SYNC"},
             {H4P_TRID_DALY,"DALY"},
-            {H4P_TRID_SHOT,"AT_T"}
+            {H4P_TRID_SHOT,"AT_T"},
+            {H4P_TRID_LOOP,"LOOP"}
         };
         virtual void        _greenLight(){ start(); }
     public:

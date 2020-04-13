@@ -114,19 +114,10 @@ void H4P_SerialCmd::_flattenCmds(function<void(string)> fn,string cmd,string pre
         }
     }
 }
-/*
-uint32_t H4P_SerialCmd::_global(vector<string> vs){
-    if(vs.size()<2) return H4_CMD_TOO_FEW_PARAMS;
-    if(vs.size()>2) return H4_CMD_TOO_MANY_PARAMS;
-    _cb[vs[0]]=H4PAYLOAD;
-    H4EVENT("Global %s=%s",CSTR(vs[0]),CSTR(H4PAYLOAD));
-    return H4_CMD_OK;
-}
-*/
+
 void H4P_SerialCmd::_hookIn(){
 #ifndef ARDUINO_ARCH_STM32    
     SPIFFS.begin();
-//    if(isLoaded(mqttTag())) h4mqtt.hookConnect([this](){ h4mqtt.subscribeDevice("global/#",CMDVS(_global),H4PC_H4); }); 
 #endif
 }
 
@@ -192,8 +183,11 @@ uint32_t H4P_SerialCmd::_svcControl(H4P_SVC_CONTROL svc,vector<string> vs){
 }
 
 uint32_t H4P_SerialCmd::_svcRestart(vector<string> vs){ return _svcControl(H4PSVC_RESTART,vs); }
+
 uint32_t H4P_SerialCmd::_svcStart(vector<string> vs){ return _svcControl(H4PSVC_START,vs); }
+
 uint32_t H4P_SerialCmd::_svcInfo(vector<string> vs){ return _svcControl(H4PSVC_STATE,vs); }
+
 uint32_t H4P_SerialCmd::_svcStop(vector<string> vs){ return _svcControl(H4PSVC_STOP,vs); }
 
 void H4P_SerialCmd::help(){ 
@@ -282,12 +276,15 @@ void H4P_SerialCmd::dumpQ(){
     for(auto const& t:tlist) reply(CSTR(_dumpTask(t)));
 }
 
-void  H4P_SerialCmd::plugins(){ 
+void  H4P_SerialCmd::plugins(){
+//    uint32_t heap=ESP.getFreeHeap();
+//    if(heap > H4P_SAFE_MINIMUM){
     for(auto const& p:H4Plugin::_plugins){
         reply("h4/svc/info/%s %s ID=%d",CSTR(p->_pName),p->_state() ? "UP":"DN",p->_subCmd);
         p->show();
         reply("");
     }
+//    } else reply("Heap too low %d",heap);
 }
 
 #ifndef ARDUINO_ARCH_STM32

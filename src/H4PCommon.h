@@ -101,7 +101,6 @@ STAG(board)
 STAG(broker);
 STAG(cerr);
 STAG(chip);
-//STAG(curl);
 STAG(device);
 STAG(esqw);
 STAG(gpio);
@@ -152,6 +151,8 @@ STAG(wifi);
     #define h4UserEvent(x,...)
 #endif
 
+#define HOOK_IF_LOADED(x) { H4Plugin* p=isLoaded(x##Tag()); \
+            if(p) { p->hookConnect([this](){ start(); }); p->hookDisconnect([this](){ stop(); }); }}
 #define DEPEND(x) { H4Plugin* p=isLoaded(x##Tag()); \
             if(p) { p->hookConnect([this](){ start(); });p->hookDisconnect([this](){ stop(); }); }\
             else { DEPENDFAIL(x) } }
@@ -191,6 +192,7 @@ enum trustedIds {
   H4P_TRID_TIME,
   H4P_TRID_SYNC,
   H4P_TRID_DALY,
+  H4P_TRID_LOOP,
   H4P_TRID_SHOT
 };
 

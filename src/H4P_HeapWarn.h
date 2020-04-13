@@ -33,28 +33,28 @@ SOFTWARE.
 #include<H4PCommon.h>
 
 class H4P_HeapWarn: public H4Plugin {
-    /*
         VSCMD(_hwPcent);
-//
+
         function<void(bool)>    _f;
         uint32_t                _initial;
         uint32_t                _limit;
         uint32_t                _minh=0;
 
-         void        _hookIn() override {}
-         void        _greenLight() override {}; // no autostart
-         void        _start() override {}
-         void        _stop() override {}
-        void            _run();
-        uint32_t        _setLimit(uint32_t v);
-*/
+            void        _run();
+            uint32_t    _setLimit(uint32_t v);
+            void        _start() override {
+                h4._hookLoop([this](){ _run(); },_subCmd);
+                H4Plugin::_start();
+            }
+            void        _stop() override {
+                h4._unHook(_subCmd);
+                H4Plugin::_stop();
+            }
     public:
-        H4P_HeapWarn(function<void(bool)> _f,uint32_t pcent=50);
+        H4P_HeapWarn(function<void(bool)> f,uint32_t pc=50);
 
-//        void        show() override;
-//        void        pcent(uint32_t pc);
+        void        show() override;
+        void        pcent(uint32_t pc);
 };
 
-extern __attribute__((weak)) H4P_HeapWarn h4hw;
-
-#endif // H4P_HeapWarn_H
+#endif // H4P_HeapWarn_Hs

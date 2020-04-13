@@ -420,7 +420,7 @@ class H4P_GPIOManager: public H4Plugin{//
         }
         void                _start() override;
         void                _stop() override {
-            bool b=h4._unHook(_subCmd);
+            h4._unHook(_subCmd);
             h4.cancelSingleton(H4P_TRID_GPIO);
             H4Plugin::_stop();
         }

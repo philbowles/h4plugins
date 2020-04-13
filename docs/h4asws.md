@@ -91,7 +91,7 @@ When "prettified" it looks like this:
    "lines":[ 
       "user=",
       "gs=Get",
-      "h4pv=0.5.1",
+      "h4pv=0.5.4",
       "state=0",
       "udn=Socket-1_0-upnp17D848",
       "muser=",
@@ -138,7 +138,6 @@ H4_INT_MAP  cmdErrors={
 
 * [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Blog](https://8266iot.blogspot.com)
-* [Facebook Esparto Support / Discussion](https://www.facebook.com/groups/esparto8266/)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)

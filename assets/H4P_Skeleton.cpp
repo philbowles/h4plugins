@@ -30,7 +30,6 @@ SOFTWARE.
 #include<H4P_Skeleton.h>
 
 H4P_Skeleton::H4P_Skeleton(const string& name,H4_FN_VOID onStart,H4_FN_VOID onStop): H4Plugin(name,onStart,onStop){
-    h4._hookLoop([this](){ _run(); },_subCmd);
     _rebootHook=[this](){ reply("FREE SOME RESOURCES\n"); };
     _factoryHook=[this](){ reply("CLEAN UP SOME SHIT\n"); };
     _cmds={
@@ -38,6 +37,11 @@ H4P_Skeleton::H4P_Skeleton(const string& name,H4_FN_VOID onStart,H4_FN_VOID onSt
         {"rattle",     { _subCmd,         0, CMD(rattle)}}, // h4/ME/rattle
         {"bones",      { _subCmd,         0, CMDVS(_bones)}} // h4/ME/bones[PL]
     }; 
+}
+
+uint32_t H4P_Skeleton::_bones(vector<string> vs){
+     Serial.print(CSTR(_pName));Serial.print(" _bones PAYLOAD=");Serial.println(CSTR(H4PAYLOAD));
+     return H4_CMD_OK;
 }
 
 void H4P_Skeleton::_hookIn(){
@@ -50,22 +54,16 @@ void H4P_Skeleton::_greenLight(){
     start();
 }
 
-void H4P_Skeleton::_start(){
-     Serial.print(CSTR(_pName));Serial.println(" _start"); 
-}
-
-void H4P_Skeleton::_stop(){
-    Serial.print(CSTR(_pName));Serial.println(" _stop"); 
-}
-
 void H4P_Skeleton::_run(){
 // once per loop - be very very careful
 }
 
-//
-uint32_t H4P_Skeleton::_bones(vector<string> vs){
-     Serial.print(CSTR(_pName));Serial.print(" _bones PAYLOAD=");Serial.println(CSTR(H4PAYLOAD));
-     return H4_CMD_OK;
+void H4P_Skeleton::rattle(){ Serial.print(CSTR(_pName));Serial.println(" rattle!"); }
+
+void H4P_Skeleton::start(){
+     Serial.print(CSTR(_pName));Serial.println(" _start"); 
 }
 
-void H4P_Skeleton::rattle(){ Serial.print(CSTR(_pName));Serial.println(" rattle!"); }
+void H4P_Skeleton::stop(){
+    Serial.print(CSTR(_pName));Serial.println(" _stop"); 
+}

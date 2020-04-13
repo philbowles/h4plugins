@@ -32,7 +32,6 @@ SOFTWARE.
 #include<H4P_WiFiSelect.h>
 #include<H4P_WiFi.h>
 #include<H4P_AsyncMQTT.h>
-//#ifndef H4P_NO_WIFI
 
 void H4P_MultiFunctionButton::progress(H4GPIOPin* ptr){ // run this as each stage changes
     H4GM_PIN(Multistage); // Create the correct pointer type in 'pin'
@@ -70,9 +69,9 @@ void H4P_MultiFunctionButton::_stop(){
 
 void H4P_MultiFunctionButton::_hookIn(){
     REQUIREBT;
+    HOOK_IF_LOADED(wifi);
     DEPEND(wink);
     _createMS();
-
     if(isLoaded(mqttTag())){
         h4mqtt.hookConnect([this](){ h4fc.stopLED(_led); });
         h4mqtt.hookDisconnect([this](){ h4fc.flashPattern("10100000",H43F_TIMEBASE,_led,_active); });

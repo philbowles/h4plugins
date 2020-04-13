@@ -56,7 +56,7 @@ void H4P_AsyncWebServer::_rest(AsyncWebServerRequest *request){
             if(fl.size()) fl.pop_back();
         }
         j+=fl+"]}";
-        Serial.printf("LINES %s\n",CSTR(j));
+//        Serial.printf("LINES %s\n",CSTR(j));
         request->send(200,"application/json",CSTR(j));
         lines.clear();
 	},request),nullptr,H4P_TRID_ASWS);

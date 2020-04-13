@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function() {
     else {
         document.getElementById("ap").style.display='none'
         document.getElementById("sta").style.display='inline-grid'
-       if(hasonof){
+        if(hasonof){
             onof=document.getElementById("onof");
             onof.parentNode.style.display='block'
             onof.addEventListener('click', function(e){ ajax("h4/toggle",false); });
