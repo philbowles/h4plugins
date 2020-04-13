@@ -76,9 +76,9 @@ void H4P_UPNPServer::_listenUDP(){
                         if (msg[0] == 'N') { //OTIFY
                             string usn=uhdrs["USN"];
                             if(_detect.count(usn)) _detect[usn](mx,uhdrs);
-                        }// else Serial.printf("WTF??? %s\n",CSTR(msg));
+                        }
                     } 
-                } else Serial.printf("msg fail too short!!! *%s*\n",CSTR(msg));
+                }
             },stringFromBuff(packet.data(), packet.length()),packet.remoteIP(), packet.remotePort()),nullptr, H4P_TRID_UDPM);
         });
     }
@@ -144,7 +144,7 @@ void H4P_UPNPServer::_upnp(AsyncWebServerRequest *request){ // redo
 #else
         if(_cb["gs"]=="Set") _btp->turn(_set);
 #endif
-        _cb[stateTag()]=stringFromInt(_btp->_getState());
+        _cb[stateTag()]=stringFromInt(_btp->state());
         request->send(200, "text/xml", CSTR(replaceParams(_soap))); // refac
     },request),nullptr, H4P_TRID_SOAP);
 }
@@ -156,8 +156,8 @@ void H4P_UPNPServer::_stop(){
     _downHooks();
 }
 
-void H4P_UPNPServer::_notify(const string& phase){ // chunker it up
-    chunker<vector<string>>(_pups,[this,phase](vector<string>::const_iterator i){ 
+void H4P_UPNPServer::_notify(const string& phase){ // h4Chunker it up
+    h4Chunker<vector<string>>(_pups,[this,phase](vector<string>::const_iterator i){ 
         string NT=(*i).size() ? (*i):__makeUSN("");
         string nfy="NOTIFY * HTTP/1.1\r\nHOST:"+string(_ubIP.toString().c_str())+":1900\r\nNTS:ssdp:"+phase+"\r\nNT:"+NT+"\r\n"+__upnpCommon((*i));
         broadcast(H4P_UDP_JITTER,CSTR(nfy));

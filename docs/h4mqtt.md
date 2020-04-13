@@ -12,11 +12,15 @@
 
 H4 MQTT Manager controls all aspects of MQTT connection and reconnection after failure. It allows the main body of your code to keep on running if MQTT fails and will automatically re-connect "in the background" when MQTT becomes available again. It also allows "on-the-fly" connection to a different server and maintains a list of all other H4 devices on the local network.
 
-H4 MQTT Manager is a "wrapper" around the well-known and stable "pubSubClient" library, thus all API functions in that library are available to the user as well as several additional H4 functions.
+H4 MQTT Manager is a "wrapper" around the "Async MQTT Client" library, thus all API functions in that library are available to the user as well as several additional H4 functions.
 
 All H4 commands have identical syntax across all H4Plugins. When a command is sent from MQTT, it needs an additional prefix, which controls which of your devices receives the message. 
 
-H4P_AsyncMQTT automatically subscribes to some special topics: `all/#`, `< your device name >/#`, `< your board type >/#` and `< your board's unique chip ID >/#`
+H4P_AsyncMQTT automatically subscribes to some special topics: 
+* `all/#`
+* `< your device name >/#`
+* `< your board type >/#`
+* `< your board's unique chip ID >/#`
 
 Assuming the actual command is `h4/reboot` then:
 
@@ -27,7 +31,7 @@ WEMOS_D1MINI/h4/reboot // reboots every H4 device running on a Wemos D1 mini boa
 mydevice/h4/reboot // reboots only the device whose local name is "mydevice"
 ```
 
-Most often you will use the last form to address one specific device.
+Most often you will use the last form to target one specific device.
 
 ## (* Do not rely on this form, it is likely to be removed in the next release)
 
@@ -37,7 +41,7 @@ Most often you will use the last form to address one specific device.
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 
 H4P_WiFi h4wifi(...
 H4P_AsyncMQTT h4mqtt(...
@@ -51,16 +55,10 @@ H4P_AsyncMQTT h4mqtt(...
 
 * h4/show/mqtt
 * h4/mqtt/change/w,x,y,z (payload: w=newbroker, x=newport, y=newusername, z=newpassword)
-* h4/mqtt/grid (show all local H4 devices)
-* h4/mqtt/restart
-* h4/mqtt/start
-* h4/mqtt/stop
 
 ## Topics automatically published
 
-H4P_AsyncMQTT publishes `all/h4/mqtt/online` when it connects up and `all/h4/mqtt/online` when it loses the MQTT connection, both with a payload of < your device name > . This allows 3rd party software e.g. NODE-RED as well as H4P_AsyncMQTT itself to maintain a list of all devices on the network, providing of course that the current device isn't the one causing the "offline" status :)
-
-This requires that those corresponding commands are publicly exposed / available, but *they should never be invoked by the user*
+H4P_AsyncMQTT publishes `h4/online` when it connects up and `h4/online` when it loses the MQTT connection, both with a payload of < your device name > . This allows 3rd party software e.g. NODE-RED to maintain a list of all devices on the network, providing of course that the current device isn't the one causing the "offline" status :)
 
 ## Callbacks
 
@@ -98,7 +96,7 @@ Once you have done this you will then also need to provide a "topic handler" fun
 
 ## The message itself
 
-As already mentioned you can call any method of the [Arduino pubsubclient library](https://github.com/knolleary/pubsubclient) using e.g. `h4mqtt.subscribe(...`  In this case you will be responsible for defining the callback and parsing (splitting apart and "understanding",validating and responding to the message and the payload. This can be quite tricky if you are new to it and has a number of issues that can cause big problems:
+As already mentioned you can call any method of the Async MQTT Client library using e.g. `h4mqtt.subscribe(...`  In this case you will be responsible for defining the callback and parsing (splitting apart and "understanding",validating and responding to) the message and the payload. This can be quite tricky if you are new to it and has a number of issues that can cause big problems:
 
 * The message callback is very much like an Interrupt Service Routine ("ISR") and what you can do inside it is very limited.
 * Calling publish inside a subscribe callback function is a recipe for disaster
@@ -122,23 +120,20 @@ vs[0]=whatever was in the message payload
 
 You may wonder why you get a `vector<string>` when there is only 1 item: the payload, but this will become obvious later when we talk about subtopics and wildcards.
 
-No matter how many parts there are to the message, the payload is always the last item. To make life easier H4 has macros `H4PAYLOAD` if you are expecting a string and `H4PAYLOAD_INT` if you are expecting a number. 
-
-Also there is a global string called `H4_MQTT::target` which will contain the message prefix (see above) such as "all" or "mything" or "WEMOS_D1MINI" depending on how/why you received this message. Normally you don't need to know this, but it's there if you want it.
+No matter how many parts there are to the message, the payload is always the last item. To make life easier H4 has macros `H4PAYLOAD` if you are expecting a string and `H4PAYLOAD_INT` if you are expecting a number.
 
 Your callback then "does it thing" but *must* return a value showing if it succeeded or not. It can be any of the following:
 
 ```cpp
-enum H4_CMD_ERROR:uint32_t  {
-    H4_CMD_OK,
-    H4_CMD_UNKNOWN,
-    H4_CMD_TOO_FEW_PARAMS,
-    H4_CMD_TOO_MANY_PARAMS,
-    H4_CMD_NOT_NUMERIC,
-    H4_CMD_OUT_OF_BOUNDS,
-    H4_CMD_NAME_UNKNOWN,
-    H4_CMD_PAYLOAD_FORMAT,
-    H4_CMD_PROHIBITED
+H4_INT_MAP  cmdErrors={
+    {H4_CMD_OK,"OK"},
+    {H4_CMD_UNKNOWN,"Unknown cmd"},
+    {H4_CMD_TOO_FEW_PARAMS,"Too few parameters"},
+    {H4_CMD_TOO_MANY_PARAMS,"Too many parameters"},
+    {H4_CMD_NOT_NUMERIC,"Numeric value expected"},
+    {H4_CMD_OUT_OF_BOUNDS,"Value out of range"},
+    {H4_CMD_NAME_UNKNOWN,"Name not known"},
+    {H4_CMD_PAYLOAD_FORMAT,"Incorrect Payload Format"}
 };
 ```
 
@@ -160,7 +155,7 @@ uint32_t myCallback(vector<string> vs){
 h4mqtt.subscribeDevice("mytopic",myCallback); // MUST be done from inside onConnect callback
 ```
 
-[Example Code](../examples/H4P_MQTT_Simple/MQTT_Simple.ino)
+[Example Code](../examples/H4P_MQTT_Simple/H4P_MQTT_Simple.ino)
 
 ## Subtopics
 
@@ -218,7 +213,7 @@ vs.size() == 1
 
 As you can see, this could get complicated when multiple subtopics are required, which is why the world invented MQTT wildcards.
 
-[Example Code](../examples/H4MQTT/MQTT_Wildcards/MQTT_Wildcards.ino)
+[Example Code](../examples/H4MQTT/H4P_MQTT_Wildcards/H4P_MQTT_Wildcards.ino)
 
 ## Wildcard topics
 
@@ -258,10 +253,6 @@ H4P_AsyncMQTT(string ssid,string psk,string device="",H4_FN_VOID onConnect=[](){
 void change(string broker,uint16_t port); // switch to new MQTT broker
 void publishDevice(string topic,string payload=""); // publish <device>/topic with string payload
 void publishDevice(string topic,uint32_t payload); // publish <device>/topic with numeric payload
-void restart(); // stop then start
-void showGrid(); // display all local H4 devices
-void start();
-void stop();
 void subscribeDevice(string topic,H4_FN_MSG f); // call f when <device>/topic message received
 void unsubscribeDevice(string topic);
 ```
@@ -270,7 +261,7 @@ void unsubscribeDevice(string topic);
 
 ## "Tweakables"
 
-The following values are defined in `H4PConfig.h` . They are chosen initally to set a good balance between stability, performance and memory / stack usage. *It is not advisable to change them unless you know exactly what you are doing and why*. 
+The following values are defined in `config.h` . They are chosen initally to set a good balance between stability, performance and memory / stack usage. *It is not advisable to change them unless you know exactly what you are doing and why*. 
 
 **N.B.** **Support will not be provided if any of these values are changed.**
 
@@ -288,7 +279,6 @@ Making it smaller will clear the queue and make the mesages arrive at the server
 
 * [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Blog](https://8266iot.blogspot.com)
-* [Facebook Esparto Support / Discussion](https://www.facebook.com/groups/esparto8266/)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)

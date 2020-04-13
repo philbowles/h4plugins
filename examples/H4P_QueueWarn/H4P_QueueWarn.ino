@@ -1,11 +1,8 @@
-#include<H4Plugins.h>
-H4_USE_PLUGINS
-
 #define SMALL_Q       10
 #define Q_WARN_PCENT  50
 
-H4 h4(115200,SMALL_Q); //auto-start Serial @ 115200, small Q of 10 to force a warning
-
+#include<H4Plugins.h>
+H4_USE_PLUGINS(115200,SMALL_Q,false) // Serial baud rate, Q size, SerialCmd autostop
 
 void qIsLow(bool inDanger){ 
     Serial.print("Q capacity is ");Serial.println(SMALL_Q);
@@ -16,7 +13,6 @@ void qIsLow(bool inDanger){
     else Serial.println("Disaster Averted"); 
 }
 
-H4P_SerialCmd h4sc;
 H4P_QueueWarn h4qw(qIsLow,50); // call qIsLow when free Q drops below 50%
 /*
     Open Serial monitor and try typing any of the following:

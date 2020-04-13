@@ -20,17 +20,16 @@ It is intended purely for expert debugging and is not normally required or used.
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 H4P_QueueWarn h4qw(...
 ```
 
 ## Dependencies
 
-none, but must be created after [**H4P_SerialCmd**](h4sc.md) if using that plugin
+none
 
 ## Commands Added
 
-* h4/show/qwrn
 * h4/qwrn/pcent/< some sensible percentage>
 
 ## Callbacks
@@ -49,18 +48,18 @@ void onQueueWarning(bool) // called after switch state changes
 //  limit = "safe" percentage
 H4P_QueueWarn(function<void(bool)> onQueueWarning,uint32_t _limit=50);
 
-void        show(); // Display current setting (converted to safe numer of tasks)
+void        show(); // Display current setting / usage
 void        pcent(uint32_t pc); // Set new "safe" percentage
 ```
 
 [Example code](../examples/H4P_QueueWarn/H4P_QueueWarn.ino)
 
-----
+---
+
 (c) 2020 Phil Bowles h4plugins@gmail.com
 
 * [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Blog](https://8266iot.blogspot.com)
-* [Facebook Esparto Support / Discussion](https://www.facebook.com/groups/esparto8266/)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)

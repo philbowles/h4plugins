@@ -1,7 +1,5 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS
-
-H4 h4(115200); // setes Serial to 115200, default to 20 tasks
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 /*
 
 Optional: Allows you to "tag" your tasks with a name* so that you can find them
@@ -21,12 +19,13 @@ const char* giveTaskName(uint32_t n){
   return mydata.count(n) ? mydata[n].c_str():"ANON";
 }
 // if you don't want task naming, just delete the above
-H4P_SerialCmd h4sc;
+
+
 
 void h4setup() {
     h4.everyRandom(5000,10000,[](){ 
     Serial.print(millis());Serial.println(" RUDE INTERRUPTION");
-    h4sc.dumpQ();
+    h4cmd.dumpQ();
   },nullptr,4);
 
   h4.every(1000,[]{ Serial.print(millis());Serial.println(" PING "); },nullptr,1);  

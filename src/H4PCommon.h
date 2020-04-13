@@ -30,17 +30,19 @@ SOFTWARE.
 #ifndef H4P_HO
 #define H4P_HO
 
-#define H4P_VERSION "0.5.0"
-
 #include<H4.h>
 #include<H4Utils.h>
-#include<H4PConfig.h>
+#include"config.h"
 
 #include<unordered_set>
 #include<cstdarg>
 
 using namespace std::placeholders;
-
+//
+//
+//
+bool stringIsAlpha(const string& s);
+//
 #ifndef ARDUINO_SONOFF_BASIC // or s20 / sv ect
   #define RELAY_BUILTIN   12
   #define BUTTON_BUILTIN  0
@@ -64,7 +66,7 @@ enum H4_CMD_ERROR:uint32_t  {
     H4_CMD_OK,
     H4_CMD_UNKNOWN,
     H4_CMD_TOO_FEW_PARAMS,
-    H4_CMD_TOO_MANY_PARAMS,    
+    H4_CMD_TOO_MANY_PARAMS,
     H4_CMD_NOT_NUMERIC,
     H4_CMD_OUT_OF_BOUNDS,
     H4_CMD_NAME_UNKNOWN,
@@ -92,19 +94,19 @@ enum H4P_LOG_TYPE {
 //
 #define STAG(x) constexpr char* x##Tag(){ return #x; }
 
-constexpr const char* cmdhash(){ return "h4/#"; }
+constexpr const char* cmdhash(){ return "/h4/#"; }
 
 STAG(asws);
 STAG(board)
 STAG(broker);
 STAG(cerr);
 STAG(chip);
-STAG(curl);
 STAG(device);
 STAG(esqw);
 STAG(gpio);
 STAG(h4);
 STAG(log);
+STAG(mfnb);
 STAG(mqtt);
 STAG(msg);
 STAG(name);
@@ -112,13 +114,14 @@ STAG(onof);
 STAG(port);
 STAG(psk);
 STAG(qwrn);
+STAG(rupd);
 STAG(scmd);
 STAG(snif);
 STAG(src);
 STAG(ssid);
 STAG(state);
 STAG(stor);
-STAG(tfnb);
+STAG(time);
 STAG(upnp);
 STAG(user);
 STAG(wink);
@@ -134,12 +137,13 @@ STAG(wifi);
 #define CMDNULL ([this](vector<string>)->uint32_t{ return H4_CMD_OK; })
 #define CMDVS(x) ([this](vector<string> vs)->uint32_t{ return x(vs); })
 #define VSCMD(x) uint32_t x(vector<string>)
+#define QTHIS(f) h4.queueFunction([this]{ f(); })
 
 #ifdef H4P_LOG_EVENTS
-    #define SYSEVENT(e,s,t,x,...) if(isLoaded(scmdTag())) { h4sc.logEventType(e,s,t,x, ##__VA_ARGS__); }
-    #define H4EVENT(x,...) if(isLoaded(scmdTag())) { h4sc.logEventType(H4P_LOG_H4,_pName,h4Tag(),x, ##__VA_ARGS__); }
+    #define SYSEVENT(e,s,t,x,...) { h4cmd.logEventType(e,s,t,x, ##__VA_ARGS__); }
+    #define H4EVENT(x,...) { h4cmd.logEventType(H4P_LOG_H4,_pName,h4Tag(),x, ##__VA_ARGS__); }
     #define DEPENDFAIL(x) { Serial.print("FATAL: ");Serial.print(CSTR(_pName));Serial.print(" needs ");Serial.println(x##Tag());return; }
-    #define h4UserEvent(x,...) if(H4Plugin::isLoaded(scmdTag())) { h4sc.logEventType(H4P_LOG_USER,userTag(),h4Tag(),x, ##__VA_ARGS__); }
+    #define h4UserEvent(x,...) { h4cmd.logEventType(H4P_LOG_USER,userTag(),h4Tag(),x, ##__VA_ARGS__); }
 #else
     #define SYSEVENT(e,x,...)
     #define H4EVENT(x,...)
@@ -147,6 +151,8 @@ STAG(wifi);
     #define h4UserEvent(x,...)
 #endif
 
+#define HOOK_IF_LOADED(x) { H4Plugin* p=isLoaded(x##Tag()); \
+            if(p) { p->hookConnect([this](){ start(); }); p->hookDisconnect([this](){ stop(); }); }}
 #define DEPEND(x) { H4Plugin* p=isLoaded(x##Tag()); \
             if(p) { p->hookConnect([this](){ start(); });p->hookDisconnect([this](){ stop(); }); }\
             else { DEPENDFAIL(x) } }
@@ -160,7 +166,7 @@ enum trustedIds {
   H4P_TRID_PATN = 50,
   H4P_TRID_PP1x,
   H4P_TRID_PWM1,
-  H4P_TRID_SYNC,
+  H4P_TRID_GPIO,
   H4P_TRID_DBNC,
   H4P_TRID_RPTP,
   H4P_TRID_POLL,
@@ -182,11 +188,17 @@ enum trustedIds {
   H4P_TRID_QLOG,
   H4P_TRID_MLRQ,
   H4P_TRID_BTTO,
-  H4P_TRID_IPPD
+  H4P_TRID_IPPD,
+  H4P_TRID_TIME,
+  H4P_TRID_SYNC,
+  H4P_TRID_DALY,
+  H4P_TRID_LOOP,
+  H4P_TRID_SHOT
 };
 
 enum H4PC_CMD_ID{
-    H4PC_ROOT=1,
+    H4PC_ROOT,
+    H4PC_H4,
     H4PC_SHOW,
     H4PC_SVC,
     H4PC_MAX
@@ -216,15 +228,15 @@ class H4Plugin {
                 if(!vs.size()) return H4_CMD_TOO_FEW_PARAMS;
                 return vs.size()>1 ? H4_CMD_TOO_MANY_PARAMS:f(vs);
             }
-                void        _upHooks();
-                void        _downHooks();
 
         virtual void        _restart(){ stop();start(); }
         virtual void        _start() { _upHooks(); }
         virtual void        _stop() { _downHooks(); }
     public:
-        static  vector<H4Plugin*>   _plugins;
         static  vector<H4_FN_VOID>  _factoryChain;
+                H4_FN_VOID          _factoryHook=[this]{};
+                H4_FN_VOID          _rebootHook=[this]{ stop(); };
+        static  vector<H4Plugin*>   _plugins;
                 string              _pName;
                 uint32_t            _subCmd;
 //       
@@ -247,7 +259,7 @@ class H4Plugin {
         }
         
                 void        restart(){ _restart(); };
-        virtual void        show(){ /* reply("%s is %s",CSTR(_pName),state() ? "UP":"DOWN"); */ }
+        virtual void        show(){}
                 void        start();
                 bool        state(){ return _state(); }
                 void        stop();
@@ -258,32 +270,22 @@ class H4Plugin {
                 string      getConfig(const string& c){ return _cb[c]; }
                 void        reply(const char* fmt,...); // hoist protected
 //      syscall only
-        virtual void        _reply(string msg) { /* Serial.print(CSTR(_pName));Serial.print(": ");*/ Serial.println(CSTR(msg)); }
-        static  void        _hookFactory(H4_FN_VOID f){ if(f) _factoryChain.push_back(f); } 
-/*
-        static void         dumpCommands(H4_CMD_MAP cm=_commands){
-            for(auto const c:cm){
-                Serial.print(CSTR(c.first));Serial.print(" o=");Serial.print(c.second.owner);Serial.print(" l=");Serial.println(c.second.levID);
-            }
-        }
-*/
+        virtual void        _reply(string msg) { Serial.println(CSTR(msg)); }
+                void        _downHooks();
+                void        _upHooks();
+
+//        static void         dumpCommands(H4_CMD_MAP cm=_commands){ for(auto const c:cm) Serial.printf("%16s o=%2d l=%2d\n",CSTR(c.first),c.second.owner,c.second.levID); }
 };
 
 class H4PLogService: public H4Plugin {
                 uint32_t    _filter=0;
-            
-                void        _filterLog(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target){
-                    if(_up){ if(type & _filter) _logEvent(msg,type,source,target); }
-                }
     protected:
+                void        _filterLog(const string &m,H4P_LOG_TYPE t,const string& s,const string& tg){ if(_up && (t & _filter)) _logEvent(m,t,s,tg); }
         virtual void        _hookIn() override;
         virtual void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target)=0;
     public:
         H4PLogService(const string& lid,uint32_t filter=0xffffffff): _filter(filter), H4Plugin(lid){}
-        virtual void        show(){
-            H4Plugin::show();
-            reply("%s Filter 0x%08x\n",CSTR(_pName),_filter);
-        }
+        virtual void        show(){ reply("%s Filter 0x%08x\n",CSTR(_pName),_filter); }
 };
 
 #endif // H4P_HO

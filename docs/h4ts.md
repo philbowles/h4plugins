@@ -20,17 +20,16 @@ It requires detailed knowledge of H4 "internals" which are beyond the scope of t
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 H4P_TaskSniffer h4ts;
 ```
 
 ## Dependencies
 
-none, but must be created *after* [**H4P_SerialCmd**](h4sc.md) if using that plugin
+none, but must be created *after* [**H4P_SerialCmd**](h4cmd.md) if using that plugin
 
 ## Commands Added
 
-* h4/show/snif
 * h4/snif/exclude/< task ID(s) >
 * h4/snif/include/< task ID(s) >
 
@@ -72,12 +71,12 @@ void show(); // Display current "hit list"
 
 [Example Code](../examples/H4P_TaskSniffer/H4P_TaskSniffer.ino)
 
-----
+---
+
 (c) 2020 Phil Bowles h4plugins@gmail.com
 
 * [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Blog](https://8266iot.blogspot.com)
-* [Facebook Esparto Support / Discussion](https://www.facebook.com/groups/esparto8266/)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)

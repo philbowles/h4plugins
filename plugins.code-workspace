@@ -4,5 +4,10 @@
 			"path": "."
 		}
     ],
-    "settings": {}
+    "settings": {
+        "VSCodeCounter.showInStatusBar": true,
+        "files.associations": {
+            "*.cppx": "cpp"
+        }
+    }
 }

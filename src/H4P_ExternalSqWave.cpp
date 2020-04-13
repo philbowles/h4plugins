@@ -51,13 +51,12 @@ void H4P_ExternalSqWave::__send(uint32_t c,uint32_t v){
     sv.push_back((char)c);
     sv.append(stringFromInt(v));
     print(CSTR(sv));
-    delay(H4ESW_TIMEOUT);    
+    delay(H4ESW_TIMEOUT);
 }
 
 uint32_t H4P_ExternalSqWave::__set(vector<string> vs,uint32_t c,uint32_t lim){
     return guardInt1(vs,bind([c,lim,this](uint32_t v){
         __send(c,constrain(v,1,lim)); 
-        return H4_CMD_OK;
     },_1));
 }
 
@@ -81,11 +80,11 @@ H4P_ExternalSqWave::H4P_ExternalSqWave(uint8_t rx,uint8_t tx,uint32_t initialF,u
     uint32_t H4PC_ESW_SET=++_nxtSubCmd;
     uint32_t H4PC_ESW_SWEEP=++_nxtSubCmd;
     _cmds={
-        {_pName,      { H4PC_ROOT, _subCmd, nullptr}},
+        {_pName,    { H4PC_H4, _subCmd, nullptr}},
         {"set",     { _subCmd, H4PC_ESW_SET, nullptr}},
         {"d",       { H4PC_ESW_SET, 0, CMDVS(_dset)}},
         {"f",       { H4PC_ESW_SET, 0, CMDVS(_fset)}},
-        {"stop",    { _subCmd, 0, CMD(stop)}},            
+        {"end",     { _subCmd, 0, CMD(end)}},            
         {"sweep",   { _subCmd, H4PC_ESW_SWEEP, nullptr}},
         {"f",       { H4PC_ESW_SWEEP, 0, CMDVS(_fsweep)}},
         {"d",       { H4PC_ESW_SWEEP, 0, CMDVS(_dsweep)}}

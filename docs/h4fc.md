@@ -25,14 +25,13 @@ LEDs flash independently at different rates using one of four methods:
 # Usage
 
 ```cpp
-#include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 H4P_FlasherController h4fc;
 ```
 
 ## Dependencies
 
-none, but must be created *after* [**H4P_SerialCmd**](h4sc.md) if using that plugin. Also if [**H4P_GPIOManager**](h4gm.md) is in use, the relevant pin will be automatically set as output - otherwise it is up to the user to call `pinMode` before any API function below and to manage its logical / physical and active high /active low states. The simplest solution is to always also include [**H4P_GPIOManager**](h4gm.md) before H4P_FlasherController.
+none, but must be created *after* [**H4P_SerialCmd**](h4cmd.md) if using that plugin. Also if [**H4P_GPIOManager**](h4gm.md) is in use, the relevant pin will be automatically set as output - otherwise it is up to the user to call `pinMode` before any API function below and to manage its logical / physical and active high /active low states. The simplest solution is to always also include [**H4P_GPIOManager**](h4gm.md) before H4P_FlasherController.
 
 ## Commands Added
 
@@ -62,7 +61,7 @@ flashLED(uint32_t rate, uint8_t pin = LED_BUILTIN,uint8_t active=HIGH);
 // 200ms is a good starting point for the right "feel"
 flashMorse(const char *pattern, uint32_t timebase, uint8_t pin = LED_BUILTIN,uint8_t active=HIGH);
 
-// NB only available if you edit the H4PConfig.h file and uncomment the define for H4F_MORSE_SUPPORT
+// NB only available if you edit the config.h file and uncomment the define for H4F_MORSE_SUPPORT
 // Translates text (no numerals or punctuation, [A-z a-z] only)
 flashMorseText(const char * pattern,uint32_t timebase,uint8_t pin=LED_BUILTIN,uint8_t active=HIGH);
 
@@ -93,7 +92,6 @@ stopLED(uint8_t pin=LED_BUILTIN);
 
 * [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Blog](https://8266iot.blogspot.com)
-* [Facebook Esparto Support / Discussion](https://www.facebook.com/groups/esparto8266/)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)

@@ -39,14 +39,16 @@ extern "C" {
 
 bool                H4P_IPDetector::_inflight=false;
 struct ping_option  H4P_IPDetector::pop;
-
+unordered_map<string,H4P_MDNSDetector*> H4P_MDNSDetector::localList;
+//
+//      IP
+//
 void H4P_IPDetector::_hookIn() { DEPEND(wifi); }
 
 void H4P_IPDetector::_start(){
     _pinger=h4.everyRandom(H4P_PJ_LO,H4P_PJ_HI,[this](){
         if(!_inflight){
             _inflight=true;
-            //Serial.printf("PING inflight %s\n",CSTR(_id));
             memset(&pop,'\0',sizeof(ping_option));
             pop.count = 1;    //  try to ping how many times
             pop.coarse_time = 1;  // ping interval
@@ -55,7 +57,7 @@ void H4P_IPDetector::_start(){
             ping_regist_recv(&pop,reinterpret_cast<ping_recv_function>(&H4P_IPDetector::_ping_recv_cb));
             ping_regist_sent(&pop,NULL);
             ping_start(&pop);
-        } //else Serial.printf("inflight %s deferred\n",CSTR(_id));
+        }
     },nullptr,H4P_TRID_IPPD);
     _upHooks();
 } 
@@ -64,12 +66,11 @@ void H4P_IPDetector::_ping_recv_cb(void *arg, void *pdata){
     H4P_IPDetector* p=reinterpret_cast<H4P_IPDetector*>(reinterpret_cast<struct ping_option*>(arg)->reverse);
     uint32_t v=1+(reinterpret_cast<struct ping_resp*>(pdata)->ping_err);
     h4.queueFunction(bind([](H4P_IPDetector* p,uint32_t v){ 
-        //Serial.printf("END PING %s %d\n",CSTR(p->_id),v);
         p->_inout(v);
         _inflight=false;
     },p,v));
 }
-H4P_IPDetectorThing::H4P_IPDetectorThing(const string& pid,const string& id): H4P_IPDetector(pid,id){
+H4P_IPDetectorSource::H4P_IPDetectorSource(const string& pid,const string& id): H4P_IPDetector(pid,id){
     H4P_BinaryThing* _btp;
     REQUIREBT;
     if(_btp){
@@ -83,6 +84,8 @@ H4P_IPDetectorThing::H4P_IPDetectorThing(const string& pid,const string& id): H4
     }
 }
 #endif
+//
+//      UPNP
 //
 void H4P_UPNPDetector::_hookIn() { 
     REQUIRE(onof);
@@ -98,7 +101,8 @@ void H4P_UPNPDetector::_start(){
     });
     _upHooks();
 }
-H4P_UPNPDetectorThing::H4P_UPNPDetectorThing(const string& pid,const string& id): H4P_UPNPDetector(pid,id){
+
+H4P_UPNPDetectorSource::H4P_UPNPDetectorSource(const string& pid,const string& id): H4P_UPNPDetector(pid,id){
     H4P_BinaryThing* _btp;
     REQUIREBT;
     if(_btp){
@@ -111,5 +115,40 @@ H4P_UPNPDetectorThing::H4P_UPNPDetectorThing(const string& pid,const string& id)
         };
     }
 }
+#ifdef ARDUINO_ARCH_ESP8266
+//
+//      MDNS
+//
+void H4P_MDNSDetector::_hookIn() { 
+    REQUIRE(onof);
+    DEPEND(wifi);
+}
 
+void H4P_MDNSDetector::_start(){
+    MDNS.installServiceQuery(CSTR(_service),CSTR(_protocol), H4P_MDNSDetector::MDNSServiceQueryCallback);
+    _upHooks();
+}
+
+H4P_MDNSDetector::H4P_MDNSDetector(const string& friendly,const string& service,const string& protocol,H4BS_FN_SWITCH f):
+    _service(service),
+    _protocol(protocol),
+    H4PDetector(friendly,friendly,f){ 
+        localList[friendly]=this;
+}
+
+H4P_H4DetectorSource::H4P_H4DetectorSource(const string& id): H4P_H4Detector(id){
+    H4P_BinaryThing* _btp;
+    REQUIREBT;
+    if(_btp){
+        _f=[this,_btp](bool b){ 
+#ifdef H4P_LOG_EVENTS
+        _btp->_turn(b,_pName+string("("+_id+")"));
+#else
+        _btp->turn(b);
 #endif
+        };
+    }
+}
+#endif // 8266
+
+#endif // wifi

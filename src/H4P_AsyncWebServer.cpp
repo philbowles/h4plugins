@@ -26,33 +26,25 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include<H4P_AsyncWebServer.h>
+#include<H4P_WiFiSelect.h>
 #ifndef H4P_NO_WIFI
+#include<H4P_AsyncWebServer.h>
+#include<H4P_BinaryThing.h>
 
 extern  void h4AddAwsHandlers();
 
-void  H4P_AsyncWebServer::_hookIn(){
+void  H4P_AsyncWebServer::_hookIn(){ 
     DEPEND(wifi);
-    _cb["h4v"]=H4_VERSION;
-    _cb["h4pv"]=H4P_VERSION;
-}
-
-bool H4P_AsyncWebServer::_webAuth(AsyncWebServerRequest *request){
-	if(_cb[userTag()]!=""){
-		if(!request->authenticate(CSTR(_cb["auser"]),CSTR(_cb["apasswd"]),NULL,false)) {
-			request->requestAuthentication(NULL,false);
-			return false;
-		}
-	} return true;
+    H4Plugin* p=isLoaded(onofTag());
+    if(p) _btp=reinterpret_cast<H4P_BinaryThing*>(p);
 }
 
 void H4P_AsyncWebServer::_rest(AsyncWebServerRequest *request){
-	if(!_webAuth(request)) return;
 	h4.queueFunction(bind([this](AsyncWebServerRequest *request){
         H4EVENT("_rest %s",request->client()->remoteIP().toString().c_str());
 		string chop=replaceAll(CSTR(request->url()),"/rest/","");
         string msg="";
-        uint32_t res=h4sc._simulatePayload(CSTR(chop),aswsTag());
+        uint32_t res=h4cmd._simulatePayload(CSTR(chop),aswsTag());
         if(isLoaded(cerrTag())) msg=h4ce.getErrorMessage(res);
         string j="{\"res\":"+stringFromInt(res)+",\"msg\":\""+msg+"\",\"lines\":[";
         string fl;
@@ -64,23 +56,34 @@ void H4P_AsyncWebServer::_rest(AsyncWebServerRequest *request){
             if(fl.size()) fl.pop_back();
         }
         j+=fl+"]}";
+//        Serial.printf("LINES %s\n",CSTR(j));
         request->send(200,"application/json",CSTR(j));
         lines.clear();
 	},request),nullptr,H4P_TRID_ASWS);
 }
 
-String H4P_AsyncWebServer::aswsReplace(const String& var){
-    string v=CSTR(var);
-    return _cb.count(v) ? String(CSTR(_cb[v])):"?";
+void H4P_AsyncWebServer::_setBothNames(const string& host,const string& friendly){
+    if(isLoaded(upnpTag())) h4wifi._setPersistentValue(nameTag(),friendly,false);
+    h4wifi.host(host);
 }
 
 void H4P_AsyncWebServer::_start(){
 	reset();
 
+    if(isLoaded(onofTag())){
+        _cb[onofTag()]="1";
+        _evts=new AsyncEventSource("/evt");
+        _evts->onConnect([this](AsyncEventSourceClient *client){
+            H4EVENT("SSE Client %08x n=%d",client,client->lastId());
+            client->send(_btp->state() ? "1":"0",onofTag(),millis(),1000);
+        });
+        addHandler(_evts);
+    } else _cb[onofTag()]="0";
+
     on("/",HTTP_GET, [this](AsyncWebServerRequest *request){ 
         H4EVENT("Root %s",request->client()->remoteIP().toString().c_str());
-        string rootweb=WiFi.getMode() & WIFI_AP ? "/ap.htm":"/sta.htm"; // streeamline - even fn change
-        request->send(SPIFFS,CSTR(rootweb),String(),false,aswsReplace);
+        _cb["wifi"]=stringFromInt(WiFi.getMode());
+        request->send(SPIFFS,"/sta.htm",String(),false,aswsReplace);
     });
 
     on("/",HTTP_POST, [this](AsyncWebServerRequest *request){ 
@@ -92,10 +95,8 @@ void H4P_AsyncWebServer::_start(){
 		    rp[CSTR(p->name())]=CSTR(p->value());
 	    }
         h4wifi.change(rp[ssidTag()],rp[pskTag()]);
-        if(isLoaded(upnpTag())){
-            h4wifi._setPersistentValue(nameTag(),rp[nameTag()],false);
-        }
-        h4wifi.host(rp[deviceTag()]);
+        //
+        _setBothNames(rp[deviceTag()],rp[nameTag()]);
     });
 
 	on("/rest",HTTP_GET,[this](AsyncWebServerRequest *request){ _rest(request); });
@@ -110,6 +111,11 @@ void H4P_AsyncWebServer::_start(){
 void H4P_AsyncWebServer::_stop(){ 
     end();
     _downHooks();
+}
+
+String H4P_AsyncWebServer::aswsReplace(const String& var){
+    string v=CSTR(var);
+    return _cb.count(v) ? String(CSTR(_cb[v])):"?";
 }
 
 #endif // H4_WIFI

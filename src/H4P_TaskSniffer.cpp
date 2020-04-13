@@ -55,7 +55,7 @@ uint32_t H4P_TaskSniffer::__incexc(vector<string> vs,function<void(vector<uint32
 
 void H4P_TaskSniffer::_common(){
     _cmds={
-        {_pName,      {H4PC_ROOT, _subCmd, nullptr}},
+        {_pName,      {H4PC_H4, _subCmd, nullptr}},
         {"include", {_subCmd, 0, CMDVS(_tsInclude)}},
         {"exclude", {_subCmd, 0, CMDVS(_tsExclude)}}
     };

@@ -35,7 +35,7 @@ SOFTWARE.
 H4P_LocalLogger::H4P_LocalLogger(uint32_t limit,uint32_t filter): H4PLogService(logTag(),filter), _limit(limit) {
     _fname=string(logTag())+".csv";
     _cmds={
-        {_pName,   {H4PC_ROOT, _subCmd, nullptr}},
+        {_pName,   {H4PC_H4, _subCmd, nullptr}},
         {msgTag(), {_subCmd, 0, CMDNULL}},
         {"clear",  {_subCmd, 0, CMD(clear)}},
         {"flush",  {_subCmd, 0, CMD(flush)}}
@@ -49,13 +49,13 @@ void H4P_LocalLogger::flush(){
     clear();
 }
 
-void H4P_LocalLogger::show(){ h4sc._dump(vector<string>{_fname}); }
+void H4P_LocalLogger::show(){ h4cmd._dump(vector<string>{_fname}); }
 //
 //      our raison d'etre
 //
 void H4P_LocalLogger::_logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target){
     vector<string> msgparts={stringFromInt(millis()),stringFromInt(type),source,target,msg};
-    uint32_t size=h4sc.write("/"+_fname,join(msgparts,",")+"\n","a");
+    uint32_t size=h4cmd.write("/"+_fname,join(msgparts,",")+"\n","a");
     if(size > _limit) flush();
 }
 #endif

@@ -1,8 +1,7 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 
-H4 h4(115200);
-H4P_SerialCmd h4sc;
+
 #ifndef ARDUINO_ARCH_STM32
   H4P_LocalLogger h4ll(10000); // 10k = amount of SPIFFS to use ESP8266 / ESP32 only
 #endif

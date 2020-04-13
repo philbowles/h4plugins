@@ -1,7 +1,5 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS
-
-H4 h4(115200);
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 /*
  * Try Serial commands
  * 
@@ -20,7 +18,8 @@ H4 h4(115200);
   #define UL_ACTIVE ACTIVE_LOW
 #endif
 
-H4P_SerialCmd h4sc;
+
+
 H4P_GPIOManager h4gm;
 H4P_BinarySwitch h4onof(LED_BUILTIN,UL_ACTIVE,OFF,[](bool b){
     Serial.print("STATE NOW ");Serial.println(b);

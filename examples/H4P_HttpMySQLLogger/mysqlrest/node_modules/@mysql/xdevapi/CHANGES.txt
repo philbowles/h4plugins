@@ -1,0 +1,198 @@
+=====================================================
+MySQL Connector/Node.JS 8.0 - Release Notes & Changes
+=====================================================
+
+MySQL Connector/Node.JS
+Copyright (c) 2016, 2020, Oracle and/or its affiliates. All rights reserved.
+
+Full release notes:
+ http://dev.mysql.com/doc/relnotes/connector-nodejs/en/
+
+v8.0.19
+=======
+
+- Add support for resolving and manage connections to hosts specified as SRV records
+- Fix issues with Collection.existsInDatabase() in the presence of regular tables
+- Fix unexpected behavior with empty where() calls
+- Re-introduce getAffectedItemsCount() method for the Session.sql() API
+
+v8.0.18
+=======
+
+- Add devDependencies to allow users and potential contributors to generate test coverage reports
+- Add devDependencies to allow users and potential contributors to enforce a formal code convention
+- Introduce performance improvements for the Collection.getOne() API
+- Introduce a full Promise-based buffered result-set API based on the MySQL X connectors standard
+- Fix issue causing incorrect padding characters to be applied for fixed-length column values
+- Fix issue preventing to insert a Node.js Buffer value into a MySQL column of a binary datatype
+- Fix issue causing MySQL binary datatypes to be coerced to Node.js Strings when retriving data from a table
+- Add support for updating MySQL binary datatype columns using raw Node.js Buffers
+
+v8.0.17
+=======
+
+- Re-structure the test suite and track the proper devDependencies to allow users to run it locally
+- Introduce a standard set of guidelines for open source contributions
+- Add support for creating multi-value indexes on document fields containing arrays
+- Add support for the "OVERLAPS" and "NOT OVERLAPS" operators
+- Track missing MySQL collations such as "utf8mb4_zh_0900_as_cs" and "utf8mb4_0900_bin"
+- Fix issue preventing the correct collation name to be retrieved with Column.getCollationName()
+- Add expression support for the "NOT" unary operator
+- Add expression support for the "DIV" binary operator
+- Allow Collection.dropIndex() to silently suceed when the index does not exist
+- Fix issue preventing backticks from being used in table column identifiers
+- Fix issue preventing JavaScript Date values to be assigned to expression placeholders
+
+v8.0.16
+=======
+
+- Add support for autonomous prepared statements for some types of operations
+- Add support for storing application-level and client-level connection attributes in the server
+- Improve pool selection algorithm to prioritize re-using idle connections instead of creating new ones
+- Improve usage of idle connections in a pool by properly resetting them and avoid re-authentication
+- Fix issues preventing JavaScript Date objects to be properly serialized within a document
+- Fix issues preventing connections to be acquired from a pool within a finite timeout
+- Fix issues preventing idle pool connections to be re-used after a period of inactivity
+- Fix issues preventing pool connections to be closed on the server
+- Remove unsupported Table.getViewDefinition() API
+
+v8.0.15
+=======
+
+There are no changes in this release of the product, but the version number has been raised to 8.0.15
+to align with the new MySQL Server release.
+
+v8.0.14
+=======
+
+- Add support for ignoring (and not failing with) initial X Protocol notices
+- Remove deprecation notices from Collection.count() and Table.count()
+- Add support for setting the default schema in the server
+- Remove support for creating non-existing schemas when connecting to the server
+- Allow pct-encoded default schema names in the connection string
+- Allow falsy values to be used in Table.insert()
+- Allow falsy values to be used in Table.update().set() and Collection.modify().set()
+- Fix issue causing the client to hang when the server certificate was not valid
+- Fix issue causing collection.existsInDatabase() to always return true in the presence of any collection
+
+v8.0.13
+=======
+
+- Add support for connection pooling via the mysqlx.getClient() interface
+- Add support for single-host and multi-host connection timeouts
+- Fix uncaught exception thrown when calling getCollationName() for non-textual columns
+- Fix support for mysql.expr() inputs in the CollectionFind.fields() method
+- Fix handling of X Protocol global notices (log errors and make connections unusable if it is the case)
+- Include standard "user" property in the output of Session.inspect()
+- Fix documentation typos and incorrect usage examples
+
+v8.0.12
+=======
+
+- Mysqlx.Crud message encoding performance improvements
+- Expression parser performance improvements
+- Add missing X DevAPI standard methods
+- Remove and deprecate extraneous X DevAPI unsupported methods
+- Fix issues with ESCAPE expressions
+- Fix metadata-based field value padding issues
+- Fix uncaught exception issue for NULL fields
+- Reduce error surface and introduce sane defaults for mysqlx.getSession()
+
+v8.0.11
+=======
+
+- Replace protobuf.js library with the official google-protobuf npm package
+- Add new "SHA256_MEMORY" authentication mechanism for MySQL 8.0.11 "caching_sha2_password" authentication plugin
+- Introduce new auto-generated document id format (which is now generated on the server)
+- Add "NOWAIT" and "SKIP_LOCKED" modes for both shared and exclusive row locks
+- Add support for sorting results on CollectionFind, CollectionRemove and CollectionModify operations
+- Update Session.getSchemas(), Schema.getCollections() and Schema.getTables() to return an array of instances
+- Introduce performance improvements on Collection.add()
+- Fix parsing issues with escape characters in expressions
+- Fix precision loss issues with the use of MySQL BIGINT type in expressions
+- Update result set interface to use JavaScript Date objects for representing the MySQL DATE type
+- Update result set interface to apply rounding mask for the MySQL FLOAT type
+- Fix decoding issues with the MySQL UNSIGNED INTEGER and BIT types
+- Fix decoding issues with large documents or document properties
+
+v8.0.9
+======
+
+- Rollout a new and improved expression parser
+- Partial rollout of a protobuf message encoder using stubs compiled by the official vendor compiler
+- Add support for creating and deleting collection indexes using the DevAPI
+- Add support for working with transaction savepoints via the DevAPI
+- Add support for modifying multiple document properties in bulk, using the `patch()` method
+- Remove relational (table and view) DDL API
+- Remove persistent session configuration management API
+- Fix all known expression parsing issues and caveats
+- Fix duplicate UUID generation issues
+- Fix document property projection issues, using the `fields()` method
+
+v8.0.8
+======
+
+- Add support for `collection.find()` and `table.select()` row locking
+- Add document-specific CRUD methods (`replaceOne()`, `addOrReplaceOne()`, `getOne()` and `removeOne()`)
+- Add support for automatic or manual selection of authentication mechanisms
+- Remove some dead or non-supported feature code
+- Fix some flaky test cases and other some small issues in the test suite
+- Refactor the database entity and operation architecture
+- Add support for the SQL "IN" operator for matching values against argument lists
+- Add support for using the "IN" operator to check if values exist in arrays or objects
+- Fix a few pressing bugs on the existing expression parser (empty quoted strings, `NULL`, negation, zeros)
+
+v8.0.7
+======
+
+- Add support for server connections using local UNIX sockets
+- Add failover support when creating sessions by providing multiple server/router addresses
+- Normalize multiple session types into a single `Session` entity
+- Enable SSL/TLS on server connections by default
+- Introduce a new mysql-specific UUID format for document ids
+- Fix issue preventing document ids to be set to `0`
+- Fix protocol issue preventing the addition of a large number of documents to a collection
+- Prevent behavior of implicitely removing entire tables and collections
+- Fix issue with `bind()` usage for removing documents from a collection
+- Normalize dropX() methods and restrict them to the proper scope
+- Fix protocol issue preventing SHA256 password users of picking the `PLAIN` authentication mechanism in MySQL 8
+- Add high-level management interface to support persistent session configurations
+
+v1.0.6
+======
+
+- Added support for single array or multiple argument function calls on the public API
+- Updated behavior of `collection.add([])` to avoid confusing exceptions
+- Fixed issues with `collection.bind()`
+- Fixed parsing issues on URI and connection string corner-cases
+- Added support for creating IPv6 sessions with a URI or connection string
+- Added support for creating TLS sessions with a URI or connection string
+- Added support for validating the server certificate with a given CA and/or CRL
+
+v1.0.5
+======
+
+- Added Table creation API.
+- Added APIs for Transaction handling
+
+v1.0.4
+======
+
+- Changed package name from `mysqlx` to `@mysql/xdevapi`
+- Added View DDL support
+- Added support for Common URI format
+- Added Collection.count() and Table.count()
+- Added Schema.getCollectionAsTable()
+- Added xdevapi.getVersion()
+
+v1.0.3
+======
+
+- Improved handling of fragmented TCP packages
+- BUG#23118665:C/NODEJS FAILS TO WORK WHEN SSL IS ENABLED
+
+v1.0.2
+======
+
+- Initial public release
+- Support for X DevAPI 1.0.4

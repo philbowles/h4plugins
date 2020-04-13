@@ -1,5 +1,5 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 //
 //  Function is called by
 //  h4/off
@@ -9,8 +9,10 @@ H4_USE_PLUGINS
 //  And reports current state with h4/state
 //  If MQTT is used, publishes current state 
 //
-H4 h4(115200);
-H4P_SerialCmd h4sc;
+
+
+
+
 H4P_BinaryThing h4onof([](bool b){ Serial.print("I am now ");Serial.println(b ? "ON":"OFF"); });
 
 void h4setup(){

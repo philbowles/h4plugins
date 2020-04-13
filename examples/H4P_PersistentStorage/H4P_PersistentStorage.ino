@@ -1,12 +1,11 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS
-
-H4 h4(115200); //auto-start Serial @ 115200, default Q size=20 
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 
 void onChange(const string& name,const string& value){
     Serial.printf("ITEM %s changed to %s\n",CSTR(name),CSTR(value));
 }
-H4P_SerialCmd h4sc;
+
+
 H4P_PersistentStorage h4ps(onChange);
 
 void h4setup() {

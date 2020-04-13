@@ -27,7 +27,7 @@ Provides
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 H4P_ExternalSqWave h4esw(...
 ```
 
@@ -36,7 +36,7 @@ H4P_ExternalSqWave h4esw(...
 If using STM32-NUCLEUO you must install the following HardwareSerial library
 * https://github.com/plerup/espsoftwareserial
 
-H4P_ExternalSqWave must be created after [**H4P_SerialCmd**](h4sc.md) if using that plugin
+H4P_ExternalSqWave must be created after [**H4P_SerialCmd**](h4cmd.md) if using that plugin
 
 ## Commands Added
 
@@ -78,7 +78,7 @@ void dSet(uint32_t d); // Set Duty Cycle
 void dSweep(uint32_t timer,uint32_t fromF,uint32_t toF,uint32_t inc,function<void(uint32_t)> onChange=[](uint32_t){});
 void fSet(uint32_t f); // Set Frequency
 void fSweep(uint32_t timer,uint32_t fromF,uint32_t toF,uint32_t inc,function<void(uint32_t)> onChange=[](uint32_t){});
-void stop(); // cancels any sweep in progress
+void end(); // cancels any sweep in progress
 ```
 
 [Example code](../examples/H4ESW/H4P_ESWSimple/H4P_ESWSimple.ino)
@@ -107,7 +107,6 @@ Below is an example of one of the graphs produced, when running the profiler on 
 
 * [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Blog](https://8266iot.blogspot.com)
-* [Facebook Esparto Support / Discussion](https://www.facebook.com/groups/esparto8266/)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)

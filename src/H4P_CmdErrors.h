@@ -43,7 +43,6 @@ class H4P_CmdErrors: public H4Plugin {
             {H4_CMD_OUT_OF_BOUNDS,"Value out of range"},
             {H4_CMD_NAME_UNKNOWN,"Name not known"},
             {H4_CMD_PAYLOAD_FORMAT,"Incorrect Payload Format"}
-//            {H4_CMD_PROHIBITED,"Prohibited from here"}
         };
 //
         H4_INT_MAP  logTypes={
@@ -52,7 +51,6 @@ class H4P_CmdErrors: public H4Plugin {
             {H4P_LOG_SVC_DOWN,"SVC DOWN"},
             {H4P_LOG_CMD,"CMD"},
             {H4P_LOG_USER,"USER"},
-//            {H4P_LOG_DEPENDFAIL,"DEPEND FAIL"},
             {H4P_LOG_MQTT_HEAP,"MQTT HEAP"},
             {H4P_LOG_MQTT_Q,"MQTT Q"},
             {H4P_LOG_PD_ENTER,"PD ENTER"},
@@ -77,7 +75,7 @@ class H4P_CmdErrors: public H4Plugin {
             {H4P_TRID_PATN,"PATN"},
             {H4P_TRID_PP1x,"PP1X"},
             {H4P_TRID_PWM1,"PWM1"},
-            {H4P_TRID_SYNC,"SYNC"},
+            {H4P_TRID_GPIO,"GPIO"},
             {H4P_TRID_DBNC,"DBNC"},
             {H4P_TRID_RPTP,"RPTP"},
             {H4P_TRID_POLL,"POLL"},
@@ -99,7 +97,12 @@ class H4P_CmdErrors: public H4Plugin {
             {H4P_TRID_QLOG,"QLOG"},
             {H4P_TRID_MLRQ,"MLRQ"},
             {H4P_TRID_BTTO,"BTTO"},
-            {H4P_TRID_IPPD,"IPPD"}
+            {H4P_TRID_IPPD,"IPPD"},
+            {H4P_TRID_TIME,"TIME"},
+            {H4P_TRID_SYNC,"SYNC"},
+            {H4P_TRID_DALY,"DALY"},
+            {H4P_TRID_SHOT,"AT_T"},
+            {H4P_TRID_LOOP,"LOOP"}
         };
         virtual void        _greenLight(){ start(); }
     public:
@@ -112,9 +115,11 @@ class H4P_CmdErrors: public H4Plugin {
         string      getLogType(uint32_t e){
             return logTypes.count(e) ? logTypes[e]:string("No such type (")+stringFromInt(e)+")";
         }
+
         string      getTaskType(uint32_t e){
             return taskTypes.count(e) ? taskTypes[e]:stringFromInt(e,"?%02d?");
         }
+        
         string      getTaskName(uint32_t e){
             return taskNames.count(e) ? taskNames[e]:giveTaskName(e);
         }
