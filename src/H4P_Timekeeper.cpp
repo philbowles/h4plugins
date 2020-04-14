@@ -37,7 +37,7 @@ void __attribute__((weak)) onRTC(){}
 constexpr uint32_t secsInDay(){ return 86400; }
 constexpr uint32_t msInDay(){ return 1000*secsInDay(); }
 
-H4P_Timekeeper::H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzo,H4_FN_VOID onC,H4_FN_VOID onD): H4Plugin(timeTag(),onC,onD){
+H4P_Timekeeper::H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzo): H4Plugin(timeTag()){
     _cmds={
         {_pName,   { H4PC_H4, _subCmd, nullptr}}, // root for this plugin, e.g. h4/ME...
         {"change", { _subCmd,       0, CMDVS(_change)}},
