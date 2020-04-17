@@ -37,7 +37,7 @@ void __attribute__((weak)) onRTC(){}
 constexpr uint32_t secsInDay(){ return 86400; }
 constexpr uint32_t msInDay(){ return 1000*secsInDay(); }
 
-H4P_Timekeeper::H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzo,H4_FN_VOID onC,H4_FN_VOID onD): H4Plugin(timeTag(),onC,onD){
+H4P_Timekeeper::H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzo): H4Plugin(timeTag()){
     _cmds={
         {_pName,   { H4PC_H4, _subCmd, nullptr}}, // root for this plugin, e.g. h4/ME...
         {"change", { _subCmd,       0, CMDVS(_change)}},
@@ -102,7 +102,7 @@ void H4P_Timekeeper::_start(){
             [this]{ sync(); },
             [this]{
                 static bool gotRTC=false; 
-                H4EVENT("%u GOT NTP %s",millis(),CSTR(clockTime()));
+                H4EVENT("NTP SYNC %s",CSTR(clockTime()));
                 if(!gotRTC) {
                     onRTC();
                     gotRTC=true;
@@ -113,11 +113,13 @@ void H4P_Timekeeper::_start(){
             true
         );
     }
+//    _upHooks();
 }
 
 void H4P_Timekeeper::_stop(){ 
     h4.cancelSingleton({H4P_TRID_TIME,H4P_TRID_SYNC});
 	sntp_stop();
+//    _downHooks();
 }
 
 uint32_t H4P_Timekeeper::_tz(vector<string> vs){
@@ -194,11 +196,9 @@ string H4P_Timekeeper::strTime(uint32_t t){ // milliseconds!
 void H4P_Timekeeper::sync(){
 	long stamp=sntp_get_current_timestamp();
 	if(stamp > 30000){ // 28800 +leeway: default is GMT+8
-		H4EVENT("GOOD STAMP %u time %lu gtz=%d grt %s",millis(),stamp,sntp_get_timezone(),sntp_get_real_time(stamp));
 		vector<string> dp=split(sntp_get_real_time(stamp)," ");
         _mss00=parseTime(dp[3])-millis();
-        H4EVENT("%s _mss00=%d",CSTR(dp[3]),_mss00);
-	} else H4EVENT("%u NO TIME AT ALL",millis());
+	} // else H4EVENT("%u NO TIME AT ALL",millis());
 }
 
 void H4P_Timekeeper::tz(uint32_t tzOffset){

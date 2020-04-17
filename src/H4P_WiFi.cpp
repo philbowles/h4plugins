@@ -47,12 +47,13 @@ void H4P_WiFi::_gotIP(){
     _cb[pskTag()]=CSTR(WiFi.psk());
 
     string host=_cb[deviceTag()];
-
+#ifdef H4P_USE_OTA
     h4.every(H4WF_OTA_RATE,[](){ ArduinoOTA.handle(); },nullptr,H4P_TRID_HOTA,true);
     _setHost(host);
   	ArduinoOTA.setHostname(CSTR(host));
 	ArduinoOTA.setRebootOnSuccess(false);	
 	ArduinoOTA.begin();
+#endif
     _cb.erase("opts"); // lose any old AP ssids
     Serial.printf("IP=%s\n",CSTR(_cb["ip"])); // unconditional
     H4EVENT("IP=%s",CSTR(_cb["ip"]));

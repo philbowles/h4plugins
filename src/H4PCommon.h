@@ -193,7 +193,8 @@ enum trustedIds {
   H4P_TRID_SYNC,
   H4P_TRID_DALY,
   H4P_TRID_LOOP,
-  H4P_TRID_SHOT
+  H4P_TRID_SHOT,
+  H4P_TRID_SSET
 };
 
 enum H4PC_CMD_ID{
