@@ -49,7 +49,7 @@ class H4Flasher{
         H4Flasher(uint8_t pin,uint32_t period,uint8_t duty,uint8_t active);
         H4Flasher(uint8_t pin,const char* pattern,uint32_t timebase,uint8_t active);
 
-                void        autoOutput(); // hoist this
+                void        autoOutput();
                 void        flashPattern(uint32_t timebase,const char* pattern);
                 void        PWM(uint32_t period,uint8_t duty);
                 void        stop();
