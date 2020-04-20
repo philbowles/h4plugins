@@ -225,6 +225,17 @@ void PolledPin::read(){
     } else H4GPIOPin::run();
 }
 
+AnalogAveragePin::AnalogAveragePin(uint8_t _p,uint32_t _f,uint32_t n,H4GM_FN_EVENT _c): _n(n), PolledPin(_p,INPUT,H4GM_PS_THRESHA,ACTIVE_HIGH,_f,true,_c) {}
+void AnalogAveragePin::read(){
+    _samples.push_back(analogRead(pin));
+//    Serial.printf("sample %u=%u\n",_samples.size(),_samples.back());
+    if(_samples.size() == _n){
+        state=accumulate( _samples.begin(), _samples.end(), 0) / _samples.size();
+        _samples.clear();
+        sendEvent();
+    };
+}
+
 AnalogThresholdPin::AnalogThresholdPin(uint8_t _p,uint32_t _f,uint32_t _l,H4GM_COMPARE _cf,H4GM_FN_EVENT _c): limit(_l), fCompare(_cf), PolledPin(_p,INPUT,H4GM_PS_THRESHA,ACTIVE_HIGH,_f,true,_c) {
     state=fCompare(analogRead(pin),limit); // refakta
 }
@@ -309,7 +320,9 @@ void H4P_GPIOManager::toggle(uint8_t p){ if(isManaged(p))  reinterpret_cast<Outp
 //
 //      (Oblique) Strategies
 //
-
+AnalogAveragePin* H4P_GPIOManager::AnalogAverage(uint8_t pin,uint32_t freq,uint32_t nSamples,H4GM_FN_EVENT callback){
+    return pinFactory<AnalogAveragePin>(false,pin,freq,nSamples,callback);
+}
 AnalogThresholdPin* H4P_GPIOManager::AnalogThreshold(uint8_t pin,uint32_t freq,uint32_t threshold,H4GM_COMPARE compare,H4GM_FN_EVENT callback){
     return pinFactory<AnalogThresholdPin>(false,pin,freq,threshold,compare,callback);
 }

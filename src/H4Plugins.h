@@ -27,7 +27,7 @@
         #include<H4P_HttpMySQLLogger.h>
     #endif
     #include<H4P_RemoteUpdate.h>
-//    #include<H4P_udpLogger.h>
+    #include<H4P_udpLogger.h>
     #include<H4P_UPNPServer.h>
     #include<H4P_PresenceDetector.h>
     #include<H4P_Timekeeper.h>

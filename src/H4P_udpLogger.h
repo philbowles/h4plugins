@@ -42,7 +42,7 @@ class H4P_udpLogger: public H4Plugin {
         AsyncUDP 	    _udp;
         IPAddress		_ubIP;
 
-            uint32_t            startheap,lastheap,delta,maxrate;
+            uint32_t            startheap,lastheap,delta,maxrate,limit;
             uint32_t            rps=0;
 
                 void            _listenUDP();
@@ -51,9 +51,17 @@ class H4P_udpLogger: public H4Plugin {
                 void            _start() override;
                 void            _greenLight() override {}; // dont autostart!
 
-    public:                
-        H4P_udpLogger(uint32_t D=32): delta(D),H4Plugin("ulog"){
+    public: 
+        /*
+        D is smallest heap delta for which log message will be produced
+        H is percentage of heap above which no reporting takes place at all
+
+        In English: Log when heap below H% of start value and most recent change is > D bytes
+        */               
+        H4P_udpLogger(uint32_t D=32, uint32_t H=70): delta(D),H4Plugin("ulog"){
             _ubIP=IPAddress(239,255,255,250);
+            lastheap=startheap=ESP.getFreeHeap();
+            limit=(H*startheap)/100;
         }
 };
 

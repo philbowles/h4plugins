@@ -2,14 +2,16 @@
 TODO:
 SOONER
     error gone away in nodejs
+    AA KW
+    AA docs
 SHORTTERM
     schedule in cheztoi
 MEDIUMTERM
     remote client get
-    sunrise/set
+//    sunrise/set
     optimise / mAcrofy guardstring2
     ESp32 MDNS detector
-    templatise / mcrofy dependent module detection
+    templatise / mcrofy dependent module detection (and std hookins for runnables?)
 LONGTERM
     ethernet module stm32
     ESP32 bluetooth PD

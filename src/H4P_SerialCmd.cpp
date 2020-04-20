@@ -48,7 +48,6 @@ H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Plugin(scmdTag()){
         {"config",     { H4PC_SHOW, 0, CMD(config) }},
         {"q",          { H4PC_SHOW, 0, CMD(dumpQ) }},
         {"plugins",    { H4PC_SHOW, 0, CMD(plugins) }},
-//        {"test",       { 0, 0, CMDVS(_test) }},
 #ifndef ARDUINO_ARCH_STM32
         {"heap",       { H4PC_SHOW, 0, CMD(heap) }},
         {"spif",       { H4PC_SHOW, 0, CMD(showSPIFFS)}},
@@ -277,14 +276,11 @@ void H4P_SerialCmd::dumpQ(){
 }
 
 void  H4P_SerialCmd::plugins(){
-//    uint32_t heap=ESP.getFreeHeap();
-//    if(heap > H4P_SAFE_MINIMUM){
     for(auto const& p:H4Plugin::_plugins){
         reply("h4/svc/info/%s %s ID=%d",CSTR(p->_pName),p->_state() ? "UP":"DN",p->_subCmd);
         p->show();
         reply("");
     }
-//    } else reply("Heap too low %d",heap);
 }
 
 #ifndef ARDUINO_ARCH_STM32

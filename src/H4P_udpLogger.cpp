@@ -36,30 +36,29 @@ void H4P_udpLogger::_hookIn(){
 void H4P_udpLogger::_listenUDP(){
     if(_udp.listenMulticast(_ubIP, 1900)) {
         _udp.onPacket([this](AsyncUDPPacket packet) {
-            h4.queueFunction(bind([this](string msg, IPAddress ip, uint16_t port) {
-                rps++;
-                if(rps > maxrate) maxrate=rps;
-                uint32_t heapnow=ESP.getFreeHeap();
-                uint32_t pcnow=heapnow*100/startheap;
-                int d=lastheap - heapnow;
-                if(abs(d) > delta) {
-                    Serial.printf("******************* Heap %s %d bytes ******************\n",d<0 ? "GAIN":"LOSS",abs(d));
-                    lastheap=heapnow;
-                }
-                Serial.printf("From %s:%d %u %u %u%% rate=%u/sec (max %u)\n",CSTR(ip.toString()),port,micros(),heapnow,pcnow,rps,maxrate);
-            },stringFromBuff(packet.data(), packet.length()),packet.remoteIP(), packet.remotePort()),nullptr, H4P_TRID_UDPM);
+            if(ESP.getFreeHeap() < limit){
+                h4.queueFunction(bind([this](string msg, IPAddress ip, uint16_t port) {
+                    rps++;
+                    if(rps > maxrate) maxrate=rps;
+                    uint32_t heapnow=ESP.getFreeHeap();
+                    uint32_t pcnow=heapnow*100/startheap;
+                    int d=lastheap - heapnow;
+                    if(abs(d) > delta) {
+                        Serial.printf("******************* Heap %s %d bytes ******************\n",d<0 ? "GAIN":"LOSS",abs(d));
+                        lastheap=heapnow;
+                    }
+                    Serial.printf("From %s:%d %u %u %u%% rate=%u/sec (max %u)\n",CSTR(ip.toString()),port,micros(),heapnow,pcnow,rps,maxrate);
+                },stringFromBuff(packet.data(), packet.length()),packet.remoteIP(), packet.remotePort()),nullptr, H4P_TRID_UDPM);
+            } //else Serial.printf("IGNORED %u > %u\n",ESP.getFreeHeap(),limit);
         });
     }
 }
 
 void H4P_udpLogger::_start(){
-    if(!(WiFi.getMode() & WIFI_AP)){
-        lastheap=startheap=ESP.getFreeHeap();
-        Serial.printf("udp logger: start heap %u min Delta=%u\n",startheap,delta);
-        _listenUDP();
-        h4.every(1000,[this](){ rps=0; });
-        _upHooks();
-    }
+    Serial.printf("udp logger: start heap %u min Delta=%u notify below %u\n",startheap,delta,limit);
+    _listenUDP();
+    h4.every(1000,[this](){ rps=0; });
+    _upHooks();
 }
 
 #endif

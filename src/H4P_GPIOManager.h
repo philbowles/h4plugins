@@ -210,6 +210,21 @@ using H4GM_COMPARE=function<bool(uint32_t,uint32_t)>;
 #define H4GM_LESS std::less<uint32_t>()
 #define H4GM_GREATER std::greater<uint32_t>()
 
+class AnalogAveragePin: public PolledPin {
+        void        read() override;
+        uint32_t            _n;
+        vector<uint32_t>    _samples;
+	public:
+#ifdef H4P_LOG_EVENTS
+        virtual string dump ()override {
+            return PolledPin::dump()
+            .append(" nSamples=").append(stringFromInt(_n)); 
+        }        
+#endif
+        AnalogAveragePin(uint8_t _p,uint32_t f,uint32_t n,H4GM_FN_EVENT _c);
+        virtual ~AnalogAveragePin(){}
+};
+
 class AnalogThresholdPin: public PolledPin {
         H4GM_COMPARE    fCompare;
         void        read() override;
@@ -436,6 +451,7 @@ class H4P_GPIOManager: public H4Plugin{//
 //
 //      Strategies
 //
+        AnalogAveragePin*   AnalogAverage(uint8_t p,uint32_t freq,uint32_t nSamples,H4GM_FN_EVENT callback);
         AnalogThresholdPin* AnalogThreshold(uint8_t p,uint32_t freq,uint32_t threshold,H4GM_COMPARE compare,H4GM_FN_EVENT callback);//
         AnalogThresholdPin* AnalogThresholdSource(uint8_t p,uint32_t freq,uint32_t threshold,H4GM_COMPARE compare);//
         CircularPin*        Circular(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,uint32_t nStages,H4GM_FN_EVENT callback);//
@@ -444,7 +460,7 @@ class H4P_GPIOManager: public H4Plugin{//
         EncoderPin*         Encoder(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE sense,H4GM_FN_EVENT);
         EncoderPin*         Encoder(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE sense,int&);
         EncoderPin*         EncoderSource(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE sense);
-        EncoderAutoPin*     EncoderAuto(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE sense,int vMin,int vMax,int vSet,uint32_t vIncr,H4GM_FN_EVENT);
+        EncoderAutoPin*     EncoderAuto(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE sense,int vMin,int vMax,int vSet,uint32_t vIncr,H4GM_FN_EVENT callback);
         EncoderAutoPin*     EncoderAuto(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE sense,int vMin,int vMax,int vSet,uint32_t vIncr,int&);
         FilteredPin*        Filtered(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint8_t filter,H4GM_FN_EVENT callback);//
         LatchingPin*        Latching(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback);//
