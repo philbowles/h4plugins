@@ -35,9 +35,10 @@ SOFTWARE.
 
 uint32_t H4P_WiFi::_change(vector<string> vs){ return guardString2(vs,[this](string a,string b){ change(a,b); }); }
 
-void H4P_WiFi::_getPersistentValue(string v,string prefix){
+bool H4P_WiFi::_getPersistentValue(string v,string prefix){
     string persistent=replaceAll(H4P_SerialCmd::read("/"+v),"\r\n","");
     _cb[v]=persistent.size() ? persistent:string(prefix)+_cb[chipTag()];
+    return persistent.size();
 }
 
 void H4P_WiFi::_gotIP(){
@@ -47,12 +48,13 @@ void H4P_WiFi::_gotIP(){
     _cb[pskTag()]=CSTR(WiFi.psk());
 
     string host=_cb[deviceTag()];
-
+#ifdef H4P_USE_OTA
     h4.every(H4WF_OTA_RATE,[](){ ArduinoOTA.handle(); },nullptr,H4P_TRID_HOTA,true);
     _setHost(host);
   	ArduinoOTA.setHostname(CSTR(host));
 	ArduinoOTA.setRebootOnSuccess(false);	
 	ArduinoOTA.begin();
+#endif
     _cb.erase("opts"); // lose any old AP ssids
     Serial.printf("IP=%s\n",CSTR(_cb["ip"])); // unconditional
     H4EVENT("IP=%s",CSTR(_cb["ip"]));
@@ -60,15 +62,18 @@ void H4P_WiFi::_gotIP(){
 }
 
 void H4P_WiFi::_greenLight() { 
-    _cb[chipTag()]=_getChipID();
-    _cb[boardTag()]=replaceAll(H4_BOARD,"ESP8266_","");
-    _getPersistentValue(deviceTag(),"H4-");
-    _getPersistentValue("h4sv","*");
     if(isLoaded(upnpTag())) h4cmd.addCmd("host2",_subCmd,0,CMDVS(_host2));
     start();
 }
 
-void H4P_WiFi::_hookIn(){ WiFi.onEvent(_wifiEvent); }
+void H4P_WiFi::_hookIn(){
+    _cb[chipTag()]=_getChipID();
+    _cb[boardTag()]=replaceAll(H4_BOARD,"ESP8266_","");
+    if(!_getPersistentValue(deviceTag(),"H4-")) if(_device!="") _cb[deviceTag()]=_device;
+    H4EVENT("Device %s",CSTR(_cb[deviceTag()]));
+    _getPersistentValue("h4sv","*");
+    WiFi.onEvent(_wifiEvent);
+}
 
 uint32_t H4P_WiFi::_host(vector<string> vs){
     return guard1(vs,[this](vector<string> vs){

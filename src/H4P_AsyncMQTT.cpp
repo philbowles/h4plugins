@@ -46,15 +46,17 @@ void H4P_AsyncMQTT::_greenLight(){
     });	
     
     onConnect([this](bool b){
-        h4.cancelSingleton(H4P_TRID_MQRC);
-        _discoDone=false;
-        subscribe(CSTR(string("all").append(cmdhash())),0);
-        subscribe(CSTR(string(device+cmdhash())),0);
-        subscribe(CSTR(string(_cb[chipTag()]+cmdhash())),0);
-        subscribe(CSTR(string(_cb[boardTag()]+cmdhash())),0);
-        publish("h4/online",0,false,CSTR(device));
-        _upHooks();
-        H4EVENT("MQTT CNX");
+        h4.queueFunction([this](){
+            h4.cancelSingleton(H4P_TRID_MQRC);
+            _discoDone=false;
+            subscribe(CSTR(string("all").append(cmdhash())),0);
+            subscribe(CSTR(string(device+cmdhash())),0);
+            subscribe(CSTR(string(_cb[chipTag()]+cmdhash())),0);
+            subscribe(CSTR(string(_cb[boardTag()]+cmdhash())),0);
+            publish("h4/online",0,false,CSTR(device));
+            _upHooks();
+            H4EVENT("MQTT CNX");
+        });
     });
 /*
   TCP_DISCONNECTED = 0,
@@ -71,10 +73,12 @@ void H4P_AsyncMQTT::_greenLight(){
 */
     onDisconnect([this](AsyncMqttClientDisconnectReason reason){
         if(!_discoDone){
-            _discoDone=true;
-            _downHooks();
-            H4EVENT("MQTT DCX %d",reason);
-            if(autorestart && WiFi.status()==WL_CONNECTED) h4.every(H4MQ_RETRY,[this](){ connect(); },nullptr,H4P_TRID_MQRC,true);
+            h4.queueFunction([this,reason](){
+                _discoDone=true;
+                _downHooks();
+                H4EVENT("MQTT DCX %d",reason);
+                if(autorestart && WiFi.status()==WL_CONNECTED) h4.every(H4MQ_RETRY,[this](){ connect(); },nullptr,H4P_TRID_MQRC,true);
+            });
         }
     });
 }
@@ -93,7 +97,7 @@ void H4P_AsyncMQTT::_setup(){
         setServer(IPAddress(PARAM_INT(0),PARAM_INT(1),PARAM_INT(2),PARAM_INT(3)),port);
     } else setServer(CSTR(broker),port);        
         
-    setCredentials(CSTR(_cb["muser"]),CSTR(_cb["mpasswd"]));
+    if(_cb["muser"]!="") setCredentials(CSTR(_cb["muser"]),CSTR(_cb["mpasswd"]));
 }
 
 void H4P_AsyncMQTT::_start(){ 

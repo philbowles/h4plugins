@@ -25,54 +25,45 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
 */
-#define H4P_VERSION "0.5.5"
+#ifndef H4P_udpLogger_HO
+#define H4P_udpLogger_HO
 
-// comment this out to prevent and logging by EVENT( whatever ) messages
-#define H4P_LOG_EVENTS
+#include<H4P_WiFiSelect.h>
+#ifndef H4P_NO_WIFI
 
-// comment this out to save a little flash if OTA not required
-//#define H4P_USE_OTA
-/*
-            TWEAKABLES
-*/
-#ifndef H4PCONFIG_H
-#define H4PCONFIG_H
+#include<H4PCommon.h>
 
-#define H4P_REPLY_BUFFER    512
+using H4P_FN_USN        =function<void(uint32_t mx,H4P_CONFIG_BLOCK)>;
+using H4P_USN_MAP       =unordered_map<string,H4P_FN_USN>;
 
-#define H4ESW_MAX_F         150000
-#define H4ESW_MAX_D            100
-#define H4ESW_TIMEOUT           50
+class H4P_udpLogger: public H4Plugin {
+        AsyncUDP 	    _udp;
+        IPAddress		_ubIP;
 
-//#define H4FC_MORSE_SUPPORT
+            uint32_t            startheap,lastheap,delta,maxrate,limit;
+            uint32_t            rps=0;
 
-#define H4MQ_RETRY            10000
+                void            _listenUDP();
 
-#define H4P_UDP_JITTER         250
-#define H4P_UDP_REFRESH     300000
-#define H4P_UDP_REPEAT           2
+                void            _hookIn() override;
+                void            _start() override;
+                void            _greenLight() override {}; // dont autostart!
 
-#define H43F_SLOW              250
-#define H43F_MEDIUM            125
-#define H43F_FAST               25
-#define H43F_TIMEBASE          175
-#define H43F_REBOOT           2000
-#define H43F_FACTORY          5000
+    public: 
+        /*
+        D is smallest heap delta for which log message will be produced
+        H is percentage of heap above which no reporting takes place at all
 
-#define H4WF_OTA_RATE         1000
-
-#define H4P_IPPD_RATE         5000
-#define H4P_PJ_SPREAD            3
-
-#define H4P_PJ_LO (H4P_IPPD_RATE - (H4_JITTER_LO * H4P_PJ_SPREAD))
-#define H4P_PJ_HI (H4P_IPPD_RATE + (H4_JITTER_HI * H4P_PJ_SPREAD))
-
-#define H4P_RUPD_STRETCH         5
-
-#define H4P_TIME_HOLDOFF      2000
-#define H4P_TIME_RESYNC    3600000
-
-#define H4P_SAFE_MINIMUM     20000
+        In English: Log when heap below H% of start value and most recent change is > D bytes
+        */               
+        H4P_udpLogger(uint32_t D=32, uint32_t H=70): delta(D),H4Plugin("ulog"){
+            _ubIP=IPAddress(239,255,255,250);
+            lastheap=startheap=ESP.getFreeHeap();
+            limit=(H*startheap)/100;
+        }
+};
 
 #endif
+#endif // H4P_udpLogger_H

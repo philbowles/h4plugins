@@ -31,9 +31,16 @@ SOFTWARE.
 #define H4P_Timekeeper_H
 
 #include<H4PCommon.h>
+#ifndef H4P_NOW_WIFI
 #ifdef ARDUINO_ARCH_ESP8266
+    #include "sntp.h"
+#else
+    #include "lwip/apps/sntp.h"
+    #include <time.h>
+#endif
+
 #include<H4P_BinaryThing.h>
-#include "sntp.h"
+
 
 using H4P_DURATION = pair<string,string>;
 using H4P_SCHEDULE = vector<H4P_DURATION>;
@@ -50,10 +57,12 @@ class H4P_Timekeeper: public H4Plugin {
                 H4P_BinaryThing*    _btp=nullptr;
                 string              _ntp1;
                 string              _ntp2;
-                uint32_t            _mss00=0;   
+                uint32_t            _mss00=0;
+                struct tm           _timeinfo;
+                int                 _tzo;
 
                 uint32_t    __alarmCore (vector<string> vs,bool daily,H4BS_FN_SWITCH);
-
+                void        __HALsetTimezone(int);
                 uint32_t    _at(vector<string> vs);
                 uint32_t    _daily(vector<string> vs);
                 void        _hookIn() override;
@@ -78,7 +87,7 @@ class H4P_Timekeeper: public H4Plugin {
                 void        show() override;
                 string 		strTime(uint32_t t);
                 void        sync();
-                void        tz(uint32_t tzOffset);
+                void        tz(int tzOffset);
                 string 		upTime();
 };
 

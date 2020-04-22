@@ -111,6 +111,7 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 * [**H4P_UPNPDetectorSource**](docs/h4pd.md): Switch default BinarySwitch/Thing when specific UPNP device USN joins / leaves network
 * [**H4P_RemoteUpdate**](docs/h4ru.md): OTA update from remote server
 * [**H4P_Timekeeper**](docs/h4tk.md): NTP server sync for "clock time" alarms and scheduling
+* [**H4P_Sunrise**](docs/h4tk.md#sunrisesunset) **EXPERIMENTAL** : Gets sunsrise / sunset times from public API give Lat/Long
   
 ## Diagnostic / Development tools:
 

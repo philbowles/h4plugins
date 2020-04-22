@@ -3,7 +3,7 @@
  MIT License
 
 Copyright (c) 2019 Phil Bowles <h4plugins@gmail.com>
-   github     https://github.com/philbowles/H4P_Timekeeper
+   github     https://github.com/philbowles/h4plugins
    blog       https://8266iot.blogspot.com     
    groups     https://www.facebook.com/groups/esp8266questions/
               https://www.facebook.com/H4P_Timekeeper-Esp8266-Firmware-Support-2338535503093896/
@@ -27,7 +27,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifdef ARDUINO_ARCH_ESP8266
+//#ifdef ARDUINO_ARCH_ESP8266
 #include<H4P_Timekeeper.h>
 #include<H4P_SerialCmd.h>
 #include<H4P_BinaryThing.h>
@@ -44,9 +44,45 @@ H4P_Timekeeper::H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzo): H
         {"sync",   { _subCmd,       0, CMD(sync)}},
         {"tz",     { _subCmd,       0, CMDVS(_tz)}}
     };
+    sntp_setoperatingmode(SNTP_OPMODE_POLL);
     _setupSNTP(ntp1,ntp2);
+    __HALsetTimezone(tzo);
+}
+#ifdef ARDUINO_ARCH_ESP8266
+
+void H4P_Timekeeper::__HALsetTimezone(int tzo){
+    _tzo=tzo;
     sntp_set_timezone(tzo);
 }
+
+void H4P_Timekeeper::sync(){
+//    Serial.printf("**************** SYNC\n");
+	long stamp=sntp_get_current_timestamp();
+	if(stamp > 30000){ // 28800 +leeway: default is GMT+8
+		vector<string> dp=split(sntp_get_real_time(stamp)," ");
+        _mss00=parseTime(dp[3])-millis();
+	}
+}
+#else 
+
+void H4P_Timekeeper::__HALsetTimezone(int tzo){
+    _tzo=tzo;
+    string tz="GMT"+stringFromInt((-1*tzo),"%+02d");
+//    Serial.printf("TZ %s\n",CSTR(tz));
+    setenv("TZ", CSTR(tz), 1);
+    tzset();
+ }
+
+void H4P_Timekeeper::sync(){
+//    Serial.printf("**************** SYNC\n");
+    time_t now = 0;
+    time(&now);
+    localtime_r(&now, &_timeinfo);
+//    Serial.printf("TM YEAR %d M%d D%d\n",_timeinfo.tm_year,_timeinfo.tm_mon,_timeinfo.tm_mday);
+//    Serial.printf("TM H%d M%d s%d\n",_timeinfo.tm_hour,_timeinfo.tm_min,_timeinfo.tm_sec);
+    if(_timeinfo.tm_year > 119) _mss00=(1000*((3600*_timeinfo.tm_hour)+(60*_timeinfo.tm_min)+_timeinfo.tm_sec))-millis();
+}
+#endif
 
 uint32_t H4P_Timekeeper::__alarmCore (vector<string> vs,bool daily,H4BS_FN_SWITCH f){
     vector<string> vg=split(H4PAYLOAD,",");
@@ -67,7 +103,8 @@ uint32_t H4P_Timekeeper::__alarmCore (vector<string> vs,bool daily,H4BS_FN_SWITC
             else H4EVENT("RTC ignored"); // don't fire if NTP not sync'ed 
         },msDue,daily ? msDue:0,H4Countdown(1),nullptr,TAG(daily ? 7:3));
         return H4_CMD_OK;
-    } else H4EVENT("Alarm ignored"); // don't set if NTP not sync'ed 
+    } else H4EVENT("Alarm ignored"); // don't set if NTP not sync'ed
+    return H4_CMD_NOT_NOW; 
 }
 
 uint32_t H4P_Timekeeper::_at(vector<string> vs){ return __alarmCore(vs,false,[this](bool b){ _btp->turn(b); }); }
@@ -89,8 +126,8 @@ void H4P_Timekeeper::_hookIn(){
 void H4P_Timekeeper::_setupSNTP(const string& ntp1, const string& ntp2){
     _ntp1=ntp1;
     _ntp2=ntp2;
-    sntp_setservername(0,CSTR(_ntp1));
-    sntp_setservername(1,CSTR(_ntp2));
+    sntp_setservername(0,(char*) _ntp1.c_str());
+    sntp_setservername(1,(char*) _ntp2.c_str());
 }
 
 void H4P_Timekeeper::_start(){
@@ -102,8 +139,9 @@ void H4P_Timekeeper::_start(){
             [this]{ sync(); },
             [this]{
                 static bool gotRTC=false; 
-                H4EVENT("%u GOT NTP %s",millis(),CSTR(clockTime()));
+                H4EVENT("NTP SYNC %s",CSTR(clockTime()));
                 if(!gotRTC) {
+                    _upHooks();
                     onRTC();
                     gotRTC=true;
                     h4.every(H4P_TIME_RESYNC,[this]{ sync(); },nullptr,H4P_TRID_SYNC,true); // tweakables
@@ -112,12 +150,13 @@ void H4P_Timekeeper::_start(){
             H4P_TRID_TIME,
             true
         );
-    }
+    } else _upHooks();
 }
 
 void H4P_Timekeeper::_stop(){ 
     h4.cancelSingleton({H4P_TRID_TIME,H4P_TRID_SYNC});
 	sntp_stop();
+    _downHooks();
 }
 
 uint32_t H4P_Timekeeper::_tz(vector<string> vs){
@@ -179,7 +218,7 @@ void H4P_Timekeeper::setScheduleSource(H4P_SCHEDULE shed){
 
 void H4P_Timekeeper::show(){
 //    reply("_mss00=%d, ms since 00:00=%d",_mss00,msSinceMidnight());
-    reply("TZO=%d",sntp_get_timezone());
+    reply("TZO=%d",_tzo);
     reply("%s %s",CSTR(_ntp1),CSTR(_ntp2));
     reply("Wallclock=%s, UpTime=%s",CSTR(clockTime()),CSTR(upTime()));
 }
@@ -191,19 +230,9 @@ string H4P_Timekeeper::strTime(uint32_t t){ // milliseconds!
 	return string(buf);
 }
 
-void H4P_Timekeeper::sync(){
-	long stamp=sntp_get_current_timestamp();
-	if(stamp > 30000){ // 28800 +leeway: default is GMT+8
-		H4EVENT("GOOD STAMP %u time %lu gtz=%d grt %s",millis(),stamp,sntp_get_timezone(),sntp_get_real_time(stamp));
-		vector<string> dp=split(sntp_get_real_time(stamp)," ");
-        _mss00=parseTime(dp[3])-millis();
-        H4EVENT("%s _mss00=%d",CSTR(dp[3]),_mss00);
-	} else H4EVENT("%u NO TIME AT ALL",millis());
-}
-
-void H4P_Timekeeper::tz(uint32_t tzOffset){
+void H4P_Timekeeper::tz(int tzOffset){
     _stop();
-    sntp_set_timezone(tzOffset);
+    __HALsetTimezone(tzOffset);
     _mss00=0; // reset timekeeping, force sync
     _start();
 }
@@ -213,4 +242,4 @@ string H4P_Timekeeper::upTime(){
 	return stringFromInt(t / msInDay(),"%02d:")+strTime(t);
 }
 
-#endif // esp8266 only
+//#endif // esp8266 only

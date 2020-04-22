@@ -46,6 +46,7 @@ Let's face it: there are only so many things you can do with a GPIO pin! Yes, th
 
 GPIOManager currently provides behaviours for:
 
+* AnalogAverage - send average of N analog samples
 * AnalogThreshold - send 0 or 1 depending on raw analog value > or < user-defined limit
 * Circular - Counts 1 - N, 1 - N etc
 * Debounced - Eliminates switch bounce
@@ -267,6 +268,18 @@ Checking such a sensor every 5 minutes is usually more than enough. The importan
 
 This strategy can also do an `analogRead` if required: `state` will hold the raw analog value;
 [Example Code](../examples/H4GM_Polled/H4GM_Polled.ino)
+
+---
+
+### **Analog Average**
+
+**AnalogAverage** is a specialised version of **Polled**. As with **Polled** it has its state value sampled periodically. After N samples, it sends the average value.
+
+#### Additional fields for AnalogAverage
+
+`uint32_t        nSamples; // The number of samples to average`
+
+[Example Code](../examples/H4GM_AnalogAverage/H4GM_AnalogAverage.ino)
 
 ---
 

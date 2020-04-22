@@ -26,12 +26,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #include<H4P_UPNPServer.h>
 #ifndef H4P_NO_WIFI
 
 void H4P_UPNPServer::_hookIn(){
     DEPEND(asws);
     REQUIREBT;
+    if(!h4wifi._getPersistentValue(nameTag(),"upnp ")) if(_name!="") _cb[nameTag()]=_name;
+    H4EVENT("UPNP name %s",CSTR(_cb[nameTag()]));
 }
 
 void  H4P_UPNPServer::friendlyName(const string& name){ h4wifi._setPersistentValue(nameTag(),name,true); }
@@ -93,13 +96,11 @@ string H4P_UPNPServer::__makeUSN(const string& s){
 string H4P_UPNPServer::__upnpCommon(const string& usn){
 	_cb["usn"]=__makeUSN(usn);
 	string rv=replaceParams(_ucom);
-	return rv+"\r\n\r\n";
+	return rv+"\r\n";
 }
 
 void H4P_UPNPServer::_start(){
     if(!(WiFi.getMode() & WIFI_AP)){
-        _cb[nameTag()]=_name;
-        h4wifi._getPersistentValue(nameTag(),"upnp ");
         _cb["age"]=stringFromInt(H4P_UDP_REFRESH/1000); // fix
 
         _cb["udn"]="Socket-1_0-upnp"+_cb[chipTag()];
@@ -160,13 +161,15 @@ void H4P_UPNPServer::_notify(const string& phase){ // h4Chunker it up
     h4Chunker<vector<string>>(_pups,[this,phase](vector<string>::const_iterator i){ 
         string NT=(*i).size() ? (*i):__makeUSN("");
         string nfy="NOTIFY * HTTP/1.1\r\nHOST:"+string(_ubIP.toString().c_str())+":1900\r\nNTS:ssdp:"+phase+"\r\nNT:"+NT+"\r\n"+__upnpCommon((*i));
-        broadcast(H4P_UDP_JITTER,CSTR(nfy));
+          broadcast(H4P_UDP_JITTER,CSTR(nfy));
     });
 }
+
 string H4P_UPNPServer::replaceParams(const string& s){ // oh for a working regex...
 	int i=0;
 	int j=0;
 	string rv(s);
+
 	while((i=rv.find("%",i))!=string::npos){
         if(j){
             string var=rv.substr(j+1,i-j-1);

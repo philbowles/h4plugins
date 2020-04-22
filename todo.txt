@@ -4,12 +4,14 @@ SOONER
     error gone away in nodejs
 SHORTTERM
     schedule in cheztoi
+    H4_TIMER from at,daily
+    adv docs + / example creating youerown commands
 MEDIUMTERM
     remote client get
-    sunrise/set
+//    sunrise/set
     optimise / mAcrofy guardstring2
     ESp32 MDNS detector
-    templatise / mcrofy dependent module detection
+    templatise / mcrofy dependent module detection (and std hookins for runnables?)
 LONGTERM
     ethernet module stm32
     ESP32 bluetooth PD

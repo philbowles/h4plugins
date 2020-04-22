@@ -70,7 +70,8 @@ enum H4_CMD_ERROR:uint32_t  {
     H4_CMD_NOT_NUMERIC,
     H4_CMD_OUT_OF_BOUNDS,
     H4_CMD_NAME_UNKNOWN,
-    H4_CMD_PAYLOAD_FORMAT
+    H4_CMD_PAYLOAD_FORMAT,
+    H4_CMD_NOT_NOW
 };
 
 enum H4P_LOG_TYPE {
@@ -193,7 +194,8 @@ enum trustedIds {
   H4P_TRID_SYNC,
   H4P_TRID_DALY,
   H4P_TRID_LOOP,
-  H4P_TRID_SHOT
+  H4P_TRID_SHOT,
+  H4P_TRID_SSET
 };
 
 enum H4PC_CMD_ID{
@@ -268,7 +270,7 @@ class H4Plugin {
                 void        hookDisconnect(H4_FN_VOID f){ _disconnected.push_back(f); } 
 //
                 string      getConfig(const string& c){ return _cb[c]; }
-                void        reply(const char* fmt,...); // hoist protected
+        static  void        reply(const char* fmt,...); // hoist protected
 //      syscall only
         virtual void        _reply(string msg) { Serial.println(CSTR(msg)); }
                 void        _downHooks();

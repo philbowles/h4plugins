@@ -46,6 +46,7 @@ H4P_RemoteUpdate	KEYWORD1
 H4P_HeapWarn	KEYWORD1
 H4P_LoopCount	KEYWORD1
 H4P_Timekeeper	KEYWORD1
+H4P_Sunrise	KEYWORD1
 
 #######################################
 # Methods and Functions (	KEYWORD2)
@@ -56,6 +57,7 @@ atSource	KEYWORD2
 all	KEYWORD2
 both	KEYWORD2
 AnalogThreshold	KEYWORD2
+AnalogAverage	KEYWORD2
 AnalogThresholdSource	KEYWORD2
 change	KEYWORD2
 Circular	KEYWORD2
