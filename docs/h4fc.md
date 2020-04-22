@@ -4,8 +4,6 @@
 
 ## Adds multiple LED blinking methods to H4 Universal Scheduler/Timer.
 
-![H4Flasher](/assets/H4flasher.jpg)
-
 *All plugins depend upon the presence of the [H4 library](https://github.com/philbowles/H4), which must be installed first.*
 
 ---

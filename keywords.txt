@@ -56,6 +56,7 @@ atSource	KEYWORD2
 all	KEYWORD2
 both	KEYWORD2
 AnalogThreshold	KEYWORD2
+AnalogAverage	KEYWORD2
 AnalogThresholdSource	KEYWORD2
 change	KEYWORD2
 Circular	KEYWORD2

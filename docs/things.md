@@ -125,7 +125,7 @@ H4P_BinarySwitch h4onof;
 * h4/state // report state
 
 H4P_UPNPServer only
-* h4/upnp/name/N (payload N= new UPNP "friendly name")
+* h4/upnp/N (payload N= new UPNP "friendly name")
   
 ## Topics automatically published
 

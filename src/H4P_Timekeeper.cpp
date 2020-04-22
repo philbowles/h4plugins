@@ -44,27 +44,42 @@ H4P_Timekeeper::H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzo): H
         {"sync",   { _subCmd,       0, CMD(sync)}},
         {"tz",     { _subCmd,       0, CMDVS(_tz)}}
     };
+    sntp_setoperatingmode(SNTP_OPMODE_POLL);
     _setupSNTP(ntp1,ntp2);
     __HALsetTimezone(tzo);
+    
 }
 #ifdef ARDUINO_ARCH_ESP8266
-string H4P_Timekeeper::__HALgetRealTime(long stamp){ return sntp_get_real_time(stamp); }
+int H4P_Timekeeper::__HALgetTimezone(){ return sntp_get_timezone(); }
 
-uint32_t H4P_Timekeeper::__HALgetTimezone(){}
+void H4P_Timekeeper::__HALsetTimezone(int tzo){ sntp_set_timezone(tzo); }
 
-long H4P_Timekeeper::__HALgetTimestamp(){ return sntp_get_current_timestamp(); };
-
-void H4P_Timekeeper::__HALsetTimezone(uint32_t tzo){
-    sntp_set_timezone(tzo);
+void H4P_Timekeeper::sync(){
+	long stamp=sntp_get_current_timestamp();
+	if(stamp > 30000){ // 28800 +leeway: default is GMT+8
+		vector<string> dp=split(sntp_get_real_time(stamp)," ");
+        _mss00=parseTime(dp[3])-millis();
+	}
 }
 #else 
-string H4P_Timekeeper::__HALgetRealTime(long stamp){ return "12:34:56"; }
+int H4P_Timekeeper::__HALgetTimezone(){ return 2; }
 
-uint32_t H4P_Timekeeper::__HALgetTimezone(){ return 2; }
+void H4P_Timekeeper::__HALsetTimezone(int tzo){
+    string tz="GMT"+stringFromInt(tzo,"%+02d");
+    Serial.printf("TZ %s\n",CSTR(tz));
+    setenv("TZ", CSTR(tz), 1);
+    tzset();
+ }
 
-long H4P_Timekeeper::__HALgetTimestamp(){ return 15815347692; };
-
-void H4P_Timekeeper::__HALsetTimezone(uint32_t tzo){ }
+void H4P_Timekeeper::sync(){
+    time_t now = 0;
+    struct tm timeinfo = { 0 };
+    time(&now);
+    localtime_r(&now, &timeinfo);
+    Serial.printf("TM YEAR %d M%d D%d\n",timeinfo.tm_year,timeinfo.tm_mon,timeinfo.tm_mday);
+    Serial.printf("TM H%d M%d s%d\n",timeinfo.tm_hour,timeinfo.tm_min,timeinfo.tm_sec);
+    if(timeinfo.tm_year > 119) _mss00=(1000*((3600*timeinfo.tm_hour)+(60*timeinfo.tm_min)+timeinfo.tm_sec))-millis();
+}
 #endif
 
 uint32_t H4P_Timekeeper::__alarmCore (vector<string> vs,bool daily,H4BS_FN_SWITCH f){
@@ -86,7 +101,8 @@ uint32_t H4P_Timekeeper::__alarmCore (vector<string> vs,bool daily,H4BS_FN_SWITC
             else H4EVENT("RTC ignored"); // don't fire if NTP not sync'ed 
         },msDue,daily ? msDue:0,H4Countdown(1),nullptr,TAG(daily ? 7:3));
         return H4_CMD_OK;
-    } else H4EVENT("Alarm ignored"); // don't set if NTP not sync'ed 
+    } else H4EVENT("Alarm ignored"); // don't set if NTP not sync'ed
+    return H4_CMD_NOT_NOW; 
 }
 
 uint32_t H4P_Timekeeper::_at(vector<string> vs){ return __alarmCore(vs,false,[this](bool b){ _btp->turn(b); }); }
@@ -108,8 +124,6 @@ void H4P_Timekeeper::_hookIn(){
 void H4P_Timekeeper::_setupSNTP(const string& ntp1, const string& ntp2){
     _ntp1=ntp1;
     _ntp2=ntp2;
-//    sntp_setservername(0,CSTR(_ntp1));
-//    sntp_setservername(1,CSTR(_ntp2));
     sntp_setservername(0,(char*) _ntp1.c_str());
     sntp_setservername(1,(char*) _ntp2.c_str());
 }
@@ -125,6 +139,7 @@ void H4P_Timekeeper::_start(){
                 static bool gotRTC=false; 
                 H4EVENT("NTP SYNC %s",CSTR(clockTime()));
                 if(!gotRTC) {
+                    _upHooks();
                     onRTC();
                     gotRTC=true;
                     h4.every(H4P_TIME_RESYNC,[this]{ sync(); },nullptr,H4P_TRID_SYNC,true); // tweakables
@@ -133,14 +148,13 @@ void H4P_Timekeeper::_start(){
             H4P_TRID_TIME,
             true
         );
-    }
-//    _upHooks();
+    } else _upHooks();
 }
 
 void H4P_Timekeeper::_stop(){ 
     h4.cancelSingleton({H4P_TRID_TIME,H4P_TRID_SYNC});
 	sntp_stop();
-//    _downHooks();
+    _downHooks();
 }
 
 uint32_t H4P_Timekeeper::_tz(vector<string> vs){
@@ -212,15 +226,6 @@ string H4P_Timekeeper::strTime(uint32_t t){ // milliseconds!
     uint32_t sex=t/1000;
 	sprintf(buf,"%02d:%02d:%02d",(sex%secsInDay())/3600,(sex/60)%60,sex%60);
 	return string(buf);
-}
-
-void H4P_Timekeeper::sync(){
-	long stamp=__HALgetTimestamp(); //sntp_get_current_timestamp();
-	if(stamp > 30000){ // 28800 +leeway: default is GMT+8
-//		vector<string> dp=split(sntp_get_real_time(stamp)," ");
-		vector<string> dp=split(__HALgetRealTime(stamp)," ");
-        _mss00=parseTime(dp[3])-millis();
-	} // else H4EVENT("%u NO TIME AT ALL",millis());
 }
 
 void H4P_Timekeeper::tz(uint32_t tzOffset){

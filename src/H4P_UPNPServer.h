@@ -79,15 +79,12 @@ class H4P_UPNPServer: public H4Plugin {
         static  string          replaceParams(const string& s);
         static  string 	        replaceParamsFile(const string &f){ return replaceParams(CSTR(H4P_SerialCmd::read(f))); }
     public:                
-        H4P_UPNPServer(const string& name="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): _name(name),H4Plugin(upnpTag(),onC,onD){
+        H4P_UPNPServer(const string& name="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): _name(name), H4Plugin(upnpTag(),onC,onD){
             _pups.push_back(_urn+"device:controllee:1");
             _pups.push_back(_urn+"service:basicevent:1");
             _ubIP=IPAddress(239,255,255,250);
-            //_hookFactory([this](){ SPIFFS.remove(CSTR(string("/"+string(nameTag())))); });
             _factoryHook=[this](){ SPIFFS.remove(CSTR(string("/"+string(nameTag())))); };
-            _cmds={ 
-                {upnpTag(),{H4PC_H4, 0, CMDVS(_friendly)}}
-                };
+            _cmds={ {upnpTag(),{H4PC_H4, 0, CMDVS(_friendly)}} };
         }
 
              void           friendlyName(const string& name);

@@ -2,10 +2,8 @@
 TODO:
 SOONER
     error gone away in nodejs
-    AA KW
-    AA docs
-    static h4preply
     adv docs + / example creating youerown commands
+    H4_TIMER from at,daily
 SHORTTERM
     schedule in cheztoi
 MEDIUMTERM
