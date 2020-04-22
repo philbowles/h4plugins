@@ -31,9 +31,15 @@ SOFTWARE.
 #define H4P_Timekeeper_H
 
 #include<H4PCommon.h>
+#ifndef H4P_NOW_WIFI
 #ifdef ARDUINO_ARCH_ESP8266
+    #include "sntp.h"
+#else
+    #include "lwip/apps/sntp.h"
+#endif
+
 #include<H4P_BinaryThing.h>
-#include "sntp.h"
+
 
 using H4P_DURATION = pair<string,string>;
 using H4P_SCHEDULE = vector<H4P_DURATION>;
@@ -53,7 +59,10 @@ class H4P_Timekeeper: public H4Plugin {
                 uint32_t            _mss00=0;   
 
                 uint32_t    __alarmCore (vector<string> vs,bool daily,H4BS_FN_SWITCH);
-
+                void        __HALsetTimezone(uint32_t);
+                uint32_t    __HALgetTimezone();
+                long        __HALgetTimestamp();
+                string      __HALgetRealTime(long);
                 uint32_t    _at(vector<string> vs);
                 uint32_t    _daily(vector<string> vs);
                 void        _hookIn() override;

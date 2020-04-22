@@ -47,7 +47,7 @@ SOFTWARE.
 
 //#define H4FC_MORSE_SUPPORT
 
-#define H4MQ_RETRY            5000
+#define H4MQ_RETRY            10000
 
 #define H4P_UDP_JITTER         250
 #define H4P_UDP_REFRESH     300000

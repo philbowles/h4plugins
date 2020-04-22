@@ -269,7 +269,7 @@ class H4Plugin {
                 void        hookDisconnect(H4_FN_VOID f){ _disconnected.push_back(f); } 
 //
                 string      getConfig(const string& c){ return _cb[c]; }
-                void        reply(const char* fmt,...); // hoist protected
+        static  void        reply(const char* fmt,...); // hoist protected
 //      syscall only
         virtual void        _reply(string msg) { Serial.println(CSTR(msg)); }
                 void        _downHooks();

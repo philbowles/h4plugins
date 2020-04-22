@@ -4,6 +4,8 @@ SOONER
     error gone away in nodejs
     AA KW
     AA docs
+    static h4preply
+    adv docs + / example creating youerown commands
 SHORTTERM
     schedule in cheztoi
 MEDIUMTERM

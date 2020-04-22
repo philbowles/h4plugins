@@ -27,7 +27,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifdef ARDUINO_ARCH_ESP8266
+//#ifdef ARDUINO_ARCH_ESP8266
 #include<H4P_Timekeeper.h>
 #include<H4P_SerialCmd.h>
 #include<H4P_BinaryThing.h>
@@ -45,8 +45,27 @@ H4P_Timekeeper::H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzo): H
         {"tz",     { _subCmd,       0, CMDVS(_tz)}}
     };
     _setupSNTP(ntp1,ntp2);
+    __HALsetTimezone(tzo);
+}
+#ifdef ARDUINO_ARCH_ESP8266
+string H4P_Timekeeper::__HALgetRealTime(long stamp){ return sntp_get_real_time(stamp); }
+
+uint32_t H4P_Timekeeper::__HALgetTimezone(){}
+
+long H4P_Timekeeper::__HALgetTimestamp(){ return sntp_get_current_timestamp(); };
+
+void H4P_Timekeeper::__HALsetTimezone(uint32_t tzo){
     sntp_set_timezone(tzo);
 }
+#else 
+string H4P_Timekeeper::__HALgetRealTime(long stamp){ return "12:34:56"; }
+
+uint32_t H4P_Timekeeper::__HALgetTimezone(){ return 2; }
+
+long H4P_Timekeeper::__HALgetTimestamp(){ return 15815347692; };
+
+void H4P_Timekeeper::__HALsetTimezone(uint32_t tzo){ }
+#endif
 
 uint32_t H4P_Timekeeper::__alarmCore (vector<string> vs,bool daily,H4BS_FN_SWITCH f){
     vector<string> vg=split(H4PAYLOAD,",");
@@ -89,8 +108,10 @@ void H4P_Timekeeper::_hookIn(){
 void H4P_Timekeeper::_setupSNTP(const string& ntp1, const string& ntp2){
     _ntp1=ntp1;
     _ntp2=ntp2;
-    sntp_setservername(0,CSTR(_ntp1));
-    sntp_setservername(1,CSTR(_ntp2));
+//    sntp_setservername(0,CSTR(_ntp1));
+//    sntp_setservername(1,CSTR(_ntp2));
+    sntp_setservername(0,(char*) _ntp1.c_str());
+    sntp_setservername(1,(char*) _ntp2.c_str());
 }
 
 void H4P_Timekeeper::_start(){
@@ -181,7 +202,7 @@ void H4P_Timekeeper::setScheduleSource(H4P_SCHEDULE shed){
 
 void H4P_Timekeeper::show(){
 //    reply("_mss00=%d, ms since 00:00=%d",_mss00,msSinceMidnight());
-    reply("TZO=%d",sntp_get_timezone());
+    reply("TZO=%d",__HALgetTimezone());
     reply("%s %s",CSTR(_ntp1),CSTR(_ntp2));
     reply("Wallclock=%s, UpTime=%s",CSTR(clockTime()),CSTR(upTime()));
 }
@@ -194,16 +215,17 @@ string H4P_Timekeeper::strTime(uint32_t t){ // milliseconds!
 }
 
 void H4P_Timekeeper::sync(){
-	long stamp=sntp_get_current_timestamp();
+	long stamp=__HALgetTimestamp(); //sntp_get_current_timestamp();
 	if(stamp > 30000){ // 28800 +leeway: default is GMT+8
-		vector<string> dp=split(sntp_get_real_time(stamp)," ");
+//		vector<string> dp=split(sntp_get_real_time(stamp)," ");
+		vector<string> dp=split(__HALgetRealTime(stamp)," ");
         _mss00=parseTime(dp[3])-millis();
 	} // else H4EVENT("%u NO TIME AT ALL",millis());
 }
 
 void H4P_Timekeeper::tz(uint32_t tzOffset){
     _stop();
-    sntp_set_timezone(tzOffset);
+    __HALsetTimezone(tzOffset);
     _mss00=0; // reset timekeeping, force sync
     _start();
 }
@@ -213,4 +235,4 @@ string H4P_Timekeeper::upTime(){
 	return stringFromInt(t / msInDay(),"%02d:")+strTime(t);
 }
 
-#endif // esp8266 only
+//#endif // esp8266 only
