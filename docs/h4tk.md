@@ -1,8 +1,8 @@
-![H4P Flyer](/assets/WiFiLogo.jpg) 
+![H4P Flyer](/assets/time/ogo.jpg) 
 
 # NTP Synchronisation (short name="time")
 
-## Adds real-time alarms and scheduling. Runs on ESP8266 only
+## Adds real-time alarms and scheduling (**EXPERIMENTAL** Sunrise/Sunset times)
 
 *All plugins depend upon the presence of the [H4 library](https://github.com/philbowles/H4), which must be installed first.*
 
@@ -14,8 +14,6 @@ Syncrhonises with two user-chosen pubic NTP servers. At boot time, it reds the c
 
 The internal clock is re-synchronised 1x per hour (configurable) while ever a network connection is available
 
-![upnp](/assets/upnp.jpg) 
-
 ---
 
 # Usage
@@ -23,7 +21,7 @@ The internal clock is re-synchronised 1x per hour (configurable) while ever a ne
 ```cpp
 #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
-H4P_WiFi h4tk(...
+H4P_Timekeeper h4tk(...
 ```
 
 ## Dependencies
@@ -32,9 +30,9 @@ H4P_WiFi h4tk(...
 
 ## Commands Added
 
-* h4/wifi/change/x,y (payload x,y = ntp1,ntp2)
-* h4/wifi/sync (force re-sync)
-* h4/wifi/tz/x (payload x = *integer* offest of timezeone in hrs from GMT)
+* h4/time/change/x,y (payload x,y = ntp1,ntp2)
+* h4/time/sync (force re-sync)
+* h4/time/tz/x (payload x = *integer* offest of timezeone in hrs from GMT)
 
 ## Callbacks
 
@@ -92,6 +90,53 @@ void sync(); // forces re-sync whith NTP servers (normally done automatically 1x
 void tz(uint32_t tzOffset); // change timezone and force resync for SUMMER/WINTER time. Will screw up any existing timers!
 string upTime(); // returns "hh:mm:ss" value of time since bootup
 ```
+
+---
+
+# Sunrise/Sunset
+
+Calls the public API @ https://api.sunrise-sunset.org/json with your Lat / Long and returns sunrise / sunset times
+
+---
+
+# Usage
+
+```cpp
+#include<H4Plugins.h>
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
+H4P_Sunrise h4ss(...
+```
+
+## Dependencies
+
+* [H4P_WiFi](h4wifi.md) Plugin
+* H4P_Timekeeper Plugin
+
+## Commands Added
+
+None
+
+## Callbacks
+
+```cpp
+void onAlarm(bool); // user-defined function called when alarm occurs
+```
+
+---
+
+# API
+
+```cpp
+// Constructor
+// lat / long must be given as string representaon of floating point values, e.g. "48.4738943","-0.6029038"
+// H4P_EPHEMERA riseOrSet is either SUNRISE or SUNSET
+H4P_Sunrise(const string& latitude,const string& longitude);
+
+void  at(H4P_EPHEMERA riseOrSet,bool onoff,H4BS_FN_SWITCH onAlarm); //  call onAlarm(onoff) at SUNRISE or SUNSET
+void  atSource(H4P_EPHEMERA riseOrSet,bool onoff); // Switch BinarySwitch/Thing on/off at SUNRISE or SUNSET
+```
+
+[Example sketch](../examples/H4P_SunriseSunset/H4P_SunriseSunset.ino)
 
 ---
 

@@ -2,10 +2,10 @@
 TODO:
 SOONER
     error gone away in nodejs
-    adv docs + / example creating youerown commands
-    H4_TIMER from at,daily
 SHORTTERM
     schedule in cheztoi
+    H4_TIMER from at,daily
+    adv docs + / example creating youerown commands
 MEDIUMTERM
     remote client get
 //    sunrise/set

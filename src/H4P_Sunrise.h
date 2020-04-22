@@ -31,7 +31,7 @@ SOFTWARE.
 #define H4P_Sunrise_H
 
 #include<H4PCommon.h>
-#ifdef ARDUINO_ARCH_ESP8266
+//#ifdef ARDUINO_ARCH_ESP8266
 #include<H4P_Timekeeper.h>
 
 enum H4P_EPHEMERA {
@@ -53,11 +53,15 @@ class H4P_Sunrise: public H4Plugin {
 
                 void        at(H4P_EPHEMERA riseOrSet,bool onoff,H4BS_FN_SWITCH f){ h4tk.at(_ephTime(riseOrSet),onoff,f); }
                 void        atSource(H4P_EPHEMERA riseOrSet,bool onoff){ h4tk.atSource(_ephTime(riseOrSet),onoff); }
-                void        daily(H4P_EPHEMERA riseOrSet,bool onoff,H4BS_FN_SWITCH f){ h4tk.daily(_ephTime(riseOrSet),onoff,f); }
-                void        dailySource(H4P_EPHEMERA riseOrSet,bool onoff){ h4tk.dailySource(_ephTime(riseOrSet),onoff); }
+//                void        daily(H4P_EPHEMERA riseOrSet,bool onoff,H4BS_FN_SWITCH f){ h4tk.daily(_ephTime(riseOrSet),onoff,f); }
+//                void        dailySource(H4P_EPHEMERA riseOrSet,bool onoff){ h4tk.dailySource(_ephTime(riseOrSet),onoff); }
+                void show() override {
+                    reply("Loc=%s",CSTR(_latlong));
+                    reply("Rise@%s Set@%s",CSTR(_cb["sunrise"]),CSTR(_cb["sunset"]));
+                }
 };
 
 extern __attribute__((weak)) H4P_Sunrise h4ss;
 
-#endif // esp8266 only
+//#endif // esp8266 only
 #endif // H4P_Sunrise_H

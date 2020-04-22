@@ -60,10 +60,10 @@ class H4P_BinaryThing: public H4Plugin{
             };
         }
 
-        virtual  void show() override { 
-            reply("State: %s",_getState() ? "ON":"OFF");
-            for(auto s :_slaves) reply("Slave: %s",CSTR(s));
-        }
+            void show() override { 
+                reply("State: %s",_getState() ? "ON":"OFF");
+                for(auto s :_slaves) reply("Slave: %s",CSTR(s));
+            }
 
                     void    slave(const string& otherh4){ _slaves.insert(otherh4); }
                     bool    state() { return _getState(); }

@@ -3,7 +3,7 @@
  MIT License
 
 Copyright (c) 2019 Phil Bowles <h4plugins@gmail.com>
-   github     https://github.com/philbowles/H4P_Timekeeper
+   github     https://github.com/philbowles/h4plugins
    blog       https://8266iot.blogspot.com     
    groups     https://www.facebook.com/groups/esp8266questions/
               https://www.facebook.com/H4P_Timekeeper-Esp8266-Firmware-Support-2338535503093896/
@@ -47,14 +47,16 @@ H4P_Timekeeper::H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzo): H
     sntp_setoperatingmode(SNTP_OPMODE_POLL);
     _setupSNTP(ntp1,ntp2);
     __HALsetTimezone(tzo);
-    
 }
 #ifdef ARDUINO_ARCH_ESP8266
-int H4P_Timekeeper::__HALgetTimezone(){ return sntp_get_timezone(); }
 
-void H4P_Timekeeper::__HALsetTimezone(int tzo){ sntp_set_timezone(tzo); }
+void H4P_Timekeeper::__HALsetTimezone(int tzo){
+    _tzo=tzo;
+    sntp_set_timezone(tzo);
+}
 
 void H4P_Timekeeper::sync(){
+//    Serial.printf("**************** SYNC\n");
 	long stamp=sntp_get_current_timestamp();
 	if(stamp > 30000){ // 28800 +leeway: default is GMT+8
 		vector<string> dp=split(sntp_get_real_time(stamp)," ");
@@ -62,23 +64,23 @@ void H4P_Timekeeper::sync(){
 	}
 }
 #else 
-int H4P_Timekeeper::__HALgetTimezone(){ return 2; }
 
 void H4P_Timekeeper::__HALsetTimezone(int tzo){
-    string tz="GMT"+stringFromInt(tzo,"%+02d");
-    Serial.printf("TZ %s\n",CSTR(tz));
+    _tzo=tzo;
+    string tz="GMT"+stringFromInt((-1*tzo),"%+02d");
+//    Serial.printf("TZ %s\n",CSTR(tz));
     setenv("TZ", CSTR(tz), 1);
     tzset();
  }
 
 void H4P_Timekeeper::sync(){
+//    Serial.printf("**************** SYNC\n");
     time_t now = 0;
-    struct tm timeinfo = { 0 };
     time(&now);
-    localtime_r(&now, &timeinfo);
-    Serial.printf("TM YEAR %d M%d D%d\n",timeinfo.tm_year,timeinfo.tm_mon,timeinfo.tm_mday);
-    Serial.printf("TM H%d M%d s%d\n",timeinfo.tm_hour,timeinfo.tm_min,timeinfo.tm_sec);
-    if(timeinfo.tm_year > 119) _mss00=(1000*((3600*timeinfo.tm_hour)+(60*timeinfo.tm_min)+timeinfo.tm_sec))-millis();
+    localtime_r(&now, &_timeinfo);
+//    Serial.printf("TM YEAR %d M%d D%d\n",_timeinfo.tm_year,_timeinfo.tm_mon,_timeinfo.tm_mday);
+//    Serial.printf("TM H%d M%d s%d\n",_timeinfo.tm_hour,_timeinfo.tm_min,_timeinfo.tm_sec);
+    if(_timeinfo.tm_year > 119) _mss00=(1000*((3600*_timeinfo.tm_hour)+(60*_timeinfo.tm_min)+_timeinfo.tm_sec))-millis();
 }
 #endif
 
@@ -216,7 +218,7 @@ void H4P_Timekeeper::setScheduleSource(H4P_SCHEDULE shed){
 
 void H4P_Timekeeper::show(){
 //    reply("_mss00=%d, ms since 00:00=%d",_mss00,msSinceMidnight());
-    reply("TZO=%d",__HALgetTimezone());
+    reply("TZO=%d",_tzo);
     reply("%s %s",CSTR(_ntp1),CSTR(_ntp2));
     reply("Wallclock=%s, UpTime=%s",CSTR(clockTime()),CSTR(upTime()));
 }
@@ -228,7 +230,7 @@ string H4P_Timekeeper::strTime(uint32_t t){ // milliseconds!
 	return string(buf);
 }
 
-void H4P_Timekeeper::tz(uint32_t tzOffset){
+void H4P_Timekeeper::tz(int tzOffset){
     _stop();
     __HALsetTimezone(tzOffset);
     _mss00=0; // reset timekeeping, force sync
