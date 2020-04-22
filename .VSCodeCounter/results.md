@@ -1,18 +1,18 @@
 # Summary
 
-Date : 2020-04-14 00:26:37
+Date : 2020-04-22 23:54:26
 
 Directory c:\Users\phil\Documents\Arduino\libraries\h4plugins
 
-Total : 151 files,  10104 codes, 2954 comments, 2346 blanks, all 15404 lines
+Total : 161 files,  10628 codes, 3193 comments, 2475 blanks, all 16296 lines
 
 [details](details.md)
 
 ## Languages
 | language | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| C++ | 111 | 5,743 | 2,935 | 1,021 | 9,699 |
-| Markdown | 24 | 2,629 | 0 | 1,304 | 3,933 |
+| C++ | 120 | 6,191 | 3,174 | 1,102 | 10,467 |
+| Markdown | 25 | 2,705 | 0 | 1,352 | 4,057 |
 | JSON | 2 | 1,216 | 0 | 2 | 1,218 |
 | JavaScript | 3 | 162 | 7 | 12 | 181 |
 | HTML | 1 | 119 | 0 | 1 | 120 |
@@ -27,15 +27,16 @@ Total : 151 files,  10104 codes, 2954 comments, 2346 blanks, all 15404 lines
 ## Directories
 | path | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| . | 151 | 10,104 | 2,954 | 2,346 | 15,404 |
+| . | 161 | 10,628 | 3,193 | 2,475 | 16,296 |
 | SPIFFS | 1 | 6 | 0 | 1 | 7 |
 | assets | 2 | 55 | 59 | 18 | 132 |
 | data | 6 | 359 | 2 | 4 | 365 |
-| docs | 22 | 2,422 | 0 | 1,211 | 3,633 |
-| examples | 63 | 2,539 | 1,106 | 324 | 3,969 |
+| docs | 23 | 2,497 | 0 | 1,259 | 3,756 |
+| examples | 67 | 2,722 | 1,168 | 355 | 4,245 |
 | examples\H4FC_ActiveLow | 1 | 12 | 7 | 3 | 22 |
 | examples\H4FC_Basic | 1 | 20 | 5 | 5 | 30 |
 | examples\H4FC_Integrated | 1 | 13 | 8 | 4 | 25 |
+| examples\H4GM_AnalogAverage | 1 | 22 | 32 | 5 | 59 |
 | examples\H4GM_AnalogThreshold | 1 | 22 | 37 | 7 | 66 |
 | examples\H4GM_AnalogThresholdSource | 1 | 9 | 1 | 4 | 14 |
 | examples\H4GM_Circular | 1 | 19 | 42 | 5 | 66 |
@@ -77,6 +78,7 @@ Total : 151 files,  10104 codes, 2954 comments, 2346 blanks, all 15404 lines
 | examples\H4P_MQTT_Simple | 1 | 31 | 14 | 8 | 53 |
 | examples\H4P_MQTT_Subtopics | 1 | 37 | 19 | 7 | 63 |
 | examples\H4P_MQTT_Wildcards | 1 | 40 | 39 | 5 | 84 |
+| examples\H4P_OLED_NTP_CLOCK | 1 | 31 | 15 | 8 | 54 |
 | examples\H4P_PersistentStorage | 1 | 23 | 0 | 5 | 28 |
 | examples\H4P_PresenceDetectH4 | 1 | 7 | 0 | 5 | 12 |
 | examples\H4P_PresenceDetectIP | 1 | 11 | 0 | 9 | 20 |
@@ -86,13 +88,14 @@ Total : 151 files,  10104 codes, 2954 comments, 2346 blanks, all 15404 lines
 | examples\H4P_RemoteUpdate | 1 | 11 | 9 | 2 | 22 |
 | examples\H4P_SONOFF_Basic | 1 | 10 | 14 | 4 | 28 |
 | examples\H4P_SerialCmd | 1 | 13 | 13 | 4 | 30 |
+| examples\H4P_SunriseSunset | 1 | 13 | 0 | 3 | 16 |
 | examples\H4P_TaskSniffer | 1 | 41 | 31 | 4 | 76 |
 | examples\H4P_Timekeeper | 1 | 34 | 15 | 8 | 57 |
 | examples\H4_TaskNames | 1 | 35 | 20 | 5 | 60 |
-| examples\xtras | 3 | 68 | 10 | 12 | 90 |
-| examples\xtras\ChezToiioT_Config | 1 | 47 | 1 | 7 | 55 |
+| examples\xtras | 3 | 90 | 23 | 15 | 128 |
+| examples\xtras\ChezToiioT_Config | 1 | 69 | 14 | 10 | 93 |
 | examples\xtras\Generic_ESP01S | 1 | 10 | 0 | 3 | 13 |
 | examples\xtras\Generic_SONOFF | 1 | 11 | 9 | 2 | 22 |
-| src | 53 | 4,321 | 1,767 | 693 | 6,781 |
+| src | 59 | 4,814 | 1,964 | 765 | 7,543 |
 
 [details](details.md)

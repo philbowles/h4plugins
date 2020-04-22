@@ -1,17 +1,17 @@
 # Details
 
-Date : 2020-04-14 00:26:36
+Date : 2020-04-22 23:54:26
 
 Directory c:\Users\phil\Documents\Arduino\libraries\h4plugins
 
-Total : 151 files,  10104 codes, 2954 comments, 2346 blanks, all 15404 lines
+Total : 161 files,  10628 codes, 3193 comments, 2475 blanks, all 16296 lines
 
 [summary](results.md)
 
 ## Files
 | filename | language | code | comment | blank | total |
 | :--- | :--- | ---: | ---: | ---: | ---: |
-| [README.md](/README.md) | Markdown | 151 | 0 | 72 | 223 |
+| [README.md](/README.md) | Markdown | 152 | 0 | 72 | 224 |
 | [SPIFFS/spiffs.bat](/SPIFFS/spiffs.bat) | Batch | 6 | 0 | 1 | 7 |
 | [assets/H4P_Skeleton.cpp](/assets/H4P_Skeleton.cpp) | C++ | 30 | 30 | 10 | 70 |
 | [assets/H4P_Skeleton.h](/assets/H4P_Skeleton.h) | C++ | 25 | 29 | 8 | 62 |
@@ -26,8 +26,8 @@ Total : 151 files,  10104 codes, 2954 comments, 2346 blanks, all 15404 lines
 | [docs/h4ce.md](/docs/h4ce.md) | Markdown | 55 | 0 | 27 | 82 |
 | [docs/h4cmd.md](/docs/h4cmd.md) | Markdown | 176 | 0 | 95 | 271 |
 | [docs/h4esw.md](/docs/h4esw.md) | Markdown | 80 | 0 | 36 | 116 |
-| [docs/h4fc.md](/docs/h4fc.md) | Markdown | 64 | 0 | 37 | 101 |
-| [docs/h4gm.md](/docs/h4gm.md) | Markdown | 310 | 0 | 164 | 474 |
+| [docs/h4fc.md](/docs/h4fc.md) | Markdown | 63 | 0 | 36 | 99 |
+| [docs/h4gm.md](/docs/h4gm.md) | Markdown | 317 | 0 | 170 | 487 |
 | [docs/h4hw.md](/docs/h4hw.md) | Markdown | 45 | 0 | 24 | 69 |
 | [docs/h4lc.md](/docs/h4lc.md) | Markdown | 45 | 0 | 24 | 69 |
 | [docs/h4logs.md](/docs/h4logs.md) | Markdown | 216 | 0 | 111 | 327 |
@@ -37,15 +37,17 @@ Total : 151 files,  10104 codes, 2954 comments, 2346 blanks, all 15404 lines
 | [docs/h4qw.md](/docs/h4qw.md) | Markdown | 45 | 0 | 24 | 69 |
 | [docs/h4ru.md](/docs/h4ru.md) | Markdown | 44 | 0 | 26 | 70 |
 | [docs/h4stor.md](/docs/h4stor.md) | Markdown | 55 | 0 | 27 | 82 |
-| [docs/h4tk.md](/docs/h4tk.md) | Markdown | 80 | 0 | 27 | 107 |
+| [docs/h4tk.md](/docs/h4tk.md) | Markdown | 109 | 0 | 43 | 152 |
 | [docs/h4ts.md](/docs/h4ts.md) | Markdown | 55 | 0 | 31 | 86 |
 | [docs/h4wifi.md](/docs/h4wifi.md) | Markdown | 67 | 0 | 41 | 108 |
 | [docs/mysql.md](/docs/mysql.md) | Markdown | 106 | 0 | 55 | 161 |
-| [docs/rn051.md](/docs/rn051.md) | Markdown | 189 | 0 | 113 | 302 |
+| [docs/rn051.md](/docs/rn051.md) | Markdown | 189 | 0 | 116 | 305 |
+| [docs/rn055.md](/docs/rn055.md) | Markdown | 40 | 0 | 24 | 64 |
 | [docs/things.md](/docs/things.md) | Markdown | 149 | 0 | 68 | 217 |
 | [examples/H4FC_ActiveLow/H4FC_ActiveLow.ino](/examples/H4FC_ActiveLow/H4FC_ActiveLow.ino) | C++ | 12 | 7 | 3 | 22 |
 | [examples/H4FC_Basic/H4FC_Basic.ino](/examples/H4FC_Basic/H4FC_Basic.ino) | C++ | 20 | 5 | 5 | 30 |
 | [examples/H4FC_Integrated/H4FC_Integrated.ino](/examples/H4FC_Integrated/H4FC_Integrated.ino) | C++ | 13 | 8 | 4 | 25 |
+| [examples/H4GM_AnalogAverage/H4GM_AnalogAverage.ino](/examples/H4GM_AnalogAverage/H4GM_AnalogAverage.ino) | C++ | 22 | 32 | 5 | 59 |
 | [examples/H4GM_AnalogThresholdSource/H4GM_AnalogThresholdSource.ino](/examples/H4GM_AnalogThresholdSource/H4GM_AnalogThresholdSource.ino) | C++ | 9 | 1 | 4 | 14 |
 | [examples/H4GM_AnalogThreshold/H4GM_AnalogThreshold.ino](/examples/H4GM_AnalogThreshold/H4GM_AnalogThreshold.ino) | C++ | 22 | 37 | 7 | 66 |
 | [examples/H4GM_Circular/H4GM_Circular.ino](/examples/H4GM_Circular/H4GM_Circular.ino) | C++ | 19 | 42 | 5 | 66 |
@@ -91,6 +93,7 @@ Total : 151 files,  10104 codes, 2954 comments, 2346 blanks, all 15404 lines
 | [examples/H4P_MQTT_Simple/H4P_MQTT_Simple.ino](/examples/H4P_MQTT_Simple/H4P_MQTT_Simple.ino) | C++ | 31 | 14 | 8 | 53 |
 | [examples/H4P_MQTT_Subtopics/H4P_MQTT_Subtopics.ino](/examples/H4P_MQTT_Subtopics/H4P_MQTT_Subtopics.ino) | C++ | 37 | 19 | 7 | 63 |
 | [examples/H4P_MQTT_Wildcards/H4P_MQTT_Wildcards.ino](/examples/H4P_MQTT_Wildcards/H4P_MQTT_Wildcards.ino) | C++ | 40 | 39 | 5 | 84 |
+| [examples/H4P_OLED_NTP_CLOCK/H4P_OLED_NTP_CLOCK.ino](/examples/H4P_OLED_NTP_CLOCK/H4P_OLED_NTP_CLOCK.ino) | C++ | 31 | 15 | 8 | 54 |
 | [examples/H4P_PersistentStorage/H4P_PersistentStorage.ino](/examples/H4P_PersistentStorage/H4P_PersistentStorage.ino) | C++ | 23 | 0 | 5 | 28 |
 | [examples/H4P_PresenceDetectH4/H4P_PresenceDetectH4.ino](/examples/H4P_PresenceDetectH4/H4P_PresenceDetectH4.ino) | C++ | 7 | 0 | 5 | 12 |
 | [examples/H4P_PresenceDetectIP/H4P_PresenceDetectIP.ino](/examples/H4P_PresenceDetectIP/H4P_PresenceDetectIP.ino) | C++ | 11 | 0 | 9 | 20 |
@@ -100,29 +103,32 @@ Total : 151 files,  10104 codes, 2954 comments, 2346 blanks, all 15404 lines
 | [examples/H4P_RemoteUpdate/H4P_RemoteUpdate.ino](/examples/H4P_RemoteUpdate/H4P_RemoteUpdate.ino) | C++ | 11 | 9 | 2 | 22 |
 | [examples/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino](/examples/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino) | C++ | 10 | 14 | 4 | 28 |
 | [examples/H4P_SerialCmd/H4P_SerialCmd.ino](/examples/H4P_SerialCmd/H4P_SerialCmd.ino) | C++ | 13 | 13 | 4 | 30 |
+| [examples/H4P_SunriseSunset/H4P_SunriseSunset.ino](/examples/H4P_SunriseSunset/H4P_SunriseSunset.ino) | C++ | 13 | 0 | 3 | 16 |
 | [examples/H4P_TaskSniffer/H4P_TaskSniffer.ino](/examples/H4P_TaskSniffer/H4P_TaskSniffer.ino) | C++ | 41 | 31 | 4 | 76 |
 | [examples/H4P_Timekeeper/H4P_Timekeeper.ino](/examples/H4P_Timekeeper/H4P_Timekeeper.ino) | C++ | 34 | 15 | 8 | 57 |
 | [examples/H4_TaskNames/H4_TaskNames.ino](/examples/H4_TaskNames/H4_TaskNames.ino) | C++ | 35 | 20 | 5 | 60 |
-| [examples/xtras/ChezToiioT_Config/ChezToiioT_Config.ino](/examples/xtras/ChezToiioT_Config/ChezToiioT_Config.ino) | C++ | 47 | 1 | 7 | 55 |
+| [examples/music.ino](/examples/music.ino) | C++ | 95 | 2 | 12 | 109 |
+| [examples/xtras/ChezToiioT_Config/ChezToiioT_Config.ino](/examples/xtras/ChezToiioT_Config/ChezToiioT_Config.ino) | C++ | 69 | 14 | 10 | 93 |
 | [examples/xtras/Generic_ESP01S/Generic_ESP01S.ino](/examples/xtras/Generic_ESP01S/Generic_ESP01S.ino) | C++ | 10 | 0 | 3 | 13 |
 | [examples/xtras/Generic_SONOFF/Generic_SONOFF.ino](/examples/xtras/Generic_SONOFF/Generic_SONOFF.ino) | C++ | 11 | 9 | 2 | 22 |
 | [library.properties](/library.properties) | Properties | 10 | 0 | 1 | 11 |
 | [plugins.code-workspace](/plugins.code-workspace) | JSON with Comments | 13 | 0 | 0 | 13 |
-| [src/H4PCommon.h](/src/H4PCommon.h) | C++ | 217 | 45 | 30 | 292 |
-| [src/H4P_AsyncMQTT.cpp](/src/H4P_AsyncMQTT.cpp) | C++ | 90 | 43 | 12 | 145 |
+| [src/H4PCommon.h](/src/H4PCommon.h) | C++ | 219 | 45 | 30 | 294 |
+| [src/H4P_AsyncMQTT.cpp](/src/H4P_AsyncMQTT.cpp) | C++ | 94 | 43 | 12 | 149 |
 | [src/H4P_AsyncMQTT.h](/src/H4P_AsyncMQTT.h) | C++ | 41 | 30 | 9 | 80 |
 | [src/H4P_AsyncWebServer.cpp](/src/H4P_AsyncWebServer.cpp) | C++ | 77 | 31 | 13 | 121 |
 | [src/H4P_AsyncWebServer.h](/src/H4P_AsyncWebServer.h) | C++ | 33 | 32 | 6 | 71 |
 | [src/H4P_BinarySwitch.h](/src/H4P_BinarySwitch.h) | C++ | 17 | 30 | 3 | 50 |
 | [src/H4P_BinaryThing.cpp](/src/H4P_BinaryThing.cpp) | C++ | 74 | 29 | 7 | 110 |
 | [src/H4P_BinaryThing.h](/src/H4P_BinaryThing.h) | C++ | 44 | 29 | 6 | 79 |
-| [src/H4P_CmdErrors.h](/src/H4P_CmdErrors.h) | C++ | 91 | 30 | 9 | 130 |
+| [src/H4P_CmdErrors.h](/src/H4P_CmdErrors.h) | C++ | 93 | 30 | 9 | 132 |
 | [src/H4P_ExternalSqWave.cpp](/src/H4P_ExternalSqWave.cpp) | C++ | 62 | 34 | 10 | 106 |
 | [src/H4P_ExternalSqWave.h](/src/H4P_ExternalSqWave.h) | C++ | 25 | 33 | 8 | 66 |
+| [src/H4P_FlasherController copy.h](/src/H4P_FlasherController copy.h) | C++ | 40 | 30 | 11 | 81 |
 | [src/H4P_FlasherController.cpp](/src/H4P_FlasherController.cpp) | C++ | 115 | 34 | 18 | 167 |
 | [src/H4P_FlasherController.h](/src/H4P_FlasherController.h) | C++ | 40 | 30 | 11 | 81 |
-| [src/H4P_GPIOManager.cpp](/src/H4P_GPIOManager.cpp) | C++ | 310 | 56 | 45 | 411 |
-| [src/H4P_GPIOManager.h](/src/H4P_GPIOManager.h) | C++ | 373 | 47 | 54 | 474 |
+| [src/H4P_GPIOManager.cpp](/src/H4P_GPIOManager.cpp) | C++ | 322 | 57 | 45 | 424 |
+| [src/H4P_GPIOManager.h](/src/H4P_GPIOManager.h) | C++ | 388 | 47 | 55 | 490 |
 | [src/H4P_HeapWarn.cpp](/src/H4P_HeapWarn.cpp) | C++ | 35 | 28 | 5 | 68 |
 | [src/H4P_HeapWarn.h](/src/H4P_HeapWarn.h) | C++ | 25 | 29 | 6 | 60 |
 | [src/H4P_HttpMySQLLogger.h](/src/H4P_HttpMySQLLogger.h) | C++ | 49 | 44 | 7 | 100 |
@@ -137,30 +143,34 @@ Total : 151 files,  10104 codes, 2954 comments, 2346 blanks, all 15404 lines
 | [src/H4P_PersistentStorage.cpp](/src/H4P_PersistentStorage.cpp) | C++ | 50 | 31 | 7 | 88 |
 | [src/H4P_PersistentStorage.h](/src/H4P_PersistentStorage.h) | C++ | 29 | 29 | 9 | 67 |
 | [src/H4P_PresenceDetector.cpp](/src/H4P_PresenceDetector.cpp) | C++ | 106 | 37 | 12 | 155 |
-| [src/H4P_PresenceDetector.h](/src/H4P_PresenceDetector.h) | C++ | 84 | 29 | 16 | 129 |
+| [src/H4P_PresenceDetector.h](/src/H4P_PresenceDetector.h) | C++ | 84 | 29 | 20 | 133 |
 | [src/H4P_QueueWarn.cpp](/src/H4P_QueueWarn.cpp) | C++ | 31 | 32 | 4 | 67 |
 | [src/H4P_QueueWarn.h](/src/H4P_QueueWarn.h) | C++ | 25 | 31 | 8 | 64 |
 | [src/H4P_RemoteUpdate.h](/src/H4P_RemoteUpdate.h) | C++ | 53 | 36 | 3 | 92 |
-| [src/H4P_SerialCmd.cpp](/src/H4P_SerialCmd.cpp) | C++ | 260 | 42 | 38 | 340 |
-| [src/H4P_SerialCmd.h](/src/H4P_SerialCmd.h) | C++ | 69 | 32 | 13 | 114 |
+| [src/H4P_SerialCmd.cpp](/src/H4P_SerialCmd.cpp) | C++ | 260 | 38 | 38 | 336 |
+| [src/H4P_SerialCmd.h](/src/H4P_SerialCmd.h) | C++ | 70 | 32 | 13 | 115 |
 | [src/H4P_SerialLogger.h](/src/H4P_SerialLogger.h) | C++ | 17 | 29 | 3 | 49 |
+| [src/H4P_Sunrise.cpp](/src/H4P_Sunrise.cpp) | C++ | 73 | 45 | 9 | 127 |
+| [src/H4P_Sunrise.h](/src/H4P_Sunrise.h) | C++ | 27 | 33 | 8 | 68 |
 | [src/H4P_TaskSniffer.cpp](/src/H4P_TaskSniffer.cpp) | C++ | 63 | 32 | 8 | 103 |
 | [src/H4P_TaskSniffer.h](/src/H4P_TaskSniffer.h) | C++ | 25 | 31 | 9 | 65 |
-| [src/H4P_Timekeeper.cpp](/src/H4P_Timekeeper.cpp) | C++ | 157 | 33 | 26 | 216 |
-| [src/H4P_Timekeeper.h](/src/H4P_Timekeeper.h) | C++ | 45 | 36 | 8 | 89 |
-| [src/H4P_UPNPServer.cpp](/src/H4P_UPNPServer.cpp) | C++ | 139 | 30 | 15 | 184 |
-| [src/H4P_UPNPServer.h](/src/H4P_UPNPServer.h) | C++ | 55 | 31 | 14 | 100 |
-| [src/H4P_WiFi.cpp](/src/H4P_WiFi.cpp) | C++ | 179 | 103 | 34 | 316 |
-| [src/H4P_WiFi.h](/src/H4P_WiFi.h) | C++ | 57 | 33 | 10 | 100 |
-| [src/H4P_WiFiSelect.h](/src/H4P_WiFiSelect.h) | C++ | 16 | 0 | 0 | 16 |
+| [src/H4P_Timekeeper.cpp](/src/H4P_Timekeeper.cpp) | C++ | 176 | 40 | 29 | 245 |
+| [src/H4P_Timekeeper.h](/src/H4P_Timekeeper.h) | C++ | 53 | 36 | 9 | 98 |
+| [src/H4P_UPNPServer.cpp](/src/H4P_UPNPServer.cpp) | C++ | 139 | 30 | 18 | 187 |
+| [src/H4P_UPNPServer.h](/src/H4P_UPNPServer.h) | C++ | 53 | 30 | 14 | 97 |
+| [src/H4P_WiFi.cpp](/src/H4P_WiFi.cpp) | C++ | 185 | 103 | 33 | 321 |
+| [src/H4P_WiFi.h](/src/H4P_WiFi.h) | C++ | 57 | 33 | 7 | 97 |
+| [src/H4P_WiFiSelect.h](/src/H4P_WiFiSelect.h) | C++ | 15 | 1 | 0 | 16 |
+| [src/H4P_udpLogger.cpp](/src/H4P_udpLogger.cpp) | C++ | 32 | 28 | 4 | 64 |
+| [src/H4P_udpLogger.h](/src/H4P_udpLogger.h) | C++ | 25 | 35 | 9 | 69 |
 | [src/H4Plugins.cpp](/src/H4Plugins.cpp) | C++ | 86 | 34 | 13 | 133 |
-| [src/H4Plugins.h](/src/H4Plugins.h) | C++ | 44 | 1 | 6 | 51 |
+| [src/H4Plugins.h](/src/H4Plugins.h) | C++ | 46 | 1 | 6 | 53 |
 | [src/asyncHTTPrequest.cpp](/src/asyncHTTPrequest.cpp) | C++ | 558 | 86 | 82 | 726 |
 | [src/asyncHTTPrequest.h](/src/asyncHTTPrequest.h) | C++ | 153 | 25 | 32 | 210 |
-| [src/config.h](/src/config.h) | C++ | 28 | 33 | 14 | 75 |
+| [src/config.h](/src/config.h) | C++ | 28 | 35 | 15 | 78 |
 | [src/h4p.vbs](/src/h4p.vbs) | Visual Basic | 6 | 0 | 1 | 7 |
 | [src/switch.ps1](/src/switch.ps1) | PowerShell | 6 | 12 | 1 | 19 |
+| [src/xbuf.cpp](/src/xbuf.cpp) | C++ | 228 | 20 | 22 | 270 |
 | [src/xbuf.h](/src/xbuf.h) | C++ | 41 | 35 | 10 | 86 |
-| [xbuf.cpp](/xbuf.cpp) | C++ | 228 | 20 | 22 | 270 |
 
 [summary](results.md)
