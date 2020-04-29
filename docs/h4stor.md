@@ -65,7 +65,7 @@ void setstring(const string& name,const string& value); // set name = value
 void setint(const string& name,int value); // set name = value for integers
 ```
 
-[Example code](../examples/H4P_persistentStorage/H4P_persistentStorage.ino)
+[Example code](../examples/H4P_PersistentStorage/H4P_PersistentStorage.ino)
 
 ---
 

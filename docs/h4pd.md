@@ -59,6 +59,7 @@ H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 H4P_BinarySwitch h4onof(12,ACTIVE_HIGH,OFF); // security light
 H4P_IPDetectorSource ippdElvis("Elvis","192.168.1.31"); // switch light on when in range
 ...
+```
 
 Finally, assume you would like your device to turn on / off when another h4 joins or leaves the network.
 

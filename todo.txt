@@ -1,5 +1,8 @@
 
 TODO:
+ADAM
+    mqtt ctor lwt
+    nullsoft nsis
 SOONER
     error gone away in nodejs
 SHORTTERM
@@ -7,6 +10,7 @@ SHORTTERM
     H4_TIMER from at,daily
     adv docs + / example creating youerown commands
 MEDIUMTERM
+    noobs page handling
     remote client get
 //    sunrise/set
     optimise / mAcrofy guardstring2

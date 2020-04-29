@@ -88,23 +88,30 @@ void H4P_AsyncMQTT::_hookIn() { DEPEND(wifi); }
 void H4P_AsyncMQTT::_setup(){
     device=_cb[deviceTag()];
     setClientId(CSTR(device));
-    setWill("h4/offline",0,false,CSTR(device));
+    if(_lwt.topic=="") {
+        _lwt.topic="h4/offline";
+        _lwt.payload=CSTR(device);
+    }
+//    Serial.printf("USING LWT %s [%s] qos=%d R=%d\n",CSTR(_lwt.topic),CSTR(_lwt.payload),_lwt.QOS,_lwt.retain);
+//    setWill(CSTR(_lwt.topic),_lwt.QOS,_lwt.retain,CSTR(_lwt.payload));
+    Serial.printf("USING LWT %s [%s] qos=%d R=%d\n",_lwt.topic,_lwt.payload,_lwt.QOS,_lwt.retain);
+    setWill(_lwt.topic,_lwt.QOS,_lwt.retain,_lwt.payload);
 
     string broker=_cb[brokerTag()];
     uint16_t port=atoi(CSTR(_cb[portTag()]));
     if(atoi(CSTR(broker))) {
         vector<string> vs=split(broker,".");
         setServer(IPAddress(PARAM_INT(0),PARAM_INT(1),PARAM_INT(2),PARAM_INT(3)),port);
-    } else setServer(CSTR(broker),port);        
+    } else setServer(CSTR(broker),port);
         
     if(_cb["muser"]!="") setCredentials(CSTR(_cb["muser"]),CSTR(_cb["mpasswd"]));
 }
 
 void H4P_AsyncMQTT::_start(){ 
-    if(!(WiFi.getMode() & WIFI_AP)) {
+//    if(!(WiFi.getMode() & WIFI_AP)) {
         autorestart=true;
         connect(); 
-    }
+//    }
 }
 
 void H4P_AsyncMQTT::_stop(){

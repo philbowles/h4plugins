@@ -13,6 +13,7 @@
 #include<H4P_QueueWarn.h>
 #include<H4P_GPIOManager.h>
 #include<H4P_FlasherController.h>
+#include<H4P_ToneController.h>
 
 #ifndef ARDUINO_ARCH_STM32
     #include<H4P_PersistentStorage.h>

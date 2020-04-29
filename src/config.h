@@ -32,7 +32,7 @@ SOFTWARE.
 #define H4P_LOG_EVENTS
 
 // comment this out to save a little flash if OTA not required
-//#define H4P_USE_OTA
+#define H4P_USE_OTA
 /*
             TWEAKABLES
 */

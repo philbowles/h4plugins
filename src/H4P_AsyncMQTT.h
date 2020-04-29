@@ -38,9 +38,17 @@ SOFTWARE.
 
 #include<AsyncMqttClient.h>
 
+struct H4P_LWT {
+    const char*      topic;
+    const char*     payload;
+    int         QOS;
+    bool        retain;
+};
+
 class H4P_AsyncMQTT: public H4Plugin, public AsyncMqttClient{
             bool            autorestart=true;
             string          device;
+            struct H4P_LWT  _lwt;
 
         VSCMD(_change);
 
@@ -51,17 +59,15 @@ class H4P_AsyncMQTT: public H4Plugin, public AsyncMqttClient{
                 void        _hookIn() override;
                 void        _greenLight() override;
     public:
-        H4P_AsyncMQTT(string broker,uint16_t port, string user="",string pass="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr):
-            H4Plugin(mqttTag(),onC,onD)
+        H4P_AsyncMQTT(string broker,uint16_t port, string user="",string pass="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr,H4P_LWT lwt={"","",0,false}):
+            _lwt(lwt), H4Plugin(mqttTag(),onC,onD)
         {
             _cb["broker"]=broker;
             _cb[portTag()]=stringFromInt(port);
             _cb["muser"]=user,
             _cb["mpasswd"]=pass;
 
-            _cmds={
-                {_pName,    { H4PC_H4, 0, CMDVS(_change) }}
-            };       
+            _cmds={ {_pName,    { H4PC_H4, 0, CMDVS(_change) }} };
         }
                 void        change(const string& broker,uint16_t port);
                 void        publishDevice(const string& topic,const string& payload="");
