@@ -2,7 +2,7 @@
 /*
  MIT License
 
-Copyright (c) 2019 Phil Bowles <h4plugins@gmail.com>
+Copyright (c) 2020 Phil Bowles <h4plugins@gmail.com>
    github     https://github.com/philbowles/H4P_ToneController
    blog       https://8266iot.blogspot.com     
    groups     https://www.facebook.com/groups/esp8266questions/
@@ -27,6 +27,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#ifdef ARDUINO_ARCH_ESP8266
 #include<H4P_ToneController.h>
 #include<H4.h>
 
@@ -126,6 +127,8 @@ H4P_ToneController::H4P_ToneController(uint32_t tempo): H4Plugin("tone"){
         n.second=distance(xpose.begin(), find(xpose.begin(),xpose.end(),f));
     }
     metronome(tempo);
+
+    _cmds={ {_pName,    { H4PC_H4, 0, CMDVS(_siren) }} };
 }
 
 void H4P_ToneController::_repeat(const string& siren,uint8_t pin,uint32_t speed,uint32_t duration){
@@ -139,6 +142,16 @@ void H4P_ToneController::_repeat(const string& siren,uint8_t pin,uint32_t speed,
         h4.cancel(h); 
         delete v;
     });
+}
+
+uint32_t H4P_ToneController::_siren(vector<string> vs){
+    /*
+    if(vs.size()<2) return H4_CMD_TOO_FEW_PARAMS;
+    if(vs.size()>2) return H4_CMD_TOO_MANY_PARAMS;
+    if(!isNumeric(H4PAYLOAD)) return H4_CMD_NOT_NUMERIC;
+    if(H4PAYLOAD_INT > H4P_SIREN_MAX) return H4_CMD_OUT_OF_BOUNDS;
+*/
+    return H4_CMD_OK;
 }
 
 uint32_t H4P_ToneController::length(const string& tune){
@@ -256,3 +269,4 @@ void H4P_Voice::_tone(uint32_t f,uint8_t effect,uint32_t d,H4_FN_VOID chain){
         h4.queueFunction(chain); // recurse on main loop!
     });
 }
+#endif

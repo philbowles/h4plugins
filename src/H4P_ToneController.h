@@ -1,7 +1,7 @@
 /*
  MIT License
 
-Copyright (c) 2019 Phil Bowles <H48266@gmail.com>
+Copyright (c) 2020 Phil Bowles <H48266@gmail.com>
    github     https://github.com/philbowles/H4
    blog       https://8266iot.blogspot.com
    groups     https://www.facebook.com/groups/esp8266questions/
@@ -37,8 +37,9 @@ enum H4P_SIREN {
     H4P_SIREN_BUZZ,
     H4P_SIREN_CHIRP,
     H4P_SIREN_HILO,
+    H4P_SIREN_SCREECH,
     H4P_SIREN_WOOPWOOP,
-    H4P_SIREN_SCREECH
+    H4P_SIREN_MAX
 };
 
 class H4P_Voice;
@@ -48,6 +49,7 @@ using H4P_TUNE          = vector<H4P_STAVE>;
 
 class H4P_ToneController: public H4Plugin {
         friend class H4P_Voice;
+        VSCMD(_siren);
 //      dsqcmb
         static unordered_map<char,uint32_t> timing;
         static unordered_map<string,uint32_t> notes;

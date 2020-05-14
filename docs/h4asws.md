@@ -71,7 +71,7 @@ H4P_AsyncWebServer(H4_FN_VOID onConnect=[](){},H4_FN_VOID onDisconnect=[](){}):
 // onDisconnect = user callback when webserver is down
 ```
 
-[Example Code](../examples/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
+[Example Code](../examples/XTRAS/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
 
 ---
 
@@ -113,22 +113,7 @@ When "prettified" it looks like this:
 }
 ```
 
-* `res` is the response code
-
-```cpp
-H4_INT_MAP  cmdErrors={
-    {H4_CMD_OK,"OK"},
-    {H4_CMD_UNKNOWN,"Unknown cmd"},
-    {H4_CMD_TOO_FEW_PARAMS,"Too few parameters"},
-    {H4_CMD_TOO_MANY_PARAMS,"Too many parameters"},
-    {H4_CMD_NOT_NUMERIC,"Numeric value expected"},
-    {H4_CMD_OUT_OF_BOUNDS,"Value out of range"},
-    {H4_CMD_NAME_UNKNOWN,"Name not known"},
-    {H4_CMD_PAYLOAD_FORMAT,"Incorrect Payload Format"}
-};
-
-```
-
+* `res` is the response code [List](h4ce.md)
 * `msg` is the corresponding error message if [H4P_CmdErrors](h4ce.md) is used
 * `lines` is an array of the same output that would have been sent a line at a time to the serial console
 

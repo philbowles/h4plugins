@@ -1,12 +1,13 @@
 /*
  MIT License
 
-Copyright (c) 2019 Phil Bowles <H48266@gmail.com>
+Copyright (c) 2020 Phil Bowles <H48266@gmail.com>
    github     https://github.com/philbowles/H4
    blog       https://8266iot.blogspot.com
    groups     https://www.facebook.com/groups/esp8266questions/
               https://www.facebook.com/H4-Esp8266-Firmware-Support-2338535503093896/
 
+Portions (c) 2020 Adam Sharp http://www.threeorbs.co.uk/
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -51,9 +52,13 @@ H4P_SCHEDULE mySchedule={
   {"18:00","23:00"}  // ON @ 1800, OFF @ 2300
 };
 */
+
+using H4_FN_DST        =function<int(uint32_t)>;
+
 class H4P_Timekeeper: public H4Plugin {
         VSCMD(_change);
         VSCMD(_tz);
+                H4_FN_DST           _fDST;
                 H4P_BinaryThing*    _btp=nullptr;
                 string              _ntp1;
                 string              _ntp2;
@@ -71,8 +76,18 @@ class H4P_Timekeeper: public H4Plugin {
                 void        _start() override;
                 void        _stop() override;
     public:
-        H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzOffset=0);
-
+        H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzOffset=0,H4_FN_DST fDST=nullptr);
+///
+// _tzo = Time Zone Offset in +/- minutes from UTC, not hours.
+                uint32_t	clockEPOCH() { time_t now = 0; return _mss00 ? time(&now) : 0; }  // Current number of seconds since EPOCH.
+                uint32_t	clockEPOCHLocal() { return clockEPOCH() + (_tzo * 60); }  // Current number of seconds since EPOCH plus TZ offset.
+                string		clockStrTimeLocal() { return strTime( (clockEPOCHLocal() % 86400) * 1000 ); }  // Current time + TZ as string HH:MM:SS.
+                string 		strfTime(uint32_t t);
+                string 		strfDate(uint32_t t);
+                string 		strfDateTime(char fmt[] = "%a %Y-%m-%d %H:%M:%S", uint32_t t=0);
+        static  int 		DST_EU(uint32_t t);  // DST offset for t in EU (inc UK).
+        static  int 		DST_USA(uint32_t t);  // DST offset for t in USA.
+///
                 void        at(const string& when,bool onoff,H4BS_FN_SWITCH f);
                 void        atSource(const string& when,bool onoff);
                 void        change(const string& ntp1,const string& ntp2);

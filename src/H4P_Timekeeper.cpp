@@ -2,12 +2,13 @@
 /*
  MIT License
 
-Copyright (c) 2019 Phil Bowles <h4plugins@gmail.com>
+Copyright (c) 2020 Phil Bowles <h4plugins@gmail.com>
    github     https://github.com/philbowles/h4plugins
    blog       https://8266iot.blogspot.com     
    groups     https://www.facebook.com/groups/esp8266questions/
               https://www.facebook.com/H4P_Timekeeper-Esp8266-Firmware-Support-2338535503093896/
                 			  
+Portions (c) 2020 Adam Sharp http://www.threeorbs.co.uk/
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +38,7 @@ void __attribute__((weak)) onRTC(){}
 constexpr uint32_t secsInDay(){ return 86400; }
 constexpr uint32_t msInDay(){ return 1000*secsInDay(); }
 
-H4P_Timekeeper::H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzo): H4Plugin(timeTag()){
+H4P_Timekeeper::H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzo,H4_FN_DST fDST): _fDST(fDST), H4Plugin(timeTag()){
     _cmds={
         {_pName,   { H4PC_H4, _subCmd, nullptr}}, // root for this plugin, e.g. h4/ME...
         {"change", { _subCmd,       0, CMDVS(_change)}},
@@ -46,21 +47,26 @@ H4P_Timekeeper::H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzo): H
     };
     sntp_setoperatingmode(SNTP_OPMODE_POLL);
     _setupSNTP(ntp1,ntp2);
-    __HALsetTimezone(tzo);
+    __HALsetTimezone(0);
+    _tzo = tzo;
+    if(!_fDST) _fDST=[](uint32_t){ return 0; };
 }
 #ifdef ARDUINO_ARCH_ESP8266
 
 void H4P_Timekeeper::__HALsetTimezone(int tzo){
     _tzo=tzo;
-    sntp_set_timezone(tzo);
+    sntp_set_timezone(0);
 }
 
 void H4P_Timekeeper::sync(){
-//    Serial.printf("**************** SYNC\n");
 	long stamp=sntp_get_current_timestamp();
+//    Serial.printf("**************** SYNC S=%u tzo=%d %s\n",stamp,_tzo,sntp_get_real_time(stamp));
 	if(stamp > 30000){ // 28800 +leeway: default is GMT+8
-		vector<string> dp=split(sntp_get_real_time(stamp)," ");
+        stamp+=(_tzo*60);
+		vector<string> dp=split(replaceAll(sntp_get_real_time(stamp + _fDST(stamp)),"  "," ")," ");
+//        dumpvs(dp);
         _mss00=parseTime(dp[3])-millis();
+//        Serial.printf("**************** SYNC S=%u tzo=%d %s ms00=%u\n",stamp,_tzo,sntp_get_real_time(stamp + _fDST(stamp)),_mss00);
 	}
 }
 #else 
@@ -68,18 +74,16 @@ void H4P_Timekeeper::sync(){
 void H4P_Timekeeper::__HALsetTimezone(int tzo){
     _tzo=tzo;
     string tz="GMT"+stringFromInt((-1*tzo),"%+02d");
-//    Serial.printf("TZ %s\n",CSTR(tz));
     setenv("TZ", CSTR(tz), 1);
     tzset();
  }
 
 void H4P_Timekeeper::sync(){
-//    Serial.printf("**************** SYNC\n");
     time_t now = 0;
     time(&now);
+    uint32_t adjusted=now+_tzo*60;
+    now=adjusted + _fDST(adjusted);
     localtime_r(&now, &_timeinfo);
-//    Serial.printf("TM YEAR %d M%d D%d\n",_timeinfo.tm_year,_timeinfo.tm_mon,_timeinfo.tm_mday);
-//    Serial.printf("TM H%d M%d s%d\n",_timeinfo.tm_hour,_timeinfo.tm_min,_timeinfo.tm_sec);
     if(_timeinfo.tm_year > 119) _mss00=(1000*((3600*_timeinfo.tm_hour)+(60*_timeinfo.tm_min)+_timeinfo.tm_sec))-millis();
 }
 #endif
@@ -139,7 +143,7 @@ void H4P_Timekeeper::_start(){
             [this]{ sync(); },
             [this]{
                 static bool gotRTC=false; 
-                H4EVENT("NTP SYNC %s",CSTR(clockTime()));
+                H4EVENT("NTP SYNC _mss00=%u %s",_mss00,CSTR(clockTime()));
                 if(!gotRTC) {
                     _upHooks();
                     onRTC();
@@ -184,6 +188,7 @@ string H4P_Timekeeper::minutesFromNow(uint32_t m){
 }
 
 int H4P_Timekeeper::parseTime(const string& ts){ // in milliseconds!
+//    Serial.printf("parseTime %s\n",CSTR(ts));
 	vector<string> parts=split(ts,":");
     uint32_t    h,m,s=0;
     switch(parts.size()){
@@ -228,6 +233,131 @@ string H4P_Timekeeper::strTime(uint32_t t){ // milliseconds!
     uint32_t sex=t/1000;
 	sprintf(buf,"%02d:%02d:%02d",(sex%secsInDay())/3600,(sex/60)%60,sex%60);
 	return string(buf);
+}
+
+string H4P_Timekeeper::strfTime(uint32_t t) { // This one uses seconds :)
+	char buf[9];
+	struct tm ts;
+	time_t rt = t;
+	ts = *gmtime(&rt);
+	strftime( buf, sizeof(buf), "%X", &ts );
+	return string(buf);
+}
+
+string H4P_Timekeeper::strfDate(uint32_t t) { // This one uses seconds :)
+	char buf[11];
+	struct tm ts;
+	time_t rt = t;
+	ts = *gmtime(&rt);
+	strftime( buf, sizeof(buf), "%Y-%m-%d", &ts );
+	return string(buf);
+}
+
+string H4P_Timekeeper::strfDateTime(char fmt[], uint32_t t) { // This one uses seconds :)
+	char buf[40];
+	struct tm ts;
+	time_t rt = t;
+	ts = *gmtime(&rt);
+	strftime( buf, sizeof(buf), fmt, &ts );
+	return string(buf);
+}
+
+int H4P_Timekeeper::DST_EU(uint32_t t) {
+
+	//*Test
+//	struct tm x = {0, 0, 2, 25, 9, 120};
+//	t = mktime(&x);
+
+	time_t rt = t;
+	struct tm ts = *gmtime(&rt);
+	int y = ts.tm_year + 1900;
+
+	//Bomb out if the year is invalid for this formula.
+	if ((y<1996) || (y>2099)) {
+		return 0;
+	}
+	
+	// Construct the date for EU DST start.
+	struct tm tmp = {0, 0, 1, 31 - (5*y/4 + 4) % 7, 2, y-1900};
+	time_t st = mktime(&tmp);
+	// Construct the date for EU DST end.
+	tmp = {0, 0, 2, 31 - (5*y/4 + 1) % 7, 9, y-1900};
+	time_t en = mktime(&tmp);
+	
+	//*Test
+//	char buf[40];
+//	struct tm tt;
+//	tt = *gmtime(&st);
+//	strftime( buf, sizeof(buf), "%a %Y-%m-%d %H:%M:%S", &tt );
+//	Serial.printf("DST Start = %s\n", buf);
+//	tt = *gmtime(&en);
+//	strftime( buf, sizeof(buf), "%a %Y-%m-%d %H:%M:%S", &tt );
+//	Serial.printf("DST End   = %s\n", buf);
+
+	if ((t >= st) && (t < en)) {
+		return 60*60;
+	} else {
+		return 0;
+	}
+	
+	return -1;
+	
+}
+
+int H4P_Timekeeper::DST_USA(uint32_t t) {
+
+	//*Test
+//	struct tm x = {0, 0, 2, 25, 9, 120};
+//	t = mktime(&x);
+
+	time_t rt = t;
+	struct tm ts = *gmtime(&rt);
+	int y = ts.tm_year + 1900;
+
+	time_t en, st;
+	
+	//Formula for 2007 and later in USA.
+	if (y>=2007) {
+		// Construct the date for USA DST start.
+		struct tm tmp = {0, 0, 1, 14 - (1 + y*5/4) % 7, 2, y-1900};
+		st = mktime(&tmp);
+		// Construct the date for USA DST end.
+		tmp = {0, 0, 2, 7 - (1 + y*5/4) % 7, 10, y-1900};
+		en = mktime(&tmp);
+	}
+	
+	//Formula valid for 1900-2006, but was only used/adopted for 1950-1969 in USA.
+	if (y<2007) {
+		if ((y>=1950) && (y<=1969)) {
+			// Construct the date for USA DST start.
+			struct tm tmp = {0, 0, 1, (2+6*y-y/4) % 7+1, 3, y-1900};
+			st = mktime(&tmp);
+			// Construct the date for USA DST end.
+			tmp = {0, 0, 2, 31-(y*5/4+1) % 7, 9, y-1900};
+			en = mktime(&tmp);
+		} else {
+			return 0;
+		}
+	}
+	
+	//*Test
+//	char buf[40];
+//	struct tm tt;
+//	tt = *gmtime(&st);
+//	strftime( buf, sizeof(buf), "%a %Y-%m-%d %H:%M:%S", &tt );
+//	Serial.printf("DST Start = %s\n", buf);
+//	tt = *gmtime(&en);
+//	strftime( buf, sizeof(buf), "%a %Y-%m-%d %H:%M:%S", &tt );
+//	Serial.printf("DST End   = %s\n", buf);
+
+	if ((t >= st) && (t < en)) {
+		return 60*60;
+	} else {
+		return 0;
+	}
+	
+	return -1;
+	
 }
 
 void H4P_Timekeeper::tz(int tzOffset){

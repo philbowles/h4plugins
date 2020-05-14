@@ -65,7 +65,7 @@ string  getTaskType(uint32_t taskType);
 string  getTaskName(uint32_t taskId); // any taskId
 ```
 
-[Example Code](../examples/H4P_CmdErrors/H4P_CmdErrors.ino)
+[Example Code](../examples/BASICS/H4P_CmdErrors/H4P_CmdErrors.ino)
 
 ---
 

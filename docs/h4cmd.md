@@ -133,7 +133,7 @@ Otherwise a simple code is returned:
 {8,"Prohibited from here"}
 ```
 
-[Example Code](../examples/H4P_SerialCmd/H4P_SerialCmd.ino)
+[Example Code](../examples/BASICS/H4P_SerialCmd/H4P_SerialCmd.ino)
 
 ---
 

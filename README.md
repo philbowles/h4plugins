@@ -6,9 +6,11 @@
 
 *All plugins depend upon the presence of the [H4 library](https://github.com/philbowles/H4), which must be installed first.*
 
-[Release Notes v0.5.5](docs/rn055.md) This is a bugfix to 0.5.4 which is a **major** release, there have been significant changes since 0.4.0 so it is important to read [v0.5.4 Release Notes](docs/rn051.md) in its entirety if you are familiar with previous versions
+[Release Notes v0.5.6](docs/rn056.md) 
 
----![H4PluginsFF](/assets/h4plugins.jpg)
+---
+
+![H4PluginsFF](/assets/h4plugins.jpg)
 
 Think of H4 and its plugins as "IOT Lego" or an "IOT Swiss Army Knife" (or both) for [**H4**](https://github.com/philbowles/H4) - and if you are not already using H4's advanced scheduling and timing features, why not? Get it now from the link above, as you will need it to use the H4Plugins system.
 
@@ -97,7 +99,9 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 * [**H4P_AsyncWebServer**](docs/h4asws.md): Fully Asynchronous Webserver
 * [**H4P_AsyncMQTT**](docs/h4mqtt.md): Automatic Connection/ reconnection MQTT client allows remote control of H4
 * [**H4P_BinarySwitch**](docs/things.md): GPIO object that allows control by commands from multiple sources
-* [**H4P_BinaryThing**](docs/xxx.md): user-defined functional object that allows control by commands from multiple sources
+* [**H4P_BinaryThing**](docs/things.md): user-defined functional object that allows control by commands from multiple sources
+* [**H4P_ConditionalSwitch**](docs/things.md): H4P_BinarySwitch that only operates when user-define function returns true
+* [**H4P_ConditionalThing**](docs/things.md): H4P_BinaryThing that only operates when user-define function returns true
 * [**H4P_UPNPServer**](docs/things.md): provides full UPNP device with Alexa voice control, Windows10 Desktop integration
 * [**H4P_MultiFunctionButton**](docs/h4mfnb.md): Tact-button giving on/off, reboot,factory reset and forced AP Mode depending on hold time
 * [**H4P_PersistentStorage**](docs/h4stor.md): Save name/value pairs across reboots (requires SPIFFS)
@@ -112,6 +116,7 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 * [**H4P_RemoteUpdate**](docs/h4ru.md): OTA update from remote server
 * [**H4P_Timekeeper**](docs/h4tk.md): NTP server sync for "clock time" alarms and scheduling
 * [**H4P_Sunrise**](docs/h4tk.md#sunrisesunset) **EXPERIMENTAL** : Gets sunsrise / sunset times from public API give Lat/Long
+* [**H4P_ToneController**](docs/h4tc.md) Buzzer, tones, sirens and...music!
   
 ## Diagnostic / Development tools:
 

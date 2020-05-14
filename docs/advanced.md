@@ -33,10 +33,10 @@ Similarly, with UPNP_Server, omitting a specific names results in the device bei
 To prevent *two* reboots, H4P_WiFi also has the `H4_XXXXXX/h4/wifi/host2` command, allowing you to specify bot the device name and friendly name in one call, saving a reboot. The payload is "device name,friendly name".
 
 Below is an example "generic" sketch that I use in all my Itead SONOFF devices.
-[Generic SONOFF sketch](../examples/xtras/Generic_SONOFF/Generic_SONOFF.ino)
+[Generic SONOFF sketch](../examples/XTRAS/Generic_SONOFF/Generic_SONOFF.ino)
 
 ...and the next is to set up and store retained MQTT messages for the complete configuration for all my own home IOT devices.
-[Create MQTT retained messges configuration](../examples/xtras/ChezToiioT_Config/ChezToiioT_Config.ino)
+[Create MQTT retained messges configuration](../examples/XTRAS/ChezToiioT_Config/ChezToiioT_Config.ino)
 
 ---
 
@@ -46,7 +46,7 @@ The generic sketch above is fine, but what happens when you make a change and ne
 
 In its simplest form, you create a server which holds a repository of the latest SPIFFS images and MCU-specific firmnware images. Setting up the server is beyond the scope of this document but see the nodejs/express sever which does this for you, or the NODE-RED H4 Updater flow below.
 
-[NodeJS/Express update server](../examples/H4P_HttpMySQLLogger/mysqlrest/h4.js)
+[NodeJS/Express update server](../examples/LOGGING/H4P_HttpMySQLLogger/mysqlrest/h4.js)
 
 ## Creating the update repo
 

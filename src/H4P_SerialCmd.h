@@ -1,7 +1,7 @@
 /*
  MIT License
 
-Copyright (c) 2019 Phil Bowles <H48266@gmail.com>
+Copyright (c) 2020 Phil Bowles <H48266@gmail.com>
    github     https://github.com/philbowles/H4
    blog       https://8266iot.blogspot.com
    groups     https://www.facebook.com/groups/esp8266questions/
@@ -53,8 +53,7 @@ using H4P_FN_LOG = function<void(const string &msg,H4P_LOG_TYPE type,const strin
 extern void h4FactoryReset();
 class H4P_SerialCmd: public H4Plugin {
         vector<H4P_FN_LOG>  _logChain;
-
-//        VSCMD(_global);
+        
         VSCMD(_svcRestart);
         VSCMD(_svcInfo);
         VSCMD(_svcStart);

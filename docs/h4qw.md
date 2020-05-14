@@ -52,7 +52,7 @@ void        show(); // Display current setting / usage
 void        pcent(uint32_t pc); // Set new "safe" percentage
 ```
 
-[Example code](../examples/H4P_QueueWarn/H4P_QueueWarn.ino)
+[Example code](../examples/DIAGNOSTICS/H4P_QueueWarn/H4P_QueueWarn.ino)
 
 ---
 

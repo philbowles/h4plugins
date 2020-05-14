@@ -1,7 +1,7 @@
 /*
  MIT License
 
-Copyright (c) 2019 Phil Bowles <H48266@gmail.com>
+Copyright (c) 2020 Phil Bowles <H48266@gmail.com>
    github     https://github.com/philbowles/H4
    blog       https://8266iot.blogspot.com
    groups     https://www.facebook.com/groups/esp8266questions/
@@ -45,6 +45,19 @@ class H4P_BinarySwitch: public H4P_BinaryThing{
         H4P_BinarySwitch(uint8_t pin,H4GM_SENSE sense, uint32_t initial,H4BS_FN_SWITCH f=nullptr,uint32_t timer=0): H4P_BinaryThing(f,initial,timer){
             _pp=h4gm.Output(pin,sense,initial,[](H4GPIOPin* ptr){});
         }
+};
+
+class H4P_ConditionalSwitch: public H4P_BinarySwitch{
+        H4_FN_CTHING _predicate;
+    protected:
+        virtual void        _setState(bool b) override { 
+            if(_predicate && _predicate(b)) H4P_BinarySwitch::_setState(b);
+//            else Serial.printf("CS: pred false when b=%d\n",b);
+        }
+    public:
+        H4P_ConditionalSwitch(uint8_t pin,H4GM_SENSE sense, uint32_t initial,H4_FN_CTHING predicate=nullptr,H4BS_FN_SWITCH f=nullptr,uint32_t timer=0):
+            _predicate(predicate), 
+            H4P_BinarySwitch(pin,sense,initial,f,timer){}
 };
 
 #endif // H4P_BinarySwitch_H

@@ -19,7 +19,7 @@
 
 The H4P_HttpMySQLLogger fits into the H4Pluins Logging strategy and you *must* read that [documentation](h4logs.md) first if you have not already done so!
 
-It simply send each matching event to an Http server. An example [server](../examples/H4P_HttpMySQLLogger/mysqlrest/README.MD) is provide using nodejs and express.
+It simply send each matching event to an Http server. An example [server](../examples/LOGGING/H4P_HttpMySQLLogger/mysqlrest/README.MD) is provide using nodejs and express.
 
 # What information gets logged?
 
@@ -91,7 +91,7 @@ H4P_HttpMySQLLogger(const string& ipaddress,H4P_FN_HTTPFAIL onFail=nullptr,uint3
 // filter has the same meaniung as other loggers
 ```
 
-[Example Code](../examples/H4P_HttpMySQLLogger/H4P_HttpMySQLLogger.ino)
+[Example Code](../examples/LOGGING/H4P_HttpMySQLLogger/H4P_HttpMySQLLogger.ino)
 
 ---
 

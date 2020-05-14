@@ -52,8 +52,7 @@ void        show(); // Display current settings / usage
 void        pcent(uint32_t pc); // Set new "safe" percentage
 ```
 
-[Example code](../examples/H4P_HeapWarn/H4P_HeapWarn.ino)
-
+[Example code](../examples/DIAGNOSTICS/H4P_LoopCount/H4P_LoopCount.ino)
 ---
 
 (c) 2020 Phil Bowles h4plugins@gmail.com

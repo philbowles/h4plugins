@@ -2,7 +2,7 @@
 /*
  MIT License
 
-Copyright (c) 2019 Phil Bowles <h4plugins@gmail.com>
+Copyright (c) 2020 Phil Bowles <h4plugins@gmail.com>
    github     https://github.com/philbowles/H4P_Sunrise
    blog       https://8266iot.blogspot.com     
    groups     https://www.facebook.com/groups/esp8266questions/
@@ -70,9 +70,7 @@ void H4P_Sunrise::_hookIn(){
 }
 
 void H4P_Sunrise::_parse(const string& s){
-//    Serial.printf("PARSE T %s\n",CSTR(s));
     vector<string> parts=split(replaceAll(s,"\"",""),":");
-//    dumpvs(parts);
     string sex=parts[3];
     sex.pop_back(); // lose the M
     int H=atoi(CSTR(parts[1]))+(sex.back()=='P' ? 12:0);

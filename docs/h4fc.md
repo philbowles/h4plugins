@@ -80,9 +80,9 @@ pulseLED(uint32_t period,uint8_t pin=LED_BUILTIN,uint8_t active=HIGH);
 stopLED(uint8_t pin=LED_BUILTIN);
 ```
 
-[Basic Example sketch](../examples/H4FC_Basic/H4FC_Basic.ino)
+[Basic Example sketch](../examples/FLASHER/H4FC_Basic/H4FC_Basic.ino)
 
-[Active Low Example sketch](../examples/H4FC_ActiveLow/H4FC_ActiveLow.ino)
+[Active Low Example sketch](../examples/FLASHER/H4FC_ActiveLow/H4FC_ActiveLow.ino)
 
 ---
 

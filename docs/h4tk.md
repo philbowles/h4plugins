@@ -136,7 +136,7 @@ void  at(H4P_EPHEMERA riseOrSet,bool onoff,H4BS_FN_SWITCH onAlarm); //  call onA
 void  atSource(H4P_EPHEMERA riseOrSet,bool onoff); // Switch BinarySwitch/Thing on/off at SUNRISE or SUNSET
 ```
 
-[Example sketch](../examples/H4P_SunriseSunset/H4P_SunriseSunset.ino)
+[Example sketch](../examples/TIME/H4P_SunriseSunset/H4P_SunriseSunset.ino)
 
 ---
 

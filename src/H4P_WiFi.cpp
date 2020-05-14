@@ -1,7 +1,7 @@
 /*
  MIT License
 
-Copyright (c) 2019 Phil Bowles <h4plugins@gmail.com>
+Copyright (c) 2020 Phil Bowles <h4plugins@gmail.com>
    github     https://github.com/philbowles/esparto
    blog       https://8266iot.blogspot.com     
    groups     https://www.facebook.com/groups/esp8266questions/
@@ -115,6 +115,7 @@ void H4P_WiFi::_setPersistentValue(string n,string v,bool reboot){
 }
 
 void H4P_WiFi::_start(){
+    H4Plugin::_factoryChain.push_back(_clearAP);
     if(SPIFFS.exists("/ap")){
         stop();
         _startAP();
@@ -160,11 +161,11 @@ void H4P_WiFi::clear(){
     WiFi.disconnect(true); 
 	ESP.eraseConfig();
     SPIFFS.remove(CSTR(string("/"+string(deviceTag()))));
+    _clearAP();
 }
 
-
 void H4P_WiFi::_startSTA(){
-    SPIFFS.remove("/ap");
+    _clearAP();
     WiFi.mode(WIFI_STA);
 	WiFi.setSleepMode(WIFI_NONE_SLEEP);
     WiFi.enableAP(false); 
@@ -221,6 +222,7 @@ string H4P_WiFi::_getChipID(){
 void H4P_WiFi::clear(){
     _stop();
 	WiFi.disconnect(true,true);
+    _clearAP();
 }
 /*
 void H4P_WiFi::_scan(){ // coalescee
@@ -236,6 +238,7 @@ void H4P_WiFi::_scan(){ // coalescee
 }
 */
 void H4P_WiFi::_startSTA(){
+    _clearAP();
     WiFi.mode(WIFI_STA);
     WiFi.setSleep(false);
     WiFi.enableAP(false); 
@@ -313,7 +316,7 @@ void H4P_WiFi::change(string ssid,string psk){ // add device / name?
 void H4P_WiFi::forceAP(){ 
     H4EVENT("AP MODE FORCED");
     h4cmd.write("/ap","");
-    h4FactoryReset();
+    h4reboot();
 } // tagify?
 
 void H4P_WiFi::setBothNames(const string& host,const string& friendly){ h4asws._setBothNames(host,friendly); }

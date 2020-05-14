@@ -56,7 +56,7 @@ H4P_GPIOManager h4gm;
 void h4setup() { // H4 constructor starts Serial
     Serial.println("H4P_GPIOManager AnalogThreshold Example v"H4P_VERSION);
 
-    h4gm.AnalogThreshold(A0,U_POLL_FREQ,U_LIMIT,[](H4GPIOPin* ptr){
+    h4gm.AnalogThreshold(A0,U_POLL_FREQ,U_LIMIT,H4GM_GREATER,[](H4GPIOPin* ptr){
         H4GM_PIN(AnalogThreshold); // Create the correct pointer type in 'pin'
         Serial.print("T=");Serial.print(millis());
         Serial.print(" AnalogThreshold ");Serial.print(pin->pin);

@@ -1,7 +1,7 @@
 /*
  MIT License
 
-Copyright (c) 2019 Phil Bowles <H48266@gmail.com>
+Copyright (c) 2020 Phil Bowles <H48266@gmail.com>
    github     https://github.com/philbowles/H4
    blog       https://8266iot.blogspot.com
    groups     https://www.facebook.com/groups/esp8266questions/
@@ -162,7 +162,7 @@ class FilteredPin: public H4GPIOPin {
     public:
 #ifdef H4P_LOG_EVENTS
         virtual string dump () override {
-            H4GPIOPin::dump()
+            return H4GPIOPin::dump()
             .append(" F=").append(stringFromInt(filter)); 
         }
 #endif

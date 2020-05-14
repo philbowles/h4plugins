@@ -1,22 +1,26 @@
 
 TODO:
-ADAM
-    mqtt ctor lwt
     nullsoft nsis
+    tkdocs
+    condlswitch etc
+    new cmd auto/new
+    ap mode
 SOONER
     error gone away in nodejs
 SHORTTERM
     schedule in cheztoi
     H4_TIMER from at,daily
-    adv docs + / example creating youerown commands
+    adv docs + / example creating your own commands
 MEDIUMTERM
+    dynamic cmds flash / siren etc
     noobs page handling
     remote client get
-//    sunrise/set
     optimise / mAcrofy guardstring2
     ESp32 MDNS detector
+    ESp32 tonecontroller
     templatise / mcrofy dependent module detection (and std hookins for runnables?)
 LONGTERM
+    dynamic add gpio / thing etc
     ethernet module stm32
     ESP32 bluetooth PD
     rf bridge

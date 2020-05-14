@@ -81,7 +81,7 @@ void fSweep(uint32_t timer,uint32_t fromF,uint32_t toF,uint32_t inc,function<voi
 void end(); // cancels any sweep in progress
 ```
 
-[Example code](../examples/H4ESW/H4P_ESWSimple/H4P_ESWSimple.ino)
+[Example code](../examples/XTRAS/H4ESW/H4P_ESWSimple/H4P_ESWSimple.ino)
 
 ---
 
@@ -99,7 +99,7 @@ Below is an example of one of the graphs produced, when running the profiler on 
 
 ![PROFILER](../assets/profiler.jpg)
 
-[Profiler code](../examples/H4ESW/H4P_ESWProfiler/H4P_ESWProfiler.ino)
+[Profiler code](../examples/XTRAS/H4ESW/H4P_ESWProfiler/H4P_ESWProfiler.ino)
 
 ---
 

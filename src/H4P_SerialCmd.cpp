@@ -1,7 +1,7 @@
 /*
  MIT License
 
-Copyright (c) 2019 Phil Bowles <h4plugins@gmail.com>
+Copyright (c) 2020 Phil Bowles <h4plugins@gmail.com>
    github     https://github.com/philbowles/esparto
    blog       https://8266iot.blogspot.com     
    groups     https://www.facebook.com/groups/esp8266questions/
@@ -82,7 +82,10 @@ uint32_t H4P_SerialCmd::_dispatch(vector<string> vs,uint32_t owner=0){
             if(i->second.fn) return (bind(i->second.fn,CHOP_FRONT(vs)))();
             else return _dispatch(CHOP_FRONT(vs),i->second.levID);
         } else return H4_CMD_UNKNOWN;
-    } else return H4_CMD_UNKNOWN;
+    } else {
+        Serial.printf("FICELLE EPUISE****\n");
+        return H4_CMD_UNKNOWN;
+    }
 }
 
 string H4P_SerialCmd::_errorString(uint32_t err){ return isLoaded(cerrTag()) ? h4ce.getErrorMessage(err):"Error: "+stringFromInt(err); }
@@ -146,7 +149,7 @@ void H4P_SerialCmd::_run(){
 //
 
 uint32_t H4P_SerialCmd::_simulatePayload(string flat,const char* src){ // refac
-	vector<string> vs=split(flat,"/");
+    vector<string> vs=split(flat,"/");
     if(vs.size()){
 		string pload=CSTR(H4PAYLOAD);
 		vs.pop_back();

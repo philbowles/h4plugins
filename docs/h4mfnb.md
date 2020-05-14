@@ -70,7 +70,7 @@ H4P_MultiFunctionButton(
     );
 ```
 
-[Example code](../examples/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
+[Example code](../examples/XTRAS/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
 
 ---
 

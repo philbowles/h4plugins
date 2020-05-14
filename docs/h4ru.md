@@ -11,11 +11,11 @@
 # What does it do?
 
 Employs the `ESP8266httpUpdate.h` (or `ESPhttpUpdate.h` for ESP32) library to "pull" either SPIFFS or latest firmware update from remote server.
-Setting up the server is beyond the scope of this document but is discussed in [Generic Deployment](xtras.md)
+Setting up the server is beyond the scope of this document but is discussed in [Generic Deployment](XTRAS.md)
 
 Also, see the nodejs/express sever which does this for you, or the [NODE-RED H4 Updater flow](advanced.md) in the advanced documentation.
 
-[NodeJS/Express update server](../examples/H4P_HttpMySQLLogger/mysqlrest/h4.js)
+[NodeJS/Express update server](../examples/LOGGING/H4P_HttpMySQLLogger/mysqlrest/routes/index.js)
 
 ---
 
@@ -33,9 +33,9 @@ H4P_RemoteUpdate h4ru(...
 
 ## Commands Added
 
-void both // updates to later spiffs(if any) then fimware(if any)
-void spiffs // updates later firmware (if any)
-void update // updates later firmware (if any)
+`h4/rupd/both` // updates to later spiffs(if any) then fimware(if any)
+`h4/rupd/spiffs` // updates later spiffs (if any)
+`h4/rupd/update` // updates later firmware (if any)
 
 If any of the above succeeds, i.e. there *is* a later version available which is updated, then the device will reboot
 
@@ -53,7 +53,7 @@ void spiffs(); // updates later firmware (if any)
 void update(); // updates later firmware (if any)
 ```
 
-[Example Code](../examples/H4P_RemoteUpdate/H4P_RemoteUpdate.ino)
+[Example Code](../examples/XTRAS/H4P_RemoteUpdate/H4P_RemoteUpdate.ino)
 
 ---
 

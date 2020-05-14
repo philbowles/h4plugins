@@ -1,7 +1,7 @@
 /*
  MIT License
 
-Copyright (c) 2019 Phil Bowles <h4plugins@gmail.com>
+Copyright (c) 2020 Phil Bowles <h4plugins@gmail.com>
    github     https://github.com/philbowles/esparto
    blog       https://8266iot.blogspot.com     
    groups     https://www.facebook.com/groups/esp8266questions/
@@ -92,9 +92,6 @@ void H4P_AsyncMQTT::_setup(){
         _lwt.topic="h4/offline";
         _lwt.payload=CSTR(device);
     }
-//    Serial.printf("USING LWT %s [%s] qos=%d R=%d\n",CSTR(_lwt.topic),CSTR(_lwt.payload),_lwt.QOS,_lwt.retain);
-//    setWill(CSTR(_lwt.topic),_lwt.QOS,_lwt.retain,CSTR(_lwt.payload));
-    Serial.printf("USING LWT %s [%s] qos=%d R=%d\n",_lwt.topic,_lwt.payload,_lwt.QOS,_lwt.retain);
     setWill(_lwt.topic,_lwt.QOS,_lwt.retain,_lwt.payload);
 
     string broker=_cb[brokerTag()];
@@ -108,17 +105,13 @@ void H4P_AsyncMQTT::_setup(){
 }
 
 void H4P_AsyncMQTT::_start(){ 
-//    if(!(WiFi.getMode() & WIFI_AP)) {
-        autorestart=true;
-        connect(); 
-//    }
+    autorestart=true;
+    connect(); 
 }
 
 void H4P_AsyncMQTT::_stop(){
-//    if(!(WiFi.getMode() & WIFI_AP)) {
-        autorestart=false;
-        disconnect(true);
-//    }
+    autorestart=false;
+    disconnect(true);
 }
 
 void H4P_AsyncMQTT::change(const string& broker,uint16_t port){ // add creds
@@ -135,14 +128,15 @@ void H4P_AsyncMQTT::publishDevice(const string& topic,const string& payload){
 
 void H4P_AsyncMQTT::subscribeDevice(string topic,H4_FN_MSG f,H4PC_CMD_ID root){
     string fullTopic=device+"/"+topic;
-    if(topic.back()=='#'){
+    if(topic.back()=='#' || topic.back()=='+'){
         topic.pop_back();
         topic.pop_back();
     }
     h4cmd.addCmd(topic,root,0,f);
     subscribe(CSTR(fullTopic),0);
-    H4EVENT("Subscribed to %s",CSTR(topic));
+    H4EVENT("Subscribed to %s",CSTR(fullTopic));
 }
+
 void H4P_AsyncMQTT::unsubscribeDevice(string topic){
     string fullTopic=device+"/"+topic; // refactor
     if(topic.back()=='#'){

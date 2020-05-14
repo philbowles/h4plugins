@@ -69,7 +69,7 @@ void show(); // Display current "hit list"
 
 ```
 
-[Example Code](../examples/H4P_TaskSniffer/H4P_TaskSniffer.ino)
+[Example Code](../examples/DIAGNOSTICS/H4P_TaskSniffer/H4P_TaskSniffer.ino)
 
 ---
 

@@ -1,7 +1,7 @@
 /*
  MIT License
 
-Copyright (c) 2019 Phil Bowles <H48266@gmail.com>
+Copyright (c) 2020 Phil Bowles <H48266@gmail.com>
    github     https://github.com/philbowles/H4
    blog       https://8266iot.blogspot.com
    groups     https://www.facebook.com/groups/esp8266questions/
@@ -41,6 +41,7 @@ class H4P_BinaryThing: public H4Plugin{
             bool            _state=false;
             H4BS_FN_SWITCH  _f;
 
+                    uint32_t _autoOff(vector<string> vs){ return guardInt1(vs,bind(&H4P_BinaryThing::autoOff,this,_1)); }
                     bool     _getState() { return _state; }
             virtual void     _hookIn() override ;
                     void     _publish(bool b);
@@ -52,6 +53,7 @@ class H4P_BinaryThing: public H4Plugin{
     public:
         H4P_BinaryThing(H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): _f(f),_state(initial),_timeout(timer), H4Plugin(onofTag()) {
             _cmds={
+                {"auto",   {H4PC_H4, 0, CMDVS(_autoOff)}},
                 {"on",     {H4PC_H4, 0, CMD(turnOn)}},
                 {"off",    {H4PC_H4, 0, CMD(turnOff)}},
                 {"state",  {H4PC_H4, 0, CMD(show)}},
@@ -61,10 +63,11 @@ class H4P_BinaryThing: public H4Plugin{
         }
 
             void show() override { 
-                reply("State: %s",_getState() ? "ON":"OFF");
+                reply("State: %s auto-off=%d",_getState() ? "ON":"OFF",_timeout);
                 for(auto s :_slaves) reply("Slave: %s",CSTR(s));
             }
 
+                    void    autoOff(uint32_t T){ Serial.printf("autoOff set to %d\n",T); _timeout=T; }
                     void    slave(const string& otherh4){ _slaves.insert(otherh4); }
                     bool    state() { return _getState(); }
                     void    turnOff(){ turn(false); }
@@ -74,6 +77,21 @@ class H4P_BinaryThing: public H4Plugin{
 #ifdef H4P_LOG_EVENTS
                     void    _turn(bool b,const string& src);
 #endif
+};
+using H4_FN_CTHING      = function<bool(bool)>;
+
+class H4P_ConditionalThing: public H4P_BinaryThing{
+        H4_FN_CTHING _predicate;
+
+        virtual void        _setState(bool b) override { 
+            if(_predicate && _predicate(b)) H4P_BinaryThing::_setState(b);
+//            else Serial.printf("CT: pred false when b=%d\n",b);
+        }
+
+    public:
+        H4P_ConditionalThing(H4_FN_CTHING predicate=nullptr,H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): 
+            _predicate(predicate),
+            H4P_BinaryThing(f,initial,timer) {}
 };
 
 #endif // H4P_BinaryThing_H
