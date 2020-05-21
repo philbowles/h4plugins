@@ -77,17 +77,6 @@ width: 280px;
 #sta{
     grid-column: 2;
     }
-#cmdf{
-grid-column: 3;
-cursor: pointer;
-margin: auto;
-}
-#cmdr{
-grid-column: 1;
-grid-row: 1;
-cursor: pointer;
-margin: auto;
-}
 #onoff{
 grid-column: 2;
 cursor: pointer;

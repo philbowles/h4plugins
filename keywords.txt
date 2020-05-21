@@ -101,7 +101,6 @@ getstring	KEYWORD2
 getTaskType	KEYWORD2
 getTaskName	KEYWORD2
 giveTaskName	KEYWORD2
-h4AddAwsHandlers	KEYWORD2
 h4FactoryReset	KEYWORD2
 h4reboot	KEYWORD2
 h4UserEvent	KEYWORD2

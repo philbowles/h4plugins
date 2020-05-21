@@ -76,7 +76,7 @@ class H4P_MultiFunctionButton: public H4Plugin{
             H4GM_SENSE l_sense);
 };
 
-extern __attribute__((weak)) H4P_MultiFunctionButton h43fb;
+extern __attribute__((weak)) H4P_MultiFunctionButton h4mfb;
 
 //#endif
 #endif // H4P_MultiFunctionButton_H

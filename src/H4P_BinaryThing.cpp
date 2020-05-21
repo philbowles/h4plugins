@@ -32,12 +32,13 @@ SOFTWARE.
 #include<H4P_AsyncMQTT.h>
 
 #ifndef H4P_NO_WIFI
-    void H4P_BinaryThing::_hookIn() { 
-        if(isLoaded(mqttTag())) {
-            h4mqtt.hookConnect([this](){ _publish(_getState()); }); 
-            h4mqtt.subscribeDevice("slave/#",CMDVS(_slave),H4PC_H4);
-        }
+void H4P_BinaryThing::_hookIn() {
+    _cb[onofTag()]="1";
+    if(isLoaded(mqttTag())) {
+        h4mqtt.hookConnect([this](){ _publish(_getState()); }); 
+        h4mqtt.subscribeDevice("slave/#",CMDVS(_slave),H4PC_H4);
     }
+}
 
 void H4P_BinaryThing::_publish(bool b){ if(isLoaded(mqttTag())) h4mqtt.publishDevice(stateTag(),b); }
 
@@ -51,8 +52,9 @@ void H4P_BinaryThing::_setSlaves(bool b){
 void H4P_BinaryThing::_setState(bool b) {
     _state=b;
     _setSlaves(b);
-    if(isLoaded(aswsTag())){ h4asws._sendEvent(b); }
+    if(isLoaded(aswsTag())){ h4asws.setUIBoolean(onofTag(),[this]{ return state(); }); }
 }
+
 uint32_t H4P_BinaryThing::_slave(vector<string> vs){
     if(vs.size()<2) return H4_CMD_TOO_FEW_PARAMS;
     if(vs.size()>2) return H4_CMD_TOO_MANY_PARAMS;
@@ -65,6 +67,11 @@ uint32_t H4P_BinaryThing::_slave(vector<string> vs){
     show();
     return H4_CMD_OK;
 }
+void H4P_ConditionalThing::_hookIn() {
+    H4P_BinaryThing::_hookIn();
+    if(isLoaded(aswsTag())) h4asws._uiAdd("Condition",H4P_UI_BOOL,[this]{ return stringFromInt(_predicate(state())); });
+}
+
 #else
 void H4P_BinaryThing::_hookIn() {}
 void H4P_BinaryThing::_publish(bool b){}
@@ -74,6 +81,7 @@ void H4P_BinaryThing::_setState(bool b) {
     _setSlaves(b);
 }
 uint32_t H4P_BinaryThing::_slave(vector<string> vs){}
+void H4P_ConditionalThing::_hookIn(){}
 #endif
 
 void H4P_BinaryThing::_start() { 

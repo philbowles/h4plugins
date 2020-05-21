@@ -113,7 +113,7 @@ uint32_t H4P_Timekeeper::__alarmCore (vector<string> vs,bool daily,H4BS_FN_SWITC
 
 uint32_t H4P_Timekeeper::_at(vector<string> vs){ return __alarmCore(vs,false,[this](bool b){ _btp->turn(b); }); }
 
-uint32_t H4P_Timekeeper::_change(vector<string> vs){ return guardString2(vs,[this](string a,string b){ change(a,b); }); }
+uint32_t H4P_Timekeeper::_change(vector<string> vs){ return guardString2(vs,[this](string a,string b){ change(a,b); return H4_CMD_OK; }); }
 
 uint32_t H4P_Timekeeper::_daily(vector<string> vs){ return __alarmCore(vs,true,[this](bool b){ _btp->turn(b); }); }
 

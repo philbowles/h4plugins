@@ -1,10 +1,11 @@
 
 TODO:
+    ret type on guard 1
+    optimised nodeMCU
     nullsoft nsis
     tkdocs
-    condlswitch etc
-    new cmd auto/new
     ap mode
+    h43fb
 SOONER
     error gone away in nodejs
 SHORTTERM

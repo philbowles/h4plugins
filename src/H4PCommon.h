@@ -39,9 +39,7 @@ SOFTWARE.
 
 using namespace std::placeholders;
 //
-//
-//
-bool stringIsAlpha(const string& s);
+bool stringIsAlpha(const string& s); // move to util!!!
 //
 #ifndef ARDUINO_SONOFF_BASIC // or s20 / sv ect
   #define RELAY_BUILTIN   12
@@ -224,7 +222,7 @@ class H4Plugin {
     
             uint32_t        guardInt1(vector<string> vs,function<void(uint32_t)> f);
 
-            uint32_t        guardString2(vector<string> vs,function<void(string,string)> f);
+            uint32_t        guardString2(vector<string> vs,function<H4_CMD_ERROR(string,string)> f);
 
             uint32_t        guard1(vector<string> vs,H4_FN_MSG f){
                 if(!vs.size()) return H4_CMD_TOO_FEW_PARAMS;

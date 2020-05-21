@@ -33,7 +33,7 @@ SOFTWARE.
 
 #ifndef H4P_NO_WIFI
 
-uint32_t H4P_WiFi::_change(vector<string> vs){ return guardString2(vs,[this](string a,string b){ change(a,b); }); }
+uint32_t H4P_WiFi::_change(vector<string> vs){ return guardString2(vs,[this](string a,string b){ change(a,b); return H4_CMD_OK; }); }
 
 bool H4P_WiFi::_getPersistentValue(string v,string prefix){
     string persistent=replaceAll(H4P_SerialCmd::read("/"+v),"\r\n","");
@@ -84,7 +84,7 @@ uint32_t H4P_WiFi::_host(vector<string> vs){
     });
 }
 
-uint32_t H4P_WiFi::_host2(vector<string> vs){ return guardString2(vs,[this](string a,string b){ h4asws._setBothNames(a,b); }); }
+uint32_t H4P_WiFi::_host2(vector<string> vs){ return guardString2(vs,[this](string a,string b){ h4asws._setBothNames(a,b); return H4_CMD_OK; }); }
 
 void H4P_WiFi::_lostIP(){
     if(!_discoDone){

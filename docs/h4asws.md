@@ -1,7 +1,7 @@
 ![H4P Flyer](/assets/HTTPLogo.jpg) 
 
 # Asynchronous Web Server (short name="asws")
-## Adds Asynchronous Webserver, AP mode configuration to H4 Universal Scheduler/Timer. Runs on ESP8266/32 only
+## Adds Asynchronous Webserver to H4 Universal Scheduler/Timer. Runs on ESP8266/32 only
 
 *All plugins depend upon the presence of the [H4 library](https://github.com/philbowles/H4), which must be installed first.*
 
@@ -9,13 +9,16 @@
 
 # What does it do?
 
-Asynchronous Web Server provide bot an AP mode server to allow first-time / factory reset configuration, but also an STA mode server that provides a REST-like command interface.
+Asynchronous Web Server provide both an AP mode server to allow first-time / factory reset configuration and an STA mode server.
+The webserver provides a REST-like command interface at `http:// your ip /rest/....` and a dynamically updating web UI with command console.
+
+![Mobile AP](/assets/webui056.jpg) 
 
 ---
 
 ## AP Mode
 
-![Mobile AP](/assets/mobile.jpg) 
+TODO: add image of AP Mode
 
 Fill in the details, click "connect" and the device will boot into STA mode using the new credentials for the rest of its days until you force a "factory reset". 
 
@@ -40,8 +43,8 @@ H4P_WiFi h4asws(...
 
 ## Commands Added
 
-None, but provides HTTP REST interface with JSON replies
-
+* `h4/asws/msg/X` (payload X = anything: gets sent to message area of webui)
+  
 ---
 
 # API
@@ -49,12 +52,11 @@ None, but provides HTTP REST interface with JSON replies
 ## Callbacks
 
 ```cpp
-void onConnect(void); // webserver is up
-void onDisconnect(void); // webserver is down
-void h4AddAwsHandlers(void) // called after adding its own handlers, adds your in here
+void onFirstClient(void); // User requests web page: add user items + "setter" functions
+void onLastClient(void); // no viewers: cancel timers, clean up resources etc
 ```
 
-H4P_AsyncWebserver is a "wrapper" around the [ESPAsyncWebServer](https://github.com/philbowles/ESPAsyncWebServer) library and therefore any funtions offered by that library can be called on `h4asws.` for example `h4.asws.on(...)` to add your own handler inside the `h4AddAwsHandlers` callback.
+H4P_AsyncWebserver is a "wrapper" around the [ESPAsyncWebServer](https://github.com/philbowles/ESPAsyncWebServer) library and therefore any funtions offered by that library can be called on `h4asws.` for example `h4.asws.on(...)` to add your own handler.
 
 Do not register a handler for any of the following paths:
 
@@ -66,12 +68,25 @@ As those are use by the plugin itself
 
 ```cpp
 // Constructor
-H4P_AsyncWebServer(H4_FN_VOID onConnect=[](){},H4_FN_VOID onDisconnect=[](){}):
-// onConnect = user callback when webserver is up
-// onDisconnect = user callback when webserver is down
+// onFirstClient callback when first user requests web page: add user items + "setter" functions
+// onLastClient  callback when last viewer close browser: cancel timers, clean up resources etc
+H4P_AsyncWebServer(H4_FN_VOID onFirstClient=nullptr,H4_FN_VOID onLastClients=nullptr):
+//
+// name =name of your own UI field
+// f = name of "setter" function which returns data of the appropriate type to popultae the field when web page requested
+void addUILabelText(const string& name,H4_FN_UITXT f);
+void addUILabelNumeric(const string& name,H4_FN_UINUM f);
+void addUIBoolean(const string& name,H4_FN_UIBOOL f);
+// change value of exisitng user webUI field
+void setUILabelNumeric(const string& name,H4_FN_UINUM f);
+void setUILabelText(const string& name,H4_FN_UITXT f);
+void setUIBoolean(const string& name,H4_FN_UIBOOL f);
+//
+void sendUIMessage(const string& msg); // msg scrolls in red at bottom of screen 
+
 ```
 
-[Example Code](../examples/XTRAS/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
+[Example Code](../examples/WEBUI/WebUI_UserFields_1/WebUI_UserFields_1.ino)
 
 ---
 

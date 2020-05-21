@@ -2,7 +2,7 @@
 # Advanced Topics
 
 - [Advanced Topics](#advanced-topics)
-  - [* Installing Windows components for UPNP](#ul-liinstalling-windows-components-for-upnpli-ul)
+  - [- Installation of Windows components for UPNP server](#ul-liinstallation-of-windows-components-for-upnp-serverli-ul)
 - [Deploying multiple devices](#deploying-multiple-devices)
   - [Generic devices / naming](#generic-devices--naming)
 - [Remote update](#remote-update)
@@ -82,6 +82,12 @@ Unlike SPIFFS where a specific version number is required in the binary name, th
 If we didn't do it this way, it would update *every time* it asked) - that won't harm anything as it will be the exact sam version it already is, but it's a waste of time!)
 
 ### NODE-RED H4 Updater flow
+C:\Users\phil\AppData\Local\Temp\scp50525\home\pi\.node-red\settings.js
+    functionGlobalContext: {
+        'path' : require('path'),
+        'fs'   : require('fs'),
+    },
+
 
 ```javscript
 [

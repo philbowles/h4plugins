@@ -28,10 +28,12 @@ SOFTWARE.
 */
 #include<H4P_AsyncMQTT.h>
 #ifndef H4P_NO_WIFI
+#include<H4P_AsyncWebServer.h>
 
 uint32_t H4P_AsyncMQTT::_change(vector<string> vs){
     return guardString2(vs,[this](string a,string b){ 
         if(isNumeric(b)) change(a,atoi(CSTR(b)));
+        else return H4_CMD_NOT_NUMERIC;
     });
 }
 
@@ -55,6 +57,7 @@ void H4P_AsyncMQTT::_greenLight(){
             subscribe(CSTR(string(_cb[boardTag()]+cmdhash())),0);
             publish("h4/online",0,false,CSTR(device));
             _upHooks();
+            _signal();
             H4EVENT("MQTT CNX");
         });
     });
@@ -76,6 +79,7 @@ void H4P_AsyncMQTT::_greenLight(){
             h4.queueFunction([this,reason](){
                 _discoDone=true;
                 _downHooks();
+                _signal();
                 H4EVENT("MQTT DCX %d",reason);
                 if(autorestart && WiFi.status()==WL_CONNECTED) h4.every(H4MQ_RETRY,[this](){ connect(); },nullptr,H4P_TRID_MQRC,true);
             });
@@ -102,7 +106,20 @@ void H4P_AsyncMQTT::_setup(){
     } else setServer(CSTR(broker),port);
         
     if(_cb["muser"]!="") setCredentials(CSTR(_cb["muser"]),CSTR(_cb["mpasswd"]));
+    if(isLoaded(aswsTag())){
+        h4asws._uiAdd(uppercase(mqttTag()),H4P_UI_BOOL,
+            [this]{ return stringFromInt(connected()); },
+            [this](const string& a,const string& b){ 
+                Serial.printf("USER MQTT %s\n",CSTR(b));
+                if(b=="1") _start();
+                else _stop();
+                H4EVENT("MQTT %s by user",b=="1" ? "Started":"Stopped");
+                if(isLoaded(aswsTag())) h4asws.sendUIMessage("MQTT %s by user",b=="1" ? "Started":"Stopped");
+            });
+    }
 }
+
+void H4P_AsyncMQTT::_signal(){ if(isLoaded(aswsTag())){ h4asws.setUIBoolean(uppercase(mqttTag()),[this]{ return connected(); }); } }
 
 void H4P_AsyncMQTT::_start(){ 
     autorestart=true;

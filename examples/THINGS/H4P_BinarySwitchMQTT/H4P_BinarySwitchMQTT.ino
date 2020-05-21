@@ -39,7 +39,7 @@ H4P_AsyncWebServer h4asws;
 H4P_BinarySwitch h4onof(LED_BUILTIN,UL_ACTIVE,OFF,[](bool b){
     Serial.print("STATE NOW ");Serial.println(b);
   });
-H4P_MultiFunctionButton h43fb(USER_BTN,INPUT_PULLUP,UB_ACTIVE,U_DEBOUNCE,LED_BUILTIN,UL_ACTIVE);
+H4P_MultiFunctionButton h4mfb(USER_BTN,INPUT_PULLUP,UB_ACTIVE,U_DEBOUNCE,LED_BUILTIN,UL_ACTIVE);
 
 void onReboot(){
     Serial.println("About to reboot: Au Revoir");      

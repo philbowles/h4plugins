@@ -29,7 +29,6 @@ SOFTWARE.
 #include<H4PCommon.h>
 #include<H4P_SerialCmd.h>
 
-void __attribute__((weak)) h4AddAwsHandlers(){}
 void __attribute__((weak)) onFactoryReset(){}
 
 vector<H4_FN_VOID>  H4Plugin::_factoryChain;
@@ -72,11 +71,11 @@ uint32_t H4Plugin::guardInt1(vector<string> vs,function<void(uint32_t)> f){
     });
 }        
 
-uint32_t H4Plugin::guardString2(vector<string> vs,function<void(string,string)> f){
+uint32_t H4Plugin::guardString2(vector<string> vs,function<H4_CMD_ERROR(string,string)> f){
     return guard1(vs,[f,this](vector<string> vs){
         auto vg=split(H4PAYLOAD,",");
         if(vg.size()<3){ 
-            if(vg.size()>1) return ([f](string s1,string s2){ f(s1,s2); return H4_CMD_OK; })(vg[0],vg[1]);
+            if(vg.size()>1) return ([f](string s1,string s2){ return f(s1,s2); })(vg[0],vg[1]);
             return H4_CMD_TOO_FEW_PARAMS;
         }
         return H4_CMD_TOO_MANY_PARAMS;

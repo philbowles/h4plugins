@@ -52,7 +52,7 @@ void H4P_MultiFunctionButton::progress(H4GPIOPin* ptr){ // run this as each stag
 
 #ifndef H4P_NO_WIFI
 void H4P_MultiFunctionButton::_start(){
-    if(isLoaded(wifiTag())){
+    if(isLoaded(wifiTag()) && isLoaded(winkTag())){
         if(WiFi.getMode() & WIFI_AP) h4fc.flashPWM(1000,10,_led,_active); 
         else h4fc.stopLED(_led); 
     }
@@ -60,7 +60,7 @@ void H4P_MultiFunctionButton::_start(){
 }
 
 void H4P_MultiFunctionButton::_stop(){
-    if(isLoaded(wifiTag())){
+    if(isLoaded(wifiTag()) && isLoaded(winkTag())){
         if(WiFi.getMode() & WIFI_AP) h4fc.stopLED(_led); 
         else h4fc.flashMorse("... --- ...   ",H43F_TIMEBASE,_led,_active);
     }

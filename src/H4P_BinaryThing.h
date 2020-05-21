@@ -62,12 +62,12 @@ class H4P_BinaryThing: public H4Plugin{
             };
         }
 
-            void show() override { 
+        virtual void show() override { 
                 reply("State: %s auto-off=%d",_getState() ? "ON":"OFF",_timeout);
                 for(auto s :_slaves) reply("Slave: %s",CSTR(s));
             }
 
-                    void    autoOff(uint32_t T){ Serial.printf("autoOff set to %d\n",T); _timeout=T; }
+                    void    autoOff(uint32_t T){ _timeout=T; }
                     void    slave(const string& otherh4){ _slaves.insert(otherh4); }
                     bool    state() { return _getState(); }
                     void    turnOff(){ turn(false); }
@@ -83,15 +83,16 @@ using H4_FN_CTHING      = function<bool(bool)>;
 class H4P_ConditionalThing: public H4P_BinaryThing{
         H4_FN_CTHING _predicate;
 
-        virtual void        _setState(bool b) override { 
-            if(_predicate && _predicate(b)) H4P_BinaryThing::_setState(b);
-//            else Serial.printf("CT: pred false when b=%d\n",b);
-        }
-
+        virtual void        _setState(bool b) override { if(_predicate(b)) H4P_BinaryThing::_setState(b); }
+                void        _hookIn() override;
     public:
-        H4P_ConditionalThing(H4_FN_CTHING predicate=nullptr,H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): 
+        H4P_ConditionalThing(H4_FN_CTHING predicate,H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): 
             _predicate(predicate),
             H4P_BinaryThing(f,initial,timer) {}
+            void show() override { 
+                reply("Condition: %d",_predicate(state()));
+                H4P_BinaryThing::show();
+            }
 };
 
 #endif // H4P_BinaryThing_H

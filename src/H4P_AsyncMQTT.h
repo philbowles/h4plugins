@@ -52,12 +52,13 @@ class H4P_AsyncMQTT: public H4Plugin, public AsyncMqttClient{
 
         VSCMD(_change);
 
+                void        _greenLight() override;
+                void        _hookIn() override;
                 void        _setup();
+                void        _signal();
                 void        _start() override;
                 bool        _state() override { return connected(); }
                 void        _stop() override;
-                void        _hookIn() override;
-                void        _greenLight() override;
     public:
         H4P_AsyncMQTT(string broker,uint16_t port, string user="",string pass="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr,H4P_LWT lwt={"","",0,false}):
             _lwt(lwt), H4Plugin(mqttTag(),onC,onD)
