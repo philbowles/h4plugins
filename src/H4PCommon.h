@@ -100,6 +100,7 @@ STAG(board)
 STAG(broker);
 STAG(cerr);
 STAG(chip);
+STAG(Condition);
 STAG(device);
 STAG(esqw);
 STAG(gpio);

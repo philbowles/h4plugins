@@ -102,10 +102,11 @@ void H4P_AsyncWebServer::_start(){
         //Serial.printf("T=%u SSE CLIENT\n",millis());
 //        client->send("HELLO",NULL,++_evtID,H4P_ASWS_EVT_TIMEOUT);
         h4.queueFunction([this,client](){
-            H4EVENT("SSE Client %08x n=%d T/O=%d",client,client->lastId(),H4P_ASWS_EVT_TIMEOUT);
-            if(_onC) {
-                if(_evts->count()==1) _onC(); // first time only
-                for(auto const& i:userItems) { _sendSSE("ui",CSTR(string(i.first+","+stringFromInt(i.second.type)+","+i.second.f()+","+(i.second.a ? "1":"0" ))));}
+//            H4EVENT("SSE Client %08x n=%d T/O=%d nC=%d nUI=%d",client,client->lastId(),H4P_ASWS_EVT_TIMEOUT,_evts->count(),userItems.size());
+            if(_evts->count()==1) if(_onC) _onC(); // first time only
+            for(auto const& i:userItems) {
+//                H4EVENT("build UI %s\n",CSTR(string(i.first+","+stringFromInt(i.second.type)+","+i.second.f()+","+(i.second.a ? "1":"0" )))); 
+                _sendSSE("ui",CSTR(string(i.first+","+stringFromInt(i.second.type)+","+i.second.f()+","+(i.second.a ? "1":"0" ))));
             }
             h4.repeatWhile([this]{ return _evts->count(); },
                 ((H4P_ASWS_EVT_TIMEOUT*3)/4),
@@ -118,7 +119,7 @@ void H4P_AsyncWebServer::_start(){
     addHandler(_evts);
 
     on("/",HTTP_GET, [this](AsyncWebServerRequest *request){ 
-        H4EVENT("Root %s",request->client()->remoteIP().toString().c_str());
+//        H4EVENT("Root %s",request->client()->remoteIP().toString().c_str());
         _cb[wifiTag()]=stringFromInt(WiFi.getMode());
         request->send(SPIFFS,"/sta.htm",String(),false,aswsReplace);
     });
@@ -152,6 +153,7 @@ String H4P_AsyncWebServer::aswsReplace(const String& var){
     string v=CSTR(var);
     return _cb.count(v) ? String(CSTR(_cb[v])):"?";
 }
+
 void H4P_AsyncWebServer::sendUIMessage(const string& msg,...){
     char buff[H4P_REPLY_BUFFER+1];
     va_list ap; 

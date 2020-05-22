@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.5">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title id="ptit">%device%</title>
 <link rel="stylesheet" type="text/css" href="h4.css">
+<link rel="icon" href="favicon.ico" type="image/jpeg" sizes="32x32">
 <script src="h4.js"></script>
 </head>
 <body>
 <div id="main">
+    <input id="hasfrnd" type="hidden" value="%name%">
     <input id="hasonof" type="hidden" value="%onof%">
     <input id="wifi" type="hidden" value="%wifi%">
-    <input id="mqtt" type="hidden" value="%mqtt%">
 <div id="header">
 <img src="H4PLogo.jpg">
 </div>
@@ -18,7 +19,7 @@
     <div class="title">Device</div>
     <div class="data">%device%.local</div>
 </div>
-<div id="name" class="line">
+<div id="frnd" class="line">
     <div class="title">Name</div>
     <div class="data">%name%</div>
 </div>
@@ -46,10 +47,12 @@
     <div class="title">Spiffs Vn</div>
     <div class="data">%h4sv%</div>
 </div>
-<div id="sta">
+<div id="uhang">
+</div>
 <div id="onoff" class="line">
     <img id="onof" src="of.jpg">
 </div>
+<div id="cchang">
 <form id="cc">
     <div id="run">
         <div><button type="submit" id="exec">Run</button></div>
@@ -59,6 +62,7 @@
     <div><textarea id="reply" readonly>Type command and Run or &lt;Enter&gt;</textarea></div>
 </form>
 </div>
+<marquee id="msg">&nbsp;</marquee>
 <div id="ap">
     <form type="application/url-encoded" method="POST">
     <div class="fline">

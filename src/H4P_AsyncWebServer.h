@@ -35,7 +35,6 @@ SOFTWARE.
 #ifndef H4P_NO_WIFI
 #include<H4P_WiFi.h>
 #include<H4P_BinaryThing.h>
-//#include<H4P_AsyncMQTT.h>
 #include<ESPAsyncWebServer.h>
 
 #define H4P_ASWS_EVT_TIMEOUT    30000

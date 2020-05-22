@@ -15,10 +15,7 @@ function ajax(url,decode=true){
             r.style.color="#ffffff" // css
             var j=JSON.parse(e.currentTarget.responseText);
             if(!j.res) j.lines.forEach(function(l){ r.innerHTML+=l+'\n'})
-            else {
-                r.innerHTML="Error: "+j.res+" "+j.msg
-                r.style.color="#d35400" // css
-            }
+            else msg.innerHTML="Error: "+j.res+" "+j.msg
         }
     });
     http.send();  
@@ -46,7 +43,6 @@ function uiItem(d,h="uhang"){
         switch(t){
             case 0: // label
                 valu.innerHTML=v;
-//                console.warn("ADD EL LABEL",n);
                 source.addEventListener(n, function(e){ console.warn(" Event ",n," ",e.data); document.getElementById(n).innerHTML=e.data; });
                 break;
             case 1:
@@ -68,8 +64,6 @@ function uiItem(d,h="uhang"){
         let hangoff=document.getElementById(h);
         hangoff.insertBefore(title,null)
         hangoff.insertBefore(valu,null)
-        //hangoff.appendChild(title);
-        //hangoff.appendChild(valu);
     } else console.warn(n," already exists ",d);
 }
 let dt;
@@ -77,11 +71,8 @@ let dt;
 function has(id){ return document.getElementById("has"+id).value!="?" }
 
 document.addEventListener("DOMContentLoaded", function() {
-    let dt=new Date;
     if(!!window.EventSource) source=new EventSource("/evt");
     let rr=document.getElementById("reply")
-//	let hasonof=parseInt(document.getElementById("hasonof").value);
-//	let ;
     let cmd=document.getElementById("cmd")
     let msg=document.getElementById("msg")
     // frig ap test
@@ -97,8 +88,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 setTimeout(function () { msg.innerHTML="&nbsp;"; },30000);
             };
         }
-//        source.onclose=function(e){ console.warn(" CLOSED ","e=",e); };        
-//        source.onerror=function(e){ console.warn(" ERROR ","e=",e); ajax("FFS",false);source.close();  };    
+        source.onmessage({data: "Thank you for using H4/Plugins"});
         if(has("frnd")){
             frnd=document.getElementById("frnd");
             frnd.style.display='inline-flex'
@@ -119,6 +109,6 @@ document.addEventListener("DOMContentLoaded", function() {
             cmd.value=lines[n-1]
             ajax(lines[n-1],true)
         },{capture: true});
-        document.getElementById("qh").addEventListener('click', function(e){ ajax("help",true) }),{capture: true};
+        document.getElementById("qh").addEventListener('click', function(e){ ajax("help",true) },{capture: true});
     } 
 })

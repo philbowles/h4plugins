@@ -50,18 +50,18 @@ class H4P_BinarySwitch: public H4P_BinaryThing{
 
 class H4P_ConditionalSwitch: public H4P_BinarySwitch{
         H4_FN_CTHING _predicate;
+        // optimise pred state
     protected:
-        virtual void        _setState(bool b) override { if(_predicate(b)) H4P_BinarySwitch::_setState(b); }
-                void        _hookIn() override {
-                    H4P_BinarySwitch::_hookIn();
-                    if(isLoaded(aswsTag())) h4asws._uiAdd("Condition",H4P_UI_BOOL,[this]{ return stringFromInt(_predicate(state())); });
-                }
-
+        virtual void        _setState(bool b) override { 
+            if(_predicate(b)) H4P_BinarySwitch::_setState(b);
+            if(isLoaded(aswsTag())) h4asws.sendUIMessage(_predicate(b) ? "&nbsp;":"Unable: condition not set");
+        }
+                void        _hookIn() override;
     public:
         H4P_ConditionalSwitch(uint8_t pin,H4GM_SENSE sense, uint32_t initial,H4_FN_CTHING predicate,H4BS_FN_SWITCH f=nullptr,uint32_t timer=0):
             _predicate(predicate), 
             H4P_BinarySwitch(pin,sense,initial,f,timer){}
-        
+        void syncCondition();
         void show(){ 
             reply("Condition %d",_predicate(state()));
             H4P_BinarySwitch::show();

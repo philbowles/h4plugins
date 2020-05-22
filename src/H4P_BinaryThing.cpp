@@ -26,8 +26,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifndef H4P_NO_WIFI
 #include<H4P_BinaryThing.h>
+#ifndef H4P_NO_WIFI
 #include<H4P_AsyncWebServer.h>
 #include<H4P_AsyncMQTT.h>
 
@@ -69,9 +69,12 @@ uint32_t H4P_BinaryThing::_slave(vector<string> vs){
 }
 void H4P_ConditionalThing::_hookIn() {
     H4P_BinaryThing::_hookIn();
-    if(isLoaded(aswsTag())) h4asws._uiAdd("Condition",H4P_UI_BOOL,[this]{ return stringFromInt(_predicate(state())); });
+    if(isLoaded(aswsTag())) h4asws._uiAdd(ConditionTag(),H4P_UI_BOOL,[this]{ return stringFromInt(_predicate(state())); });
 }
 
+void H4P_ConditionalThing::syncCondition() {
+    if(isLoaded(aswsTag())) h4asws._sendSSE(ConditionTag(),CSTR(stringFromInt(_predicate(state()))));
+}
 #else
 void H4P_BinaryThing::_hookIn() {}
 void H4P_BinaryThing::_publish(bool b){}
@@ -82,6 +85,8 @@ void H4P_BinaryThing::_setState(bool b) {
 }
 uint32_t H4P_BinaryThing::_slave(vector<string> vs){}
 void H4P_ConditionalThing::_hookIn(){}
+void H4P_ConditionalThing::syncCondition() {}
+
 #endif
 
 void H4P_BinaryThing::_start() { 

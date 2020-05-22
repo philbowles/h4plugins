@@ -4,10 +4,6 @@ H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 
 #define AUTO_OFF  10000
 
-
-
-
-
 H4P_SerialLogger h4sl;
 H4P_BinaryThing h4onof([](bool b){ Serial.print("I am now ");Serial.println(b ? "ON":"OFF"); },ON,AUTO_OFF);
 

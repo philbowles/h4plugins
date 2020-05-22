@@ -93,6 +93,8 @@ class H4P_ConditionalThing: public H4P_BinaryThing{
                 reply("Condition: %d",_predicate(state()));
                 H4P_BinaryThing::show();
             }
+
+        void syncCondition();
 };
 
 #endif // H4P_BinaryThing_H
