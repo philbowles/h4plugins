@@ -56,6 +56,9 @@ H4P_ConditionalSwitch	KEYWORD1
 # Methods and Functions (	KEYWORD2)
 #######################################
 addCmd	KEYWORD2
+addUILabelText	KEYWORD2
+addUILabelNumeric	KEYWORD2
+addUIBoolean	KEYWORD2
 at	KEYWORD2
 atSource	KEYWORD2
 all	KEYWORD2
@@ -67,6 +70,9 @@ change	KEYWORD2
 chromaticRun	KEYWORD2
 Circular	KEYWORD2
 clear	KEYWORD2
+clockEPOCH	KEYWORD2
+clockEPOCHLocal	KEYWORD2
+clockStrTimeLocal	KEYWORD2
 clockTime	KEYWORD2
 config	KEYWORD2
 daily	KEYWORD2
@@ -75,6 +81,8 @@ Debounced	KEYWORD2
 DebouncedSource	KEYWORD2
 dec	KEYWORD2
 dSet	KEYWORD2
+DST_EU	KEYWORD2
+DST_USA	KEYWORD2
 dSweep	KEYWORD2
 dumpQ	KEYWORD2
 Encoder	KEYWORD2
@@ -149,6 +157,7 @@ Retriggering	KEYWORD2
 RetriggeringSource	KEYWORD2
 Sequenced	KEYWORD2
 setCenter	KEYWORD2
+sendUIMessage	KEYWORD2
 setint	KEYWORD2
 setMax	KEYWORD2
 setMin	KEYWORD2
@@ -156,6 +165,9 @@ setSchedule	KEYWORD2
 setScheduleSource	KEYWORD2
 setPercent	KEYWORD2
 setstring	KEYWORD2
+setUILabelNumeric	KEYWORD2
+setUILabelText	KEYWORD2
+setUIBoolean	KEYWORD2
 setValue	KEYWORD2
 setVolume	KEYWORD2
 showSPIFFS	KEYWORD2
@@ -166,7 +178,11 @@ state	KEYWORD2
 stop	KEYWORD2
 stopLED	KEYWORD2
 strTime	KEYWORD2
+strfTime	KEYWORD2
+strfDate	KEYWORD2
+strfDateTime	KEYWORD2
 sync	KEYWORD2
+syncCondition	KEYWORD2
 subscribeDevice	KEYWORD2
 throttle	KEYWORD2
 Timed	KEYWORD2

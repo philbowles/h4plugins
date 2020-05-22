@@ -47,13 +47,32 @@ H4P_WiFi h4asws(...
   
 ---
 
+# User-defined fields
+
+Since v0.5.6 user can add their own data fields to the main UI. The user must provide a "setter" function for each field which returns the value to be displayed. Once the web UI is active, i.e. there is at least one browser / viewer, the user is also able to asynchronously update and of his/her fields. 
+Currently available are:
+
+* Text Labels (from a user `string`-returning function )
+* Numeric Labels (from a user `int`-returning function )
+* Boolean red/green LED (from a user `bool`-returning function )
+
+Boolean fields can also be clickable to send messages back from the UI to switch on/off, start/stop processes. If a clickable Boolena is required, the user must additionally provide a callback "action" function to handle/react to the on/off click
+
 # API
 
 ## Callbacks
 
 ```cpp
+// general
 void onFirstClient(void); // User requests web page: add user items + "setter" functions
 void onLastClient(void); // no viewers: cancel timers, clean up resources etc
+// ui "setter"s
+string fUserStringSetter(void); // user function that returns data for a LabelText UI field
+int fUserIntSetter(void); // user function that returns data for a LabelNumeric UI field
+string fUserBoolSetter(void); // user function that returns data for a Boolean UI field
+// "action" funtion for clickable boolean
+void onUIBoolClick(string name,string value); // name is the user's name for the UI field, value will be "1" or "0"
+
 ```
 
 H4P_AsyncWebserver is a "wrapper" around the [ESPAsyncWebServer](https://github.com/philbowles/ESPAsyncWebServer) library and therefore any funtions offered by that library can be called on `h4asws.` for example `h4.asws.on(...)` to add your own handler.
@@ -86,7 +105,8 @@ void sendUIMessage(const string& msg); // msg scrolls in red at bottom of screen
 
 ```
 
-[Example Code](../examples/WEBUI/WebUI_UserFields_1/WebUI_UserFields_1.ino)
+[Example Code - static fields](../examples/WEBUI/WebUI_StaticFields/WebUI_StaticFields.ino)
+[Example Code - dynamic fields](../examples/WEBUI/WebUI_DynamicFields/WebUI_DynamicFields.ino)
 
 ---
 

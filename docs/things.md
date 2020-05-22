@@ -150,7 +150,7 @@ onChange is the name of  a user function that gets called after the state change
 onConnect is called when UPNP_Server is fully "up"
 onDisconnect is called when UPNP_Server goes "down"
 timer ("AutoOFF") causes the device to turn off automatically after n milliseconds. When 0, stays ON till commanded OFF
-predicate is the name of a bool returning function which takes a bool parametr of current state: if it returns false, switch/thing will ignore all commands
+predicate is the name of a bool returning function which takes a bool parameter of current state: if it returns false, switch/thing will ignore all commands
 */
 H4P_BinarySwitch(uint8_t pin,H4GM_SENSE sense, uint32_t initial,H4BS_FN_SWITCH f=nullptr,uint32_t timer=0)
 H4P_BinaryThing(H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0);
@@ -158,6 +158,7 @@ H4P_ConditionalSwitch(uint8_t pin,H4GM_SENSE sense, uint32_t initial,H4_FN_CTHIN
 H4P_ConditionalThing(H4_FN_CTHING predicate=nullptr,H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): 
 
 void autoOff(uint32_t T); // change autoOff time to T milliseconds
+void syncCondition(); // Conditional swicth / thing only: keep webUI in-step with current value of condition
 void turnOff();
 void turnOn();
 void toggle(); // invert state
@@ -178,7 +179,8 @@ For details on setting up Windows for the full UPNP experience, see [Advanced To
 [Example Sketch - BinarySwitch with 3-function button](../examples/THINGS/H4P_BinarySwitchmfnb/H4P_BinarySwitchmfnb.ino)
 [Example Sketch - BinarySwitch with MQTT](../examples/THINGS/H4P_BinarySwitchMQTT/H4P_BinarySwitchMQTT.ino)
 [Example Sketch - UPNPServer with MQTT](../examples/XTRAS/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
-[Example Sketch - Conditionals](../examples/XTRAS/SQUAWK/SQUAWK.ino)
+[Example Sketch - ConditionalThing](../examples/THINGS/H4P_ConditionalThing/H4P_ConditionalThing.ino)
+[Example Sketch - ConditionalSwitch](../examples/THINGS/H4P_ConditionalSwitch/H4P_ConditionalSwitch.ino)
 
 ---
 # Input Examples

@@ -1,22 +1,17 @@
 
 TODO:
     ret type on guard 1
-    optimised nodeMCU
-    nullsoft nsis
     tkdocs
-    ap mode
-    h43fb
 SOONER
     error gone away in nodejs
+    early abort dependfail
 SHORTTERM
     schedule in cheztoi
     H4_TIMER from at,daily
     adv docs + / example creating your own commands
 MEDIUMTERM
     dynamic cmds flash / siren etc
-    noobs page handling
     remote client get
-    optimise / mAcrofy guardstring2
     ESp32 MDNS detector
     ESp32 tonecontroller
     templatise / mcrofy dependent module detection (and std hookins for runnables?)
@@ -25,6 +20,4 @@ LONGTERM
     ethernet module stm32
     ESP32 bluetooth PD
     rf bridge
-    signal on no spiffs
     fix switch.ps1 to use soap etc (revert a la esparto)
-    lots of const string&

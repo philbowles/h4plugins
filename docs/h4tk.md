@@ -4,6 +4,8 @@
 
 ## Adds real-time alarms and scheduling (**EXPERIMENTAL** Sunrise/Sunset times)
 
+Many thanks to Adam Sharp (http://threeorbs.co.uk) for extensive work and help on this plugin
+
 *All plugins depend upon the presence of the [H4 library](https://github.com/philbowles/H4), which must be installed first.*
 
 ---
@@ -32,7 +34,7 @@ H4P_Timekeeper h4tk(...
 
 * h4/time/change/x,y (payload x,y = ntp1,ntp2)
 * h4/time/sync (force re-sync)
-* h4/time/tz/x (payload x = *integer* offest of timezeone in hrs from GMT)
+* h4/time/tz/x (payload x = *integer* offest of timezeone in minutes from GMT)
 
 ## Callbacks
 
@@ -64,11 +66,20 @@ H4P_SCHEDULE mySchedule={
 # API
 
 ```cpp
+/*
+*Note: All internal real times are from EPOCH and calculated in seconds.  This
+keeps everything functional with integer maths, but allows for a fairly fine
+resolution within the proceedings.
+
+*Note: Dates are ISO = YYYY-MM-DD which is country independant.
+
+*/
 // Constructor
 // NTP servers can be either domain name or text ip address e.g. "192.168.1.4"
-// tzOffset = *integer* number of hours offset from GMT: Sorry, Newfoundland, India, Iran, Afghanistan
-// Myanmar, Sri Lanka, the Marquesas, parts of Australia, Nepal, and the Chatham Islands... :(
-H4P_Timekeeper(const string& ntp_server_1,const string& ntp2,int tzOffset=0);
+// tzOffset = *integer* number of seconds offset from GMT: This means users in Newfoundland, India, Iran, Afghanistan
+// Myanmar, Sri Lanka, the Marquesas, parts of Australia, Nepal, and the Chatham Islands... can now set the correct TZ
+// fDST = the (optional) name of a daylight saving function: either DST_EU or DST_USA (see below)
+H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzOffset=0,H4_FN_DST fDST=nullptr);
 
 // Common Parameters:
 // when is the desired time in "hh:mm:ss" or simply "hh:mm" format
@@ -79,16 +90,26 @@ void at(const string& when,bool onoff,H4BS_FN_SWITCH onAlarm); //  call onAlarm(
 void atSource(const string& when,bool onoff); // Switch BinarySwitch/Thing on/off at "hh:mm:ss"
 void change(const string& ntp1,const string& ntp2); // change ntp servers
 string clockTime(); // return "hh:mm:ss" representing curretn "Wall-Clock Time"
+uint32_t clockEPOCH(); // Current number of seconds since EPOCH.
+uint32_t clockEPOCHLocal(); // Current number of seconds since EPOCH plus TZ offset.
+string clockStrTimeLocal(); // Current time + TZ as string HH:MM:SS.
 void daily(const string& when,bool onoff,H4BS_FN_SWITCH onAlarm); // call onAlarm(onoff) at "hh:mm:ss" every day
 void dailySource(const string& when,bool onoff); // Switch BinarySwitch/Thing on/off at "hh:mm:ss" every day
 uint32_t msSinceMidnight(); // return number of milliseconds since 00:00
 int parseTime(const string& ts); // given "hh:mm" or "hh:mm:ss", returns milliseconds value of the time, or -1 if invalid
 void setSchedule(H4P_SCHEDULE sched,H4BS_FN_SWITCH onAlarm); //  call onAlarm(onoff) according to pre-defined schedule
 void setScheduleSource(H4P_SCHEDULE sched); // Switch BinarySwitch/Thing on/off according to pre-defined schedule
+string strfTime(uint32_t t); //Convert the supplied number of seconds since EPOCH as a time string
+string strfDate(uint32_t t); //Convert the supplied number of seconds since EPOCH as a date string
+string strfDateTime(char fmt[] = "%a %Y-%m-%d %H:%M:%S", uint32_t t=0); //Convert the supplied number of seconds into the supplied format.
 string strTime(uint32_t t); // returns "hh:mm:ss" string representation t milliseconds
 void sync(); // forces re-sync whith NTP servers (normally done automatically 1x per hour)
 void tz(uint32_t tzOffset); // change timezone and force resync for SUMMER/WINTER time. Will screw up any existing timers!
 string upTime(); // returns "hh:mm:ss" value of time since bootup
+// daylight saving
+int DST_EU(uint32_t t); // DST offset for t in EU (inc UK).
+int DST_USA(uint32_t t); // DST offset for t in USA.
+
 ```
 
 ---
