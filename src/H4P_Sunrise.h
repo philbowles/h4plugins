@@ -31,7 +31,9 @@ SOFTWARE.
 #define H4P_Sunrise_H
 
 #include<H4PCommon.h>
-//#ifdef ARDUINO_ARCH_ESP8266
+#include<H4P_WiFiSelect.h>
+#ifndef H4P_NO_WIFI
+
 #include<H4P_Timekeeper.h>
 
 enum H4P_EPHEMERA {
@@ -63,5 +65,5 @@ class H4P_Sunrise: public H4Plugin {
 
 extern __attribute__((weak)) H4P_Sunrise h4ss;
 
-//#endif // esp8266 only
+#endif //Wifi only
 #endif // H4P_Sunrise_H

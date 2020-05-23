@@ -28,17 +28,17 @@ SOFTWARE.
 */
 #include<H4P_BinarySwitch.h>
 #ifndef H4P_NO_WIFI
-#include<H4P_AsyncWebServer.h>
-#include<H4P_AsyncMQTT.h>
+    #include<H4P_AsyncWebServer.h>
+    #include<H4P_AsyncMQTT.h>
+    void H4P_ConditionalSwitch::syncCondition(){ if(isLoaded(aswsTag())) h4asws._sendSSE(ConditionTag(),CSTR(stringFromInt(_predicate(state())))); }
+#else
+    void H4P_ConditionalSwitch::syncCondition(){}
+#endif
 
 void H4P_ConditionalSwitch::_hookIn() {
     REQUIRE(gpio);
     H4P_BinarySwitch::_hookIn();
+#ifndef H4P_NO_WIFI
     if(isLoaded(aswsTag())) h4asws._uiAdd(ConditionTag(),H4P_UI_BOOL,[this]{ return stringFromInt(_predicate(state())); });
-}
-
-void H4P_ConditionalSwitch::syncCondition(){ if(isLoaded(aswsTag())) h4asws._sendSSE(ConditionTag(),CSTR(stringFromInt(_predicate(state())))); }
-#else
-void H4P_ConditionalSwitch::syncCondition(){}
-
 #endif
+}

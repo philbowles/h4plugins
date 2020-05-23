@@ -61,7 +61,7 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
             H4P_BinaryThing*    _btp=nullptr;
             AsyncEventSource*   _evts;
             H4_CMD_MAP          _local={};
-            std::map<string,H4P_UI_ITEM> userItems={};
+            std::unordered_map<string,H4P_UI_ITEM> userItems={};
             vector<string>      lines={};
             H4_FN_VOID          _onC,_onD;
 

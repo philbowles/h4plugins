@@ -28,8 +28,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_Sunrise.h>
+#include<H4P_WiFiSelect.h>
+#ifndef H4P_NO_WIFI
+
 #include<H4P_SerialCmd.h>
-//#include<H4P_BinaryThing.h>
 #include <WiFiClientSecure.h>
 
 #ifdef ARDUINO_ARCH_ESP8266
@@ -122,4 +124,4 @@ void H4P_Sunrise::_start(){
         }
     } //else H4EVENT("ALREADY GOT SS %s",CSTR(_cb["sunrise"]));
 }
-//#endif // esp8266 only
+#endif // wifi only

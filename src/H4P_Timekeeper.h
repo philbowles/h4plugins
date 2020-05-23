@@ -32,7 +32,8 @@ SOFTWARE.
 #define H4P_Timekeeper_H
 
 #include<H4PCommon.h>
-#ifndef H4P_NOW_WIFI
+#include<H4P_WiFiSelect.h>
+#ifndef H4P_NO_WIFI
 #ifdef ARDUINO_ARCH_ESP8266
     #include "sntp.h"
 #else
@@ -108,5 +109,5 @@ class H4P_Timekeeper: public H4Plugin {
 
 extern __attribute__((weak)) H4P_Timekeeper h4tk;
 
-#endif // esp8266 only
+#endif // no wifi
 #endif // H4P_Timekeeper_H
