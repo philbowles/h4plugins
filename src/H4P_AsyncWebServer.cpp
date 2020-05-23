@@ -118,13 +118,13 @@ void H4P_AsyncWebServer::_start(){
     });
     addHandler(_evts);
 
-    on("/",HTTP_GET, [this](AsyncWebServerRequest *request){ 
-//        H4EVENT("Root %s",request->client()->remoteIP().toString().c_str());
+    on("/",HTTP_GET, [this](AsyncWebServerRequest *request){
+        H4EVENT("Root %s",request->client()->remoteIP().toString().c_str());
         _cb[wifiTag()]=stringFromInt(WiFi.getMode());
         request->send(SPIFFS,"/sta.htm",String(),false,aswsReplace);
     });
 
-    on("/",HTTP_POST, [this](AsyncWebServerRequest *request){ 
+    on("/",HTTP_POST, [this](AsyncWebServerRequest *request){
         H4EVENT("Root POST %s",request->client()->remoteIP().toString().c_str());
     	H4P_CONFIG_BLOCK rp;
 	    int params = request->params();

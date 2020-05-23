@@ -6,7 +6,8 @@
 
 *All plugins depend upon the presence of the [H4 library](https://github.com/philbowles/H4), which must be installed first.*
 
-[Release Notes v0.5.6](docs/rn056.md) 
+[Release Notes v0.5.6](docs/rn056.md)
+(Unfortunately, continuing issues with ESPAsyncWebServer library require that you uninstall the original and install a working patched version, see below)
 
 ---
 
@@ -14,7 +15,9 @@
 
 Think of H4 and its plugins as "IOT Lego" or an "IOT Swiss Army Knife" (or both) for [**H4**](https://github.com/philbowles/H4) - and if you are not already using H4's advanced scheduling and timing features, why not? Get it now from the link above, as you will need it to use the H4Plugins system.
 
-H4Plugins includes modules for WiFi + OTA, Webserver, MQTT, numerous common types of GPIO handling (e.g. debouncing, rotary encoders), Amazon Alexa voice control, logging to remote MySQL server and extensive diagnostics. By "plugging " together only the required modules, you can rapidly build your own custom firmware or IOT app. Everything you build will be stable and responsive: the plugins work together to allow multiple simultaneous processes to run, so ***no more WDT resets***! As your experience grows you can extend your app / firmware with H4Plugins' well-documented API and runtime command system. Let's see H4Plugins being used as replacement firmware for a SONOFF Basic switch.
+H4Plugins includes modules for WiFi + OTA, Webserver, MQTT, numerous common types of GPIO handling (e.g. debouncing, rotary encoders), Amazon Alexa voice control, NTP synchronisation, device presence detection, logging to remote MySQL server and extensive diagnostics. By "plugging " together only the required modules, you can rapidly build your own custom firmware or IOT app. Everything you build will be stable and responsive: the plugins work together to allow multiple simultaneous processes to run, so ***no more WDT resets***! As your experience grows you can extend your app / firmware with H4Plugins' well-documented API and runtime command system. Let's see an example of H4Plugins being used as replacement firmware for a SONOFF Basic switch.
+
+## SONOFF Basic Example
 
 What follows is the *entire H4Plugins code* - despite the fact it might look like there is something missing, there is not. The code as shown compiles to produce firmware that can be uploaded directly to any / all of your SONOFF devices and provides:
 
@@ -28,9 +31,9 @@ What follows is the *entire H4Plugins code* - despite the fact it might look lik
 * LED pattern signalling, e.g. ... --- ... ("SOS") = No WiFi, two short blips = no MQTT, single slow blip = AP mode etc
 * HTTP REST control from any other device with JSON response
 * Dynamic reconfiguration of SSID and/or MQTT server
-* Optional master/slave of other H4 devices
+* Optional master/slave of other H4/Plugins devices
 * UPNP device control from e.g. Windows Network Explorer
-* Alexa voice control
+* Amazon ECHO "Alexa" voice control
 
 ```cpp
 #include<H4Plugins.h>
@@ -49,7 +52,7 @@ As you can see, all you need to do is list the modules/funcionality you require 
 
 The modular design of H4's plugin architecture minimises scarce resources in low-memory MCU targets: You only compile in what you need by choosing the relevant bulding blocks. Detailed diagnostics can be easily included (or completely compiled-out) and controlled at runtime via the serial console, web console,HTTP REST or MQTT depending on which options you choose. It is built on top of the very stable [H4](https://github.com/philbowles/H4) timer/scheduler which traces its ancestry back to "Esparto" - of which one user recently said: *"and now have Esparto modules with months of uptime without an issue"*.
 
-There are 52(!) example sketches demonstrating all the features and the API of all of the plugins. They should be used both as a template for your own sketches and as a learning resource. Users are strongly recommended to work through them in the order [listed below](readme.md#current-plugins-februrary-2020)
+There are over 70 example sketches demonstrating all the features and the API of all of the plugins. They should be used both as a template for your own sketches and as a learning resource.
 
 Each plugin is also throroughly documented in the links below. *Please make sure you have read and fully understood the documentation for the [H4 library](https://github.com/philbowles/H4) and the relevant Plugin(s) before raising an issue.*
 
@@ -156,7 +159,7 @@ H4Plugins is tested using
 
 * H4 0.5.4
 * ArduinoIDE 1.8.12
-* ESP8266 core 2.6.3
+* ESP8266 core 2.7.1
 * ESP32 core 1.0.4
 * STM32-NUCLEO core 1.8.0
 
@@ -175,7 +178,10 @@ Next install the 3rd-party libraries:
 
 The above libraries coexist quite happily if you download all of them to enable targetting both ESP8266 and ESP32.
 
-* [ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer)
+* [ESPAsyncWebServer](https://github.com/philbowles/ESPAsyncWebServerr)
+
+**N.B** If you have previously installed the original version of the above, by "me-no-dev" you *must* uninstall it and use only this patched version. 
+The author seems unwilling to fix several serious bugs - the above version works *and is required* for correct functioning of H4/Plugins
   
 * Finally, install this H4Plugins library
 
@@ -188,15 +194,14 @@ are recommended (if available for the chosen board):
 
 See [Advanced Topics](docs/advanced.md) for how to simply add H4 optimised board definitions that will ensure you get the smallest possible binary (and therefore most likely to be OTA-able)
 
+## Optimised Board Definitions
+
+![Optimised Boards](assets/optismall.jpg)
+
 ## For ALL sketches
 
-* Debug Level: NoAssert-NDEBUG
-* Exceptions: Disabled
-
-## For WiFi sketches
-
-* lwIP Variant: v2 Higher Bandwidth (No Features)
-
+![Settings](assets/settings.jpg
+)
 ### **IMPORTANT**
 
 WiFI sketches must reserve SPIFFS space to hold the AP Mode web pages. These take < 64K so allocate the minimum SPIFFS possible that is greater than or equal to 64k and remember to copy the `data` folder to the sketch folder and upload using either the [ESP8266 sketch data uploader](https://github.com/esp8266/arduino-esp8266fs-plugin) or the [ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin) (or both) depending on which platform you compile for.

@@ -1,14 +1,12 @@
 let onof
 let source
 function ajax(url,decode=true){
-//    console.warn("AJAX START")
     document.body.style.cursor = "wait";
     var http = new XMLHttpRequest();
     var fullurl="http://"+window.location.hostname+"/rest/"+url;
     http.open('GET', fullurl);
     let r=document.getElementById("reply")
     http.addEventListener("load", function(e){
-//        console.warn("AJAX FINISH")
         document.body.style.cursor = "default";
         if(decode){
             r.innerHTML=""
@@ -34,7 +32,6 @@ function uiItem(d,h="uhang"){
         let t=parseInt(parts[1])
         let v=parts[2]
         let a=parseInt(parts[3])
-//        console.warn("ACTIVE = ",a);
         let title=document.createElement("div");
         title.innerHTML=n;
         let valu=document.createElement("div");
@@ -43,14 +40,14 @@ function uiItem(d,h="uhang"){
         switch(t){
             case 0: // label
                 valu.innerHTML=v;
-                source.addEventListener(n, function(e){ console.warn(" Event ",n," ",e.data); document.getElementById(n).innerHTML=e.data; });
+                source.addEventListener(n, function(e){ document.getElementById(n).innerHTML=e.data; });
                 break;
             case 1:
                 break;
             case 2:
                 let b=parseInt(v);
                 valu.classList=(a ? "uia ":"")+"ld led-"+(b ? "green":"red");
-                source.addEventListener(n, function(e){ console.warn(" Event ",n," ",e.data); redgreen(n,parseInt(e.data)); });
+                source.addEventListener(n, function(e){ redgreen(n,parseInt(e.data)); });
                 if(a) {
                     valu.addEventListener("click", function(e){ 
                         ajax("h4/asws/uib/"+n+","+(valu.classList.value.indexOf("red")==-1 ? 0:1)) },
@@ -58,13 +55,11 @@ function uiItem(d,h="uhang"){
                     title.classList.add("tuia");
                 }
                 break;
-            default:
-                console.warn("WTF ",t);
         }
         let hangoff=document.getElementById(h);
         hangoff.insertBefore(title,null)
         hangoff.insertBefore(valu,null)
-    } else console.warn(n," already exists ",d);
+    }
 }
 let dt;
 
@@ -82,7 +77,6 @@ document.addEventListener("DOMContentLoaded", function() {
         source.addEventListener('ui', function(e){ uiItem(e.data) });
         source.onmessage=function(e){
             let m=e.data;
-            console.warn(" Message ",m);
             if(m.substr(0,2)!='ka'){ 
                 msg.innerHTML=e.data;
                 setTimeout(function () { msg.innerHTML="&nbsp;"; },30000);

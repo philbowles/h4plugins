@@ -197,19 +197,15 @@ This switches off any serial output and auto-stops the H4P_SerialCmd wasting tim
 
 There are several compile-time options for most devices (in the `tools` menu) that can affect the size and/or performance of your sketch. It is easily possible to produce a sketch that is too big for OTA if these options are used unwisely.
 
-To simply your life, H4 provides some extra boards definitions which have all the correct setting "baked in" for best performance / smallest size, for
+To simplify your life, H4 provides some extra boards definitions which have all the correct setting "baked in" for best performance / smallest size, for
 
-* Wemos D1/R2 mini
-* Itead Sonoff (Basic/S20/SV/TH)
-* ESP01-S (note, **NOT** bare ESP-01 with 512kRAM - just throw those in the bin)
+![optimised boards](../assets/optismall.jpg)
 
 To "install" these you need to copy the [boards.local.txt](../boards.local.txt) form this repo to the Arduino IDE folder contating `boards.txt` which will look something like:
 
 `C:\Users\phil\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.6.3`
 
-Once the file is copied, restart the IDE and you will see the new ooptions in the boards menu
-
-![H4 Optimised boards](../assets/optimised.jpg)
+Once the file is copied, restart the IDE and you will see the new options in the boards menu
 
 For any device not mentioned, these are the settings recommended. The example is for a 4M device, so 1MB SPIFFS is selected: on a 1MB device, select the 64K option
 

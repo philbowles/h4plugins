@@ -1,7 +1,6 @@
 
 TODO:
     ret type on guard 1
-    tkdocs
 SOONER
     error gone away in nodejs
     early abort dependfail
