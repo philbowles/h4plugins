@@ -31,8 +31,12 @@ SOFTWARE.
 #define H4P_BinarySwitch_HO
 
 #include<H4P_BinaryThing.h>
+#include<H4P_WiFiSelect.h>
+#ifndef H4P_NO_WIFI
+    #include<H4P_AsyncWebServer.h>
+#endif
+
 #include<H4P_GPIOManager.h>
-#include<H4P_AsyncWebServer.h>
 
 class H4P_BinarySwitch: public H4P_BinaryThing{
 //
@@ -54,7 +58,9 @@ class H4P_ConditionalSwitch: public H4P_BinarySwitch{
     protected:
         virtual void        _setState(bool b) override { 
             if(_predicate(b)) H4P_BinarySwitch::_setState(b);
+#ifndef H4P_NO_WIFI
             if(isLoaded(aswsTag())) h4asws.sendUIMessage(_predicate(b) ? "&nbsp;":"Unable: condition not set");
+#endif
         }
                 void        _hookIn() override;
     public:

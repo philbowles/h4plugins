@@ -31,7 +31,6 @@ SOFTWARE.
 #include<H4P_AsyncWebServer.h>
 #include<H4P_AsyncMQTT.h>
 
-#ifndef H4P_NO_WIFI
 void H4P_BinaryThing::_hookIn() {
     _cb[onofTag()]="1";
     if(isLoaded(mqttTag())) {
@@ -119,5 +118,3 @@ void H4P_BinaryThing::turn(bool b){
     }
 }
 #endif
-
-#endif // H4_WIFI

@@ -30,6 +30,8 @@ SOFTWARE.
 */
 //#ifdef ARDUINO_ARCH_ESP8266
 #include<H4P_Timekeeper.h>
+#ifndef H4P_NO_WIFI
+
 #include<H4P_SerialCmd.h>
 #include<H4P_BinaryThing.h>
 
@@ -372,4 +374,4 @@ string H4P_Timekeeper::upTime(){
 	return stringFromInt(t / msInDay(),"%02d:")+strTime(t);
 }
 
-//#endif // esp8266 only
+#endif // wifi only

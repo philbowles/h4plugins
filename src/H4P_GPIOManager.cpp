@@ -27,6 +27,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_GPIOManager.h>
+//#include<algorithm>
+#include <numeric>
 
 H4GPIOPin::H4GPIOPin(            
     uint8_t _p,
@@ -65,6 +67,7 @@ void H4GPIOPin::_pinFactoryCommon(bool onof){ // optimise for no logging
     H4P_GPIOManager::pins[pin]=this;
     begin();
 }
+
 #ifdef H4P_LOG_EVENTS
 string H4GPIOPin::dump(){ // tart this up - complete rework
     /*
@@ -230,7 +233,7 @@ void AnalogAveragePin::read(){
     _samples.push_back(analogRead(pin));
 //    Serial.printf("sample %u=%u\n",_samples.size(),_samples.back());
     if(_samples.size() == _n){
-        state=accumulate( _samples.begin(), _samples.end(), 0) / _samples.size();
+        state=std::accumulate( _samples.begin(), _samples.end(), 0) / _samples.size();
         _samples.clear();
         sendEvent();
     };
