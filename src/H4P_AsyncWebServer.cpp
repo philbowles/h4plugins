@@ -49,9 +49,7 @@ uint32_t H4P_AsyncWebServer::_uib(vector<string> vs){
         if(isNumeric(b)) {
             uint32_t bv=atoi(CSTR(b));
             if(bv < 2) {
-                Serial.printf("UIB %s => %d\n",CSTR(a),bv);
                 if(userItems.count(a)){
-                    //ack the bool
                     _sendSSE(CSTR(a),CSTR(b));
                     userItems[a].a(a,b);
                     return H4_CMD_OK;
@@ -83,12 +81,7 @@ void H4P_AsyncWebServer::_rest(AsyncWebServerRequest *request){
 	},request),nullptr,H4P_TRID_ASWS);
 }
 
-void  H4P_AsyncWebServer::_sendSSE(const char* name,const char* msg){
-    if(_evts && _evts->count()) {
-        Serial.printf("T=%u _sendSSE id=%d SSE Qlength=%d FH=%u\n",millis(),++_evtID,_evts->avgPacketsWaiting(),ESP.getFreeHeap());
-        _evts->send(msg,name,_evtID);
-    } //else Serial.printf("_SSE IGNORED\n");
-}
+void  H4P_AsyncWebServer::_sendSSE(const char* name,const char* msg){ if(_evts && _evts->count()) _evts->send(msg,name,_evtID); }
 
 void H4P_AsyncWebServer::_setBothNames(const string& host,const string& friendly){
     if(isLoaded(upnpTag())) h4wifi._setPersistentValue(nameTag(),friendly,false);
