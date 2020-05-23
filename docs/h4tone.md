@@ -126,7 +126,7 @@ H4P_sirenScreech(p,d);
 H4P_sirenWoopWoop(p,d);
 ```
 
-[Example Sketch](../examples/MUSIC/H4P_Simple_Tones/H4P_Simple_Tones.ino)
+[Example Sketch](../examples/MUSIC/H4P_Sirens/H4P_Sirens.ino)
 
 ```cpp
 //

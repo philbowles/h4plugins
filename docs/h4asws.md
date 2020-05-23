@@ -18,9 +18,9 @@ The webserver provides a REST-like command interface at `http:// your ip /rest/.
 
 ## AP Mode
 
-TODO: add image of AP Mode
+![Mobile AP mode](/assets/apmode.jpg) 
 
-Fill in the details, click "connect" and the device will boot into STA mode using the new credentials for the rest of its days until you force a "factory reset". 
+Fill in the details, click "connect" and the device will boot into STA mode using the new credentials for the rest of its days until you force a "factory reset" or `h4/wifi/apmode`
 
 N.B. The "name" field is only relevant if you are also using the [H4P_UPNPServer](/things.md) plugin, when it will become the "friendly name" of the device as shown in Windows Network Explorer. Is is also the name by which Amazon Alexa will control it via voice commands "switch on < name >" and "switch off < name >"
 
@@ -92,14 +92,14 @@ As those are use by the plugin itself
 H4P_AsyncWebServer(H4_FN_VOID onFirstClient=nullptr,H4_FN_VOID onLastClients=nullptr):
 //
 // name =name of your own UI field
-// f = name of "setter" function which returns data of the appropriate type to popultae the field when web page requested
-void addUILabelText(const string& name,H4_FN_UITXT f);
-void addUILabelNumeric(const string& name,H4_FN_UINUM f);
-void addUIBoolean(const string& name,H4_FN_UIBOOL f);
+// f... = name of "setter" function which returns data of the appropriate type to popultae the field when web page requested
+void addUILabelNumeric(const string& name,H4_FN_UINUM fUserIntSetter);
+void addUILabelText(const string& name,H4_FN_UITXT fUserStringSetter);
+void addUIBoolean(const string& name,H4_FN_UIBOOL fUserBoolSetter);
 // change value of exisitng user webUI field
-void setUILabelNumeric(const string& name,H4_FN_UINUM f);
-void setUILabelText(const string& name,H4_FN_UITXT f);
-void setUIBoolean(const string& name,H4_FN_UIBOOL f);
+void setUILabelNumeric(const string& name,H4_FN_UINUM fUserIntSetter);
+void setUILabelText(const string& name,H4_FN_UITXT fUserStringSetter);
+void setUIBoolean(const string& name,H4_FN_UIBOOL fUserBoolSetter);
 //
 void sendUIMessage(const string& msg); // msg scrolls in red at bottom of screen 
 
@@ -112,7 +112,7 @@ void sendUIMessage(const string& msg); // msg scrolls in red at bottom of screen
 
 # The REST interface
 
-The REST interface allows the user to enter commands in a similar fashion to the serial commans line or MQTT. The command to be executed is prefixed by`http://< device IP address / name >/rest/` for example `http://192.168.1.104/rest/h4/show/config`. The responsse is a JSON object.
+The REST interface allows the user to enter commands in a similar fashion to the serial commans line or MQTT. The command to be executed is prefixed by`http://< device IP address or name >/rest/` for example `http://192.168.1.104/rest/h4/show/config`. The response is a JSON object.
 
 ![JSONREST](../assets/rest.jpg)
 

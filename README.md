@@ -178,7 +178,7 @@ Next install the 3rd-party libraries:
 
 The above libraries coexist quite happily if you download all of them to enable targetting both ESP8266 and ESP32.
 
-* [ESPAsyncWebServer](https://github.com/philbowles/ESPAsyncWebServerr)
+* [ESPAsyncWebServer](https://github.com/philbowles/ESPAsyncWebServer)
 
 **N.B** If you have previously installed the original version of the above, by "me-no-dev" you *must* uninstall it and use only this patched version. 
 The author seems unwilling to fix several serious bugs - the above version works *and is required* for correct functioning of H4/Plugins

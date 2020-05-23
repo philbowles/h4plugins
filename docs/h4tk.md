@@ -1,4 +1,4 @@
-![H4P Flyer](/assets/time/ogo.jpg) 
+![H4P Flyer](../assets/WiFiLogo.jpg)
 
 # NTP Synchronisation (short name="time")
 
@@ -12,7 +12,7 @@ Many thanks to Adam Sharp (http://threeorbs.co.uk) for extensive work and help o
 
 # What does it do?
 
-Syncrhonises with two user-chosen pubic NTP servers. At boot time, it reds the current time then continues to maintain an internal clock. Thus even if WiFi later becomes unavailble, the "Wall-clock time" will always be available, even though it may drift.
+Syncrhonises with two user-chosen public NTP servers. At boot time, it reads the current time then continues to maintain an internal clock. Thus even if WiFi later becomes unavailble, the "Wall-clock time" will always be available, even though it may drift.
 
 The internal clock is re-synchronised 1x per hour (configurable) while ever a network connection is available
 

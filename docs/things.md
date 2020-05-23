@@ -10,7 +10,9 @@
 
 # What do they do?
 
-Let's not forget that "IOT" is the Internet of *Things*. So what is a "Thing"? The answer is: *anything you want it to be*. In H4 Plugins terms, it is an object that holds an interal `state` of `ON` or `OFF` and reacts to commands `on`,`off`,`toggle` and `switch`. If you are using the  [H4P_AsyncMQTT plugin](h4mqtt.md) it publishes the `state` topic whenever the state changes. A Switch is a just a Thing with a predefined output function linked to a single GPIO.
+Let's not forget that "IOT" is the Internet of *Things*. So what is a "Thing"? The answer is: *anything you want it to be*. In H4 Plugins terms, it is an object that holds an interal `state` of `ON` or `OFF` and reacts to commands `on`,`off`,`toggle` and `switch`. If you are using the  [H4P_AsyncMQTT plugin](h4mqtt.md) it publishes the `state` topic whenever the state changes. It also provides a fat-finger-friendly graphcial on/off button.
+
+A Switch is a just a Thing with a predefined output function linked to a single GPIO.
 
 There can only be one *output* Thing (or Switch) in a sketch/app and it must be named as `h4onof`. It is effectively the default handler for the above commands. It is what your device does when any source ( [Serial](h4cmd.md), [MQTT](h4mqtt.md), [HTTP REST](h4asws.md), Amazon Alexa voice command or [linked GPIO input connector](h5gpio.md) ) sends an `on`,`off`,`toggle` or `switch` command.
 
@@ -94,8 +96,8 @@ That's it - the rest is the same.
 
 * BinaryThing calls a user-defined function with `bool` value when `on`,`off`,`toggle` or `switch` command is received
 * BinarySwitch drives a GPIO HIGH or LOW when  `on`,`off`,`toggle` or `switch` command is received
-* ConditionalThing is a BinaryThing that only operates when user-defined funtion returns `true`
-* ConditionalSwitch is a BinarySwitch that only operates when user-defined funtion returns `true`
+* ConditionalThing is a BinaryThing that only operates when user-defined function returns `true`
+* ConditionalSwitch is a BinarySwitch that only operates when user-defined function returns `true`
 
 ---
 
@@ -158,7 +160,7 @@ H4P_ConditionalSwitch(uint8_t pin,H4GM_SENSE sense, uint32_t initial,H4_FN_CTHIN
 H4P_ConditionalThing(H4_FN_CTHING predicate=nullptr,H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): 
 
 void autoOff(uint32_t T); // change autoOff time to T milliseconds
-void syncCondition(); // Conditional swicth / thing only: keep webUI in-step with current value of condition
+void syncCondition(); // Conditional switch / thing only: keep webUI in-step with current value of condition
 void turnOff();
 void turnOn();
 void toggle(); // invert state
