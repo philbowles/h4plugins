@@ -51,6 +51,11 @@ void H4P_WiFi::_gotIP(){
 #ifdef H4P_USE_OTA
     h4.every(H4WF_OTA_RATE,[](){ ArduinoOTA.handle(); },nullptr,H4P_TRID_HOTA,true);
     _setHost(host);
+    if(MDNS.begin(CSTR(host))) {
+        MDNS.addService("h4","tcp",666);
+        MDNS.addServiceTxt("h4","tcp","id",CSTR(_cb[chipTag()]));
+        MDNS.addServiceTxt("h4","tcp","ip",CSTR(_cb["ip"]));
+    } else Serial.println("Error starting mDNS");
   	ArduinoOTA.setHostname(CSTR(host));
 	ArduinoOTA.setRebootOnSuccess(false);	
 	ArduinoOTA.begin();
