@@ -152,9 +152,9 @@ STAG(wifi);
 #endif
 
 #define HOOK_IF_LOADED(x) { H4Plugin* p=isLoaded(x##Tag()); \
-            if(p) { p->hookConnect([this](){ start(); }); p->hookDisconnect([this](){ stop(); }); }}
+            if(p) { p->hookConnect([this](){ start(); }); p->hookDisconnect([this](){ H4Plugin::stop(); }); }}
 #define DEPEND(x) { H4Plugin* p=isLoaded(x##Tag()); \
-            if(p) { p->hookConnect([this](){ start(); });p->hookDisconnect([this](){ stop(); }); }\
+            if(p) { p->hookConnect([this](){ start(); });p->hookDisconnect([this](){ H4Plugin::stop(); }); }\
             else { DEPENDFAIL(x) } }
 #define REQUIRE(x) { H4Plugin* p=isLoaded(x##Tag()); \
             if(!p) { DEPENDFAIL(x) } }

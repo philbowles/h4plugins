@@ -6,8 +6,8 @@
 
 *All plugins depend upon the presence of the [H4 library](https://github.com/philbowles/H4), which must be installed first.*
 
-[Release Notes v0.5.6](docs/rn056.md)
-(Unfortunately, continuing issues with ESPAsyncWebServer library require that you uninstall the original and install a working patched version, see below)
+[Release Notes v0.5.7](docs/rn057.md)
+Unfortunately, major issues with asyncMqttClient library require that you uninstall it, and throw it away and pretend you never heard of it. It is replaced by [AsyncMQTT](http://github.com/philbowles/asyncmqtt)
 
 ---
 
@@ -171,7 +171,7 @@ First you need to install the [H4](https://github.com/philbowles/H4) library.
 
 Next install the 3rd-party libraries:
 
-* [Async MQTT client library](https://github.com/marvinroger/async-mqtt-client)
+* [AsyncMQTT](http://github.com/philbowles/asyncmqtt)
 * [ESP8266 ESPAsyncUDP Library](https://github.com/me-no-dev/ESPAsyncUDP)
 * [ESP8266 ESPAsyncTCP Library](https://github.com/me-no-dev/ESPAsyncTCP)
 * [ESP32 AsyncTCP Library](https://github.com/me-no-dev/AsyncTCP)
