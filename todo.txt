@@ -4,10 +4,17 @@ TODO:
 SOONER
     error gone away in nodejs
     early abort dependfail
+    wifi/change -> reboot
+    stale ui msgbox
+    unicorn get version
 SHORTTERM
+    getstartingheap
     schedule in cheztoi
     H4_TIMER from at,daily
     adv docs + / example creating your own commands
+    retval on ps inc/dec
+    ps discard(x)
+    jitter on loggers freq
 MEDIUMTERM
     dynamic cmds flash / siren etc
     remote client get

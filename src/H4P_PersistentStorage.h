@@ -34,8 +34,8 @@ SOFTWARE.
 #include<H4PCommon.h>
 
 class H4P_PersistentStorage: public H4Plugin {
-        H4P_CONFIG_BLOCK psRam={};
-        H4P_FN_PSCHANGE    _f;
+        H4P_CONFIG_BLOCK    psRam={};
+        H4P_FN_PSCHANGE     _f=nullptr;
 
         VSCMD(_get);
         VSCMD(_set);
@@ -46,7 +46,6 @@ class H4P_PersistentStorage: public H4Plugin {
         string& operator[](const string& name){
             return psRam[name];
         }
-
         H4P_PersistentStorage(H4P_FN_PSCHANGE f=nullptr);
 
         void          clear();

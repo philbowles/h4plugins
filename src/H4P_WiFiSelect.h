@@ -8,6 +8,7 @@
         #include<WiFi.h>
         #include <AsyncTCP.h>
         #include <AsyncUDP.h>
+        #include<ESPmDNS.h>
     #endif
     #include<DNSServer.h>
     #include<ArduinoOTA.h>

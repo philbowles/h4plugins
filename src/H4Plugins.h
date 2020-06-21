@@ -50,5 +50,6 @@
     uint32_t            H4Plugin::_nxtSubCmd=H4PC_MAX-1; \
     H4P_CONFIG_BLOCK    H4Plugin::_cb={{"date",string(__DATE__)+"/"+string(__TIME__)}, \
                                        {"h4v",string(H4_VERSION)}, \
+                                       {"pango",string(PANGO_VERSION)}, \
                                        {"h4pv",string(H4P_VERSION)}};
 #endif

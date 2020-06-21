@@ -44,7 +44,7 @@ void H4P_BinaryThing::_publish(bool b){ if(isLoaded(mqttTag())) h4mqtt.publishDe
 void H4P_BinaryThing::_setSlaves(bool b){
     for(auto s:_slaves){
         string t=s+"/h4/switch";
-        h4mqtt.publish(CSTR(t),0,false,CSTR(stringFromInt(b)));
+        h4mqtt.publish(CSTR(t),0,false,stringFromInt(b));
     }
 }
 
