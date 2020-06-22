@@ -36,7 +36,11 @@ SOFTWARE.
 #ifndef H4P_NO_WIFI
 #include<H4P_WiFi.h>
 
+<<<<<<< HEAD
 #include<PangolinMQTT.h>
+=======
+#include<AsyncMQTT.h>
+>>>>>>> master
 
 struct H4P_LWT {
     const char*      topic;
@@ -45,7 +49,11 @@ struct H4P_LWT {
     bool        retain;
 };
 
+<<<<<<< HEAD
 class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
+=======
+class H4P_AsyncMQTT: public H4Plugin, public AsyncMQTT{
+>>>>>>> master
             bool            autorestart=true;
             string          device;
             struct H4P_LWT  _lwt;
@@ -77,7 +85,11 @@ class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
                 void        unsubscribeDevice(string topic);
 
     //          syscall only
+<<<<<<< HEAD
                 void        _reply(string msg) override { publish(CSTR(string("h4/"+_cb[deviceTag()]+"/reply")),0,false,msg); }
+=======
+                void        _reply(string msg) override { publish(CSTR(string("h4/"+_cb[deviceTag()]+"/reply")),0,false,(uint8_t*) msg.data()); }
+>>>>>>> master
                 void        show() override { reply("Server: %s:%s %s",CSTR(_cb["broker"]),CSTR(_cb[portTag()]),connected() ? "CNX":"DCX"); }
 };
 

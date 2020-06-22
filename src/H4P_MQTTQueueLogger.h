@@ -42,7 +42,7 @@ class H4P_MQTTQueueLogger: public H4P_MQTTLogger {
         }
         void _stop() override {
             H4P_MQTTLogger::_stop();
-            h4.cancelSingleton(H4P_TRID_HLOG);
+            h4.cancelSingleton(H4P_TRID_QLOG);
         }
         void _greenLight() override { h4cmd.removeCmd(msgTag(),_subCmd); } // msg is meaningless - we only "see" H4P_LOG_MQTT_Q events
     public:
