@@ -39,11 +39,7 @@ uint32_t H4P_AsyncMQTT::_change(vector<string> vs){
 
 void H4P_AsyncMQTT::_greenLight(){
     _setup();
-<<<<<<< HEAD
     onMessage([this](const char* topic, uint8_t* payload, PANGO_PROPS properties, size_t length, size_t index, size_t total){
-=======
-    onMessage([this](const char* topic, uint8_t* payload, ASMQ_PROPS_t properties, size_t length, size_t index, size_t total){
->>>>>>> master
         h4.queueFunction(
             bind([](string topic, string pload){ 
                 h4cmd._executeCmd(CSTR(string(mqttTag()).append("/").append(topic)),pload); 
@@ -78,11 +74,7 @@ void H4P_AsyncMQTT::_greenLight(){
 
   TLS_BAD_FINGERPRINT = 7
 */
-<<<<<<< HEAD
     onDisconnect([this](int8_t reason){
-=======
-    onDisconnect([this](uint8_t reason){
->>>>>>> master
         if(!_discoDone){
             h4.queueFunction([this,reason](){
                 _discoDone=true;
