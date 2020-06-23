@@ -73,6 +73,8 @@ class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
                 void        change(const string& broker,uint16_t port);
                 void        publishDevice(const string& topic,const string& payload="");
                 void        publishDevice(const string& topic,uint32_t payload){ publishDevice(topic,stringFromInt(payload)); }
+                void        publishDevice(const string& topic,uint32_t payload,uint8_t qos,bool retain=false){ publish(CSTR(string("h4/"+_cb[deviceTag()]+topic)),qos,false,stringFromInt(payload)); }
+                void        publishDevice(const string& topic,const string& payload,uint8_t qos,bool retain=false){ publish(CSTR(string("h4/"+_cb[deviceTag()]+topic)),qos,false,payload); }
                 void        subscribeDevice(string topic,H4_FN_MSG f,H4PC_CMD_ID root=H4PC_ROOT);
                 void        unsubscribeDevice(string topic);
 
