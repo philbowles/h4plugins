@@ -122,20 +122,7 @@ You may wonder why you get a `vector<string>` when there is only 1 item: the pay
 
 No matter how many parts there are to the message, the payload is always the last item. To make life easier H4 has macros `H4PAYLOAD` if you are expecting a string and `H4PAYLOAD_INT` if you are expecting a number.
 
-Your callback then "does it thing" but *must* return a value showing if it succeeded or not. It can be any of the following:
-
-```cpp
-H4_INT_MAP  cmdErrors={
-    {H4_CMD_OK,"OK"},
-    {H4_CMD_UNKNOWN,"Unknown cmd"},
-    {H4_CMD_TOO_FEW_PARAMS,"Too few parameters"},
-    {H4_CMD_TOO_MANY_PARAMS,"Too many parameters"},
-    {H4_CMD_NOT_NUMERIC,"Numeric value expected"},
-    {H4_CMD_OUT_OF_BOUNDS,"Value out of range"},
-    {H4_CMD_NAME_UNKNOWN,"Name not known"},
-    {H4_CMD_PAYLOAD_FORMAT,"Incorrect Payload Format"}
-};
-```
+Your callback then "does it thing" but *must* return a value showing if it succeeded or not. It can be any of the following [List](h4ce.md)
 
 ## Simple example
 
@@ -155,7 +142,7 @@ uint32_t myCallback(vector<string> vs){
 h4mqtt.subscribeDevice("mytopic",myCallback); // MUST be done from inside onConnect callback
 ```
 
-[Example Code](../examples/H4P_MQTT_Simple/H4P_MQTT_Simple.ino)
+[Example Code](../examples/MQTT/H4P_MQTT_Simple/H4P_MQTT_Simple.ino)
 
 ## Subtopics
 
@@ -213,7 +200,7 @@ vs.size() == 1
 
 As you can see, this could get complicated when multiple subtopics are required, which is why the world invented MQTT wildcards.
 
-[Example Code](../examples/H4MQTT/H4P_MQTT_Wildcards/H4P_MQTT_Wildcards.ino)
+[Example Code](../examples/MQTT/H4P_MQTT_Wildcards/H4P_MQTT_Wildcards.ino)
 
 ## Wildcard topics
 
@@ -237,7 +224,7 @@ If your code expects exactly one subtopic, it will almost certainly break when t
 
 You *must* validate both the number of arguments (subtopics) and "sensible" values for each before trying to process the message, remembering to return the appropriate erro code if you are unable to handle the message.
 
-[Example Code](../examples/H4MQTT/MQTT_Wildcards/MQTT_Wildcards.ino)
+[Example Code](../examples/MQTT/MQTT_Wildcards/MQTT_Wildcards.ino)
 
 ---
 
@@ -279,7 +266,6 @@ Making it smaller will clear the queue and make the mesages arrive at the server
 
 * [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Blog](https://8266iot.blogspot.com)
-* [Facebook Esparto Support / Discussion](https://www.facebook.com/groups/esparto8266/)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)

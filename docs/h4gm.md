@@ -46,6 +46,7 @@ Let's face it: there are only so many things you can do with a GPIO pin! Yes, th
 
 GPIOManager currently provides behaviours for:
 
+* AnalogAverage - send average of N analog samples
 * AnalogThreshold - send 0 or 1 depending on raw analog value > or < user-defined limit
 * Circular - Counts 1 - N, 1 - N etc
 * Debounced - Eliminates switch bounce
@@ -180,21 +181,21 @@ These are shown in "dependency" order, rather than alphabetically as many expand
 ### **Raw**
 
 Is more like a *non*-strategy: It passes every single change to the callback. It is a convenient base for your own scenarios (if any) not covered by GPIO manager. The benefit is you automatically get uS time of every event, the difference since previous (delta) etc and you can "throttle" the pin. This is explained in more detail later, but means you can set a maximum rate (cps) of events to handle per second.
-[Example Code](../examples/H4GM_Raw/H4GM_Raw.ino)
+[Example Code](../examples/GPIO/H4GM_Raw/H4GM_Raw.ino)
 
 ---
 
 ### **Filtered**
 
 Works like **Debounced** but only sends only all ONs or all OFFs , i.e. it filters out the ones you don't want.
-[Example Code](../examples/H4GM_Filtered/H4GM_Filtered.ino)
+[Example Code](../examples/GPIO/H4GM_Filtered/H4GM_Filtered.ino)
 
 ---
 
 ### **Debounced**
 
 Probably one of the most useful: if you don't know what switch bounce is then you **need** this and you also need to read and understand [this link](http://www.ganssle.com/debouncing.htm). If you *do* know what switch bounce is, then you also need this, as it "just works". The callback receives only "clean" ON/OFF changes once you set the appropriate *millisecond* value for the particular switch / button.
-[Example Code](../examples/H4GM_Debounced/H4GM_Debounced.ino)
+[Example Code](../examples/GPIO/H4GM_Debounced/H4GM_Debounced.ino)
 
 ---
 
@@ -205,7 +206,7 @@ Based on **Debounced**, it retains its state between press/release pairs. Press 
 #### Additional fields for Latching
 
 `uint32_t        latched; // alternately ON or OFF`
-[Example Code](../examples/H4GM_Latching/H4GM_Latching.ino
+[Example Code](../examples/GPIO/H4GM_Latching/H4GM_Latching.ino
 )
 
 ---
@@ -217,7 +218,7 @@ Based on **Debounced**, it only calls you after a *pair* of ON/OFF changes, i.e.
 #### Additional fields for Sequenced
 
 `uint32_t        stage; // Ever-increasing number of times ON/OFF pair occurred`
-[Example Code](../examples/H4GM_Sequenced/H4GM_Sequenced.ino)
+[Example Code](../examples/GPIO/H4GM_Sequenced/H4GM_Sequenced.ino)
 
 ---
 
@@ -228,7 +229,7 @@ Based on **Sequenced**, you provide a maximum number of stages and then the valu
 #### Additional fields for Circular
 
 `uint32_t        stage; // stage of cycle`
-[Example Code](../examples/H4GM_Circular/H4GM_Circular.ino)
+[Example Code](../examples/GPIO/H4GM_Circular/H4GM_Circular.ino)
 
 ---
 
@@ -239,14 +240,14 @@ Based on **Debounced**, when the state changes back to OFF the additional field 
 #### Additional fields for Timed
 
 `uint32_t        held; // Number of microseconds GPIO was held ON`
-[Example Code](../examples/H4GM_Timed/H4GM_Timed.ino)
+[Example Code](../examples/GPIO/H4GM_Timed/H4GM_Timed.ino)
 
 ---
 
 ### **Repeating**
 
 Based on **Timed**, it will continue to call your function while ever the GPIO is held ON. You choose how often you get called (the *frequency*) and when the state changes back to OFF the additional field `held` will contain the number of microseconds the button was held down.
-[Example Code](../examples/H4GM_Repeating/H4GM_Repeating.ino)
+[Example Code](../examples/GPIO/H4GM_Repeating/H4GM_Repeating.ino)
 
 ---
 
@@ -255,7 +256,7 @@ Based on **Timed**, it will continue to call your function while ever the GPIO i
 Think of a PIR movement sensor: On first detection it goes ON and stays on for a chosen period (the "timeout"). Any *new* movement before the timout period expires will cause it to start all over again, staying ON and re-starting the clock or "re-triggering the timeout".
 
 The Retriggering strategy is identical. You get a callback when the pin changes to ON and then again to OFF following `timeout` milliseconds after the final physical retriggering event. 
-[Example Code](../examples/H4GM_Retriggering/H4GM_Retriggering.ino)
+[Example Code](../examples/GPIO/H4GM_Retriggering/H4GM_Retriggering.ino)
 
 ---
 
@@ -266,7 +267,19 @@ The Retriggering strategy is identical. You get a callback when the pin changes 
 Checking such a sensor every 5 minutes is usually more than enough. The important thing to note is that *you do not get called every N minutes* - you get called on an N-minute multiple only if the state has changed from the previous reading N minutes ago.
 
 This strategy can also do an `analogRead` if required: `state` will hold the raw analog value;
-[Example Code](../examples/H4GM_Polled/H4GM_Polled.ino)
+[Example Code](../examples/GPIO/H4GM_Polled/H4GM_Polled.ino)
+
+---
+
+### **Analog Average**
+
+**AnalogAverage** is a specialised version of **Polled**. As with **Polled** it has its state value sampled periodically. After N samples, it sends the average value.
+
+#### Additional fields for AnalogAverage
+
+`uint32_t        nSamples; // The number of samples to average`
+
+[Example Code](../examples/GPIO/H4GM_AnalogAverage/H4GM_AnalogAverage.ino)
 
 ---
 
@@ -280,12 +293,12 @@ This strategy can also do an `analogRead` if required: `state` will hold the raw
 
 The constructor has a `compare` parameter which can be either `H4GM_LESS` or `H4GM_GREATER`
 
-* If the raw value of the encoder is 77 and you specify a limit of 100 and use `H4GM_LESS` then the callback will receive 1 as 77 is less than 100
-* If the raw value of the encoder is 77 and you specify a limit of 100 and use `H4GM_GREATER` then the callback will receive 0 as 77 is NOT greater than 100
-* If the raw value of the encoder is 100 and you specify a limit of 512 and use `H4GM_LESS` then the callback will receive 1 as 100 is less than 512
-* If the raw value of the encoder is 100 and you specify a limit of 512 and use `H4GM_GREATER` then the callback will receive 0 as 100 is NOT greater than 512
+* If the raw value of the pin is 77 and you specify a limit of 100 and use `H4GM_LESS` then the callback will receive 1 as 77 is less than 100
+* If the raw value of the pin is 77 and you specify a limit of 100 and use `H4GM_GREATER` then the callback will receive 0 as 77 is NOT greater than 100
+* If the raw value of the pin is 100 and you specify a limit of 512 and use `H4GM_LESS` then the callback will receive 1 as 100 is less than 512
+* If the raw value of the pin is 100 and you specify a limit of 512 and use `H4GM_GREATER` then the callback will receive 0 as 100 is NOT greater than 512
 
-[Example Code](../examples/H4GM_AnalogThreshold/H4GM_AnalogThreshold.ino)
+[Example Code](../examples/GPIO/H4GM_AnalogThreshold/H4GM_AnalogThreshold.ino)
 
 ---
 
@@ -299,7 +312,7 @@ It also has a variant that takes the name of an `int` variable instead of a call
 
 `int        encoderValue; // +1 clockwise click. -1 anti-clockwise`
 
-[Example Code](../examples/H4GM_Encoder/H4GM_Encoder.ino)
+[Example Code](../examples/GPIO/H4GM_Encoder/H4GM_Encoder.ino)
 
 ---
 
@@ -336,7 +349,7 @@ setCenter // manully set the value to the mid-point (max - min / 2)
 
 ```
 
-[Example Code](../examples/H4GM_EncoderAuto/H4GM_EncoderAuto.ino)
+[Example Code](../examples/GPIO/H4GM_EncoderAuto/H4GM_EncoderAuto.ino)
 
 ---
 
@@ -397,7 +410,7 @@ For simplicity the code calls another plugin [H4P_FlasherController](../h4fc) to
 
 `uint32_t        held; // Number of microseconds GPIO was held ON`
 
-[Example Code](../examples/H4GM_Multistage/H4GM_Multistage.ino)
+[Example Code](../examples/GPIO/H4GM_Multistage/H4GM_Multistage.ino)
 
 ---
 
@@ -433,7 +446,8 @@ void toggle(uint8_t p); // reverse current logical state
 //
 //      Strategies
 //
-AnalogThresholdPin* AnalogThreshold(uint8_t p,uint32_t freq,uint32_t threshold,H4GM_COMPARE compare,H4GM_FN_EVENT callback);//
+AnalogAveragePin*   AnalogAverage(uint8_t p,uint32_t freq,uint32_t nSamples,H4GM_FN_EVENT callback);
+nalogThresholdPin*  AnalogThreshold(uint8_t p,uint32_t freq,uint32_t threshold,H4GM_COMPARE compare,H4GM_FN_EVENT callback);//
 AnalogThresholdPin* AnalogThresholdSource(uint8_t p,uint32_t freq,uint32_t threshold,H4GM_COMPARE compare);//
 CircularPin*        Circular(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,uint32_t nStages,H4GM_FN_EVENT callback);//
 DebouncedPin*       Debounced(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT callback);//
@@ -465,7 +479,6 @@ TimedPin*           Timed(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTim
 
 * [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Blog](https://8266iot.blogspot.com)
-* [Facebook Esparto Support / Discussion](https://www.facebook.com/groups/esparto8266/)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)

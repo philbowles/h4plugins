@@ -1,7 +1,7 @@
 /*
  MIT License
 
-Copyright (c) 2019 Phil Bowles <h4plugins@gmail.com>
+Copyright (c) 2020 Phil Bowles <h4plugins@gmail.com>
    github     https://github.com/philbowles/esparto
    blog       https://8266iot.blogspot.com     
    groups     https://www.facebook.com/groups/esp8266questions/
@@ -27,6 +27,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_GPIOManager.h>
+//#include<algorithm>
+#include <numeric>
 
 H4GPIOPin::H4GPIOPin(            
     uint8_t _p,
@@ -65,6 +67,7 @@ void H4GPIOPin::_pinFactoryCommon(bool onof){ // optimise for no logging
     H4P_GPIOManager::pins[pin]=this;
     begin();
 }
+
 #ifdef H4P_LOG_EVENTS
 string H4GPIOPin::dump(){ // tart this up - complete rework
     /*
@@ -225,6 +228,17 @@ void PolledPin::read(){
     } else H4GPIOPin::run();
 }
 
+AnalogAveragePin::AnalogAveragePin(uint8_t _p,uint32_t _f,uint32_t n,H4GM_FN_EVENT _c): _n(n), PolledPin(_p,INPUT,H4GM_PS_THRESHA,ACTIVE_HIGH,_f,true,_c) {}
+void AnalogAveragePin::read(){
+    _samples.push_back(analogRead(pin));
+//    Serial.printf("sample %u=%u\n",_samples.size(),_samples.back());
+    if(_samples.size() == _n){
+        state=std::accumulate( _samples.begin(), _samples.end(), 0) / _samples.size();
+        _samples.clear();
+        sendEvent();
+    };
+}
+
 AnalogThresholdPin::AnalogThresholdPin(uint8_t _p,uint32_t _f,uint32_t _l,H4GM_COMPARE _cf,H4GM_FN_EVENT _c): limit(_l), fCompare(_cf), PolledPin(_p,INPUT,H4GM_PS_THRESHA,ACTIVE_HIGH,_f,true,_c) {
     state=fCompare(analogRead(pin),limit); // refakta
 }
@@ -309,7 +323,9 @@ void H4P_GPIOManager::toggle(uint8_t p){ if(isManaged(p))  reinterpret_cast<Outp
 //
 //      (Oblique) Strategies
 //
-
+AnalogAveragePin* H4P_GPIOManager::AnalogAverage(uint8_t pin,uint32_t freq,uint32_t nSamples,H4GM_FN_EVENT callback){
+    return pinFactory<AnalogAveragePin>(false,pin,freq,nSamples,callback);
+}
 AnalogThresholdPin* H4P_GPIOManager::AnalogThreshold(uint8_t pin,uint32_t freq,uint32_t threshold,H4GM_COMPARE compare,H4GM_FN_EVENT callback){
     return pinFactory<AnalogThresholdPin>(false,pin,freq,threshold,compare,callback);
 }

@@ -12,18 +12,6 @@
 
 H4 WiFi Manager controls all aspects of WiFi connection and reconnection after failure. It allows the main body of your code to keep on running if WiFi fails and will automatically re-connect "in the background" when WiFi becomes available again. It also allows seamless change of connection to a different SSID and provides the ability to update your code "Over The Air" (OTA).
 
-If no ssid / password has ever successfully connected - as will be the case on a brand new device or after a factory reset - the device will start in AP mode.
-
-Using a mobile device or other WiFi connector, a scan will show an open SSID of H4_XXXXXX where XXXXXX is the unique chip ID of the device (usually the last 6 characters of the MAC address)
-
-You can then connect to H4_XXXXXX and open a browser to http://192.168.4.1 where you will see this:
-
-![Mobile AP](/assets/mobile.jpg) 
-
-Fill in the details, click "connect" and the device will boot into STA mode using the new credentials for the rest of its days until you force a "factory reset". 
-
-N.B. The "name" field is only relevant if you are also using the [H4P_UPNPServer](/things.md) plugin, when it will become the "friendly name" of the device as shown in Windows Network Explorer. Is is also the name by which Amazon Alexa will control it via voice commands "switch on < name >" and "switch off < name >"
-
 ![upnp](/assets/upnp.jpg) 
 
 ---
@@ -37,8 +25,6 @@ H4P_WiFi h4wifi(...
 ```
 
 ### Dependencies
-
-* [H4P_AsyncWebServer](h4asws.md) Plugin
 
 * You must copy the `data` sub-folder to your sketch folder and upload to SPIFFS. To do this you will need to intall either the [ESP8266 sketch data uploader](https://github.com/esp8266/arduino-esp8266fs-plugin) or the [ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin) (or both) depending on which platform you compile for. 
 
@@ -101,7 +87,6 @@ The larger the value, the less of a performace hit, BUT the longer it takes for 
 
 * [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Blog](https://8266iot.blogspot.com)
-* [Facebook Esparto Support / Discussion](https://www.facebook.com/groups/esparto8266/)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)

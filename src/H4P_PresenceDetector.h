@@ -1,7 +1,7 @@
 /*
  MIT License
 
-Copyright (c) 2019 Phil Bowles <H48266@gmail.com>
+Copyright (c) 2020 Phil Bowles <H48266@gmail.com>
    github     https://github.com/philbowles/H4
    blog       https://8266iot.blogspot.com
    groups     https://www.facebook.com/groups/esp8266questions/
@@ -62,6 +62,20 @@ class H4PDetector: public H4Plugin{
         bool        isPresent(){ return _here; }
         void show() override { reply("%s (%s) %s Present",CSTR(_pName),CSTR(_id),_here ? "":"NOT"); }
 };
+
+class H4P_UPNPDetector: public H4PDetector {
+    protected:
+                void        _hookIn() override;
+                void        _start() override;
+    public:
+        H4P_UPNPDetector(const string& friendly,const string& usn,H4BS_FN_SWITCH f=nullptr): H4PDetector(friendly,usn,f){}
+};
+
+class H4P_UPNPDetectorSource: public H4P_UPNPDetector{
+    public:
+        H4P_UPNPDetectorSource(const string& pid,const string& id);
+};
+
 #ifdef ARDUINO_ARCH_ESP8266
 class H4P_IPDetector: public H4PDetector {
         static  bool _inflight;
@@ -80,19 +94,7 @@ class H4P_IPDetectorSource: public H4P_IPDetector{
     public:
         H4P_IPDetectorSource(const string& pid,const string& id);
 };
-#endif
-class H4P_UPNPDetector: public H4PDetector {
-    protected:
-                void        _hookIn() override;
-                void        _start() override;
-    public:
-        H4P_UPNPDetector(const string& friendly,const string& usn,H4BS_FN_SWITCH f=nullptr): H4PDetector(friendly,usn,f){}
-};
-class H4P_UPNPDetectorSource: public H4P_UPNPDetector{
-    public:
-        H4P_UPNPDetectorSource(const string& pid,const string& id);
-};
-#ifdef ARDUINO_ARCH_ESP8266
+#ifdef H4P_USE_OTA
 class H4P_MDNSDetector: public H4PDetector {
         string _service;
         string _protocol;
@@ -121,8 +123,10 @@ class H4P_H4DetectorSource: public H4P_H4Detector{
     public:
         H4P_H4DetectorSource(const string& local);
 };
+
+#endif // OTA
 #endif // esp8266
 
 #endif // wifi
 
-#endif // H4P_PresenceDetector_H
+#endif // H4P_PresenceDetector_HO

@@ -81,7 +81,7 @@ void fSweep(uint32_t timer,uint32_t fromF,uint32_t toF,uint32_t inc,function<voi
 void end(); // cancels any sweep in progress
 ```
 
-[Example code](../examples/H4ESW/H4P_ESWSimple/H4P_ESWSimple.ino)
+[Example code](../examples/XTRAS/H4ESW/H4P_ESWSimple/H4P_ESWSimple.ino)
 
 ---
 
@@ -99,7 +99,7 @@ Below is an example of one of the graphs produced, when running the profiler on 
 
 ![PROFILER](../assets/profiler.jpg)
 
-[Profiler code](../examples/H4ESW/H4P_ESWProfiler/H4P_ESWProfiler.ino)
+[Profiler code](../examples/XTRAS/H4ESW/H4P_ESWProfiler/H4P_ESWProfiler.ino)
 
 ---
 
@@ -107,7 +107,6 @@ Below is an example of one of the graphs produced, when running the profiler on 
 
 * [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Blog](https://8266iot.blogspot.com)
-* [Facebook Esparto Support / Discussion](https://www.facebook.com/groups/esparto8266/)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)

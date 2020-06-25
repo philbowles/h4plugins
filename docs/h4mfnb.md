@@ -19,7 +19,7 @@ A "medium" press over 2 seconds (but less than 5 seconds**) starts the associate
 
 A "long" press - anything over 5 seconds** - starts the LED flashing extremely rapidly and when the button is released, the device will clear any stored configuration information and then reboot, a process known as a "factory reset".
 
-**N.B** If the [H4P_WiFi](h4wifi.md) plugin is in use, the factory reset will clear any stored WiFi credentials therefore ensuring the when the device reboots, it will start in AP configuration mode.
+**N.B** If the [H4P_WiFi](h4wifi.md) plugin is in use, the factory reset will clear any stored WiFi credentials, [H4P_PersistentStorage](h4stor.md) items etc
 
 (* ***Four** functions if you count the LED flashing* :) )
 
@@ -40,7 +40,7 @@ H4P_GPIOManager h4gm;
 //H4P_BinarySwitch h4onof(...
 or
 //H4P_BinaryThing h4onof(...
-H4P_MultiFunctionButton h4onof(...
+H4P_MultiFunctionButton h4mfb(...
 ```
 
 # Dependencies
@@ -58,19 +58,18 @@ none
 ```cpp
 /* constructor: */
 H4P_MultiFunctionButton(
-    H4P_BinarySwitch* bsp,  //a reference to a previoulsy defined H4P_BinarySwitch or H4P_UPNPServer
-    uint32_t dbTimeMs, // the switch debounce value in milliseconds: depends on the individual switch
-    //          the input button
+//  the input button
     uint8_t pin,
-    uint8_t mode, // or INPUT_PULLUP depending on the hardware
-    H4GM_SENSE b_sense, // the "sense" of the button
+    uint8_t mode,
+    H4GM_SENSE b_sense,
+    uint32_t dbTimeMs, // debounce time
 //          the linked LED for message flashing
-    uint8_t led, // GPIO# of the linked LED
-    H4GM_SENSE l_sense // the active "sense" of the linked LED
-    );
+    uint8_t led,
+    H4GM_SENSE l_sense);
+);
 ```
 
-[Example code](../examples/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
+[Example code](../examples/XTRAS/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
 
 ---
 
@@ -99,7 +98,6 @@ Millisecond time defining transition from short->medium
 
 * [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Blog](https://8266iot.blogspot.com)
-* [Facebook Esparto Support / Discussion](https://www.facebook.com/groups/esparto8266/)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)

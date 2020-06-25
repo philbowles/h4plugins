@@ -1,7 +1,7 @@
 /*
  MIT License
 
-Copyright (c) 2019 Phil Bowles <H48266@gmail.com>
+Copyright (c) 2020 Phil Bowles <H48266@gmail.com>
    github     https://github.com/philbowles/H4
    blog       https://8266iot.blogspot.com
    groups     https://www.facebook.com/groups/esp8266questions/
@@ -39,9 +39,7 @@ SOFTWARE.
 
 using namespace std::placeholders;
 //
-//
-//
-bool stringIsAlpha(const string& s);
+bool stringIsAlpha(const string& s); // move to util!!!
 //
 #ifndef ARDUINO_SONOFF_BASIC // or s20 / sv ect
   #define RELAY_BUILTIN   12
@@ -66,11 +64,12 @@ enum H4_CMD_ERROR:uint32_t  {
     H4_CMD_OK,
     H4_CMD_UNKNOWN,
     H4_CMD_TOO_FEW_PARAMS,
-    H4_CMD_TOO_MANY_PARAMS,    
+    H4_CMD_TOO_MANY_PARAMS,
     H4_CMD_NOT_NUMERIC,
     H4_CMD_OUT_OF_BOUNDS,
     H4_CMD_NAME_UNKNOWN,
-    H4_CMD_PAYLOAD_FORMAT
+    H4_CMD_PAYLOAD_FORMAT,
+    H4_CMD_NOT_NOW
 };
 
 enum H4P_LOG_TYPE {
@@ -101,7 +100,7 @@ STAG(board)
 STAG(broker);
 STAG(cerr);
 STAG(chip);
-STAG(curl);
+STAG(Condition);
 STAG(device);
 STAG(esqw);
 STAG(gpio);
@@ -152,8 +151,10 @@ STAG(wifi);
     #define h4UserEvent(x,...)
 #endif
 
+#define HOOK_IF_LOADED(x) { H4Plugin* p=isLoaded(x##Tag()); \
+            if(p) { p->hookConnect([this](){ start(); }); p->hookDisconnect([this](){ H4Plugin::stop(); }); }}
 #define DEPEND(x) { H4Plugin* p=isLoaded(x##Tag()); \
-            if(p) { p->hookConnect([this](){ start(); });p->hookDisconnect([this](){ stop(); }); }\
+            if(p) { p->hookConnect([this](){ start(); });p->hookDisconnect([this](){ H4Plugin::stop(); }); }\
             else { DEPENDFAIL(x) } }
 #define REQUIRE(x) { H4Plugin* p=isLoaded(x##Tag()); \
             if(!p) { DEPENDFAIL(x) } }
@@ -191,7 +192,9 @@ enum trustedIds {
   H4P_TRID_TIME,
   H4P_TRID_SYNC,
   H4P_TRID_DALY,
-  H4P_TRID_SHOT
+  H4P_TRID_LOOP,
+  H4P_TRID_SHOT,
+  H4P_TRID_SSET
 };
 
 enum H4PC_CMD_ID{
@@ -220,7 +223,7 @@ class H4Plugin {
     
             uint32_t        guardInt1(vector<string> vs,function<void(uint32_t)> f);
 
-            uint32_t        guardString2(vector<string> vs,function<void(string,string)> f);
+            uint32_t        guardString2(vector<string> vs,function<H4_CMD_ERROR(string,string)> f);
 
             uint32_t        guard1(vector<string> vs,H4_FN_MSG f){
                 if(!vs.size()) return H4_CMD_TOO_FEW_PARAMS;
@@ -266,7 +269,7 @@ class H4Plugin {
                 void        hookDisconnect(H4_FN_VOID f){ _disconnected.push_back(f); } 
 //
                 string      getConfig(const string& c){ return _cb[c]; }
-                void        reply(const char* fmt,...); // hoist protected
+        static  void        reply(const char* fmt,...); // hoist protected
 //      syscall only
         virtual void        _reply(string msg) { Serial.println(CSTR(msg)); }
                 void        _downHooks();

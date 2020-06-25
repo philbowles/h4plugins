@@ -1,7 +1,7 @@
 /*
  MIT License
 
-Copyright (c) 2019 Phil Bowles <H48266@gmail.com>
+Copyright (c) 2020 Phil Bowles <H48266@gmail.com>
    github     https://github.com/philbowles/H4
    blog       https://8266iot.blogspot.com
    groups     https://www.facebook.com/groups/esp8266questions/
@@ -49,7 +49,7 @@ class H4Flasher{
         H4Flasher(uint8_t pin,uint32_t period,uint8_t duty,uint8_t active);
         H4Flasher(uint8_t pin,const char* pattern,uint32_t timebase,uint8_t active);
 
-                void        autoOutput();
+                void        autoOutput(); // hoist this
                 void        flashPattern(uint32_t timebase,const char* pattern);
                 void        PWM(uint32_t period,uint8_t duty);
                 void        stop();
@@ -58,7 +58,6 @@ class H4Flasher{
 class H4P_FlasherController: public H4Plugin {
         std::unordered_map<uint8_t,H4Flasher*> _flashMap;
         void            _flash(uint32_t period,uint8_t duty,uint8_t pin,uint8_t active=HIGH);
-//        void            _greenLight() override { start(); }
     public:
         H4P_FlasherController(): H4Plugin(winkTag()){}
              

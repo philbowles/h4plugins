@@ -4,8 +4,6 @@
 
 ## Adds multiple LED blinking methods to H4 Universal Scheduler/Timer.
 
-![H4Flasher](/assets/H4flasher.jpg)
-
 *All plugins depend upon the presence of the [H4 library](https://github.com/philbowles/H4), which must be installed first.*
 
 ---
@@ -82,9 +80,9 @@ pulseLED(uint32_t period,uint8_t pin=LED_BUILTIN,uint8_t active=HIGH);
 stopLED(uint8_t pin=LED_BUILTIN);
 ```
 
-[Basic Example sketch](../examples/H4FC_Basic/H4FC_Basic.ino)
+[Basic Example sketch](../examples/FLASHER/H4FC_Basic/H4FC_Basic.ino)
 
-[Active Low Example sketch](../examples/H4FC_ActiveLow/H4FC_ActiveLow.ino)
+[Active Low Example sketch](../examples/FLASHER/H4FC_ActiveLow/H4FC_ActiveLow.ino)
 
 ---
 
@@ -92,7 +90,6 @@ stopLED(uint8_t pin=LED_BUILTIN);
 
 * [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Blog](https://8266iot.blogspot.com)
-* [Facebook Esparto Support / Discussion](https://www.facebook.com/groups/esparto8266/)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)

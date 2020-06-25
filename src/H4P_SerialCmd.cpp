@@ -1,7 +1,7 @@
 /*
  MIT License
 
-Copyright (c) 2019 Phil Bowles <h4plugins@gmail.com>
+Copyright (c) 2020 Phil Bowles <h4plugins@gmail.com>
    github     https://github.com/philbowles/esparto
    blog       https://8266iot.blogspot.com     
    groups     https://www.facebook.com/groups/esp8266questions/
@@ -48,7 +48,6 @@ H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Plugin(scmdTag()){
         {"config",     { H4PC_SHOW, 0, CMD(config) }},
         {"q",          { H4PC_SHOW, 0, CMD(dumpQ) }},
         {"plugins",    { H4PC_SHOW, 0, CMD(plugins) }},
-//        {"test",       { 0, 0, CMDVS(_test) }},
 #ifndef ARDUINO_ARCH_STM32
         {"heap",       { H4PC_SHOW, 0, CMD(heap) }},
         {"spif",       { H4PC_SHOW, 0, CMD(showSPIFFS)}},
@@ -83,7 +82,10 @@ uint32_t H4P_SerialCmd::_dispatch(vector<string> vs,uint32_t owner=0){
             if(i->second.fn) return (bind(i->second.fn,CHOP_FRONT(vs)))();
             else return _dispatch(CHOP_FRONT(vs),i->second.levID);
         } else return H4_CMD_UNKNOWN;
-    } else return H4_CMD_UNKNOWN;
+    } else {
+        Serial.printf("FICELLE EPUISE****\n");
+        return H4_CMD_UNKNOWN;
+    }
 }
 
 string H4P_SerialCmd::_errorString(uint32_t err){ return isLoaded(cerrTag()) ? h4ce.getErrorMessage(err):"Error: "+stringFromInt(err); }
@@ -114,19 +116,10 @@ void H4P_SerialCmd::_flattenCmds(function<void(string)> fn,string cmd,string pre
         }
     }
 }
-/*
-uint32_t H4P_SerialCmd::_global(vector<string> vs){
-    if(vs.size()<2) return H4_CMD_TOO_FEW_PARAMS;
-    if(vs.size()>2) return H4_CMD_TOO_MANY_PARAMS;
-    _cb[vs[0]]=H4PAYLOAD;
-    H4EVENT("Global %s=%s",CSTR(vs[0]),CSTR(H4PAYLOAD));
-    return H4_CMD_OK;
-}
-*/
+
 void H4P_SerialCmd::_hookIn(){
 #ifndef ARDUINO_ARCH_STM32    
     SPIFFS.begin();
-//    if(isLoaded(mqttTag())) h4mqtt.hookConnect([this](){ h4mqtt.subscribeDevice("global/#",CMDVS(_global),H4PC_H4); }); 
 #endif
 }
 
@@ -156,7 +149,7 @@ void H4P_SerialCmd::_run(){
 //
 
 uint32_t H4P_SerialCmd::_simulatePayload(string flat,const char* src){ // refac
-	vector<string> vs=split(flat,"/");
+    vector<string> vs=split(flat,"/");
     if(vs.size()){
 		string pload=CSTR(H4PAYLOAD);
 		vs.pop_back();
@@ -192,8 +185,11 @@ uint32_t H4P_SerialCmd::_svcControl(H4P_SVC_CONTROL svc,vector<string> vs){
 }
 
 uint32_t H4P_SerialCmd::_svcRestart(vector<string> vs){ return _svcControl(H4PSVC_RESTART,vs); }
+
 uint32_t H4P_SerialCmd::_svcStart(vector<string> vs){ return _svcControl(H4PSVC_START,vs); }
+
 uint32_t H4P_SerialCmd::_svcInfo(vector<string> vs){ return _svcControl(H4PSVC_STATE,vs); }
+
 uint32_t H4P_SerialCmd::_svcStop(vector<string> vs){ return _svcControl(H4PSVC_STOP,vs); }
 
 void H4P_SerialCmd::help(){ 
@@ -282,7 +278,7 @@ void H4P_SerialCmd::dumpQ(){
     for(auto const& t:tlist) reply(CSTR(_dumpTask(t)));
 }
 
-void  H4P_SerialCmd::plugins(){ 
+void  H4P_SerialCmd::plugins(){
     for(auto const& p:H4Plugin::_plugins){
         reply("h4/svc/info/%s %s ID=%d",CSTR(p->_pName),p->_state() ? "UP":"DN",p->_subCmd);
         p->show();

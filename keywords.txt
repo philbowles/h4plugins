@@ -43,25 +43,46 @@ H4P_H4DetectorSource	KEYWORD1
 H4P_MDNSDetector	KEYWORD1
 H4P_MDNSDetectorSource	KEYWORD1
 H4P_RemoteUpdate	KEYWORD1
+H4P_HeapWarn	KEYWORD1
+H4P_LoopCount	KEYWORD1
 H4P_Timekeeper	KEYWORD1
+H4P_ToneController	KEYWORD1
+H4P_Sunrise	KEYWORD1
+H4P_Voice	KEYWORD1
+H4P_ConditionalThing	KEYWORD1
+H4P_ConditionalSwitch	KEYWORD1
 
 #######################################
 # Methods and Functions (	KEYWORD2)
 #######################################
-
 addCmd	KEYWORD2
+addUILabelText	KEYWORD2
+addUILabelNumeric	KEYWORD2
+addUIBoolean	KEYWORD2
+at	KEYWORD2
+atSource	KEYWORD2
 all	KEYWORD2
 both	KEYWORD2
 AnalogThreshold	KEYWORD2
+AnalogAverage	KEYWORD2
 AnalogThresholdSource	KEYWORD2
 change	KEYWORD2
+chromaticRun	KEYWORD2
 Circular	KEYWORD2
 clear	KEYWORD2
+clockEPOCH	KEYWORD2
+clockEPOCHLocal	KEYWORD2
+clockStrTimeLocal	KEYWORD2
+clockTime	KEYWORD2
 config	KEYWORD2
+daily	KEYWORD2
+dailySource	KEYWORD2
 Debounced	KEYWORD2
 DebouncedSource	KEYWORD2
 dec	KEYWORD2
 dSet	KEYWORD2
+DST_EU	KEYWORD2
+DST_USA	KEYWORD2
 dSweep	KEYWORD2
 dumpQ	KEYWORD2
 Encoder	KEYWORD2
@@ -88,10 +109,14 @@ getstring	KEYWORD2
 getTaskType	KEYWORD2
 getTaskName	KEYWORD2
 giveTaskName	KEYWORD2
-h4AddAwsHandlers	KEYWORD2
 h4FactoryReset	KEYWORD2
 h4reboot	KEYWORD2
 h4UserEvent	KEYWORD2
+H4P_sirenBuzz	KEYWORD2
+H4P_sirenChirp	KEYWORD2
+H4P_sirenHiLo	KEYWORD2
+H4P_sirenScreech	KEYWORD2
+H4P_sirenWoopWoop	KEYWORD2
 heap	KEYWORD2
 help	KEYWORD2
 host	KEYWORD2
@@ -103,12 +128,18 @@ isLoaded	KEYWORD2
 isPresent	KEYWORD2
 Latching	KEYWORD2
 LatchingSource	KEYWORD2
+length	KEYWORD2
 logEvent	KEYWORD2
 logicalRead	KEYWORD2
 logicalWrite	KEYWORD2
+metronome	KEYWORD2
+msSinceMidnight	KEYWORD2
+multivox	KEYWORD2
 Multistage	KEYWORD2
 Output	KEYWORD2
+parseTime	KEYWORD2
 pcent	KEYWORD2
+play	KEYWORD2
 plugins	KEYWORD2
 Polled	KEYWORD2
 PolledSource	KEYWORD2
@@ -120,17 +151,25 @@ RawSource	KEYWORD2
 read	KEYWORD2
 Repeating	KEYWORD2
 removeCmd	KEYWORD2
+rest	KEYWORD2
 restart	KEYWORD2
 Retriggering	KEYWORD2
 RetriggeringSource	KEYWORD2
 Sequenced	KEYWORD2
 setCenter	KEYWORD2
+sendUIMessage	KEYWORD2
 setint	KEYWORD2
 setMax	KEYWORD2
 setMin	KEYWORD2
+setSchedule	KEYWORD2
+setScheduleSource	KEYWORD2
 setPercent	KEYWORD2
 setstring	KEYWORD2
+setUILabelNumeric	KEYWORD2
+setUILabelText	KEYWORD2
+setUIBoolean	KEYWORD2
 setValue	KEYWORD2
+setVolume	KEYWORD2
 showSPIFFS	KEYWORD2
 show	KEYWORD2
 spiffs	KEYWORD2
@@ -138,18 +177,25 @@ start	KEYWORD2
 state	KEYWORD2
 stop	KEYWORD2
 stopLED	KEYWORD2
+strTime	KEYWORD2
+strfTime	KEYWORD2
+strfDate	KEYWORD2
+strfDateTime	KEYWORD2
+sync	KEYWORD2
+syncCondition	KEYWORD2
 subscribeDevice	KEYWORD2
 throttle	KEYWORD2
 Timed	KEYWORD2
-tnames	KEYWORD2
+tone	KEYWORD2
 toggle	KEYWORD2
 turn	KEYWORD2
 turnOff	KEYWORD2
 turnOn	KEYWORD2
+tz	KEYWORD2
 unsubscribeDevice	KEYWORD2
 update	KEYWORD2
+upTime	KEYWORD2
 write	KEYWORD2
-	
 
 #######################################
 # Constants (	LITERAL11)
@@ -178,3 +224,8 @@ H4P_FN_PSCHANGE	LITERAL1
 H4GM_COMPARE	LITERAL1
 H4GM_LESS	LITERAL1
 H4GM_GREATER	LITERAL1
+
+H4P_DURATION	LITERAL1
+H4P_SCHEDULE	LITERAL1
+H4P_STAVE	LITERAL1
+H4P_TUNE	LITERAL1

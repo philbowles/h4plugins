@@ -1,7 +1,7 @@
 /*
  MIT License
 
-Copyright (c) 2019 Phil Bowles <h4plugins@gmail.com>
+Copyright (c) 2020 Phil Bowles <h4plugins@gmail.com>
    github     https://github.com/philbowles/esparto
    blog       https://8266iot.blogspot.com     
    groups     https://www.facebook.com/groups/esp8266questions/
@@ -26,18 +26,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifndef H4P_NO_WIFI
 #include<H4P_BinaryThing.h>
+#ifndef H4P_NO_WIFI
 #include<H4P_AsyncWebServer.h>
 #include<H4P_AsyncMQTT.h>
 
-#ifndef H4P_NO_WIFI
-    void H4P_BinaryThing::_hookIn() { 
-        if(isLoaded(mqttTag())) {
-            h4mqtt.hookConnect([this](){ _publish(_getState()); }); 
-            h4mqtt.subscribeDevice("slave/#",CMDVS(_slave),H4PC_H4);
-        }
+void H4P_BinaryThing::_hookIn() {
+    _cb[onofTag()]="1";
+    if(isLoaded(mqttTag())) {
+        h4mqtt.hookConnect([this](){ _publish(_getState()); }); 
+        h4mqtt.subscribeDevice("slave/#",CMDVS(_slave),H4PC_H4);
     }
+}
 
 void H4P_BinaryThing::_publish(bool b){ if(isLoaded(mqttTag())) h4mqtt.publishDevice(stateTag(),b); }
 
@@ -51,8 +51,9 @@ void H4P_BinaryThing::_setSlaves(bool b){
 void H4P_BinaryThing::_setState(bool b) {
     _state=b;
     _setSlaves(b);
-    if(isLoaded(aswsTag())){ h4asws._sendEvent(b); }
+    if(isLoaded(aswsTag())){ h4asws.setUIBoolean(onofTag(),[this]{ return state(); }); }
 }
+
 uint32_t H4P_BinaryThing::_slave(vector<string> vs){
     if(vs.size()<2) return H4_CMD_TOO_FEW_PARAMS;
     if(vs.size()>2) return H4_CMD_TOO_MANY_PARAMS;
@@ -65,6 +66,14 @@ uint32_t H4P_BinaryThing::_slave(vector<string> vs){
     show();
     return H4_CMD_OK;
 }
+void H4P_ConditionalThing::_hookIn() {
+    H4P_BinaryThing::_hookIn();
+    if(isLoaded(aswsTag())) h4asws._uiAdd(ConditionTag(),H4P_UI_BOOL,[this]{ return stringFromInt(_predicate(state())); });
+}
+
+void H4P_ConditionalThing::syncCondition() {
+    if(isLoaded(aswsTag())) h4asws._sendSSE(ConditionTag(),CSTR(stringFromInt(_predicate(state()))));
+}
 #else
 void H4P_BinaryThing::_hookIn() {}
 void H4P_BinaryThing::_publish(bool b){}
@@ -74,6 +83,9 @@ void H4P_BinaryThing::_setState(bool b) {
     _setSlaves(b);
 }
 uint32_t H4P_BinaryThing::_slave(vector<string> vs){}
+void H4P_ConditionalThing::_hookIn(){}
+void H4P_ConditionalThing::syncCondition() {}
+
 #endif
 
 void H4P_BinaryThing::_start() { 
@@ -106,5 +118,3 @@ void H4P_BinaryThing::turn(bool b){
     }
 }
 #endif
-
-#endif // H4_WIFI

@@ -1,7 +1,7 @@
 /*
  MIT License
 
-Copyright (c) 2019 Phil Bowles <H48266@gmail.com>
+Copyright (c) 2020 Phil Bowles <H48266@gmail.com>
    github     https://github.com/philbowles/H4
    blog       https://8266iot.blogspot.com
    groups     https://www.facebook.com/groups/esp8266questions/
@@ -76,7 +76,7 @@ class H4P_MultiFunctionButton: public H4Plugin{
             H4GM_SENSE l_sense);
 };
 
-extern __attribute__((weak)) H4P_MultiFunctionButton h43fb;
+extern __attribute__((weak)) H4P_MultiFunctionButton h4mfb;
 
 //#endif
 #endif // H4P_MultiFunctionButton_H

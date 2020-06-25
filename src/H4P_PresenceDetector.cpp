@@ -1,7 +1,7 @@
 /*
  MIT License
 
-Copyright (c) 2019 Phil Bowles <h4plugins@gmail.com>
+Copyright (c) 2020 Phil Bowles <h4plugins@gmail.com>
    github     https://github.com/philbowles/esparto
    blog       https://8266iot.blogspot.com     
    groups     https://www.facebook.com/groups/esp8266questions/
@@ -31,6 +31,37 @@ SOFTWARE.
 #ifndef H4P_NO_WIFI
 #include<H4P_BinaryThing.h>
 #include<H4P_UPNPServer.h>
+//
+//      UPNP
+//
+void H4P_UPNPDetector::_hookIn() { 
+    REQUIRE(onof);
+    DEPEND(upnp);
+}
+
+void H4P_UPNPDetector::_start(){
+    h4upnp._listenUSN(_id,[this](uint32_t mx,H4P_CONFIG_BLOCK uh){
+        bool direction=uh["NTS"].find("alive")!=string::npos;
+        h4.cancel(_pinger);
+        if(direction) _pinger=h4.once(mx,[this](){ _inout(false); },nullptr,H4P_TRID_UDPU);
+        _inout(direction);
+    });
+    _upHooks();
+}
+
+H4P_UPNPDetectorSource::H4P_UPNPDetectorSource(const string& pid,const string& id): H4P_UPNPDetector(pid,id){
+    H4P_BinaryThing* _btp;
+    REQUIREBT;
+    if(_btp){
+        _f=[this,_btp](bool b){ 
+#ifdef H4P_LOG_EVENTS
+        _btp->_turn(b,_pName+string("("+_id+")"));
+#else
+        _btp->turn(b);
+#endif
+        };
+    }
+}
 
 #ifdef ARDUINO_ARCH_ESP8266
 extern "C" {
@@ -39,7 +70,6 @@ extern "C" {
 
 bool                H4P_IPDetector::_inflight=false;
 struct ping_option  H4P_IPDetector::pop;
-unordered_map<string,H4P_MDNSDetector*> H4P_MDNSDetector::localList;
 //
 //      IP
 //
@@ -83,42 +113,12 @@ H4P_IPDetectorSource::H4P_IPDetectorSource(const string& pid,const string& id): 
         };
     }
 }
-#endif
-//
-//      UPNP
-//
-void H4P_UPNPDetector::_hookIn() { 
-    REQUIRE(onof);
-    DEPEND(upnp);
-}
-
-void H4P_UPNPDetector::_start(){
-    h4upnp._listenUSN(_id,[this](uint32_t mx,H4P_CONFIG_BLOCK uh){
-        bool direction=uh["NTS"].find("alive")!=string::npos;
-        h4.cancel(_pinger);
-        if(direction) _pinger=h4.once(mx,[this](){ _inout(false); },nullptr,H4P_TRID_UDPU);
-        _inout(direction);
-    });
-    _upHooks();
-}
-
-H4P_UPNPDetectorSource::H4P_UPNPDetectorSource(const string& pid,const string& id): H4P_UPNPDetector(pid,id){
-    H4P_BinaryThing* _btp;
-    REQUIREBT;
-    if(_btp){
-        _f=[this,_btp](bool b){ 
-#ifdef H4P_LOG_EVENTS
-        _btp->_turn(b,_pName+string("("+_id+")"));
-#else
-        _btp->turn(b);
-#endif
-        };
-    }
-}
-#ifdef ARDUINO_ARCH_ESP8266
+#ifdef H4P_USE_OTA
 //
 //      MDNS
 //
+unordered_map<string,H4P_MDNSDetector*> H4P_MDNSDetector::localList;
+
 void H4P_MDNSDetector::_hookIn() { 
     REQUIRE(onof);
     DEPEND(wifi);
@@ -149,6 +149,6 @@ H4P_H4DetectorSource::H4P_H4DetectorSource(const string& id): H4P_H4Detector(id)
         };
     }
 }
+#endif // OTA
 #endif // 8266
-
 #endif // wifi

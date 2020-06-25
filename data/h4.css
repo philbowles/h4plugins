@@ -5,19 +5,23 @@ margin: auto;
 form {
 margin-top: 10px;
 margin-bottom: 8px;
-grid-column: 2;
+width: inherit;
 }
 select{ 
     width: 173px;
 }
 #main{
 display: grid;
-grid-template-columns: 25px auto 25px;
+grid-template-columns: 25px 300px 25px;
 justify-content: center;
-grid-gap: 15px;
+grid-gap: 5px;
 }
+#cchang{ 
+    grid-column: 2;
+    width: 295px;
+ }
 #cc{ 
-    background-color: #006468;
+        background-color: #006468;
     padding: 4px;
     border-radius: 5px;
 }
@@ -51,60 +55,90 @@ grid-gap: 15px;
     background-color: black;
     resize: none;
     color:white;
-    width: 285px;
+    width: 289px;
     height:160px;
+    cursor: pointer;
 }
 #header {
-grid-row-start: 1;
-grid-column: 2;
-margin: auto;
+    grid-row-start: 1;
+    grid-column: 2;
+    margin: auto;
 }
 #footer {
-font-size: x-small;
-text-align: center;
-grid-column: 2;
-width: 280px;
+    font-size: x-small;
+    text-align: center;
+    grid-column: 2;
+    width: 300px;
 }
 #ap{
     grid-column: 2;
     width: 280px;
+    display: none;
     }
 .fline {
     display: inline-flex;
     width: -webkit-fill-available;
 }
-#sta{
+#msg{ 
+    color: red;
     grid-column: 2;
-    }
-#cmdf{
-grid-column: 3;
-cursor: pointer;
-margin: auto;
+ }
+#uhang{ 
+    grid-column: 2;
+    display: grid;
+    grid-template-columns: 40% 60%;
+    grid-gap: 5px;
+ }
+ #onoff{
+    grid-column: 2;
+    cursor: pointer;
+    display: none;
+    margin: auto;
 }
-#cmdr{
-grid-column: 1;
-grid-row: 1;
-cursor: pointer;
-margin: auto;
-}
-#onoff{
-grid-column: 2;
-cursor: pointer;
-display: none;
-margin: auto;
+#frnd{
+    display: none;
 }
 .line {
-display: inline-flex;
-text-align: left;
-grid-column: 2;
+    display: inline-flex;
+    text-align: left;
+    grid-column: 2;
 }
+
 .btn{
-display: grid;
-justify-items: center;
-margin-top: 6px;
+    display: grid;
+    justify-items: center;
+    margin-top: 6px;
 } 
-.title { width: 30%; }
+.title { width: 40%; }
 .data{ 
-width: 70%;
-text-align: right;
+    width: 60%;
+    text-align: right;
+}
+.uv{ 
+    text-align: right;
+    margin-right: 6px;
+}
+.ld {
+    margin-left: 162px;
+    margin-top: 5px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.led-red {
+    background-color: #F00;
+    box-shadow: #000 0 -1px 6px 1px, inset #600 0 -1px 8px, #F00 0 3px 11px;
+}
+
+.led-green {
+    background-color: #80FF00;
+    box-shadow: #000 0 -1px 6px 1px, inset #460 0 -1px 8px, #80FF00 0 3px 11px;
+}
+.tuia{
+    color: darkorange;
+    width: max-content;
+}
+.uia{
+    cursor: pointer;
 }

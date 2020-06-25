@@ -104,7 +104,7 @@ none
 
 Constructor takes `uint32_t` filter parameter that defaults to `H4P_LOG_ALL`.
 
-[Example Code](../examples/H4P_Loggers/H4P_Loggers.ino)
+[Example Code](../examples/LOGGING/H4P_Loggers/H4P_Loggers.ino)
 
 ---
 
@@ -172,7 +172,7 @@ void show();
 
 ```
 
-[Example Code](../examples/H4P_Loggers/H4P_Loggers.ino)
+[Example Code](../examples/LOGGING/H4P_Loggers/H4P_Loggers.ino)
 
 ---
 
@@ -210,7 +210,7 @@ none
 H4P_MQTTLogger(const string& topic,uint32_t filter=H4P_LOG_ALL);
 ```
 
-[Example Code](../examples/H4P_MQTTLogger/H4P_MQTTLogger.ino)
+[Example Code](../examples/LOGGING/H4P_MQTTLogger/H4P_MQTTLogger.ino)
 
 ---
 
@@ -245,7 +245,7 @@ none
 H4P_MQTTHeapLogger(uint32_t frequency,uint32_t filter=H4P_LOG_ALL); // frequency is in milliseconds
 ```
 
-[Example Code](../examples/H4P_MQTTHeapLogger/H4P_MQTTHeapLogger.ino)
+[Example Code](../examples/LOGGING/H4P_MQTTHeapLogger/H4P_MQTTHeapLogger.ino)
 ----
 
 # H4P_MQTTQueueLogger (name "qlog") [ ESP8266 / ESP32 only ]
@@ -279,7 +279,7 @@ none
 H4P_MQTTQueueLogger(uint32_t frequency,uint32_t filter=H4P_LOG_ALL); // frequency is in milliseconds
 ```
 
-[Example Code](../examples/H4P_MQTTHeapLogger/H4P_MQTTHeapLogger.ino)
+[Example Code](../examples/LOGGING/H4P_MQTTHeapLogger/H4P_MQTTHeapLogger.ino)
 
 ---
 
@@ -310,7 +310,7 @@ class myLogger: public H4PLogService {
 
 ...and that's it! Then add the new logger to your sketch - Everything else is automatic.
 
-[Example Code](../examples/H4P_CustomLogger/H4P_CustomLogger.ino)
+[Example Code](../examples/LOGGING/H4P_CustomLogger/H4P_CustomLogger.ino)
 
 ---
 
@@ -318,7 +318,6 @@ class myLogger: public H4PLogService {
 
 * [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Blog](https://8266iot.blogspot.com)
-* [Facebook Esparto Support / Discussion](https://www.facebook.com/groups/esparto8266/)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)

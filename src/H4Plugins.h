@@ -8,9 +8,12 @@
 #include<H4P_SerialLogger.h>
 #include<H4P_ExternalSqWave.h>
 #include<H4P_TaskSniffer.h>
+#include<H4P_HeapWarn.h>
+#include<H4P_LoopCount.h>
 #include<H4P_QueueWarn.h>
 #include<H4P_GPIOManager.h>
 #include<H4P_FlasherController.h>
+#include<H4P_ToneController.h>
 
 #ifndef ARDUINO_ARCH_STM32
     #include<H4P_PersistentStorage.h>
@@ -25,9 +28,11 @@
         #include<H4P_HttpMySQLLogger.h>
     #endif
     #include<H4P_RemoteUpdate.h>
+    #include<H4P_udpLogger.h>
     #include<H4P_UPNPServer.h>
     #include<H4P_PresenceDetector.h>
     #include<H4P_Timekeeper.h>
+    #include<H4P_Sunrise.h>
 #endif
 
 #include<H4P_BinaryThing.h>

@@ -2,7 +2,7 @@
 # Advanced Topics
 
 - [Advanced Topics](#advanced-topics)
-  - [* Installing Windows components for UPNP](#ul-liinstalling-windows-components-for-upnpli-ul)
+  - [- Installation of Windows components for UPNP server](#ul-liinstallation-of-windows-components-for-upnp-serverli-ul)
 - [Deploying multiple devices](#deploying-multiple-devices)
   - [Generic devices / naming](#generic-devices--naming)
 - [Remote update](#remote-update)
@@ -33,10 +33,10 @@ Similarly, with UPNP_Server, omitting a specific names results in the device bei
 To prevent *two* reboots, H4P_WiFi also has the `H4_XXXXXX/h4/wifi/host2` command, allowing you to specify bot the device name and friendly name in one call, saving a reboot. The payload is "device name,friendly name".
 
 Below is an example "generic" sketch that I use in all my Itead SONOFF devices.
-[Generic SONOFF sketch](../examples/xtras/Generic_SONOFF/Generic_SONOFF.ino)
+[Generic SONOFF sketch](../examples/XTRAS/Generic_SONOFF/Generic_SONOFF.ino)
 
 ...and the next is to set up and store retained MQTT messages for the complete configuration for all my own home IOT devices.
-[Create MQTT retained messges configuration](../examples/xtras/ChezToiioT_Config/ChezToiioT_Config.ino)
+[Create MQTT retained messges configuration](../examples/XTRAS/ChezToiioT_Config/ChezToiioT_Config.ino)
 
 ---
 
@@ -46,7 +46,7 @@ The generic sketch above is fine, but what happens when you make a change and ne
 
 In its simplest form, you create a server which holds a repository of the latest SPIFFS images and MCU-specific firmnware images. Setting up the server is beyond the scope of this document but see the nodejs/express sever which does this for you, or the NODE-RED H4 Updater flow below.
 
-[NodeJS/Express update server](../examples/H4P_HttpMySQLLogger/mysqlrest/h4.js)
+[NodeJS/Express update server](../examples/LOGGING/H4P_HttpMySQLLogger/mysqlrest/h4.js)
 
 ## Creating the update repo
 
@@ -82,6 +82,12 @@ Unlike SPIFFS where a specific version number is required in the binary name, th
 If we didn't do it this way, it would update *every time* it asked) - that won't harm anything as it will be the exact sam version it already is, but it's a waste of time!)
 
 ### NODE-RED H4 Updater flow
+C:\Users\phil\AppData\Local\Temp\scp50525\home\pi\.node-red\settings.js
+    functionGlobalContext: {
+        'path' : require('path'),
+        'fs'   : require('fs'),
+    },
+
 
 ```javscript
 [
@@ -191,19 +197,15 @@ This switches off any serial output and auto-stops the H4P_SerialCmd wasting tim
 
 There are several compile-time options for most devices (in the `tools` menu) that can affect the size and/or performance of your sketch. It is easily possible to produce a sketch that is too big for OTA if these options are used unwisely.
 
-To simply your life, H4 provides some extra boards definitions which have all the correct setting "baked in" for best performance / smallest size, for
+To simplify your life, H4 provides some extra boards definitions which have all the correct setting "baked in" for best performance / smallest size, for
 
-* Wemos D1/R2 mini
-* Itead Sonoff (Basic/S20/SV/TH)
-* ESP01-S (note, **NOT** bare ESP-01 with 512kRAM - just throw those in the bin)
+![optimised boards](../assets/optismall.jpg)
 
 To "install" these you need to copy the [boards.local.txt](../boards.local.txt) form this repo to the Arduino IDE folder contating `boards.txt` which will look something like:
 
 `C:\Users\phil\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.6.3`
 
-Once the file is copied, restart the IDE and you will see the new ooptions in the boards menu
-
-![H4 Optimised boards](../assets/optimised.jpg)
+Once the file is copied, restart the IDE and you will see the new options in the boards menu
 
 For any device not mentioned, these are the settings recommended. The example is for a 4M device, so 1MB SPIFFS is selected: on a 1MB device, select the 64K option
 
@@ -233,7 +235,6 @@ The files you will need are in the `src` subfolder
 
 * [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Blog](https://8266iot.blogspot.com)
-* [Facebook Esparto Support / Discussion](https://www.facebook.com/groups/esparto8266/)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)

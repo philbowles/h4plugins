@@ -1,7 +1,7 @@
 /*
  MIT License
 
-Copyright (c) 2019 Phil Bowles <H48266@gmail.com>
+Copyright (c) 2020 Phil Bowles <H48266@gmail.com>
    github     https://github.com/philbowles/H4
    blog       https://8266iot.blogspot.com
    groups     https://www.facebook.com/groups/esp8266questions/
@@ -33,10 +33,7 @@ SOFTWARE.
 #include<H4PCommon.h>
 
 class H4P_QueueWarn: public H4Plugin {
-    protected:
-//
-//      cmd responders
-//
+    //protected:
         VSCMD(_qwPcent);
 //
         uint32_t                limit;
@@ -47,11 +44,18 @@ class H4P_QueueWarn: public H4Plugin {
         uint32_t        __setLimit(uint32_t v);
 
         void            _run();
-
+        void            _start() override {
+            h4._hookLoop([this](){ _run(); },_subCmd);
+            H4Plugin::_start();
+        }
+        void            _stop() override {
+            h4._unHook(_subCmd);
+            H4Plugin::_stop();
+        }
     public:
         H4P_QueueWarn(function<void(bool)> _f,uint32_t _limit=50);
 
-        void        show();
+        void        show() override;
         void        pcent(uint32_t pc);
 };
 

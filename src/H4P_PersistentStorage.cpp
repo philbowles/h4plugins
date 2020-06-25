@@ -1,7 +1,7 @@
 /*
  MIT License
 
-Copyright (c) 2019 Phil Bowles <h4plugins@gmail.com>
+Copyright (c) 2020 Phil Bowles <h4plugins@gmail.com>
    github     https://github.com/philbowles/esparto
    blog       https://8266iot.blogspot.com     
    groups     https://www.facebook.com/groups/esp8266questions/
@@ -78,10 +78,11 @@ uint32_t H4P_PersistentStorage::_set(vector<string> vs){
     return guardString2(vs,[this](string a,string b){ 
         setstring(a,b);
         _showItem(a); //
+        return H4_CMD_OK;
     }); 
 }
 
-void     H4P_PersistentStorage::clear(){
+void H4P_PersistentStorage::clear(){
     psRam.clear();
     SPIFFS.remove(CSTR(string("/"+_pName)));
 }

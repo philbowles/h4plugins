@@ -19,7 +19,7 @@
 
 The H4P_HttpMySQLLogger fits into the H4Pluins Logging strategy and you *must* read that [documentation](h4logs.md) first if you have not already done so!
 
-It simply send each matching event to an Http server. An example [server](../examples/H4P_HttpMySQLLogger/mysqlrest/README.MD) is provide using nodejs and express.
+It simply send each matching event to an Http server. An example [server](../examples/LOGGING/H4P_HttpMySQLLogger/mysqlrest/README.MD) is provide using nodejs and express.
 
 # What information gets logged?
 
@@ -91,7 +91,7 @@ H4P_HttpMySQLLogger(const string& ipaddress,H4P_FN_HTTPFAIL onFail=nullptr,uint3
 // filter has the same meaniung as other loggers
 ```
 
-[Example Code](../examples/H4P_HttpMySQLLogger/H4P_HttpMySQLLogger.ino)
+[Example Code](../examples/LOGGING/H4P_HttpMySQLLogger/H4P_HttpMySQLLogger.ino)
 
 ---
 
@@ -152,7 +152,6 @@ For this reason, a unique ever-increasing sequence number is added to each event
 
 * [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Blog](https://8266iot.blogspot.com)
-* [Facebook Esparto Support / Discussion](https://www.facebook.com/groups/esparto8266/)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)

@@ -1,7 +1,7 @@
 /*
  MIT License
 
-Copyright (c) 2019 Phil Bowles <H48266@gmail.com>
+Copyright (c) 2020 Phil Bowles <H48266@gmail.com>
    github     https://github.com/philbowles/H4
    blog       https://8266iot.blogspot.com
    groups     https://www.facebook.com/groups/esp8266questions/
@@ -36,32 +36,39 @@ SOFTWARE.
 #ifndef H4P_NO_WIFI
 #include<H4P_WiFi.h>
 
-#include<AsyncMqttClient.h>
+#include<AsyncMQTT.h>
 
-class H4P_AsyncMQTT: public H4Plugin, public AsyncMqttClient{
+struct H4P_LWT {
+    const char*      topic;
+    const char*     payload;
+    int         QOS;
+    bool        retain;
+};
+
+class H4P_AsyncMQTT: public H4Plugin, public AsyncMQTT{
             bool            autorestart=true;
             string          device;
+            struct H4P_LWT  _lwt;
 
         VSCMD(_change);
 
+                void        _greenLight() override;
+                void        _hookIn() override;
                 void        _setup();
+                void        _signal();
                 void        _start() override;
                 bool        _state() override { return connected(); }
                 void        _stop() override;
-                void        _hookIn() override;
-                void        _greenLight() override;
     public:
-        H4P_AsyncMQTT(string broker,uint16_t port, string user="",string pass="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr):
-            H4Plugin(mqttTag(),onC,onD)
+        H4P_AsyncMQTT(string broker,uint16_t port, string user="",string pass="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr,H4P_LWT lwt={"","",0,false}):
+            _lwt(lwt), H4Plugin(mqttTag(),onC,onD)
         {
             _cb["broker"]=broker;
             _cb[portTag()]=stringFromInt(port);
             _cb["muser"]=user,
             _cb["mpasswd"]=pass;
 
-            _cmds={
-                {_pName,    { H4PC_H4, 0, CMDVS(_change) }}
-            };       
+            _cmds={ {_pName,    { H4PC_H4, 0, CMDVS(_change) }} };
         }
                 void        change(const string& broker,uint16_t port);
                 void        publishDevice(const string& topic,const string& payload="");
@@ -70,7 +77,7 @@ class H4P_AsyncMQTT: public H4Plugin, public AsyncMqttClient{
                 void        unsubscribeDevice(string topic);
 
     //          syscall only
-                void        _reply(string msg) override { publish(CSTR(string("h4/"+_cb[deviceTag()]+"/reply")),0,false,CSTR(msg)); }
+                void        _reply(string msg) override { publish(CSTR(string("h4/"+_cb[deviceTag()]+"/reply")),0,false,(uint8_t*) msg.data()); }
                 void        show() override { reply("Server: %s:%s %s",CSTR(_cb["broker"]),CSTR(_cb[portTag()]),connected() ? "CNX":"DCX"); }
 };
 

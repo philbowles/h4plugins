@@ -1,7 +1,7 @@
 /*
  MIT License
 
-Copyright (c) 2019 Phil Bowles <h4plugins@gmail.com>
+Copyright (c) 2020 Phil Bowles <h4plugins@gmail.com>
    github     https://github.com/philbowles/esparto
    blog       https://8266iot.blogspot.com     
    groups     https://www.facebook.com/groups/esp8266questions/
@@ -33,11 +33,12 @@ SOFTWARE.
 
 #ifndef H4P_NO_WIFI
 
-uint32_t H4P_WiFi::_change(vector<string> vs){ return guardString2(vs,[this](string a,string b){ change(a,b); }); }
+uint32_t H4P_WiFi::_change(vector<string> vs){ return guardString2(vs,[this](string a,string b){ change(a,b); return H4_CMD_OK; }); }
 
-void H4P_WiFi::_getPersistentValue(string v,string prefix){
+bool H4P_WiFi::_getPersistentValue(string v,string prefix){
     string persistent=replaceAll(H4P_SerialCmd::read("/"+v),"\r\n","");
     _cb[v]=persistent.size() ? persistent:string(prefix)+_cb[chipTag()];
+    return persistent.size();
 }
 
 void H4P_WiFi::_gotIP(){
@@ -47,27 +48,37 @@ void H4P_WiFi::_gotIP(){
     _cb[pskTag()]=CSTR(WiFi.psk());
 
     string host=_cb[deviceTag()];
-
+#ifdef H4P_USE_OTA
     h4.every(H4WF_OTA_RATE,[](){ ArduinoOTA.handle(); },nullptr,H4P_TRID_HOTA,true);
     _setHost(host);
+    if(MDNS.begin(CSTR(host))) {
+        MDNS.addService("h4","tcp",666);
+        MDNS.addServiceTxt("h4","tcp","id",CSTR(_cb[chipTag()]));
+        MDNS.addServiceTxt("h4","tcp","ip",CSTR(_cb["ip"]));
+    } else Serial.println("Error starting mDNS");
   	ArduinoOTA.setHostname(CSTR(host));
 	ArduinoOTA.setRebootOnSuccess(false);	
 	ArduinoOTA.begin();
+#endif
     _cb.erase("opts"); // lose any old AP ssids
+    Serial.printf("IP=%s\n",CSTR(_cb["ip"])); // unconditional
     H4EVENT("IP=%s",CSTR(_cb["ip"]));
     _upHooks();
 }
 
 void H4P_WiFi::_greenLight() { 
-    _cb[chipTag()]=_getChipID();
-    _cb[boardTag()]=replaceAll(H4_BOARD,"ESP8266_","");
-    _getPersistentValue(deviceTag(),"H4-");
-    _getPersistentValue("h4sv","*");
     if(isLoaded(upnpTag())) h4cmd.addCmd("host2",_subCmd,0,CMDVS(_host2));
     start();
 }
 
-void H4P_WiFi::_hookIn(){ WiFi.onEvent(_wifiEvent); }
+void H4P_WiFi::_hookIn(){
+    _cb[chipTag()]=_getChipID();
+    _cb[boardTag()]=replaceAll(H4_BOARD,"ESP8266_","");
+    if(!_getPersistentValue(deviceTag(),"H4-")) if(_device!="") _cb[deviceTag()]=_device;
+    H4EVENT("Device %s",CSTR(_cb[deviceTag()]));
+    _getPersistentValue("h4sv","*");
+    WiFi.onEvent(_wifiEvent);
+}
 
 uint32_t H4P_WiFi::_host(vector<string> vs){
     return guard1(vs,[this](vector<string> vs){
@@ -78,7 +89,7 @@ uint32_t H4P_WiFi::_host(vector<string> vs){
     });
 }
 
-uint32_t H4P_WiFi::_host2(vector<string> vs){ return guardString2(vs,[this](string a,string b){ h4asws._setBothNames(a,b); }); }
+uint32_t H4P_WiFi::_host2(vector<string> vs){ return guardString2(vs,[this](string a,string b){ h4asws._setBothNames(a,b); return H4_CMD_OK; }); }
 
 void H4P_WiFi::_lostIP(){
     if(!_discoDone){
@@ -109,6 +120,7 @@ void H4P_WiFi::_setPersistentValue(string n,string v,bool reboot){
 }
 
 void H4P_WiFi::_start(){
+    H4Plugin::_factoryChain.push_back(_clearAP);
     if(SPIFFS.exists("/ap")){
         stop();
         _startAP();
@@ -154,11 +166,11 @@ void H4P_WiFi::clear(){
     WiFi.disconnect(true); 
 	ESP.eraseConfig();
     SPIFFS.remove(CSTR(string("/"+string(deviceTag()))));
+    _clearAP();
 }
 
-
 void H4P_WiFi::_startSTA(){
-    SPIFFS.remove("/ap");
+    _clearAP();
     WiFi.mode(WIFI_STA);
 	WiFi.setSleepMode(WIFI_NONE_SLEEP);
     WiFi.enableAP(false); 
@@ -215,6 +227,7 @@ string H4P_WiFi::_getChipID(){
 void H4P_WiFi::clear(){
     _stop();
 	WiFi.disconnect(true,true);
+    _clearAP();
 }
 /*
 void H4P_WiFi::_scan(){ // coalescee
@@ -230,6 +243,7 @@ void H4P_WiFi::_scan(){ // coalescee
 }
 */
 void H4P_WiFi::_startSTA(){
+    _clearAP();
     WiFi.mode(WIFI_STA);
     WiFi.setSleep(false);
     WiFi.enableAP(false); 
@@ -307,7 +321,7 @@ void H4P_WiFi::change(string ssid,string psk){ // add device / name?
 void H4P_WiFi::forceAP(){ 
     H4EVENT("AP MODE FORCED");
     h4cmd.write("/ap","");
-    h4FactoryReset();
+    h4reboot();
 } // tagify?
 
 void H4P_WiFi::setBothNames(const string& host,const string& friendly){ h4asws._setBothNames(host,friendly); }

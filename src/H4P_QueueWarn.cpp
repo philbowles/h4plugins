@@ -1,7 +1,7 @@
 /*
  MIT License
 
-Copyright (c) 2019 Phil Bowles <h4plugins@gmail.com>
+Copyright (c) 2020 Phil Bowles <h4plugins@gmail.com>
    github     https://github.com/philbowles/esparto
    blog       https://8266iot.blogspot.com     
    groups     https://www.facebook.com/groups/esp8266questions/
@@ -27,6 +27,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_QueueWarn.h>
+#include<H4P_SerialCmd.h>
 
 uint32_t H4P_QueueWarn::__setLimit(uint32_t v){ return (h4._capacity()*v)/100; }
 //
@@ -45,7 +46,6 @@ void H4P_QueueWarn::pcent(uint32_t pc){
 uint32_t H4P_QueueWarn::_qwPcent(vector<string> vs){ return guardInt1(vs,bind(&H4P_QueueWarn::pcent,this,_1)); }
 //
 H4P_QueueWarn::H4P_QueueWarn(function<void(bool)> _f,uint32_t _limit): H4Plugin(qwrnTag()){
-    h4._hookLoop([this](){ _run(); },_subCmd);
     _cmds={
         {_pName,     {H4PC_H4, _subCmd, nullptr}},
         {"pcent",  {_subCmd,   0, CMDVS(_qwPcent)}}
@@ -58,16 +58,10 @@ void H4P_QueueWarn::_run(){ // optimise a la throttle
     static bool warned=false;
     uint32_t qsize=h4.size();
     if(qsize > maxq) maxq=qsize;
-    if(qsize > limit) {
-        if(!warned){
-            f(true);
-            warned=true;
-        }
+    bool state=qsize > limit;
+    if(state ^ warned){
+        H4EVENT("Queue Warn %d %d",state,qsize);
+        f(state);
     }
-    else {
-        if(warned){
-            f(false);
-            warned=false;
-        }
-    }
+    warned=state;
 }

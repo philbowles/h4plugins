@@ -59,6 +59,7 @@ H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 H4P_BinarySwitch h4onof(12,ACTIVE_HIGH,OFF); // security light
 H4P_IPDetectorSource ippdElvis("Elvis","192.168.1.31"); // switch light on when in range
 ...
+```
 
 Finally, assume you would like your device to turn on / off when another h4 joins or leaves the network.
 
@@ -69,6 +70,7 @@ H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 H4P_BinarySwitch h4onof(12,ACTIVE_HIGH,OFF); // security light
 H4P_H4Detect linked("anotherH4"); // switch light on when anotherH4 is on network
 ...
+```
 
 ---
 
@@ -103,32 +105,23 @@ H4P_UPNPDetectorSource(const string& friendly,const string& id); // id = UPnP US
 
 All the above provide:
 bool isPresent(); // returns true/false depending on whether device is present / absent
-
+```
 
 # Examples
 
-[Example Sketch - BinaryThing](../examples/H4P_BinaryThing/H4P_BinaryThing.ino)
-[Example Sketch - BinarySwitch](../examples/H4P_BinarySwitch/H4P_BinarySwitch.ino)
-[Example Sketch - BinarySwitch with 3-function button](../examples/H4P_BinarySwitchmfnb/H4P_BinarySwitchmfnb.ino)
-[Example Sketch - BinarySwitch with MQTT](../examples/H4P_BinarySwitchMQTT/H4P_BinarySwitchMQTT.ino)
-[Example Sketch - UPNPServer with MQTT](../examples/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
+[Example Sketch - BinaryThing](../examples/THINGS/H4P_BinaryThing/H4P_BinaryThing.ino)
+[Example Sketch - BinarySwitch](../examples/THINGS/H4P_BinarySwitch/H4P_BinarySwitch.ino)
+[Example Sketch - BinarySwitch with 3-function button](../examples/THINGS/H4P_BinarySwitchmfnb/H4P_BinarySwitchmfnb.ino)
+[Example Sketch - BinarySwitch with MQTT](../examples/THINGS/H4P_BinarySwitchMQTT/H4P_BinarySwitchMQTT.ino)
+[Example Sketch - UPNPServer with MQTT](../examples/THINGS/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
 
 ---
 
-## "Tweakables"
-
-The following values are defined in `config.h` . They are chosen initally to set a good balance between stability, performance and memory / stack usage. *It is not advisable to change them unless you know exactly what you are doing and why*. 
-
-**N.B.** **Support will not be provided if any of these values are changed.**
-
-
----
 
 (c) 2020 Phil Bowles h4plugins@gmail.com
 
 * [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Blog](https://8266iot.blogspot.com)
-* [Facebook Esparto Support / Discussion](https://www.facebook.com/groups/esparto8266/)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)

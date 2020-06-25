@@ -1,22 +1,22 @@
 
 TODO:
+    ret type on guard 1
 SOONER
-    H4 bump!!!
-    conditional on BT at/daily cmds
-    atSource
-    dailySource
     error gone away in nodejs
-    TK KW
+    early abort dependfail
 SHORTTERM
     schedule in cheztoi
+    H4_TIMER from at,daily
+    adv docs + / example creating your own commands
 MEDIUMTERM
-    optimise / mAcrofy guardstring2
+    dynamic cmds flash / siren etc
+    remote client get
     ESp32 MDNS detector
+    ESp32 tonecontroller
+    templatise / mcrofy dependent module detection (and std hookins for runnables?)
 LONGTERM
+    dynamic add gpio / thing etc
     ethernet module stm32
     ESP32 bluetooth PD
-    remote client get
     rf bridge
-    signal on no spiffs
     fix switch.ps1 to use soap etc (revert a la esparto)
-    lots of const string&
