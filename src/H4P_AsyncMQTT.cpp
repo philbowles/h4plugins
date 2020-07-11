@@ -81,7 +81,12 @@ void H4P_AsyncMQTT::_greenLight(){
                 _downHooks();
                 _signal();
                 H4EVENT("MQTT DCX %d",reason);
-                if(autorestart && WiFi.status()==WL_CONNECTED) h4.every(H4MQ_RETRY,[this](){ connect(); },nullptr,H4P_TRID_MQRC,true);
+                if (autorestart)
+                    h4.once(H4MQ_RETRY, [this]() {
+                        if (WiFi.status() == WL_CONNECTED)
+                            h4.every(
+                                H4MQ_RETRY, [this]() { connect(); }, nullptr, H4P_TRID_MQRC, true);
+                    });
             });
         }
     });
