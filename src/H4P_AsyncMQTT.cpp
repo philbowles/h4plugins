@@ -50,7 +50,7 @@ void H4P_AsyncMQTT::_greenLight(){
     onConnect([this](bool b){
         h4.queueFunction([this](){
             h4.cancelSingleton(H4P_TRID_MQRC);
-            _discoDone=false;
+            H4EVENT("onConnect  _discoDone = %d \n",!_discoDone);
             subscribe(CSTR(string("all").append(cmdhash())),0);
             subscribe(CSTR(string(device+cmdhash())),0);
             subscribe(CSTR(string(_cb[chipTag()]+cmdhash())),0);
@@ -74,21 +74,19 @@ void H4P_AsyncMQTT::_greenLight(){
 
   TLS_BAD_FINGERPRINT = 7
 */
-    onDisconnect([this](int8_t reason){
-        if(!_discoDone){
-            h4.queueFunction([this,reason](){
-                _discoDone=true;
-                _downHooks();
-                _signal();
-                H4EVENT("MQTT DCX %d",reason);
-                if (autorestart)
-                    h4.once(H4MQ_RETRY, [this]() {
-                        if (WiFi.status() == WL_CONNECTED)
-                            h4.every(
-                                H4MQ_RETRY, [this]() { connect(); }, nullptr, H4P_TRID_MQRC, true);
-                    });
-            });
-        }
+    onDisconnect([this](int8_t reason) {
+        h4.queueFunction([this, reason]() {
+            _downHooks();
+            _signal();
+            H4EVENT("MQTT DCX %d", reason);
+            H4EVENT("autorestart = %d && WiFi.status() == WL_CONNECTED = %d \n", autorestart, WiFi.status() == WL_CONNECTED);
+            if (autorestart)
+                h4.once(H4MQ_RETRY, [this]() {
+                    if (WiFi.status() == WL_CONNECTED)
+                        h4.every(
+                            H4MQ_RETRY, [this]() { connect(); }, nullptr, H4P_TRID_MQRC, true);
+                });
+        });
     });
 }
 
