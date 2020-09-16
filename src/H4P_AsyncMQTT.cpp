@@ -82,9 +82,7 @@ void H4P_AsyncMQTT::_greenLight(){
             H4EVENT("autorestart = %d && WiFi.status() == WL_CONNECTED = %d \n", autorestart, WiFi.status() == WL_CONNECTED);
             if (autorestart)
                 h4.once(H4MQ_RETRY, [this]() {
-                    if (WiFi.status() == WL_CONNECTED)
-                        h4.every(
-                            H4MQ_RETRY, [this]() { connect(); }, nullptr, H4P_TRID_MQRC, true);
+                        h4.every(H4MQ_RETRY, [this]() { if (WiFi.status() == WL_CONNECTED) connect(); }, nullptr, H4P_TRID_MQRC, true);
                 });
         });
     });
