@@ -251,7 +251,7 @@ void H4P_WiFi::_startSTA(){
     WiFi.begin(CSTR(_cb[ssidTag()]),CSTR(_cb[pskTag()]));
 }
 
-void H4P_WiFi::_mcuStart(){ WiFi.begin(); }
+void H4P_WiFi::_mcuStart(){ if(WiFi.getMode()==WIFI_OFF || WiFi.SSID()=="") _startSTA(); }
 
 void H4P_WiFi::_stop(){
     _stopCore();
