@@ -37,7 +37,8 @@ void H4P_PersistentStorage::_hookIn() {
     vector<string> items=split(H4P_SerialCmd::read("/"+_pName),SEPARATOR);
     for(auto const& i:items){
         vector<string> nv=split(i,"=");
-        psRam[nv[0]]=nv[1];
+        if (nv.size() == 2)
+            psRam[nv[0]]=nv[1];
     }
 //    _hookFactory([this](){ clear(); });
     _factoryHook=[this](){ clear(); };
