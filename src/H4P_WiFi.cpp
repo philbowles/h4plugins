@@ -255,7 +255,7 @@ void H4P_WiFi::_mcuStart(){ if(WiFi.getMode()==WIFI_OFF || WiFi.SSID()=="") _sta
 
 void H4P_WiFi::_stop(){
     _stopCore();
-    WiFi.disconnect(true,false);
+    WiFi.disconnect(false,false);
 }
 /* ESP32
 * WiFi Events
