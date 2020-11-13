@@ -99,11 +99,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         source.onmessage=function(e){
             let m=e.data;           
-            if(m.substr(0,2)!='ka'){ // lose this? why are we sending ka?
-//                msg.innerHTML=e.data;
-//                setTimeout(function () { msg.innerHTML="&nbsp;"; },30000);
-                toaster(e.data)
-            }
+            if(m.substr(0,2)!='ka') toaster(e.data)
         }
 
         source.onmessage({data: "Thank you for using H4/Plugins - please support me on Patreon"});

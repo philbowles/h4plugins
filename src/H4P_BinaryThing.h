@@ -82,8 +82,7 @@ using H4_FN_CTHING      = function<bool(bool)>;
 
 class H4P_ConditionalThing: public H4P_BinaryThing{
         H4_FN_CTHING _predicate;
-
-        virtual void        _setState(bool b) override { if(_predicate(b)) H4P_BinaryThing::_setState(b); }
+        virtual void        _setState(bool b);
                 void        _hookIn() override;
     public:
         H4P_ConditionalThing(H4_FN_CTHING predicate,H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): 
