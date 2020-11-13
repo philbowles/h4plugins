@@ -81,7 +81,7 @@ void H4P_AsyncWebServer::_rest(AsyncWebServerRequest *request){
 	},request),nullptr,H4P_TRID_ASWS);
 }
 
-void  H4P_AsyncWebServer::_sendSSE(const char* name,const char* msg){ if(_evts && _evts->count()) _evts->send(msg,name,_evtID); }
+void H4P_AsyncWebServer::_sendSSE(const char* name,const char* msg){ if(_evts && _evts->count()) _evts->send(msg,name,_evtID); }
 
 void H4P_AsyncWebServer::_setBothNames(const string& host,const string& friendly){
     if(isLoaded(upnpTag())) h4wifi._setPersistentValue(nameTag(),friendly,false);
@@ -92,21 +92,21 @@ void H4P_AsyncWebServer::_start(){
 	reset();
     _evts=new AsyncEventSource("/evt");
     _evts->onConnect([this](AsyncEventSourceClient *client){
-        //Serial.printf("T=%u SSE CLIENT\n",millis());
-//        client->send("HELLO",NULL,++_evtID,H4P_ASWS_EVT_TIMEOUT);
         h4.queueFunction([this,client](){
-//            H4EVENT("SSE Client %08x n=%d T/O=%d nC=%d nUI=%d",client,client->lastId(),H4P_ASWS_EVT_TIMEOUT,_evts->count(),userItems.size());
-            if(_evts->count()==1) if(_onC) _onC(); // first time only
+            H4EVENT("SSE Client %08x n=%d T/O=%d nC=%d nUI=%d",client,client->lastId(),H4P_ASWS_EVT_TIMEOUT,_evts->count(),userItems.size());
+            if(_evts->count()==1) if(_onC) _onC(); // first time only R WE SURE?
             for(auto const& i:userItems) {
-//                H4EVENT("build UI %s\n",CSTR(string(i.first+","+stringFromInt(i.second.type)+","+i.second.f()+","+(i.second.a ? "1":"0" )))); 
+                H4EVENT("build UI %s",CSTR(string(i.first+","+stringFromInt(i.second.type)+","+i.second.f()+","+(i.second.a ? "1":"0" )))); 
                 _sendSSE("ui",CSTR(string(i.first+","+stringFromInt(i.second.type)+","+i.second.f()+","+(i.second.a ? "1":"0" ))));
             }
+            /*
             h4.repeatWhile([this]{ return _evts->count(); },
                 ((H4P_ASWS_EVT_TIMEOUT*3)/4),
                 [this]{ _sendSSE("","ka"); },
-                [this]{ if(_onD) _onD(); },
+                [this]{ if(_onD) _onD(); }, // ???
                 H4P_TRID_SSET,true
             );
+            */
         });
     });
     addHandler(_evts);

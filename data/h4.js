@@ -13,7 +13,10 @@ function ajax(url,decode=true){
             r.style.color="#ffffff" // css
             var j=JSON.parse(e.currentTarget.responseText);
             if(!j.res) j.lines.forEach(function(l){ r.innerHTML+=l+'\n'})
-            else msg.innerHTML="Error: "+j.res+" "+j.msg
+            else {
+                msg.innerHTML="Error: "+j.res+" "+j.msg
+                setTimeout(function () { msg.innerHTML="&nbsp;"; },30000);
+            }
         }
     });
     http.send();  
@@ -42,9 +45,9 @@ function uiItem(d,h="uhang"){
                 valu.innerHTML=v;
                 source.addEventListener(n, function(e){ document.getElementById(n).innerHTML=e.data; });
                 break;
-            case 1:
+            case 1: // text
                 break;
-            case 2:
+            case 2: // bool
                 let b=parseInt(v);
                 valu.classList=(a ? "uia ":"")+"ld led-"+(b ? "green":"red");
                 source.addEventListener(n, function(e){ redgreen(n,parseInt(e.data)); });
@@ -55,6 +58,10 @@ function uiItem(d,h="uhang"){
                     title.classList.add("tuia");
                 }
                 break;
+            case 4: // onof
+                break;
+            default:
+                console.warn("UI WTF ",t);
         }
         let hangoff=document.getElementById(h);
         hangoff.insertBefore(title,null)
@@ -75,14 +82,17 @@ document.addEventListener("DOMContentLoaded", function() {
     if(parseInt(document.getElementById("wifi").value)==2) document.getElementById("ap").style.display='inline-grid'
     else {
         source.addEventListener('ui', function(e){ uiItem(e.data) });
+
         source.onmessage=function(e){
-            let m=e.data;
-            if(m.substr(0,2)!='ka'){ 
+            let m=e.data;           
+            if(m.substr(0,2)!='ka'){ // lose this? why are we sending ka?
                 msg.innerHTML=e.data;
                 setTimeout(function () { msg.innerHTML="&nbsp;"; },30000);
-            };
+            }
         }
-        source.onmessage({data: "Thank you for using H4/Plugins"});
+
+        source.onmessage({data: "Thank you for using H4/Plugins - please support me on Patreon"});
+
         if(has("frnd")){
             frnd=document.getElementById("frnd");
             frnd.style.display='inline-flex'

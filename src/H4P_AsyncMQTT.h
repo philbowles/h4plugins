@@ -39,15 +39,16 @@ SOFTWARE.
 #include<PangolinMQTT.h>
 
 struct H4P_LWT {
-    const char*      topic;
+    const char*     topic;
     const char*     payload;
-    int         QOS;
-    bool        retain;
+    int             QOS;
+    bool            retain;
 };
 
 class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
             bool            autorestart=true;
             string          device;
+            string          prefix="h4/";
             struct H4P_LWT  _lwt;
 
         VSCMD(_change);
@@ -57,7 +58,7 @@ class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
                 void        _setup();
                 void        _signal();
                 void        _start() override;
-                bool        _state() override { return connected(); }
+                bool        _state() override { return PANGO::TCP; }
                 void        _stop() override;
     public:
         H4P_AsyncMQTT(string broker,uint16_t port, string user="",string pass="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr,H4P_LWT lwt={"","",0,false}):
@@ -73,14 +74,17 @@ class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
                 void        change(const string& broker,uint16_t port);
                 void        publishDevice(const string& topic,const string& payload="");
                 void        publishDevice(const string& topic,uint32_t payload){ publishDevice(topic,stringFromInt(payload)); }
+/*                
                 void        publishDevice(const string& topic,uint32_t payload,uint8_t qos,bool retain=false){ publish(CSTR(string("h4/"+_cb[deviceTag()]+topic)),qos,false,stringFromInt(payload)); }
                 void        publishDevice(const string& topic,const string& payload,uint8_t qos,bool retain=false){ publish(CSTR(string("h4/"+_cb[deviceTag()]+topic)),qos,false,payload); }
+*/
                 void        subscribeDevice(string topic,H4_FN_MSG f,H4PC_CMD_ID root=H4PC_ROOT);
                 void        unsubscribeDevice(string topic);
 
     //          syscall only
-                void        _reply(string msg) override { publish(CSTR(string("h4/"+_cb[deviceTag()]+"/reply")),0,false,msg); }
-                void        show() override { reply("Server: %s:%s %s",CSTR(_cb["broker"]),CSTR(_cb[portTag()]),connected() ? "CNX":"DCX"); }
+//                void        _reply(string msg) override { publish(CSTR(string("h4/"+_cb[deviceTag()]+"/reply")),msg); }
+                void        _reply(string msg) override { publishDevice("reply",msg); }
+                void        show() override { reply("Server: %s:%s %s",CSTR(_cb["broker"]),CSTR(_cb[portTag()]),_state() ? "CNX":"DCX"); }
 };
 
     extern __attribute__((weak)) H4P_AsyncMQTT h4mqtt;

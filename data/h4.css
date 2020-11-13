@@ -89,7 +89,7 @@ grid-gap: 5px;
     grid-template-columns: 40% 60%;
     grid-gap: 5px;
  }
- #onoff{
+#onof{
     grid-column: 2;
     cursor: pointer;
     display: none;

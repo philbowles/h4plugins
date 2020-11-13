@@ -32,7 +32,7 @@ SOFTWARE.
 #include<H4P_AsyncMQTT.h>
 
 void H4P_BinaryThing::_hookIn() {
-    _cb[onofTag()]="1";
+    if(isLoaded(aswsTag())) h4asws._uiAdd(onofTag(),H4P_UI_ONOF,[this]{ return stringFromInt(state()); });
     if(isLoaded(mqttTag())) {
         h4mqtt.hookConnect([this](){ _publish(_getState()); }); 
         h4mqtt.subscribeDevice("slave/#",CMDVS(_slave),H4PC_H4);
@@ -44,7 +44,7 @@ void H4P_BinaryThing::_publish(bool b){ if(isLoaded(mqttTag())) h4mqtt.publishDe
 void H4P_BinaryThing::_setSlaves(bool b){
     for(auto s:_slaves){
         string t=s+"/h4/switch";
-        h4mqtt.publish(CSTR(t),0,false,stringFromInt(b));
+        h4mqtt.xPublish(CSTR(t),stringFromInt(b));
     }
 }
 

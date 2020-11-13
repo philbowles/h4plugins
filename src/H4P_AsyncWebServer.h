@@ -42,7 +42,8 @@ SOFTWARE.
 enum H4P_UI_TYPE {
     H4P_UI_LABEL,
     H4P_UI_TEXT,
-    H4P_UI_BOOL
+    H4P_UI_BOOL,
+    H4P_UI_ONOF
 };
 
 using H4_FN_UITXT      = function<string(void)>;
