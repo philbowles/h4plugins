@@ -1,5 +1,11 @@
-let onof
+//let onof
 let source
+
+function toaster(t){
+    msg.innerHTML=t;
+    setTimeout(function () { msg.innerHTML="&nbsp;"; },30000);
+}
+
 function ajax(url,decode=true){
     document.body.style.cursor = "wait";
     var http = new XMLHttpRequest();
@@ -13,10 +19,7 @@ function ajax(url,decode=true){
             r.style.color="#ffffff" // css
             var j=JSON.parse(e.currentTarget.responseText);
             if(!j.res) j.lines.forEach(function(l){ r.innerHTML+=l+'\n'})
-            else {
-                msg.innerHTML="Error: "+j.res+" "+j.msg
-                setTimeout(function () { msg.innerHTML="&nbsp;"; },30000);
-            }
+            else toaster("Error: "+j.res+" "+j.msg)
         }
     });
     http.send();  
@@ -28,12 +31,19 @@ function redgreen(id,b){
     i.classList.add(b ? "led-green":"led-red");  
 } 
 
+function uiOnOff(b){
+    let node=document.getElementById("onof")
+    node.children[0].src=b ? "on.jpg":"of.jpg"
+}
+
 function uiItem(d,h="uhang"){
     let parts=d.split(",");
     let n=parts[0]
-    if(!document.getElementById(n)){
+    let node=document.getElementById(n)
+    let v=parseInt(parts[2])
+    if(!node){
+        let hangoff=document.getElementById(h);
         let t=parseInt(parts[1])
-        let v=parts[2]
         let a=parseInt(parts[3])
         let title=document.createElement("div");
         title.innerHTML=n;
@@ -58,17 +68,21 @@ function uiItem(d,h="uhang"){
                     title.classList.add("tuia");
                 }
                 break;
-            case 4: // onof
-                break;
-            default:
-                console.warn("UI WTF ",t);
         }
-        let hangoff=document.getElementById(h);
         hangoff.insertBefore(title,null)
         hangoff.insertBefore(valu,null)
     }
+    else {
+        if(n=="onof"){
+            let img=document.createElement("img");
+            node.appendChild(img)
+            uiOnOff(v)
+            node.style.display='block'
+            node.addEventListener('click', function(e){ ajax("h4/toggle",false); });
+            source.addEventListener(n, function(e){ uiOnOff(parseInt(e.data)) });
+        }
+    }
 }
-let dt;
 
 function has(id){ return document.getElementById("has"+id).value!="?" }
 
@@ -86,8 +100,9 @@ document.addEventListener("DOMContentLoaded", function() {
         source.onmessage=function(e){
             let m=e.data;           
             if(m.substr(0,2)!='ka'){ // lose this? why are we sending ka?
-                msg.innerHTML=e.data;
-                setTimeout(function () { msg.innerHTML="&nbsp;"; },30000);
+//                msg.innerHTML=e.data;
+//                setTimeout(function () { msg.innerHTML="&nbsp;"; },30000);
+                toaster(e.data)
             }
         }
 
@@ -97,16 +112,12 @@ document.addEventListener("DOMContentLoaded", function() {
             frnd=document.getElementById("frnd");
             frnd.style.display='inline-flex'
         }
-        if(has("onof")){
-            onof=document.getElementById("onof");
-            onof.parentNode.style.display='block'
-            onof.addEventListener('click', function(e){ ajax("h4/toggle",false); });
-            source.addEventListener('onof', function(e){ onof.src=parseInt(e.data) ? "on.jpg":"of.jpg" });
-        }
+
         document.getElementById("cc").addEventListener('submit', function(e){
             e.preventDefault();
             ajax(cmd.value,true);
         },{capture: true});
+
         rr.addEventListener('click', function(e){
             let lines=rr.value.split("\n")
             let n=rr.value.substr(0, rr.selectionStart).split("\n").length
