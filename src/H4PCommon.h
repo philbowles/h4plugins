@@ -113,6 +113,7 @@ STAG(device);
 STAG(esqw);
 STAG(gpio);
 STAG(h4);
+STAG(h4sv);
 STAG(log);
 STAG(mfnb);
 STAG(mqtt);
@@ -277,7 +278,17 @@ class H4Plugin {
                 void        hookDisconnect(H4_FN_VOID f){ _disconnected.push_back(f); } 
 //
                 string      getConfig(const string& c){ return _cb[c]; }
-        static  void        reply(const char* fmt,...); // hoist protected
+                
+                template<typename... Args>
+                void        reply(const char* fmt, Args... args){ // find pub sub size
+                    char* buff=static_cast<char*>(malloc(H4P_REPLY_BUFFER+1));
+                    snprintf(buff,H4P_REPLY_BUFFER,fmt,args...);
+                    string source=_cb[srcTag()];
+                    H4Plugin* p=isLoaded(source);
+                    if(p) p->_reply(buff);
+                    else Serial.println(buff);
+                    free(buff);
+                }
 //      syscall only
         virtual void        _reply(string msg) { Serial.println(CSTR(msg)); }
                 void        _downHooks();

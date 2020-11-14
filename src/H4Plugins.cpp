@@ -82,18 +82,6 @@ uint32_t H4Plugin::guardString2(vector<string> vs,function<H4_CMD_ERROR(string,s
     });
 }
 
-void H4Plugin::reply(const char* fmt,...){ // find pub sub size
-    char buff[H4P_REPLY_BUFFER+1];
-    va_list ap; 
-    va_start(ap, fmt); 
-    vsnprintf(buff,H4P_REPLY_BUFFER,fmt,ap);
-    va_end(ap);
-    string source=_cb[srcTag()];
-    H4Plugin* p=isLoaded(source);
-    if(p) p->_reply(buff);
-    else Serial.println(buff);
-}
-
 void H4Plugin::_startup(){
     _commands.insert(_cmds.begin(),_cmds.end());
     _cmds.clear();

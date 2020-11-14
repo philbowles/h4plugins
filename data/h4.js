@@ -58,7 +58,7 @@ function uiItem(d,h="uhang"){
     let parts=d.split(",");
     let n=parts[0]
     let node=document.getElementById(n)
-    let v=parseInt(parts[2])
+    let v=parts[2]
     if(!node){
         let hangoff=document.getElementById(h);
         let t=parseInt(parts[1])
@@ -94,9 +94,8 @@ function uiItem(d,h="uhang"){
         if(n=="onof"){
             let img=document.createElement("img");
             node.appendChild(img)
-            uiOnOff(v)
+            uiOnOff(parseInt(v))
             node.style.display='block'
-//            node.addEventListener('click', function(e){ ajax("h4/toggle",false); });
             source.addEventListener(n, function(e){ uiOnOff(parseInt(e.data)) });
         }
     }

@@ -39,7 +39,6 @@ uint32_t H4P_AsyncMQTT::_change(vector<string> vs){
 
 void H4P_AsyncMQTT::_greenLight(){
     _setup();
-//    using PANGO_cbMessage       =std::function<void(const char* topic, const uint8_t* payload, size_t len,uint8_t qos,bool retain,bool dup)>;
     onMessage([this](const char* topic, const uint8_t* payload, size_t length, uint8_t qos, bool retain,bool dup){
         h4.queueFunction(
             bind([](string topic, string pload){ 
@@ -107,7 +106,7 @@ void H4P_AsyncMQTT::_setup(){ // allow for TLS
         setServer(IPAddress(PARAM_INT(0),PARAM_INT(1),PARAM_INT(2),PARAM_INT(3)),port);
     } else setServer(CSTR(broker),port);
         
-    if(_cb["muser"]!="") setCredentials(CSTR(_cb["muser"]),CSTR(_cb["mpasswd"]));
+    if(_cb["muser"]!="") setCredentials(CSTR(_cb["muser"]),CSTR(_cb["mpasswd"])); // optimise tag()
     if(isLoaded(aswsTag())){
         h4asws._uiAdd(uppercase(mqttTag()),H4P_UI_BOOL,
             [this]{ return stringFromInt(_state()); },

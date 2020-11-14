@@ -33,7 +33,7 @@ H4P_Skeleton::H4P_Skeleton(const string& name,H4_FN_VOID onStart,H4_FN_VOID onSt
     _rebootHook=[this](){ reply("FREE SOME RESOURCES\n"); };
     _factoryHook=[this](){ reply("CLEAN UP SOME SHIT\n"); };
     _cmds={
-        {_pName,       { H4PC_H4, _subCmd, nullptr}}, // root for this plugin, e.g. h4/ME...
+        {_pName,       { H4PC_H4, _subCmd, nullptr}}, // root for this plugin
         {"rattle",     { _subCmd,         0, CMD(rattle)}}, // h4/ME/rattle
         {"bones",      { _subCmd,         0, CMDVS(_bones)}} // h4/ME/bones[PL]
     }; 

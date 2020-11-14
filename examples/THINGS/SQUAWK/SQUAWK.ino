@@ -1,5 +1,5 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
+H4_USE_PLUGINS(0,20,true) // Serial baud rate, Q size, SerialCmd autostop
 
 #define LIGHT D1
 #define ARMED D2
@@ -13,10 +13,10 @@ void onMQTTConnect(){ h4mqtt.subscribeDevice("arm",arm); }
 
 void onMQTTDisconnect(){ h4mqtt.unsubscribeDevice("arm"); }
 
-H4P_SerialLogger h4sl;
+//H4P_SerialLogger h4sl;
 H4P_GPIOManager h4gm;
 H4P_FlasherController h4fc;
-H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","squawkX");
+H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","squawk");
 H4P_AsyncMQTT h4mqtt("192.168.1.4",1883,"","",onMQTTConnect,onMQTTDisconnect);
 H4P_AsyncWebServer h4asws;
 /*
@@ -38,7 +38,7 @@ bool predicate(bool b){ return armed; }
 
 H4P_ConditionalSwitch h4onof(SQUAWK,ACTIVE_HIGH,OFF,predicate);
 
-H4P_UPNPServer h4upnp("Squawkbox2");
+H4P_UPNPServer h4upnp("Squawkbox");
 
 void h4setup(){
 //  pSquawk=h4gm.Output(SQUAWK,ACTIVE_HIGH,OFF);  

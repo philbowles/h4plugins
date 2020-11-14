@@ -36,6 +36,10 @@ void  H4P_AsyncWebServer::_hookIn(){
     DEPEND(wifi);
     H4Plugin* p=isLoaded(onofTag());
     if(p) _btp=reinterpret_cast<H4P_BinaryThing*>(p);
+    _uiAdd("H4 Vn",H4P_UI_LABEL,[]()->string{ return H4_VERSION; });
+    _uiAdd("H4Plugins Vn",H4P_UI_LABEL,[]()->string{ return H4P_VERSION; });
+    _uiAdd("UI Vn",H4P_UI_LABEL,[]()->string{ return _cb[h4svTag()]; });
+    if(isLoaded(mqttTag())) _uiAdd("Pangolin Vn",H4P_UI_LABEL,[]()->string{ return _cb["pmv"]; });
 }
 
 uint32_t H4P_AsyncWebServer::_msg(vector<string> vs){
@@ -49,11 +53,14 @@ uint32_t H4P_AsyncWebServer::_uib(vector<string> vs){
         if(isNumeric(b)) {
             uint32_t bv=atoi(CSTR(b));
             if(bv < 2) {
-                if(userItems.count(a)){
-                    _sendSSE(CSTR(a),CSTR(b));
-                    userItems[a].a(a,b);
-                    return H4_CMD_OK;
-                } else return H4_CMD_NAME_UNKNOWN;
+                for(auto &u:userItems){
+                    if(u.id==a){
+                        _sendSSE(CSTR(a),CSTR(b));
+                        u.a(a,b);
+                        return H4_CMD_OK;
+                    }
+                }
+                return H4_CMD_NAME_UNKNOWN;
             } else return H4_CMD_PAYLOAD_FORMAT;
         } else return H4_CMD_NOT_NUMERIC;
     });
@@ -95,9 +102,10 @@ void H4P_AsyncWebServer::_start(){
         h4.queueFunction([this,client](){
             H4EVENT("SSE Client %08x n=%d T/O=%d nC=%d nUI=%d",client,client->lastId(),H4P_ASWS_EVT_TIMEOUT,_evts->count(),userItems.size());
             if(_evts->count()==1) if(_onC) _onC(); // first time only R WE SURE?
+//            reverse(userItems.begin(),userItems.end());
             for(auto const& i:userItems) {
-                H4EVENT("build UI %s",CSTR(string(i.first+","+stringFromInt(i.second.type)+","+i.second.f()+","+(i.second.a ? "1":"0" )))); 
-                _sendSSE("ui",CSTR(string(i.first+","+stringFromInt(i.second.type)+","+i.second.f()+","+(i.second.a ? "1":"0" ))));
+                H4EVENT("build UI %s",CSTR(string(i.id+","+stringFromInt(i.type)+","+i.f()+","+(i.a ? "1":"0" )))); 
+                _sendSSE("ui",CSTR(string(i.id+","+stringFromInt(i.type)+","+i.f()+","+(i.a ? "1":"0" ))));
             }
             /*
             h4.repeatWhile([this]{ return _evts->count(); },
@@ -145,15 +153,6 @@ void H4P_AsyncWebServer::_stop(){
 String H4P_AsyncWebServer::aswsReplace(const String& var){
     string v=CSTR(var);
     return _cb.count(v) ? String(CSTR(_cb[v])):"?";
-}
-
-void H4P_AsyncWebServer::sendUIMessage(const string& msg,...){
-    char buff[H4P_REPLY_BUFFER+1];
-    va_list ap; 
-    va_start(ap, msg); 
-    vsnprintf(buff,H4P_REPLY_BUFFER,CSTR(msg),ap);
-    va_end(ap);
-    _sendSSE(NULL,buff);
 }
 
 #endif // H4_WIFI

@@ -172,7 +172,7 @@ void DebouncedPin::stateChange(){
 FilteredPin::FilteredPin(uint8_t _p,uint8_t _g,H4GM_STYLE _s,uint8_t _a,uint8_t _f,H4GM_FN_EVENT _c): H4GPIOPin(_p,_g,_s,_a,_c),filter(_f) {}
 
 LatchingPin::LatchingPin(uint8_t _p,uint8_t _g,H4GM_STYLE _s,uint8_t _a,uint32_t _t,H4GM_FN_EVENT _c):CircularPin(_p,_g,_s,_a,_t,2,_c) {
-    latched=!state; // begin() calls sendState(), which toggles it...so "untoggle" it!
+    latched=!state; // begin() calls sendState(), which toggles it, so "untoggle" it!
 }
 void LatchingPin::lastCall(){
     latched=stage==1 ? ON:OFF;

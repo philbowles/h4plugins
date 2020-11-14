@@ -165,7 +165,7 @@ void H4P_UPNPServer::_notify(const string& phase){ // h4Chunker it up
     });
 }
 
-string H4P_UPNPServer::replaceParams(const string& s){ // oh for a working regex...
+string H4P_UPNPServer::replaceParams(const string& s){ // oh for a working regex!
 	int i=0;
 	int j=0;
 	string rv(s);

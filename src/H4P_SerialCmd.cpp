@@ -207,15 +207,6 @@ uint32_t H4P_SerialCmd::invokeCmd(string topic,uint32_t payload,const char* src)
     return invokeCmd(topic,stringFromInt(payload),src);
 }
 
-void H4P_SerialCmd::logEventType(H4P_LOG_TYPE t,const string& src,const string& tgt,const string& fmt,...){
-    char buff[256];
-    va_list ap; 
-    va_start(ap, fmt); 
-    vsnprintf(buff,255,CSTR(fmt),ap);
-    va_end(ap);
-    _logEvent(buff,t,src,tgt);
-}
-
 void H4P_SerialCmd::removeCmd(const string& s,uint32_t _subCmd){ if(__exactMatch(s,_subCmd)!=_commands.end()) _commands.erase(s); }
 
 #ifndef ARDUINO_ARCH_STM32
@@ -252,10 +243,10 @@ void H4P_SerialCmd::all(){
         }
     });
 }
-
+// ifdef log events?
 const char* __attribute__((weak)) giveTaskName(uint32_t id){ return "ANON"; }
 string H4P_SerialCmd::_dumpTask(task* t){
-    H4Plugin* p=isLoaded(cerrTag()); // v inefficient, but...
+    H4Plugin* p=isLoaded(cerrTag()); // v inefficient, but, hey!
 
     char buf[128];
     uint32_t type=t->uid/100;

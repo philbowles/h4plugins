@@ -76,7 +76,7 @@ void H4P_WiFi::_hookIn(){
     _cb[boardTag()]=replaceAll(H4_BOARD,"ESP8266_","");
     if(!_getPersistentValue(deviceTag(),"H4-")) if(_device!="") _cb[deviceTag()]=_device;
     H4EVENT("Device %s",CSTR(_cb[deviceTag()]));
-    _getPersistentValue("h4sv","*");
+    _getPersistentValue(h4svTag(),"*");
     WiFi.onEvent(_wifiEvent);
 }
 
@@ -103,8 +103,8 @@ void H4P_WiFi::_scan(){ // check 4 common hoist
     int n=WiFi.scanNetworks();
 
     for (uint8_t i = 0; i < n; i++){
-        char buf[128];
-        snprintf(buf,127,"<option>%s</option>",CSTR(WiFi.SSID(i)));
+        char buf[256];
+        snprintf(buf,255,"<option>%s</option>",CSTR(WiFi.SSID(i)));
         _cb["opts"].append(buf); // delete later!!!
     }
     WiFi.scanDelete();
@@ -229,19 +229,7 @@ void H4P_WiFi::clear(){
 	WiFi.disconnect(true,true);
     _clearAP();
 }
-/*
-void H4P_WiFi::_scan(){ // coalescee
-    int n=WiFi.scanNetworks();
 
-    for (uint8_t i = 0; i < n; i++){
-        char buf[128];
-        snprintf(buf,127,"<option>%s</option>",CSTR(WiFi.SSID(i)));
-        _cb["opts"].append(buf); // delete later!!!
-    }
-    WiFi.scanDelete();
-    WiFi.enableSTA(false); // force AP only
-}
-*/
 void H4P_WiFi::_startSTA(){
     _clearAP();
     WiFi.mode(WIFI_STA);

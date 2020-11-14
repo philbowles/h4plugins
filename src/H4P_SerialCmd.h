@@ -100,8 +100,16 @@ class H4P_SerialCmd: public H4Plugin {
                 void            help();
                 uint32_t        invokeCmd(string,string="",const char* src=userTag());			
                 uint32_t        invokeCmd(string,uint32_t,const char* src=userTag()); 
-                void            logEventType(H4P_LOG_TYPE,const string& src,const string& tgt,const string& fmt,...);
                 void            removeCmd(const string& name,uint32_t _subCmd=0); 
+
+                template<typename... Args>
+                void            logEventType(H4P_LOG_TYPE t,const string& src,const string& tgt,const string& fmt, Args... args){
+                    char* buff=static_cast<char*>(malloc(256)); // fix this!
+                    snprintf(buff,255,CSTR(fmt),args...);
+                    _logEvent(buff,t,src,tgt);
+                    free(buff);
+                }
+
 //      syscall only
                 void            _hookLogChain(H4P_FN_LOG f){ _logChain.push_back(f); }
                 void            _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target);

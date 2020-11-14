@@ -42,7 +42,7 @@ constexpr uint32_t msInDay(){ return 1000*secsInDay(); }
 
 H4P_Timekeeper::H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzo,H4_FN_DST fDST): _fDST(fDST), H4Plugin(timeTag()){
     _cmds={
-        {_pName,   { H4PC_H4, _subCmd, nullptr}}, // root for this plugin, e.g. h4/ME...
+        {_pName,   { H4PC_H4, _subCmd, nullptr}}, // root for this plugin
         {"change", { _subCmd,       0, CMDVS(_change)}},
         {"sync",   { _subCmd,       0, CMD(sync)}},
         {"tz",     { _subCmd,       0, CMDVS(_tz)}}
@@ -106,10 +106,10 @@ uint32_t H4P_Timekeeper::__alarmCore (vector<string> vs,bool daily,H4BS_FN_SWITC
         uint32_t u=daily ? H4P_TRID_DALY:H4P_TRID_SHOT;
         h4.add([this,f,onoff]{
             if(_mss00) f(onoff);
-            else H4EVENT("RTC ignored"); // don't fire if NTP not sync'ed 
+            //else H4EVENT("RTC ignored"); // don't fire if NTP not sync'ed 
         },msDue,daily ? msDue:0,H4Countdown(1),nullptr,TAG(daily ? 7:3));
         return H4_CMD_OK;
-    } else H4EVENT("Alarm ignored"); // don't set if NTP not sync'ed
+    } //else H4EVENT("Alarm ignored"); // don't set if NTP not sync'ed
     return H4_CMD_NOT_NOW; 
 }
 

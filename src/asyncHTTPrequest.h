@@ -31,7 +31,6 @@
 
 #include <Arduino.h>
 #include<H4P_WiFiSelect.h>
-//#include <pgmspace.h>
 #include <xbuf.h>
 
 #define DEBUG_HTTP(format,...)  if(_debug){\

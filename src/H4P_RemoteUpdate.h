@@ -32,13 +32,7 @@ SOFTWARE.
 
 #include<H4PCommon.h>
 #include<H4P_SerialCmd.h>
-/*
-enum HTTPUpdateResult {
-    HTTP_UPDATE_FAILED,
-    HTTP_UPDATE_NO_UPDATES,
-    HTTP_UPDATE_OK
-};
-*/
+
 #ifdef ARDUINO_ARCH_ESP8266
     #include<ESP8266httpUpdate.h>
 class H4P_RemoteUpdate: public H4Plugin, public ESP8266HTTPUpdate {
@@ -53,7 +47,7 @@ class H4P_RemoteUpdate: public H4Plugin, public HTTPUpdate {
                 void        _hookIn(){ DEPEND(wifi); }
                 void        _updateFromUrl(bool fw,bool reboot){
                     String updateUrl=CSTR(replaceAll((_url+"/"+_cb[boardTag()]+"/"+_cb["date"])," ","_"));
-                    String version=fw ? H4P_VERSION:CSTR(_cb["h4sv"]);
+                    String version=fw ? H4P_VERSION:CSTR(_cb[h4svTag()]); // tag it
                     H4EVENT("%s [%s]",CSTR(updateUrl),CSTR(version));
                     h4wifi._downHooks();
                     t_httpUpdate_return rv=fw ? update(_c,updateUrl,version):updateSpiffs(_c,updateUrl,version);

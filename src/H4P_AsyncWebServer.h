@@ -51,7 +51,8 @@ using H4_FN_UINUM      = function<int(void)>;
 using H4_FN_UIBOOL     = function<bool(void)>;
 using H4_FN_UIACTIVE   = function<void(string,string)>;
 
-struct H4P_UI_ITEM {
+struct H4P_UI_ITEM {    
+    string         id;
     H4P_UI_TYPE     type;
     H4_FN_UITXT     f;
     H4_FN_UIACTIVE  a;
@@ -62,7 +63,7 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
             H4P_BinaryThing*    _btp=nullptr;
             AsyncEventSource*   _evts;
             H4_CMD_MAP          _local={};
-            std::unordered_map<string,H4P_UI_ITEM> userItems={};
+            vector<H4P_UI_ITEM> userItems={};
             vector<string>      lines={};
             H4_FN_VOID          _onC,_onD;
 
@@ -74,7 +75,7 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
                 void         _start() override;
                 void         _stop() override;
                 void         _hookIn() override;
-                void         _greenLight() override {} // do not autostart!
+                void         _greenLight() override {}; // do not autostart!
     public:
         H4P_AsyncWebServer(H4_FN_VOID onClientConnect=nullptr,H4_FN_VOID onClientDisconnect=nullptr): AsyncWebServer(80),H4Plugin(aswsTag()){
             _onC=onClientConnect;
@@ -93,12 +94,20 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
                 void        setUILabelNumeric(const string& name,H4_FN_UINUM f){ _sendSSE(CSTR(name),CSTR(stringFromInt(f()))); }
                 void        setUILabelText(const string& name,H4_FN_UITXT f){ _sendSSE(CSTR(name),CSTR(f())); }
                 void        setUIBoolean(const string& name,H4_FN_UIBOOL f){ setUILabelNumeric(name,f); }
-                void        sendUIMessage(const string& msg,...);
+
+                template<typename... Args>
+                void        sendUIMessage(const string& msg, Args... args){ // variadic T<>
+                    char* buff=static_cast<char*>(malloc(H4P_REPLY_BUFFER+1));
+                    snprintf(buff,H4P_REPLY_BUFFER,CSTR(msg),args...);
+                    _sendSSE(NULL,buff);
+                    free(buff);
+                }
+
 //          syscall only
                 void        _reply(string msg) override { lines.push_back(msg); }
                 void        _setBothNames(const string& host,const string& friendly);
                 void        _sendSSE(const char* name,const char* msg);
-                void        _uiAdd(const string& n,H4P_UI_TYPE t,H4_FN_UITXT f,H4_FN_UIACTIVE a=nullptr){ userItems[n]={t,f,a}; }
+                void        _uiAdd(const string& n,H4P_UI_TYPE t,H4_FN_UITXT f,H4_FN_UIACTIVE a=nullptr){ userItems.push_back(H4P_UI_ITEM {n,t,f,a}); }
 };
 
 extern __attribute__((weak)) H4P_AsyncWebServer h4asws;

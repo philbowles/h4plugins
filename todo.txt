@@ -2,6 +2,9 @@
 TODO:
     ret type on guard 1
 SOONER
+    ESP32 FS 
+    BUG initial disabled ConditionalSwitch
+#
     error gone away in nodejs
     early abort dependfail
     wifi/change -> reboot
