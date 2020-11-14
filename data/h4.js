@@ -8,6 +8,7 @@ function toaster(t){
 
 function ajax(url,decode=true){
     document.body.style.cursor = "wait";
+    toaster("&nbsp;");
     var http = new XMLHttpRequest();
     var fullurl="http://"+window.location.hostname+"/rest/"+url;
     http.open('GET', fullurl);
@@ -28,12 +29,29 @@ function ajax(url,decode=true){
 function redgreen(id,b){
     let i=document.getElementById(id)
     i.classList.remove(b ? "led-red":"led-green");
-    i.classList.add(b ? "led-green":"led-red");  
-} 
+    i.classList.add(b ? "led-green":"led-red");
+    if(id=="Condition"){ //hate this!!
+        console.warn("GRAY ME OUT BABYLON!")
+        uiOnOff(b ? 0:2);
+    }
+}
+
+function onofhandler(e){ ajax("h4/toggle",false); }
 
 function uiOnOff(b){
+    let colors=["of","on","nun"]
     let node=document.getElementById("onof")
-    node.children[0].src=b ? "on.jpg":"of.jpg"
+    node.children[0].src=colors[b]+".jpg"
+    let cursor
+    if(b==2){
+        node.removeEventListener('click', onofhandler );
+        cursor="no-drop"
+    }
+    else {
+        node.addEventListener('click', onofhandler );
+        cursor="pointer"
+    }
+    node.style.cursor=cursor
 }
 
 function uiItem(d,h="uhang"){
@@ -78,13 +96,13 @@ function uiItem(d,h="uhang"){
             node.appendChild(img)
             uiOnOff(v)
             node.style.display='block'
-            node.addEventListener('click', function(e){ ajax("h4/toggle",false); });
+//            node.addEventListener('click', function(e){ ajax("h4/toggle",false); });
             source.addEventListener(n, function(e){ uiOnOff(parseInt(e.data)) });
         }
     }
 }
 
-function has(id){ return document.getElementById("has"+id).value!="?" }
+function has(id){ return document.getElementById("has"+id).value!="?" } // lose?
 
 document.addEventListener("DOMContentLoaded", function() {
     if(!!window.EventSource) source=new EventSource("/evt");
@@ -98,7 +116,7 @@ document.addEventListener("DOMContentLoaded", function() {
         source.addEventListener('ui', function(e){ uiItem(e.data) });
 
         source.onmessage=function(e){
-            let m=e.data;           
+            let m=e.data;
             if(m.substr(0,2)!='ka') toaster(e.data)
         }
 
