@@ -114,7 +114,7 @@ void H4P_AsyncWebServer::_start(){
     on("/",HTTP_GET, [this](AsyncWebServerRequest *request){
         H4EVENT("Root %s",request->client()->remoteIP().toString().c_str());
         _cb[wifiTag()]=stringFromInt(WiFi.getMode());
-        request->send(SPIFFS,"/sta.htm",String(),false,aswsReplace);
+        request->send(LittleFS,"/sta.htm",String(),false,aswsReplace);
     });
 
     on("/",HTTP_POST, [this](AsyncWebServerRequest *request){
@@ -131,7 +131,7 @@ void H4P_AsyncWebServer::_start(){
 
 	on("/rest",HTTP_GET,[this](AsyncWebServerRequest *request){ _rest(request); });
 
-    serveStatic("/", SPIFFS, "/").setCacheControl("max-age=31536000");
+    serveStatic("/", LittleFS, "/").setCacheControl("max-age=31536000");
     // 404 ?
     begin();
     _upHooks();

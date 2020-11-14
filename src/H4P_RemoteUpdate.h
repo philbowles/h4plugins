@@ -75,7 +75,7 @@ class H4P_RemoteUpdate: public H4Plugin, public HTTPUpdate {
             _cmds={
                 {_pName,       { H4PC_H4,_subCmd  , nullptr}},
                 {"both",       { _subCmd, 0, CMD(both)}},
-                {"spiffs",     { _subCmd, 0, CMD(spiffs)}},
+                {"fs",         { _subCmd, 0, CMD(spiffs)}},
                 {"update",     { _subCmd, 0, CMD(firmware)}}
             }; 
         }

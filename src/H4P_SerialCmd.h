@@ -37,7 +37,7 @@ using  namespace std::placeholders;
     #ifdef ARDUINO_ARCH_ESP8266
         #include<FS.h>
     #else
-        #include<SPIFFS.h>
+        #include<LittleFS.h>
     #endif
 #endif
 

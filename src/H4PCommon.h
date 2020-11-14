@@ -34,6 +34,14 @@ SOFTWARE.
 #include<H4Utils.h>
 #include"config.h"
 
+#ifndef ARDUINO_ARCH_STM32 
+    #ifdef ARDUINO_ARCH_ESP8266
+        #include<LittleFS.h>
+    #else
+        #include<FS.h>
+    #endif
+#endif
+
 #include<unordered_set>
 #include<cstdarg>
 

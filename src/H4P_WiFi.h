@@ -34,6 +34,7 @@ SOFTWARE.
 
 #include<H4P_WiFiSelect.h>
 #ifndef ARDUINO_ARCH_STM32
+
 #include <H4P_SerialCmd.h>
 
 class H4P_WiFi: public H4Plugin{
@@ -44,7 +45,7 @@ class H4P_WiFi: public H4Plugin{
                 VSCMD(_host);
                 VSCMD(_host2);
 //
-        static  void        _clearAP(){ SPIFFS.remove("/ap"); }
+        static  void        _clearAP(){ LittleFS.remove("/ap"); }
                 string      _getChipID();
                 void        _gotIP();
                 void        _lostIP();
