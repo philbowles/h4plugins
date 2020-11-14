@@ -6,6 +6,7 @@ H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 #define SQUAWK D6
 
 boolean armed=false;
+
 uint32_t arm(vector<string> vs); // necessary fwd ref
 
 void onMQTTConnect(){ h4mqtt.subscribeDevice("arm",arm); }
@@ -55,10 +56,14 @@ void armingStateChange(bool b){
   }
   h4mqtt.publishDevice("armed",armed=b);
   h4onof.syncCondition();
-  h4asws.setUILabelText("board","TOTAL BOLOX");
 }
 
 uint32_t arm(vector<string> vs){
-  armingStateChange(H4PAYLOAD_INT);   
-  return H4_CMD_OK; 
+  if(vs.size()){
+    bool b=H4PAYLOAD_INT;
+    if(b!=armed) armingStateChange(b); 
+    else Serial.printf("Nothing to do!\n");  
+    return H4_CMD_OK;
+  }
+  else return H4_CMD_TOO_FEW_PARAMS;
 }

@@ -66,20 +66,16 @@ uint32_t H4P_BinaryThing::_slave(vector<string> vs){
     show();
     return H4_CMD_OK;
 }
+
 void H4P_ConditionalThing::_hookIn() {
     H4P_BinaryThing::_hookIn();
     if(isLoaded(aswsTag())) h4asws._uiAdd(ConditionTag(),H4P_UI_BOOL,[this]{ return stringFromInt(_predicate(state())); });
 }
-void H4P_ConditionalThing:: _setState(bool b) { 
-    if(_predicate(b)) H4P_BinaryThing::_setState(b);
-//#ifndef H4P_NO_WIFI
-//    else if(isLoaded(aswsTag())) h4asws.sendUIMessage(_predicate(b) ? "&nbsp;":"Unable: condition not set");
-//#endif
-}
 
-void H4P_ConditionalThing::syncCondition() {
-    if(isLoaded(aswsTag())) h4asws._sendSSE(ConditionTag(),CSTR(stringFromInt(_predicate(state()))));
-}
+void H4P_ConditionalThing:: _setState(bool b) { if(_predicate(b)) H4P_BinaryThing::_setState(b);}
+
+void H4P_ConditionalThing::syncCondition() { if(isLoaded(aswsTag())) h4asws._sendSSE(ConditionTag(),CSTR(stringFromInt(_predicate(state())))); }
+
 #else
 void H4P_BinaryThing::_hookIn() {}
 void H4P_BinaryThing::_publish(bool b){}
