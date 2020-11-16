@@ -33,14 +33,6 @@ SOFTWARE.
 #include<H4PCommon.h>
 using  namespace std::placeholders;
 
-#ifndef ARDUINO_ARCH_STM32 
-    #ifdef ARDUINO_ARCH_ESP8266
-        #include<FS.h>
-    #else
-        #include<LittleFS.h>
-    #endif
-#endif
-
 enum H4P_SVC_CONTROL {
     H4PSVC_RESTART,
     H4PSVC_STATE,

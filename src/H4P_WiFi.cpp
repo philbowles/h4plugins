@@ -121,7 +121,7 @@ void H4P_WiFi::_setPersistentValue(string n,string v,bool reboot){
 
 void H4P_WiFi::_start(){
     H4Plugin::_factoryChain.push_back(_clearAP);
-    if(LittleFS.exists("/ap")){
+    if(HAL_FS.exists("/ap")){
         stop();
         _startAP();
     } else _mcuStart();
@@ -165,7 +165,7 @@ void H4P_WiFi::clear(){
 	stop();
     WiFi.disconnect(true); 
 	ESP.eraseConfig();
-    LittleFS.remove(CSTR(string("/"+string(deviceTag()))));
+    HAL_FS.remove(CSTR(string("/"+string(deviceTag()))));
     _clearAP();
 }
 

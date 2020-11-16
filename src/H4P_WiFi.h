@@ -45,7 +45,7 @@ class H4P_WiFi: public H4Plugin{
                 VSCMD(_host);
                 VSCMD(_host2);
 //
-        static  void        _clearAP(){ LittleFS.remove("/ap"); }
+        static  void        _clearAP(){ HAL_FS.remove("/ap"); }
                 string      _getChipID();
                 void        _gotIP();
                 void        _lostIP();

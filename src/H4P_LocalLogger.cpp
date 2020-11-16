@@ -42,7 +42,7 @@ H4P_LocalLogger::H4P_LocalLogger(uint32_t limit,uint32_t filter): H4PLogService(
     };
 }
 
-void H4P_LocalLogger::clear(){ LittleFS.remove(CSTR(string("/").append(logTag()))); }
+void H4P_LocalLogger::clear(){ HAL_FS.remove(CSTR(string("/").append(logTag()))); }
 
 void H4P_LocalLogger::flush(){
     show();

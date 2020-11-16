@@ -84,6 +84,6 @@ uint32_t H4P_PersistentStorage::_set(vector<string> vs){
 
 void H4P_PersistentStorage::clear(){
     psRam.clear();
-    LittleFS.remove(CSTR(string("/"+_pName)));
+    HAL_FS.remove(CSTR(string("/"+_pName)));
 }
 #endif

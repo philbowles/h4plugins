@@ -83,7 +83,7 @@ class H4P_UPNPServer: public H4Plugin {
             _pups.push_back(_urn+"device:controllee:1");
             _pups.push_back(_urn+"service:basicevent:1");
             _ubIP=IPAddress(239,255,255,250);
-            _factoryHook=[this](){ LittleFS.remove(CSTR(string("/"+string(nameTag())))); };
+            _factoryHook=[this](){ HAL_FS.remove(CSTR(string("/"+string(nameTag())))); };
             _cmds={ {upnpTag(),{H4PC_H4, 0, CMDVS(_friendly)}} };
         }
 

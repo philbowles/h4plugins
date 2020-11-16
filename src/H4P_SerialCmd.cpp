@@ -119,7 +119,7 @@ void H4P_SerialCmd::_flattenCmds(function<void(string)> fn,string cmd,string pre
 
 void H4P_SerialCmd::_hookIn(){
 #ifndef ARDUINO_ARCH_STM32    
-    LittleFS.begin();
+    HAL_FS.begin();
 #endif
 }
 
@@ -212,7 +212,7 @@ void H4P_SerialCmd::removeCmd(const string& s,uint32_t _subCmd){ if(__exactMatch
 #ifndef ARDUINO_ARCH_STM32
 string H4P_SerialCmd::read(const string& fn){
 	string rv="";
-        File f=LittleFS.open(CSTR(fn), "r");
+        File f=HAL_FS.open(CSTR(fn), "r");
         if(f && f.size()) {
             int n=f.size();
             uint8_t* buff=(uint8_t *) malloc(n+1);
@@ -225,7 +225,7 @@ string H4P_SerialCmd::read(const string& fn){
 }
 
 uint32_t H4P_SerialCmd::write(const string& fn,const string& data,const char* mode){
-    File b=LittleFS.open(CSTR(fn), mode);
+    File b=HAL_FS.open(CSTR(fn), mode);
     b.print(CSTR(data));
     uint32_t rv=b.size(); // ESP32 pain
     b.close();
@@ -294,11 +294,11 @@ void H4P_SerialCmd::showSPIFFS(){
     uint32_t n=0;
 
     FSInfo info;
-    LittleFS.info(info);
+    HAL_FS.info(info);
     reply("totalBytes %d",info.totalBytes);    
     reply("usedBytes %d",info.usedBytes);    
     
-    Dir dir = LittleFS.openDir("/");
+    Dir dir = HAL_FS.openDir("/");
 
     while (dir.next()) {
         n++;
@@ -312,7 +312,7 @@ void H4P_SerialCmd::showSPIFFS(){
     uint32_t sigma=0;
     uint32_t n=0;
 
-    File root = LittleFS.open("/");
+    File root = HAL_FS.open("/");
  
     File file = root.openNextFile();
  

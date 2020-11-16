@@ -2,8 +2,9 @@
 TODO:
     ret type on guard 1
 SOONER
-    ESP32 FS 
+    Rationalise/Align publishDevice MQTT
     BUG initial disabled ConditionalSwitch
+    ui input box -> ap mode
 #
     error gone away in nodejs
     early abort dependfail

@@ -4,6 +4,7 @@
 #include<config.h>
 
 #include<H4P_CmdErrors.h>
+#include<H4P_Heartbeat.h>
 #include<H4P_SerialCmd.h>
 #include<H4P_SerialLogger.h>
 #include<H4P_ExternalSqWave.h>
