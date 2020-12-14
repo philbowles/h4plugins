@@ -61,7 +61,7 @@ enum H4GM_SENSE:uint8_t {
     ACTIVE_HIGH
 };
 
-#define NORMALISE(a,b) (!(a ^ b))
+//#define NORMALISE(a,b) (!(a ^ b))
 
 class  H4GPIOPin;
 
@@ -77,9 +77,6 @@ class H4GPIOPin{
             void            _throttle(bool b);
 
     protected:
-//
-            H4GM_FN_EVENT   onEvent=nullptr;
-
             void            _setState(uint32_t s){ // tidy
                                 state=s;
                                 stateChange();
@@ -100,10 +97,9 @@ class H4GPIOPin{
 
     virtual void            stateChange(){ sendEvent(); };
 
-
-//            void _factoryCommon(H4P_BinaryThing* btp);
             void _pinFactoryCommon(bool onof);
     public:
+            H4GM_FN_EVENT   onEvent=nullptr;
     virtual uint32_t        logicalRead(){ return state; }
             uint8_t         pin=0;                  // GPIO hardware pin number
             uint8_t         gpioType=0;             // INPUT, INOUT_PULLUP, OUTPUT etc
@@ -419,7 +415,7 @@ class EncoderAutoPin: public EncoderPin{
 class H4P_GPIOManager: public H4Plugin{//
 
         H4GPIOPin*      isManaged(uint8_t p){ return pins.count(p) ? pins[p]:nullptr; }
-        OutputPin*      isOutput(uint8_t p);
+//        OutputPin*      isOutput(uint8_t p);
 
         template<typename T, typename... Args>
         T* pinFactory(bool onof,uint8_t _p,Args... args) {

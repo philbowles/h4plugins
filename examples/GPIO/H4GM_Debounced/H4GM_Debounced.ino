@@ -56,7 +56,7 @@ void h4setup() { // H4 constructor starts Serial
     Serial.print("GPIO ");Serial.print(USER_BTN);Serial.print(" ACTIVE ");Serial.println(UB_ACTIVE ? "HIGH":"LOW");
 
     h4gm.Debounced(USER_BTN,INPUT,UB_ACTIVE,U_DBTIME_MS,[](H4GPIOPin* ptr){
-    H4GM_PIN(Debounced); // Required! turns ptr into correct pin-> pointer
+        H4GM_PIN(Debounced); // Required! turns ptr into correct pin-> pointer
         Serial.print("GPIO ");Serial.print(pin->pin);Serial.print(" state ");Serial.print(pin->state);
         Serial.print(" @ uS ");Serial.print(pin->Tevt);Serial.print(" delta=");Serial.print(pin->delta);
         Serial.print(" rate=");Serial.print(pin->cps);Serial.println("/sec");

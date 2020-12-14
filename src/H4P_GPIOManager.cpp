@@ -29,13 +29,13 @@ SOFTWARE.
 #include<H4P_GPIOManager.h>
 #include <numeric>
 
-H4GPIOPin::H4GPIOPin(            
+H4GPIOPin::H4GPIOPin(
     uint8_t _p,
     uint8_t _g,
     H4GM_STYLE _s,
     uint8_t _a,
     H4GM_FN_EVENT _f
-    ):            
+    ):
     pin(_p),
     gpioType(_g),
     style(_s),
@@ -92,7 +92,7 @@ string H4GPIOPin::dump(){ // tart this up - complete rework
 void H4GPIOPin::stampEvent(){
     unsigned long now=micros();
     delta=now - Tevt;
-    Tevt=now;      
+    Tevt=now;
     cps++;
 }
 
@@ -304,11 +304,13 @@ void EncoderAutoPin::setValue(int v){
 //
 //      H4P_GPIOManager
 //
+/* do we need this ?
 OutputPin* H4P_GPIOManager::isOutput(uint8_t p){
     H4GPIOPin* output;
     if((output=isManaged(p)) && output->style==H4GM_PS_OUTPUT) return reinterpret_cast<OutputPin*>(output);
     return nullptr;
 }
+*/
 
 uint32_t H4P_GPIOManager::logicalRead(uint8_t p){ if(pins.count(p)) return pins[p]->logicalRead(); }
 
