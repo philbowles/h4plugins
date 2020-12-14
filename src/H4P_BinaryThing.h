@@ -38,19 +38,19 @@ class H4P_BinaryThing: public H4Plugin{
             uint32_t        _timeout;
             unordered_set<string>   _slaves;
     protected:
-            bool            _state=false;
             H4BS_FN_SWITCH  _f;
 
                     uint32_t _autoOff(vector<string> vs){ return guardInt1(vs,bind(&H4P_BinaryThing::autoOff,this,_1)); }
-                    bool     _getState() { return _state; }
+//                    bool     _getState() { return _state; }
             virtual void     _hookIn() override ;
                     void     _publish(bool b);
                     void     _setSlaves(bool b);
-            virtual void     _setState(bool b);               
-                    uint32_t _slave(vector<string> vs); //vscmd               
+            virtual void     _setState(bool b);
+                    uint32_t _slave(vector<string> vs); //vscmd
                     void     _start() override;
                     uint32_t _switch(vector<string> vs){ return guardInt1(vs,bind(&H4P_BinaryThing::turn,this,_1)); }
     public:
+            bool            _state=false;
         H4P_BinaryThing(H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): _f(f),_state(initial),_timeout(timer), H4Plugin(onofTag()) {
             _cmds={
                 {"auto",   {H4PC_H4, 0, CMDVS(_autoOff)}},
@@ -63,13 +63,13 @@ class H4P_BinaryThing: public H4Plugin{
         }
 
         virtual void show() override { 
-                reply("State: %s auto-off=%d",_getState() ? "ON":"OFF",_timeout);
+                reply("State: %s auto-off=%d",_state ? "ON":"OFF",_timeout);
                 for(auto s :_slaves) reply("Slave: %s",CSTR(s));
             }
 
                     void    autoOff(uint32_t T){ _timeout=T; }
                     void    slave(const string& otherh4){ _slaves.insert(otherh4); }
-                    bool    state() { return _getState(); }
+                    bool    state() { return _state; }
                     void    turnOff(){ turn(false); }
                     void    turnOn(){ turn(true); }
                     void    toggle(){ turn(!_state); }
@@ -78,18 +78,18 @@ class H4P_BinaryThing: public H4Plugin{
                     void    _turn(bool b,const string& src);
 #endif
 };
-using H4_FN_CTHING      = function<bool(bool)>;
+using H4_FN_CPRED      = function<uint32_t(bool)>;
 
 class H4P_ConditionalThing: public H4P_BinaryThing{
-        H4_FN_CTHING _predicate;
+                H4_FN_CPRED _predicate;
         virtual void        _setState(bool b);
                 void        _hookIn() override;
     public:
-        H4P_ConditionalThing(H4_FN_CTHING predicate,H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): 
+        H4P_ConditionalThing(H4_FN_CPRED predicate,H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): 
             _predicate(predicate),
             H4P_BinaryThing(f,initial,timer) {}
             void show() override { 
-                reply("Condition: %d",_predicate(state()));
+                reply("Condition: %d",_predicate(_state));
                 H4P_BinaryThing::show();
             }
 

@@ -40,40 +40,15 @@ class H4P_Heartbeat: public H4Plugin {
                 function<void(H4P_Heartbeat*)> _bf;
 
                 void        _greenLight() override { _start(); }; // autostart
-                void        _start() override {
-                    h4._hookLoop([this](){ _run(); },_subCmd);
-                    H4Plugin::_start();
-                }
-                void        _stop() override {
-                    h4._unHook(_subCmd);
-                    H4Plugin::_stop();
-                }
-                void _run(){
-                    uint32_t now=millis();
-                    uint32_t nowsec=now/1000;
-                    if(!(now%1000) && nowsec!=_uptime) {
-                        _bf(this);
-                        _uptime=nowsec;
-                    }
-                }
-    public:
+                void        _start() override;
+                void        _stop() override ;
+                void        _run();
+    public: 
         H4P_Heartbeat(function<void(H4P_Heartbeat*)> beat): _bf(beat),H4Plugin("beat"){}
-        
-        static string secsToTime(uint32_t sec){ 
-            Serial.printf("secsToTime %d\n",sec);
-            char* t="000d 00:00:00";
-            uint32_t s=sec%60;
-            Serial.printf("secsToTime s=%d\n",s);
-            uint32_t m=sec/60;
-            Serial.printf("secsToTime m=%d\n",m);
-            uint32_t h=sec/3600;
-            Serial.printf("secsToTime h=%d\n",h);
-            uint32_t d=sec/86400;
-            Serial.printf("secsToTime d=%d\n",d);
-            sprintf(t,"%3dd %02d:%02d:%02d",d,h,m,s);
-            Serial.printf("secsToTime FINAL %s\n",t);
-            return string(t);
-        }
+        // refakta c/w timekeeper!!!
+        static string secsToTime(uint32_t sex);
+
+        void show() override { reply("upSecs=%u %s\n",upSecs(),CSTR(upTime())); }
 
         static uint32_t upSecs(){ return _uptime; }
 

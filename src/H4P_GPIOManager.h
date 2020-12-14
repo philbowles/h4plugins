@@ -101,7 +101,7 @@ class H4GPIOPin{
     virtual void            stateChange(){ sendEvent(); };
 
 
-            void _factoryCommon(H4P_BinaryThing* btp);
+//            void _factoryCommon(H4P_BinaryThing* btp);
             void _pinFactoryCommon(bool onof);
     public:
     virtual uint32_t        logicalRead(){ return state; }
@@ -133,13 +133,7 @@ class H4GPIOPin{
                 if(onEvent) onEvent(this);
             }
 
-            H4GPIOPin(            
-                uint8_t _p,
-                uint8_t _g,
-                H4GM_STYLE _s,
-                uint8_t _a,
-                H4GM_FN_EVENT _c
-                );
+            H4GPIOPin(uint8_t _p, uint8_t _g, H4GM_STYLE _s, uint8_t _a, H4GM_FN_EVENT _c);
 
         virtual ~H4GPIOPin(){}
 #ifdef H4P_LOG_EVENTS

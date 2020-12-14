@@ -156,8 +156,8 @@ predicate is the name of a bool returning function which takes a bool parameter 
 */
 H4P_BinarySwitch(uint8_t pin,H4GM_SENSE sense, uint32_t initial,H4BS_FN_SWITCH f=nullptr,uint32_t timer=0)
 H4P_BinaryThing(H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0);
-H4P_ConditionalSwitch(uint8_t pin,H4GM_SENSE sense, uint32_t initial,H4_FN_CTHING predicate=nullptr,H4BS_FN_SWITCH f=nullptr,uint32_t timer=0):
-H4P_ConditionalThing(H4_FN_CTHING predicate=nullptr,H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): 
+H4P_ConditionalSwitch(uint8_t pin,H4GM_SENSE sense, uint32_t initial,H4_FN_CPRED predicate=nullptr,H4BS_FN_SWITCH f=nullptr,uint32_t timer=0):
+H4P_ConditionalThing(H4_FN_CPRED predicate=nullptr,H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): 
 
 void autoOff(uint32_t T); // change autoOff time to T milliseconds
 void syncCondition(); // Conditional switch / thing only: keep webUI in-step with current value of condition

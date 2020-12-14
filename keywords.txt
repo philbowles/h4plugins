@@ -51,6 +51,7 @@ H4P_Sunrise	KEYWORD1
 H4P_Voice	KEYWORD1
 H4P_ConditionalThing	KEYWORD1
 H4P_ConditionalSwitch	KEYWORD1
+H4P_Heartbeat	KEYWORD1
 
 #######################################
 # Methods and Functions (	KEYWORD2)

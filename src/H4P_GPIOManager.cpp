@@ -27,7 +27,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_GPIOManager.h>
-//#include<algorithm>
 #include <numeric>
 
 H4GPIOPin::H4GPIOPin(            

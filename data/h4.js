@@ -1,4 +1,3 @@
-//let onof
 let source
 
 function toaster(t){
@@ -26,18 +25,14 @@ function ajax(url,decode=true){
     http.send();  
 }
 
-function redgreen(id,b){
-    let i=document.getElementById(id)
+function redgreen(n,b){
+    let i=document.getElementById(n)
     i.classList.remove(b ? "led-red":"led-green");
     i.classList.add(b ? "led-green":"led-red");
-    if(id=="Condition"){ //hate this!!
-        console.warn("GRAY ME OUT BABYLON!")
-        uiOnOff(b ? 0:2);
-    }
 }
 
 function onofhandler(e){ ajax("h4/toggle",false); }
-
+/*
 function uiOnOff(b){
     let colors=["of","on","nun"]
     let node=document.getElementById("onof")
@@ -53,12 +48,32 @@ function uiOnOff(b){
     }
     node.style.cursor=cursor
 }
+*/
+function uiOnOff(b){
+    let colors=["of","on"]
+    let node=document.getElementById("onof")
+    node.children[0].src=colors[b]+".jpg"
+}
+
+function uiOnOffEnable(b){
+    let cursor
+    if(b){
+        node.addEventListener('click', onofhandler );
+        cursor="pointer"
+    }
+    else {
+        node.removeEventListener('click', onofhandler );
+        cursor="no-drop"
+    }
+    node.style.cursor=cursor
+}
 
 function uiItem(d,h="uhang"){
     let parts=d.split(",");
     let n=parts[0]
     let node=document.getElementById(n)
     let v=parts[2]
+    let b=parseInt(v);
     if(!node){
         let hangoff=document.getElementById(h);
         let t=parseInt(parts[1])
@@ -76,8 +91,7 @@ function uiItem(d,h="uhang"){
             case 1: // text
                 break;
             case 2: // bool
-                let b=parseInt(v);
-                valu.classList=(a ? "uia ":"")+"ld led-"+(b ? "green":"red");
+                valu.classList=(a ? "uia ":"")+"ld led-"+(b==1 ? "green":"red");
                 source.addEventListener(n, function(e){ redgreen(n,parseInt(e.data)); });
                 if(a) {
                     valu.addEventListener("click", function(e){ 
@@ -91,13 +105,13 @@ function uiItem(d,h="uhang"){
         hangoff.insertBefore(valu,null)
     }
     else {
-        if(n=="onof"){
-            let img=document.createElement("img");
-            node.appendChild(img)
-            uiOnOff(parseInt(v))
-            node.style.display='block'
-            source.addEventListener(n, function(e){ uiOnOff(parseInt(e.data)) });
-        }
+        let img=document.createElement("img");
+        node.appendChild(img)
+        uiOnOff(b);
+        let c=document.getElementById("Condition");
+        if(c && c.classList.value.indexOf("green")==-1) uiOnOff(2);
+        node.style.display='block'
+        source.addEventListener(n, function(e){ uiOnOff(parseInt(e.data)) });
     }
 }
 

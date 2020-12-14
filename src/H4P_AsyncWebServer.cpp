@@ -37,7 +37,7 @@ void  H4P_AsyncWebServer::_hookIn(){
     H4Plugin* p=isLoaded(onofTag());
     if(p) _btp=reinterpret_cast<H4P_BinaryThing*>(p);
     _uiAdd("H4 Vn",H4P_UI_LABEL,[]()->string{ return H4_VERSION; });
-    _uiAdd("H4Plugins Vn",H4P_UI_LABEL,[]()->string{ return H4P_VERSION; });
+    _uiAdd("H4Plugins Vn",H4P_UI_LABEL,[]()->string{ return _cb[h4pvTag()]; });
     _uiAdd("UI Vn",H4P_UI_LABEL,[]()->string{ return _cb[h4svTag()]; });
     if(isLoaded(mqttTag())) _uiAdd("Pangolin Vn",H4P_UI_LABEL,[]()->string{ return _cb["pmv"]; });
 }
@@ -53,7 +53,7 @@ uint32_t H4P_AsyncWebServer::_uib(vector<string> vs){
         if(isNumeric(b)) {
             uint32_t bv=atoi(CSTR(b));
             if(bv < 2) {
-                for(auto &u:userItems){
+                for(auto &u:_userItems){
                     if(u.id==a){
                         _sendSSE(CSTR(a),CSTR(b));
                         u.a(a,b);
@@ -76,7 +76,7 @@ void H4P_AsyncWebServer::_rest(AsyncWebServerRequest *request){
         string j="{\"res\":"+stringFromInt(res)+",\"msg\":\""+msg+"\",\"lines\":[";
         string fl;
         if(!res){
-            for(auto &l:lines){
+            for(auto &l:_lines){
                 if(l.back()=='\n') l.pop_back();
                 fl+="\""+l+"\",";
             }
@@ -84,7 +84,7 @@ void H4P_AsyncWebServer::_rest(AsyncWebServerRequest *request){
         }
         j+=fl+"]}";
         request->send(200,"application/json",CSTR(j));
-        lines.clear();
+        _lines.clear();
 	},request),nullptr,H4P_TRID_ASWS);
 }
 
@@ -100,21 +100,16 @@ void H4P_AsyncWebServer::_start(){
     _evts=new AsyncEventSource("/evt");
     _evts->onConnect([this](AsyncEventSourceClient *client){
         h4.queueFunction([this,client](){
-            H4EVENT("SSE Client %08x n=%d T/O=%d nC=%d nUI=%d",client,client->lastId(),H4P_ASWS_EVT_TIMEOUT,_evts->count(),userItems.size());
+            H4EVENT("SSE Client %08x n=%d T/O=%d nC=%d nUI=%d",client,client->lastId(),H4P_ASWS_EVT_TIMEOUT,_evts->count(),_userItems.size());
             if(_evts->count()==1) if(_onC) _onC(); // first time only R WE SURE?
-//            reverse(userItems.begin(),userItems.end());
-            for(auto const& i:userItems) {
-                H4EVENT("build UI %s",CSTR(string(i.id+","+stringFromInt(i.type)+","+i.f()+","+(i.a ? "1":"0" )))); 
-                _sendSSE("ui",CSTR(string(i.id+","+stringFromInt(i.type)+","+i.f()+","+(i.a ? "1":"0" ))));
-            }
-            /*
+            int n=0;
+            for(auto const& i:_userItems) _sendSSE("ui",CSTR(string(i.id+","+stringFromInt(i.type)+","+i.f()+","+(i.a ? "1":"0" ))));
             h4.repeatWhile([this]{ return _evts->count(); },
                 ((H4P_ASWS_EVT_TIMEOUT*3)/4),
-                [this]{ _sendSSE("","ka"); },
+                [this]{ /* _sendSSE("","ka"); */ },
                 [this]{ if(_onD) _onD(); }, // ???
                 H4P_TRID_SSET,true
             );
-            */
         });
     });
     addHandler(_evts);

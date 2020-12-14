@@ -52,19 +52,20 @@ using H4_FN_UIBOOL     = function<bool(void)>;
 using H4_FN_UIACTIVE   = function<void(string,string)>;
 
 struct H4P_UI_ITEM {    
-    string         id;
+    string          id;
     H4P_UI_TYPE     type;
     H4_FN_UITXT     f;
     H4_FN_UIACTIVE  a;
 };
 
+using H4P_UI_LIST       = vector<H4P_UI_ITEM>;
 class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
             uint32_t            _evtID=0;
             H4P_BinaryThing*    _btp=nullptr;
             AsyncEventSource*   _evts;
             H4_CMD_MAP          _local={};
-            vector<H4P_UI_ITEM> userItems={};
-            vector<string>      lines={};
+            H4P_UI_LIST         _userItems={};
+            vector<string>      _lines={};
             H4_FN_VOID          _onC,_onD;
 
             VSCMD(_msg);
@@ -102,12 +103,11 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
                     _sendSSE(NULL,buff);
                     free(buff);
                 }
-
 //          syscall only
-                void        _reply(string msg) override { lines.push_back(msg); }
+                void        _reply(string msg) override { _lines.push_back(msg); }
                 void        _setBothNames(const string& host,const string& friendly);
                 void        _sendSSE(const char* name,const char* msg);
-                void        _uiAdd(const string& n,H4P_UI_TYPE t,H4_FN_UITXT f,H4_FN_UIACTIVE a=nullptr){ userItems.push_back(H4P_UI_ITEM {n,t,f,a}); }
+                void        _uiAdd(const string& n,H4P_UI_TYPE t,H4_FN_UITXT f,H4_FN_UIACTIVE a=nullptr){ _userItems.push_back(H4P_UI_ITEM {n,t,f,a}); }
 };
 
 extern __attribute__((weak)) H4P_AsyncWebServer h4asws;

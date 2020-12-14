@@ -26,24 +26,29 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include<H4P_BinarySwitch.h>
-#ifndef H4P_NO_WIFI
-    #include<H4P_AsyncWebServer.h>
-    void H4P_ConditionalSwitch::syncCondition(){ if(isLoaded(aswsTag())) h4asws._sendSSE(ConditionTag(),CSTR(stringFromInt(_predicate(state())))); }
-#else
-    void H4P_ConditionalSwitch::syncCondition(){}
-#endif
+#include<H4P_Heartbeat.h>
 
-void H4P_ConditionalSwitch::_hookIn() {
-    REQUIRE(gpio);
-    H4P_BinarySwitch::_hookIn();
-#ifndef H4P_NO_WIFI
-    if(isLoaded(aswsTag())) h4asws._uiAdd(ConditionTag(),H4P_UI_BOOL,[this]{ return stringFromInt(_predicate(state())); });
-#endif
+uint32_t            H4P_Heartbeat::_uptime=0;
+
+void H4P_Heartbeat::_start() {
+    h4._hookLoop([this](){ _run(); },_subCmd);
+    H4Plugin::_start();
 }
-void H4P_ConditionalSwitch::_setState(bool b) { 
-    if(_predicate(b)) H4P_BinarySwitch::_setState(b);
-#ifndef H4P_NO_WIFI
-    else if(isLoaded(aswsTag())) h4asws.sendUIMessage("Unable: condition disarmed");
-#endif
+void H4P_Heartbeat::_stop() {
+    h4._unHook(_subCmd);
+    H4Plugin::_stop();
+}
+void H4P_Heartbeat::_run(){
+    uint32_t now=millis();
+    uint32_t nowsec=now/1000;
+    if(!(now%1000) && nowsec!=_uptime) {
+        _bf(this);
+        _uptime=nowsec;
+    }
+}
+
+string H4P_Heartbeat::secsToTime(uint32_t sex){ 
+    char buf[15];
+    sprintf(buf,"%3d %02d:%02d:%02d",sex/86400,(sex%86400)/3600,(sex/60)%60,sex%60);
+    return string(buf);
 }

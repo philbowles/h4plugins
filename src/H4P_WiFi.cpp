@@ -55,13 +55,12 @@ void H4P_WiFi::_gotIP(){
         MDNS.addService("h4","tcp",666);
         MDNS.addServiceTxt("h4","tcp","id",CSTR(_cb[chipTag()]));
         MDNS.addServiceTxt("h4","tcp","ip",CSTR(_cb["ip"]));
-    } else Serial.println("Error starting mDNS");
+    } //else Serial.println("Error starting mDNS");
   	ArduinoOTA.setHostname(CSTR(host));
 	ArduinoOTA.setRebootOnSuccess(false);	
 	ArduinoOTA.begin();
 #endif
     _cb.erase("opts"); // lose any old AP ssids
-    Serial.printf("IP=%s\n",CSTR(_cb["ip"])); // unconditional
     H4EVENT("IP=%s",CSTR(_cb["ip"]));
     _upHooks();
 }
