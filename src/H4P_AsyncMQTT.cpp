@@ -30,6 +30,8 @@ SOFTWARE.
 #ifndef H4P_NO_WIFI
 #include<H4P_AsyncWebServer.h>
 
+void __attribute__((weak)) onMQTTError(uint8_t e,int info){ SYSEVENT(H4P_LOG_MQTT_ERROR,mqttTag(),h4Tag(),"e=%d info=%d",e,info); }
+
 uint32_t H4P_AsyncMQTT::_change(vector<string> vs){
     return guardString2(vs,[this](string a,string b){ 
         if(isNumeric(b)) change(a,atoi(CSTR(b)));
@@ -39,14 +41,17 @@ uint32_t H4P_AsyncMQTT::_change(vector<string> vs){
 
 void H4P_AsyncMQTT::_greenLight(){
     _setup();
+
+    onError(onMQTTError);
+
     onMessage([this](const char* topic, const uint8_t* payload, size_t length, uint8_t qos, bool retain,bool dup){
         h4.queueFunction(
             bind([](string topic, string pload){ 
                 h4cmd._executeCmd(CSTR(string(mqttTag()).append("/").append(topic)),pload); 
             },string(topic),stringFromBuff((uint8_t*) payload,length)),
         nullptr,H4P_TRID_MQMS);
-    });	
-    
+    });
+
     onConnect([this](bool b){
         h4.queueFunction([this](){
             h4.cancelSingleton(H4P_TRID_MQRC);
@@ -55,25 +60,13 @@ void H4P_AsyncMQTT::_greenLight(){
             subscribe(CSTR(string(device+cmdhash())),0);
             subscribe(CSTR(string(_cb[chipTag()]+cmdhash())),0);
             subscribe(CSTR(string(_cb[boardTag()]+cmdhash())),0);
-            xPublish("h4/online",device);
+            xPublish(CSTR(string(h4Tag()).append("/online")),device);
             _upHooks();
             _signal();
             H4EVENT("MQTT CNX");
         });
     });
-/*
-  TCP_DISCONNECTED = 0,
 
-  MQTT_UNACCEPTABLE_PROTOCOL_VERSION = 1,
-  MQTT_IDENTIFIER_REJECTED = 2,
-  MQTT_SERVER_UNAVAILABLE = 3,
-  MQTT_MALFORMED_CREDENTIALS = 4,
-  MQTT_NOT_AUTHORIZED = 5,
-
-  ESP8266_NOT_ENOUGH_SPACE = 6,
-
-  TLS_BAD_FINGERPRINT = 7
-*/
     onDisconnect([this](int8_t reason){
         if(!_discoDone){
             h4.queueFunction([this,reason](){
@@ -91,13 +84,13 @@ void H4P_AsyncMQTT::_hookIn() { DEPEND(wifi); }
 
 void H4P_AsyncMQTT::_setup(){ // allow for TLS
     device=_cb[deviceTag()];
-    prefix+=device+"/";
     setClientId(CSTR(device));
     if(_lwt.topic=="") {
-        _lwt.topic="h4/offline";
+        _lwt.topic=CSTR(string(prefix).append("offline"));
         _lwt.payload=CSTR(device);
     }
     setWill(_lwt.topic,_lwt.QOS,_lwt.retain,_lwt.payload);
+    prefix+=device+"/";
 
     string broker=_cb[brokerTag()];
     uint16_t port=atoi(CSTR(_cb[portTag()]));
@@ -114,12 +107,12 @@ void H4P_AsyncMQTT::_setup(){ // allow for TLS
                 if(b=="1") _start();
                 else _stop();
                 H4EVENT("MQTT %s by user",b=="1" ? "Started":"Stopped");
-                if(isLoaded(aswsTag())) h4asws.sendUIMessage("MQTT %s by user",b=="1" ? "Started":"Stopped");
+                if(isLoaded(aswsTag())) h4asws.uiMessage("MQTT %s by user",b=="1" ? "Started":"Stopped");
             });
     }
 }
 
-void H4P_AsyncMQTT::_signal(){ if(isLoaded(aswsTag())){ h4asws.setUIBoolean(uppercase(mqttTag()),[this]{ return _state(); }); } }
+void H4P_AsyncMQTT::_signal(){ if(isLoaded(aswsTag())){ h4asws.uiSync(uppercase(mqttTag())); }}
 
 void H4P_AsyncMQTT::_start(){ 
     autorestart=true;
@@ -139,9 +132,7 @@ void H4P_AsyncMQTT::change(const string& broker,uint16_t port){ // add creds
     start();
 }
 
-void H4P_AsyncMQTT::publishDevice(const string& topic,const string& payload){ 
-    xPublish(CSTR(string(prefix+topic)),payload);
-}
+void H4P_AsyncMQTT::publishDevice(const string& topic,const string& payload){ xPublish(CSTR(string(prefix+topic)),payload); }
 
 void H4P_AsyncMQTT::subscribeDevice(string topic,H4_FN_MSG f,H4PC_CMD_ID root){
     string fullTopic=device+"/"+topic;

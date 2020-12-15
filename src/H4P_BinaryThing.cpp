@@ -51,7 +51,7 @@ void H4P_BinaryThing::_setSlaves(bool b){
 void H4P_BinaryThing::_setState(bool b) {
     _state=b;
     _setSlaves(b);
-    if(isLoaded(aswsTag())){ h4asws.setUIBoolean(onofTag(),[this]{ return state(); }); }
+    if(isLoaded(aswsTag())) h4asws.uiSync(onofTag());
 }
 
 uint32_t H4P_BinaryThing::_slave(vector<string> vs){
@@ -77,7 +77,7 @@ void H4P_ConditionalThing::_hookIn() {
 void H4P_ConditionalThing:: _setState(bool b) { 
     if(_predicate(b)) H4P_BinaryThing::_setState(b);
 #ifndef H4P_NO_WIFI
-    else if(isLoaded(aswsTag())) h4asws.sendUIMessage("Unable: condition disarmed");
+    else if(isLoaded(aswsTag())) h4asws.uiMessage("Unable: condition disarmed");
 #endif
 }
 

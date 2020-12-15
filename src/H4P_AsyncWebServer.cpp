@@ -31,6 +31,7 @@ SOFTWARE.
 #include<H4P_AsyncWebServer.h>
 #include<H4P_CmdErrors.h>
 #include<H4P_SerialCmd.h>
+#include<H4P_GPIOManager.h>
 
 void  H4P_AsyncWebServer::_hookIn(){ 
     DEPEND(wifi);
@@ -44,7 +45,7 @@ void  H4P_AsyncWebServer::_hookIn(){
 
 uint32_t H4P_AsyncWebServer::_msg(vector<string> vs){
     return guard1(vs,[this](vector<string> vs){
-        sendUIMessage(H4PAYLOAD);
+        uiMessage(H4PAYLOAD);
         return H4_CMD_OK;
     });
 }
@@ -148,6 +149,28 @@ void H4P_AsyncWebServer::_stop(){
 String H4P_AsyncWebServer::aswsReplace(const String& var){
     string v=CSTR(var);
     return _cb.count(v) ? String(CSTR(_cb[v])):"?";
+}
+
+void H4P_AsyncWebServer::uiAddGPIO(uint8_t pin){
+    if(isLoaded(gpioTag())){
+        H4GPIOPin*  p;
+        if(p=h4gm.isManaged(pin)) {
+            char buf[32];
+            snprintf(buf,31,"P%02d (Typ%d)",pin,p->style);
+            string name(buf);
+            H4GM_FN_EVENT f=p->onEvent;
+            p->onEvent=[this,name,f](H4GPIOPin* hp){
+                _sendSSE(CSTR(name),hp->logicalRead() ? "1":"0");
+                if(f) f(hp);
+            };
+            _uiAdd(name,H4P_UI_BOOL,[p]{ return stringFromInt(p->logicalRead()); },nullptr);
+        } //else Serial.printf("FATAL! uiAddGPIO pin %d not managed!\n",pin);
+    } //else Serial.printf("FATAL! uiAddGPIO needs h4gm!!!\n");
+}
+
+void H4P_AsyncWebServer::uiSync(const string& name){
+    H4P_UI_LIST::iterator it;
+    if((it=find_if(_userItems.begin(),_userItems.end(),[name](const H4P_UI_ITEM& i){ return i.id==name; }))!=_userItems.end()) _sendSSE(CSTR(name),CSTR(it->f()));
 }
 
 #endif // H4_WIFI

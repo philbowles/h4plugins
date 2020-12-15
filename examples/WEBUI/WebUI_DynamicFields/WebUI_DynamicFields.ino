@@ -5,7 +5,7 @@ H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 boolean boolData(){ return random(0,50) > 25; }
 
 void userBoolAction(const string& name,const string& b){ 
-  h4asws.sendUIMessage("%s was clicked! %s\n",CSTR(name),CSTR(b));
+  h4asws.uiMessage("%s was clicked! %s\n",CSTR(name),CSTR(b));
 }
 
 H4_TIMER  millisTimer;
@@ -13,17 +13,17 @@ H4_TIMER  millisTimer;
 // whenever a user browses the UI
 void onViewers(){
     // create your own UI fields and "setter" functions
-    h4asws.addUILabelText("User Text",[]{ return "some value"; });  
-    h4asws.addUIBoolean("User Bool",boolData); // no action function = not clickable  
-    h4asws.addUIBoolean("User Bool 1",boolData,userBoolAction);  
-    h4asws.addUIBoolean("User Bool 2",boolData,userBoolAction);  
-    h4asws.addUILabelNumeric("Millis",millis);
+    h4asws.uiAddLabelText("User Text",[]{ return "some value"; });  
+    h4asws.uiAddBoolean("User Bool",boolData); // no action function = not clickable  
+    h4asws.uiAddBoolean("User Bool 1",boolData,userBoolAction);  
+    h4asws.uiAddBoolean("User Bool 2",boolData,userBoolAction);  
+    h4asws.uiAddLabelNumeric("Millis",millis);
     // setup conditions for updating fields (if required)
-    h4.everyRandom(15000,20000,[]{ h4asws.setUIBoolean("User Bool",boolData); });
-    h4.everyRandom(15000,20000,[]{ h4asws.setUIBoolean("User Bool 1",boolData); });
-    h4.everyRandom(15000,20000,[]{ h4asws.setUIBoolean("User Bool 2",boolData); });
-    h4.everyRandom(25000,30000,[]{ h4asws.sendUIMessage("IMPORTANT ANNOUNCEMENT"); });
-    millisTimer=h4.every(1000,[]{ h4asws.setUILabelNumeric("Millis",millis); }); 
+    h4.everyRandom(15000,20000,[]{ h4asws.uiSetBoolean("User Bool",boolData); });
+    h4.everyRandom(15000,20000,[]{ h4asws.uiSetBoolean("User Bool 1",boolData); });
+    h4.everyRandom(15000,20000,[]{ h4asws.uiSetBoolean("User Bool 2",boolData); });
+    h4.everyRandom(25000,30000,[]{ h4asws.uiMessage("IMPORTANT ANNOUNCEMENT"); });
+    millisTimer=h4.every(1000,[]{ h4asws.uiSetLabelNumeric("Millis",millis); }); 
 }
 
 // when ui is no longer required as all browsers closed

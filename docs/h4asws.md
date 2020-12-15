@@ -93,15 +93,15 @@ H4P_AsyncWebServer(H4_FN_VOID onFirstClient=nullptr,H4_FN_VOID onLastClients=nul
 //
 // name =name of your own UI field
 // f... = name of "setter" function which returns data of the appropriate type to popultae the field when web page requested
-void addUILabelNumeric(const string& name,H4_FN_UINUM fUserIntSetter);
-void addUILabelText(const string& name,H4_FN_UITXT fUserStringSetter);
-void addUIBoolean(const string& name,H4_FN_UIBOOL fUserBoolSetter);
+void uiAddLabelNumeric(const string& name,H4_FN_UINUM fUserIntSetter);
+void uiAddLabelText(const string& name,H4_FN_UITXT fUserStringSetter);
+void uiAddBoolean(const string& name,H4_FN_UIBOOL fUserBoolSetter);
 // change value of exisitng user webUI field
-void setUILabelNumeric(const string& name,H4_FN_UINUM fUserIntSetter);
-void setUILabelText(const string& name,H4_FN_UITXT fUserStringSetter);
-void setUIBoolean(const string& name,H4_FN_UIBOOL fUserBoolSetter);
+void uiSetLabelNumeric(const string& name,H4_FN_UINUM fUserIntSetter);
+void uiSetLabelText(const string& name,H4_FN_UITXT fUserStringSetter);
+void uiSetBoolean(const string& name,H4_FN_UIBOOL fUserBoolSetter);
 //
-void sendUIMessage(const string& msg); // msg scrolls in red at bottom of screen 
+void uiMessage(const string& msg); // msg scrolls in red at bottom of screen 
 
 ```
 

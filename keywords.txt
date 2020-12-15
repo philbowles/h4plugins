@@ -57,9 +57,9 @@ H4P_Heartbeat	KEYWORD1
 # Methods and Functions (	KEYWORD2)
 #######################################
 addCmd	KEYWORD2
-addUILabelText	KEYWORD2
-addUILabelNumeric	KEYWORD2
-addUIBoolean	KEYWORD2
+uiAddLabelText	KEYWORD2
+uiAddLabelNumeric	KEYWORD2
+uiAddBoolean	KEYWORD2
 at	KEYWORD2
 atSource	KEYWORD2
 all	KEYWORD2
@@ -158,7 +158,7 @@ Retriggering	KEYWORD2
 RetriggeringSource	KEYWORD2
 Sequenced	KEYWORD2
 setCenter	KEYWORD2
-sendUIMessage	KEYWORD2
+uiMessage	KEYWORD2
 setint	KEYWORD2
 setMax	KEYWORD2
 setMin	KEYWORD2
@@ -166,9 +166,9 @@ setSchedule	KEYWORD2
 setScheduleSource	KEYWORD2
 setPercent	KEYWORD2
 setstring	KEYWORD2
-setUILabelNumeric	KEYWORD2
-setUILabelText	KEYWORD2
-setUIBoolean	KEYWORD2
+uiSetLabelNumeric	KEYWORD2
+uiSetLabelText	KEYWORD2
+uiSetBoolean	KEYWORD2
 setValue	KEYWORD2
 setVolume	KEYWORD2
 showSPIFFS	KEYWORD2

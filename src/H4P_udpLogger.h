@@ -35,9 +35,6 @@ SOFTWARE.
 
 #include<H4PCommon.h>
 
-//using H4P_FN_USN        =function<void(uint32_t mx,H4P_CONFIG_BLOCK)>;
-//using H4P_USN_MAP       =unordered_map<string,H4P_FN_USN>;
-
 class H4P_udpLogger: public H4Plugin {
         AsyncUDP 	    _udp;
         IPAddress		_ubIP;

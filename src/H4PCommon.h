@@ -93,6 +93,7 @@ enum H4P_LOG_TYPE {
     H4P_LOG_MQTT_Q=128,
     H4P_LOG_PD_ENTER=256,
     H4P_LOG_PD_LEAVE=512,
+    H4P_LOG_MQTT_ERROR=1024,
     H4P_LOG_ALL=0xffffffff,
     H4P_LOG_ERROR=H4P_LOG_ALL
 };
@@ -107,6 +108,7 @@ enum H4P_LOG_TYPE {
 constexpr const char* cmdhash(){ return "/h4/#"; }
 
 STAG(asws);
+STAG(beat);
 STAG(board)
 STAG(broker);
 STAG(cerr);

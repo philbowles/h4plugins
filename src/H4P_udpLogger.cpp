@@ -29,9 +29,7 @@ SOFTWARE.
 #include<H4P_udpLogger.h>
 #ifndef H4P_NO_WIFI
 
-void H4P_udpLogger::_hookIn(){
-    DEPEND(wifi);
-}
+void H4P_udpLogger::_hookIn(){ DEPEND(wifi); }
 
 void H4P_udpLogger::_listenUDP(){
     if(_udp.listenMulticast(_ubIP, 1900)) {

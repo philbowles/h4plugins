@@ -34,15 +34,17 @@ void H4P_Heartbeat::_start() {
     h4._hookLoop([this](){ _run(); },_subCmd);
     H4Plugin::_start();
 }
+
 void H4P_Heartbeat::_stop() {
     h4._unHook(_subCmd);
     H4Plugin::_stop();
 }
+
 void H4P_Heartbeat::_run(){
     uint32_t now=millis();
     uint32_t nowsec=now/1000;
     if(!(now%1000) && nowsec!=_uptime) {
-        _bf(this);
+        _bf();
         _uptime=nowsec;
     }
 }

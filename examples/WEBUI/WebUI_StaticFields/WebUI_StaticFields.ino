@@ -7,9 +7,9 @@ boolean boolData(){ return random(0,50) > 25; } // randmly return true / false
 // whenever a user browses the UI
 void onViewers(){
     // create your own UI fields and "setter" functions
-    h4asws.addUILabelText("User Text",[]{ return "some value"; });  
-    h4asws.addUIBoolean("User Bool",boolData); // no action function = not clickable  
-    h4asws.addUILabelNumeric("Millis",millis);
+    h4asws.uiAddLabelText("User Text",[]{ return "some value"; });  
+    h4asws.uiAddBoolean("User Bool",boolData); // no action function = not clickable  
+    h4asws.uiAddLabelNumeric("Millis",millis);
 }
 
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","webui");

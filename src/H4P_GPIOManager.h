@@ -414,7 +414,6 @@ class EncoderAutoPin: public EncoderPin{
 //
 class H4P_GPIOManager: public H4Plugin{//
 
-        H4GPIOPin*      isManaged(uint8_t p){ return pins.count(p) ? pins[p]:nullptr; }
 //        OutputPin*      isOutput(uint8_t p);
 
         template<typename T, typename... Args>
@@ -431,13 +430,14 @@ class H4P_GPIOManager: public H4Plugin{//
         }
         void                _run();
     public:
-        static H4GM_PINMAP     pins;
+                H4GPIOPin*      isManaged(uint8_t p){ return pins.count(p) ? pins[p]:nullptr; }
+        static  H4GM_PINMAP     pins;
         H4P_GPIOManager();
         //              returns 32 not 8 as it can also analogRead and state will hold analog value as well as digital 1/0
-            uint32_t        logicalRead(uint8_t p);
-            void            logicalWrite(uint8_t p,uint8_t l);
-            void            throttle(uint8_t p,uint32_t v,H4GM_FN_BOOL f=[](bool){});
-            void            toggle(uint8_t p);
+                uint32_t        logicalRead(uint8_t p);
+                void            logicalWrite(uint8_t p,uint8_t l);
+                void            throttle(uint8_t p,uint32_t v,H4GM_FN_BOOL f=[](bool){});
+                void            toggle(uint8_t p);
 //
 //      Strategies
 //

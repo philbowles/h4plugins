@@ -44,6 +44,6 @@ void H4P_ConditionalSwitch::_hookIn() {
 void H4P_ConditionalSwitch::_setState(bool b) { 
     if(_predicate(b)) H4P_BinarySwitch::_setState(b);
 #ifndef H4P_NO_WIFI
-    else if(isLoaded(aswsTag())) h4asws.sendUIMessage("Unable: condition disarmed");
+    else if(isLoaded(aswsTag())) h4asws.uiMessage("Unable: condition disarmed");
 #endif
 }

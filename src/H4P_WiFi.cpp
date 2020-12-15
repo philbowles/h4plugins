@@ -41,6 +41,8 @@ bool H4P_WiFi::_getPersistentValue(string v,string prefix){
     return persistent.size();
 }
 
+STAG(tcp)
+
 void H4P_WiFi::_gotIP(){
     _discoDone=false;
     _cb["ip"]=WiFi.localIP().toString().c_str();
@@ -52,9 +54,9 @@ void H4P_WiFi::_gotIP(){
     h4.every(H4WF_OTA_RATE,[](){ ArduinoOTA.handle(); },nullptr,H4P_TRID_HOTA,true);
     _setHost(host);
     if(MDNS.begin(CSTR(host))) {
-        MDNS.addService("h4","tcp",666);
-        MDNS.addServiceTxt("h4","tcp","id",CSTR(_cb[chipTag()]));
-        MDNS.addServiceTxt("h4","tcp","ip",CSTR(_cb["ip"]));
+        MDNS.addService(h4Tag(),tcpTag(),666);
+        MDNS.addServiceTxt(h4Tag(),tcpTag(),"id",CSTR(_cb[chipTag()]));
+        MDNS.addServiceTxt(h4Tag(),tcpTag(),"ip",CSTR(_cb["ip"]));
     } //else Serial.println("Error starting mDNS");
   	ArduinoOTA.setHostname(CSTR(host));
 	ArduinoOTA.setRebootOnSuccess(false);	

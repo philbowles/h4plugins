@@ -32,20 +32,18 @@ SOFTWARE.
 
 #include<H4PCommon.h>
 
-STAG(beat);
-
 class H4P_Heartbeat: public H4Plugin {
         static  uint32_t    _uptime;
  
-                function<void(H4P_Heartbeat*)> _bf;
+                H4_FN_VOID  _bf;
 
                 void        _greenLight() override { _start(); }; // autostart
                 void        _start() override;
                 void        _stop() override ;
                 void        _run();
     public: 
-        H4P_Heartbeat(function<void(H4P_Heartbeat*)> beat): _bf(beat),H4Plugin("beat"){}
-        // refakta c/w timekeeper!!!
+        H4P_Heartbeat(H4_FN_VOID beat): _bf(beat),H4Plugin(beatTag()){}
+
         static string secsToTime(uint32_t sex);
 
         void show() override { reply("upSecs=%u %s\n",upSecs(),CSTR(upTime())); }

@@ -88,21 +88,31 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
                 {"uib",     { _subCmd, 0, CMDVS(_uib)}}
             };
         }
-                void        addUILabelText(const string& name,H4_FN_UITXT f){ _uiAdd(name,H4P_UI_LABEL,f); }
-                void        addUILabelNumeric(const string& name,H4_FN_UINUM f){ _uiAdd(name,H4P_UI_LABEL,[f]{ return stringFromInt(f()); }); }
-                void        addUIBoolean(const string& name,H4_FN_UIBOOL f,H4_FN_UIACTIVE a=nullptr){ _uiAdd(name,H4P_UI_BOOL,[f]{ return stringFromInt(f()); },a); }
         static  String      aswsReplace(const String& var);
-                void        setUILabelNumeric(const string& name,H4_FN_UINUM f){ _sendSSE(CSTR(name),CSTR(stringFromInt(f()))); }
-                void        setUILabelText(const string& name,H4_FN_UITXT f){ _sendSSE(CSTR(name),CSTR(f())); }
-                void        setUIBoolean(const string& name,H4_FN_UIBOOL f){ setUILabelNumeric(name,f); }
+/*
+                template<typename T>
+                void uiAdd(const string& name,function<T(void)> f){
+                    _uiAdd(name,H4P_UI_LABEL,[f]{ return stringFromInt(f()); });
+                }
+*/
+                void        uiAddLabelText(const string& name,H4_FN_UITXT f){ _uiAdd(name,H4P_UI_LABEL,f); }
+                void        uiAddLabelNumeric(const string& name,H4_FN_UINUM f){ _uiAdd(name,H4P_UI_LABEL,[f]{ return stringFromInt(f()); }); }
+                void        uiAddBoolean(const string& name,H4_FN_UIBOOL f,H4_FN_UIACTIVE a=nullptr){ _uiAdd(name,H4P_UI_BOOL,[f]{ return stringFromInt(f()); },a); }
+                void        uiAddGPIO(uint8_t pin);
 
                 template<typename... Args>
-                void        sendUIMessage(const string& msg, Args... args){ // variadic T<>
+                void        uiMessage(const string& msg, Args... args){ // variadic T<>
                     char* buff=static_cast<char*>(malloc(H4P_REPLY_BUFFER+1));
                     snprintf(buff,H4P_REPLY_BUFFER,CSTR(msg),args...);
                     _sendSSE(NULL,buff);
                     free(buff);
                 }
+                void        uiSetLabelNumeric(const string& name,const int f){ _sendSSE(CSTR(name),CSTR(stringFromInt(f))); }
+                void        uiSetLabelText(const string& name,const string& value){ _sendSSE(CSTR(name),CSTR(value)); }
+                void        uiSetBoolean(const string& name,const bool b){ uiSetLabelNumeric(name,b); }
+
+                void        uiSync(const string& name);
+
 //          syscall only
                 void        _reply(string msg) override { _lines.push_back(msg); }
                 void        _setBothNames(const string& host,const string& friendly);
