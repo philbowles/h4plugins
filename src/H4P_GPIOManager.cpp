@@ -68,21 +68,7 @@ void H4GPIOPin::_pinFactoryCommon(bool onof){ // optimise for no logging
 }
 
 #ifdef H4P_LOG_EVENTS
-string H4GPIOPin::dump(){ // tart this up - complete rework
-    /*
-    Serial.print("PIN ");Serial.println(pin);
-    Serial.print(" gpioType=");Serial.println(gpioType);
-    Serial.print(" style=");Serial.println(style);
-    Serial.print(" sense=");Serial.println(sense);
-    Serial.print(" Tevt=");Serial.println(Tevt);
-    Serial.print(" state=");Serial.println(state);
-    Serial.print(" delta=");Serial.println(delta);
-    Serial.print(" rate=");Serial.println(rate);
-    Serial.print(" Rpeak=");Serial.println(Rpeak);
-    Serial.print(" cps=");Serial.println(cps);
-    Serial.print(" cMax=");Serial.println(cMax);
-    Serial.print(" nEvents=");Serial.println(nEvents);
-    */
+string H4GPIOPin::dump(){
     char buf[128];
     sprintf(buf,"%2d %2d %2d %2d %6d %6d %6d %6d %6d %6d %6d %6d",pin,gpioType,style,sense,Tevt,state,delta,rate,Rpeak,cps,cMax,(int) nEvents);
     return(buf);
@@ -113,8 +99,6 @@ void H4GPIOPin::run(){
 //
 //      H4P_GPIOManager
 //
-//#define SCALE 1 // cmd to change it
-
 void H4P_GPIOManager::_start(){
     h4._hookLoop([this](){ _run(); },_subCmd);
     h4.every(1000,[this](){

@@ -76,7 +76,7 @@ class H4P_SerialCmd: public H4Plugin {
 #ifndef ARDUINO_ARCH_STM32
         static  string          read(const string& fn);
         static  uint32_t        write(const string& fn,const string& data,const char* mode="w");
-        void                    showSPIFFS();
+        void                    showFS();
         void                    heap(){ reply("Heap=%u",ESP.getFreeHeap()); }        
 #endif
                 void            all();

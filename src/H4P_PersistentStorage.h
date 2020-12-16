@@ -43,9 +43,7 @@ class H4P_PersistentStorage: public H4Plugin {
         void         _hookIn() override;
         void         _showItem(const string& n){ reply("%s=%s",CSTR(n),CSTR(psRam[n])); }
     public:
-        string& operator[](const string& name){
-            return psRam[name];
-        }
+        string& operator[](const string& name){ return psRam[name]; }
         H4P_PersistentStorage(H4P_FN_PSCHANGE f=nullptr);
 
         void          clear();

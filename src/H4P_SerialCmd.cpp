@@ -50,7 +50,7 @@ H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Plugin(scmdTag()){
         {"plugins",    { H4PC_SHOW, 0, CMD(plugins) }},
 #ifndef ARDUINO_ARCH_STM32
         {"heap",       { H4PC_SHOW, 0, CMD(heap) }},
-        {"fs",         { H4PC_SHOW, 0, CMD(showSPIFFS)}},
+        {"fs",         { H4PC_SHOW, 0, CMD(showFS)}},
         {"dump",       { H4PC_H4, 0, CMDVS(_dump)}},
 #endif
     }; 
@@ -282,14 +282,14 @@ uint32_t H4P_SerialCmd::_dump(vector<string> vs){
     return guard1(vs,[this](vector<string> vs){
         return ([this](string h){ 
             reply("DUMP FILE %s",CSTR(h));
-            reply(CSTR(read("/"+h)));
+            reply("%s",CSTR(read("/"+h)));
             return H4_CMD_OK;
         })(H4PAYLOAD);
     });
 }
 
 #ifdef ARDUINO_ARCH_ESP8266
-void H4P_SerialCmd::showSPIFFS(){
+void H4P_SerialCmd::showFS(){
     uint32_t sigma=0;
     uint32_t n=0;
 
@@ -308,7 +308,7 @@ void H4P_SerialCmd::showSPIFFS(){
     reply("%d file(s) %u bytes",n,sigma);
 }
 #else
-void H4P_SerialCmd::showSPIFFS(){
+void H4P_SerialCmd::showFS(){
     uint32_t sigma=0;
     uint32_t n=0;
 

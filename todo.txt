@@ -3,7 +3,6 @@ TODO:
     ret type on guard 1
 SOONER
     Rationalise/Align publishDevice MQTT
-    BUG initial disabled ConditionalSwitch
     ui input box -> ap mode
 #
     error gone away in nodejs
