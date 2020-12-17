@@ -101,7 +101,6 @@ string H4P_UPNPServer::__upnpCommon(const string& usn){
 void H4P_UPNPServer::_start(){
     if(!(WiFi.getMode() & WIFI_AP)){
         _cb["age"]=stringFromInt(H4P_UDP_REFRESH/1000); // fix
-
         _cb["udn"]="Socket-1_0-upnp"+_cb[chipTag()];
         _cb["updt"]=_pups[2];
         _cb["umfr"]="Belkin International Inc.";
@@ -128,8 +127,8 @@ void H4P_UPNPServer::_start(){
             }
         );
         _listenUDP();
-        _notify("alive"); // TAG
-        h4.every(H4P_UDP_REFRESH / 3,[this](){ _notify("alive"); },nullptr,H4P_TRID_NTFY,true); // TAG
+        _notify(aliveTag()); // TAG
+        h4.every(H4P_UDP_REFRESH / 3,[this](){ _notify(aliveTag()); },nullptr,H4P_TRID_NTFY,true); // TAG
         _upHooks();
     }
 }
@@ -160,7 +159,7 @@ void H4P_UPNPServer::_notify(const string& phase){ // h4Chunker it up
     h4Chunker<vector<string>>(_pups,[this,phase](vector<string>::const_iterator i){ 
         string NT=(*i).size() ? (*i):__makeUSN("");
         string nfy="NOTIFY * HTTP/1.1\r\nHOST:"+string(_ubIP.toString().c_str())+":1900\r\nNTS:ssdp:"+phase+"\r\nNT:"+NT+"\r\n"+__upnpCommon((*i));
-          broadcast(H4P_UDP_JITTER,CSTR(nfy));
+        broadcast(H4P_UDP_JITTER,CSTR(nfy));
     });
 }
 

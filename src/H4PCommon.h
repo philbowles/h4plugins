@@ -105,6 +105,7 @@ enum H4P_LOG_TYPE {
 
 constexpr const char* cmdhash(){ return "/h4/#"; }
 
+STAG(alive);
 STAG(asws);
 STAG(beat);
 STAG(board)
