@@ -26,8 +26,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
-#ifndef ARDUINO_ARCH_STM32
 #include<H4P_LocalLogger.h>
 
 #ifdef H4P_LOG_EVENTS
@@ -58,6 +56,4 @@ void H4P_LocalLogger::_logEvent(const string &msg,H4P_LOG_TYPE type,const string
     uint32_t size=h4cmd.write("/"+_fname,join(msgparts,",")+"\n","a");
     if(size > _limit) flush();
 }
-#endif
-
 #endif

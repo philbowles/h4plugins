@@ -29,7 +29,6 @@ SOFTWARE.
 */
 #include<H4P_Sunrise.h>
 #include<H4P_WiFiSelect.h>
-#ifndef H4P_NO_WIFI
 
 #include<H4P_SerialCmd.h>
 #include <WiFiClientSecure.h>
@@ -124,4 +123,3 @@ void H4P_Sunrise::_start(){
         }
     } //else H4EVENT("ALREADY GOT SS %s",CSTR(_cb["sunrise"]));
 }
-#endif // wifi only

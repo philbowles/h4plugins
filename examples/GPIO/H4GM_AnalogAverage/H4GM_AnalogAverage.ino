@@ -6,14 +6,10 @@ and STM32NUCLEO-F429ZI whuch has a user button that is ACTIVE_HIGH
 
 You will probably need to adjust these values for you own device
 */
-#ifdef ARDUINO_ARCH_STM32
-  #define UB_ACTIVE ACTIVE_HIGH
-  #define UL_ACTIVE ACTIVE_HIGH
-#else
-  #define USER_BTN 0
-  #define UB_ACTIVE ACTIVE_LOW
-  #define UL_ACTIVE ACTIVE_LOW
-#endif
+
+#define USER_BTN 0
+#define UB_ACTIVE ACTIVE_LOW
+#define UL_ACTIVE ACTIVE_LOW
 /*
     ALL GPIO strategies are derived from H4GPIOPin: the following members are available
     inside ALL GPIO pin callbacks, once you have a valid pointer for the pin type using 

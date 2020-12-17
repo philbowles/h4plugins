@@ -30,7 +30,6 @@ SOFTWARE.
 #ifndef H4P_MQTTLogger_HO
 #define H4P_MQTTLogger_HO
 
-#ifndef ARDUINO_ARCH_STM32
 #include <H4PCommon.h>
 #include <H4P_AsyncMQTT.h>
 
@@ -45,5 +44,4 @@ class H4P_MQTTLogger: public H4PLogService {
     public:
         H4P_MQTTLogger(const string& topic,uint32_t filter=H4P_LOG_ALL): H4PLogService(topic,filter){}
 };
-#endif
 #endif // H4P_MQTTLogger_H

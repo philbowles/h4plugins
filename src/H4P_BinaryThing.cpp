@@ -27,7 +27,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_BinaryThing.h>
-#ifndef H4P_NO_WIFI
 #include<H4P_AsyncWebServer.h>
 #include<H4P_AsyncMQTT.h>
 
@@ -76,27 +75,10 @@ void H4P_ConditionalThing::_hookIn() {
 
 void H4P_ConditionalThing:: _setState(bool b) { 
     if(_predicate(b)) H4P_BinaryThing::_setState(b);
-#ifndef H4P_NO_WIFI
     else if(isLoaded(aswsTag())) h4asws.uiMessage("Unable: condition disarmed");
-#endif
 }
 
 void H4P_ConditionalThing::syncCondition() { if(isLoaded(aswsTag())) h4asws._sendSSE(ConditionTag(),CSTR(stringFromInt(_predicate(state())))); }
-
-#else
-void H4P_BinaryThing::_hookIn() {}
-void H4P_BinaryThing::_publish(bool b){}
-void H4P_BinaryThing::_setSlaves(bool b){}
-void H4P_BinaryThing::_setState(bool b) {
-    _state=b;
-    _setSlaves(b);
-}
-uint32_t H4P_BinaryThing::_slave(vector<string> vs){}
-
-void H4P_ConditionalThing::_hookIn(){}
-void H4P_ConditionalThing::syncCondition() {}
-
-#endif
 
 void H4P_BinaryThing::_start() { 
     H4Plugin::_start();

@@ -27,7 +27,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_WiFiSelect.h>
-#ifndef H4P_NO_WIFI
 #include<H4P_AsyncWebServer.h>
 #include<H4P_CmdErrors.h>
 #include<H4P_SerialCmd.h>
@@ -151,6 +150,15 @@ String H4P_AsyncWebServer::aswsReplace(const String& var){
     return _cb.count(v) ? String(CSTR(_cb[v])):"?";
 }
 
+void H4P_AsyncWebServer::uiAddGPIO(){
+    if(isLoaded(gpioTag())){
+        for(auto const& p:H4P_GPIOManager::pins) {
+            Serial.printf("MANAGED GPIO PIN %d\n",p.first);
+            uiAddGPIO(p.first);
+        }
+    } else Serial.printf("FATAL! uiAddGPIO needs h4gm!!!\n");
+}
+
 void H4P_AsyncWebServer::uiAddGPIO(uint8_t pin){
     if(isLoaded(gpioTag())){
         H4GPIOPin*  p;
@@ -172,5 +180,3 @@ void H4P_AsyncWebServer::uiSync(const string& name){
     H4P_UI_LIST::iterator it;
     if((it=find_if(_userItems.begin(),_userItems.end(),[name](const H4P_UI_ITEM& i){ return i.id==name; }))!=_userItems.end()) _sendSSE(CSTR(name),CSTR(it->f()));
 }
-
-#endif // H4_WIFI

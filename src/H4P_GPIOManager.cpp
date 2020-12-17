@@ -50,6 +50,7 @@ void H4GPIOPin::_pinFactoryCommon(bool onof){ // optimise for no logging
         H4P_BinaryThing* btp=reinterpret_cast<H4P_BinaryThing*>(H4Plugin::isLoaded(onofTag()));
         if(btp){
             onEvent=[this,btp](H4GPIOPin* pp){ 
+                Serial.printf("BTP onEvent pp -> %d\n",pp->logicalRead());
                 if(pp->style==H4GM_PS_LATCHING) {
                     if(pp->nEvents) btp->toggle(); // POTENTIAL BUG! if btp already commanded on, 1st time wont toggle
     #ifdef H4P_LOG_EVENTS
@@ -178,22 +179,23 @@ void RepeatingPin::sendEvent() {
 
 MultistagePin::MultistagePin(uint8_t _p,uint8_t _g,H4GM_STYLE _s,uint8_t _a,uint32_t _t,H4GM_STAGE_MAP _m,H4GM_FN_EVENT _c=[](H4GPIOPin*){}): DebouncedPin(_p,_g,_s,_a,_t,_c),stageMap(_m){}
 void MultistagePin::sendEvent(){
+    Serial.printf("MultistagePin::sendEvent state=%d\n",state);
     if(state){
         stage=0;
         for(auto const& s:stageMap) {
             if(s.first) stageTimer.push_back(h4.once(s.first,[this](){
                 held=stageMap[++stage].first;
-                H4GPIOPin::sendEvent();
+                DebouncedPin::sendEvent();
                 },nullptr,H4P_TRID_MULT)); 
         }
     }
     else {
         if(delta){
             for(auto const& t:stageTimer) h4.cancel(t);
-            stageTimer.clear();stageTimer.shrink_to_fit();
+            stageTimer.clear();stageTimer.shrink_to_fit(); // really?
             held=delta;
             stageMap[stage].second(this);
-        } else H4GPIOPin::sendEvent();// inital time only 
+        } else DebouncedPin::sendEvent();// inital time only 
     }
 }
 

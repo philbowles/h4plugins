@@ -31,8 +31,6 @@ SOFTWARE.
 #define H4P_UPNPServer_HO
 
 #include<H4P_WiFiSelect.h>
-#ifndef H4P_NO_WIFI
-
 #include<H4PCommon.h>
 #include<H4P_AsyncWebServer.h>
 #include<H4P_BinaryThing.h>
@@ -93,5 +91,5 @@ class H4P_UPNPServer: public H4Plugin {
              void           _listenUSN(const string& usn,H4P_FN_USN f){ _detect[usn]=f; }
 };
     extern __attribute__((weak)) H4P_UPNPServer h4upnp;
-#endif
+
 #endif // H4P_UPNPServer_H

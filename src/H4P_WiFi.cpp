@@ -31,8 +31,6 @@ SOFTWARE.
 #include <H4P_SerialCmd.h>
 #include<H4P_AsyncWebserver.h>
 
-#ifndef H4P_NO_WIFI
-
 uint32_t H4P_WiFi::_change(vector<string> vs){ return guardString2(vs,[this](string a,string b){ change(a,b); return H4_CMD_OK; }); }
 
 bool H4P_WiFi::_getPersistentValue(string v,string prefix){
@@ -314,5 +312,3 @@ void H4P_WiFi::forceAP(){
 } // tagify?
 
 void H4P_WiFi::setBothNames(const string& host,const string& friendly){ h4asws._setBothNames(host,friendly); }
-
-#endif

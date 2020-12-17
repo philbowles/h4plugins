@@ -9,16 +9,9 @@ H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
  * h4/switch/n where n is 0 or 1
  * 
  */
-#ifdef ARDUINO_ARCH_STM32
-  #define UB_ACTIVE ACTIVE_HIGH
-  #define UL_ACTIVE ACTIVE_HIGH
-#else
-  #define USER_BTN 0
-  #define UB_ACTIVE ACTIVE_LOW
-  #define UL_ACTIVE ACTIVE_LOW
-#endif
-
-
+#define USER_BTN 0
+#define UB_ACTIVE ACTIVE_LOW
+#define UL_ACTIVE ACTIVE_LOW
 
 H4P_GPIOManager h4gm;
 H4P_BinarySwitch h4onof(LED_BUILTIN,UL_ACTIVE,OFF,[](bool b){

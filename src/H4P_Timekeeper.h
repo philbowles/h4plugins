@@ -33,7 +33,6 @@ SOFTWARE.
 
 #include<H4PCommon.h>
 #include<H4P_WiFiSelect.h>
-#ifndef H4P_NO_WIFI
 #ifdef ARDUINO_ARCH_ESP8266
     #include "sntp.h"
 #else
@@ -42,7 +41,6 @@ SOFTWARE.
 #endif
 
 #include<H4P_BinaryThing.h>
-
 
 using H4P_DURATION = pair<string,string>;
 using H4P_SCHEDULE = vector<H4P_DURATION>;
@@ -109,5 +107,4 @@ class H4P_Timekeeper: public H4Plugin {
 
 extern __attribute__((weak)) H4P_Timekeeper h4tk;
 
-#endif // no wifi
 #endif // H4P_Timekeeper_H

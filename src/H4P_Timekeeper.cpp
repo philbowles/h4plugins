@@ -28,10 +28,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-//#ifdef ARDUINO_ARCH_ESP8266
 #include<H4P_Timekeeper.h>
-#ifndef H4P_NO_WIFI
-
 #include<H4P_SerialCmd.h>
 #include<H4P_BinaryThing.h>
 
@@ -373,5 +370,3 @@ string H4P_Timekeeper::upTime(){
 	uint32_t t=millis();
 	return stringFromInt(t / msInDay(),"%02d:")+strTime(t);
 }
-
-#endif // wifi only

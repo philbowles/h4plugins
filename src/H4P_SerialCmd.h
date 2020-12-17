@@ -73,12 +73,10 @@ class H4P_SerialCmd: public H4Plugin {
         }
     public:
         H4P_SerialCmd(bool autoStop=false);
-#ifndef ARDUINO_ARCH_STM32
         static  string          read(const string& fn);
         static  uint32_t        write(const string& fn,const string& data,const char* mode="w");
-        void                    showFS();
-        void                    heap(){ reply("Heap=%u",ESP.getFreeHeap()); }        
-#endif
+                void            showFS();
+                void            heap(){ reply("Heap=%u",ESP.getFreeHeap()); }        
                 void            all();
                 void            config(){ for(auto const& c:_cb) reply("%s=%s",CSTR(c.first),CSTR(c.second)); }        
                 void            plugins();

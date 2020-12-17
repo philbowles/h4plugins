@@ -31,12 +31,8 @@ SOFTWARE.
 #define H4P_WiFi_H
 
 #include<H4PCommon.h>
-
 #include<H4P_WiFiSelect.h>
-#ifndef ARDUINO_ARCH_STM32
-
 #include <H4P_SerialCmd.h>
-
 class H4P_WiFi: public H4Plugin{
                 DNSServer* _dnsServer;
                 string     _device;
@@ -90,9 +86,5 @@ class H4P_WiFi: public H4Plugin{
                 void     _setPersistentValue(string n,string v,bool reboot);
 };
     extern __attribute__((weak)) H4P_WiFi h4wifi;
-
-#else
-    #define H4P_NO_WIFI
-#endif // stm32
-
+    
 #endif // H4P_WiFi_H

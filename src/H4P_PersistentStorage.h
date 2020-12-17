@@ -30,7 +30,6 @@ SOFTWARE.
 #ifndef H4P_PersistentStorage_HO
 #define H4P_PersistentStorage_HO
 
-#ifndef ARDUINO_ARCH_STM32
 #include<H4PCommon.h>
 
 class H4P_PersistentStorage: public H4Plugin {
@@ -59,6 +58,4 @@ class H4P_PersistentStorage: public H4Plugin {
 };
 
 extern __attribute__((weak)) H4P_PersistentStorage h4ps;
-
-#endif
 #endif // H4P_PersistentStorage_H

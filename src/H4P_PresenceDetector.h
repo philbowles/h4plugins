@@ -31,8 +31,6 @@ SOFTWARE.
 #define H4P_PresenceDetector_HO
 
 #include<H4P_WiFiSelect.h>
-#ifndef H4P_NO_WIFI
-
 #include<H4PCommon.h>
 #include<H4P_SerialCmd.h>
 
@@ -126,7 +124,4 @@ class H4P_H4DetectorSource: public H4P_H4Detector{
 
 #endif // OTA
 #endif // esp8266
-
-#endif // wifi
-
 #endif // H4P_PresenceDetector_HO

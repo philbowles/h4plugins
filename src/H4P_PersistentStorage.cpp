@@ -26,20 +26,17 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifndef ARDUINO_ARCH_STM32
 #include<H4P_PersistentStorage.h>
 #include<H4P_SerialCmd.h>
 
 #define SEPARATOR "\xff"
 
 void H4P_PersistentStorage::_hookIn() {
-//    DEPEND(scmd);
     vector<string> items=split(H4P_SerialCmd::read("/"+_pName),SEPARATOR);
     for(auto const& i:items){
         vector<string> nv=split(i,"=");
         psRam[nv[0]]=nv[1];
     }
-//    _hookFactory([this](){ clear(); });
     _factoryHook=[this](){ clear(); };
 }
 
@@ -86,4 +83,3 @@ void H4P_PersistentStorage::clear(){
     psRam.clear();
     HAL_FS.remove(CSTR(string("/"+_pName)));
 }
-#endif

@@ -65,11 +65,7 @@ uint32_t myCallback(vector<string> vs){
   }
 }
 
-#ifdef ARDUINO_ARCH_STM32
-  #define U_BOARD_NAME BOARD_NAME
-#else
-  #define U_BOARD_NAME ARDUINO_BOARD
-#endif
+#define U_BOARD_NAME ARDUINO_BOARD
 /*
     Using any MQTT client MQTTSpy, NODE RED etc etc, subscribe to testbed/# 
     to see all the messages from this device:

@@ -34,15 +34,13 @@ SOFTWARE.
 #include<H4Utils.h>
 #include"config.h"
 
-#ifndef ARDUINO_ARCH_STM32 
-    #ifdef ARDUINO_ARCH_ESP8266
-        #include<LittleFS.h>
-        #define HAL_FS LittleFS
-    #else
-        #include<FS.h>
-        #include<SPIFFS.h>
-        #define HAL_FS SPIFFS
-    #endif
+#ifdef ARDUINO_ARCH_ESP8266
+    #include<LittleFS.h>
+    #define HAL_FS LittleFS
+#else
+    #include<FS.h>
+    #include<SPIFFS.h>
+    #define HAL_FS SPIFFS
 #endif
 
 #include<unordered_set>

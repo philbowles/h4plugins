@@ -10,15 +10,10 @@ H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
  * 
  * Also try short / medium / long press on USER_BTN
  */
-#ifdef ARDUINO_ARCH_STM32
-  #define UB_ACTIVE ACTIVE_HIGH
-  #define UL_ACTIVE ACTIVE_HIGH
-#else
   // 16 for nodeMCU - change it for your device
-  #define USER_BTN 16
-  #define UB_ACTIVE ACTIVE_LOW
-  #define UL_ACTIVE ACTIVE_LOW
-#endif
+#define USER_BTN 16
+#define UB_ACTIVE ACTIVE_LOW
+#define UL_ACTIVE ACTIVE_LOW
 
 #define U_DEBOUNCE  15
 

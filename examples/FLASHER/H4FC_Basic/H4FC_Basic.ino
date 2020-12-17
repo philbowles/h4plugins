@@ -8,11 +8,9 @@ You will probably need to wire your own
 and e.g #define LED_RED 99, LED_GREEN 23... etc
 */
 
-#ifndef ARDUINO_ARCH_STM32
-    #define LED_RED     D8
-    #define LED_GREEN   D7
-    #define LED_BLUE    D6
-#endif
+#define LED_RED     D8
+#define LED_GREEN   D7
+#define LED_BLUE    D6
 
 void h4setup() { // H4 constructor starts Serial
     Serial.println("H4P_FlasherController Basic Example v"H4P_VERSION);

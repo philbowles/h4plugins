@@ -26,7 +26,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifndef ARDUINO_ARCH_STM32
 #include<H4P_HeapWarn.h>
 #include<H4P_SerialCmd.h>
 
@@ -64,5 +63,3 @@ void H4P_HeapWarn::show(){
     reply("Hwarn: startvalue=%d warn when size < %d",_initial,_limit);
     reply("Hwarn: min level=%d [%d%%]",_minh,(_minh*100)/_initial);
 }
-
-#endif // stm32

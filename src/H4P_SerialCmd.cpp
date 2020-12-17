@@ -28,9 +28,6 @@ SOFTWARE.
 */
 #include<H4P_SerialCmd.h>
 #include<H4P_CmdErrors.h>
-//#ifndef H4P_NO_WIFI
-//    #include<H4P_AsyncMQTT.h>
-//#endif
 
 H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Plugin(scmdTag()){
     _cmds={
@@ -48,11 +45,9 @@ H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Plugin(scmdTag()){
         {"config",     { H4PC_SHOW, 0, CMD(config) }},
         {"q",          { H4PC_SHOW, 0, CMD(dumpQ) }},
         {"plugins",    { H4PC_SHOW, 0, CMD(plugins) }},
-#ifndef ARDUINO_ARCH_STM32
         {"heap",       { H4PC_SHOW, 0, CMD(heap) }},
         {"fs",         { H4PC_SHOW, 0, CMD(showFS)}},
         {"dump",       { H4PC_H4, 0, CMDVS(_dump)}},
-#endif
     }; 
     if(autoStop) QTHIS(stop);
 }
@@ -117,36 +112,25 @@ void H4P_SerialCmd::_flattenCmds(function<void(string)> fn,string cmd,string pre
     }
 }
 
-void H4P_SerialCmd::_hookIn(){
-#ifndef ARDUINO_ARCH_STM32    
-    HAL_FS.begin();
-#endif
-}
+void H4P_SerialCmd::_hookIn(){ HAL_FS.begin(); }
 
 void H4P_SerialCmd::_logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target){
     for(auto const& l:_logChain) l(msg,type,source,target); // if 0 serial print
 }
 
-//uint32_t runRate=500;
-
 void H4P_SerialCmd::_run(){
     static string cmd="";
 	static int	c;
-//    static int rate=runRate;
-//    if(--rate < 0){
-        if((c=Serial.read()) != -1){
-            if (c == '\n') {
-                h4.queueFunction(bind([this](string cmd){
-                    uint32_t err=_simulatePayload(cmd);
-                    if(err) reply("%s\n",CSTR(_errorString(err)));
-                },cmd),nullptr,H4P_TRID_SCMD);
-                cmd="";
-            } else cmd+=c;
-        }
-//        rate=runRate;
-//    }
+    if((c=Serial.read()) != -1){
+        if (c == '\n') {
+            h4.queueFunction(bind([this](string cmd){
+                uint32_t err=_simulatePayload(cmd);
+                if(err) reply("%s\n",CSTR(_errorString(err)));
+            },cmd),nullptr,H4P_TRID_SCMD);
+            cmd="";
+        } else cmd+=c;
+    }
 }
-//
 
 uint32_t H4P_SerialCmd::_simulatePayload(string flat,const char* src){ // refac
     vector<string> vs=split(flat,"/");
@@ -209,7 +193,6 @@ uint32_t H4P_SerialCmd::invokeCmd(string topic,uint32_t payload,const char* src)
 
 void H4P_SerialCmd::removeCmd(const string& s,uint32_t _subCmd){ if(__exactMatch(s,_subCmd)!=_commands.end()) _commands.erase(s); }
 
-#ifndef ARDUINO_ARCH_STM32
 string H4P_SerialCmd::read(const string& fn){
 	string rv="";
         File f=HAL_FS.open(CSTR(fn), "r");
@@ -231,7 +214,6 @@ uint32_t H4P_SerialCmd::write(const string& fn,const string& data,const char* mo
     b.close();
     return rv; 
 }
-#endif
 
 void H4P_SerialCmd::all(){
     __flatten([this](string s){ 
@@ -277,7 +259,6 @@ void  H4P_SerialCmd::plugins(){
     }
 }
 
-#ifndef ARDUINO_ARCH_STM32
 uint32_t H4P_SerialCmd::_dump(vector<string> vs){
     return guard1(vs,[this](vector<string> vs){
         return ([this](string h){ 
@@ -325,5 +306,3 @@ void H4P_SerialCmd::showFS(){
     reply("%d file(s) %u bytes",n,sigma);
 }
 #endif // 8266/32 spiffs
-
-#endif // not stm32

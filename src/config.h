@@ -53,12 +53,12 @@ SOFTWARE.
 #define H4P_UDP_REFRESH     300000
 #define H4P_UDP_REPEAT           2
 
-#define H43F_SLOW              250
-#define H43F_MEDIUM            125
-#define H43F_FAST               25
-#define H43F_TIMEBASE          175
-#define H43F_REBOOT           2000
-#define H43F_FACTORY          5000
+#define H4MF_SLOW              250
+#define H4MF_MEDIUM            125
+#define H4MF_FAST               25
+#define H4MF_TIMEBASE          175
+#define H4MF_REBOOT           2000
+#define H4MF_FACTORY          5000
 
 #define H4WF_OTA_RATE         1000
 

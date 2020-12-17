@@ -30,7 +30,6 @@ SOFTWARE.
 #ifndef H4P_LocalLogger_HO
 #define H4P_LocalLogger_HO
 
-#ifndef ARDUINO_ARCH_STM32
 #include <H4PCommon.h>
 #ifdef H4P_LOG_EVENTS
 
@@ -48,7 +47,6 @@ class H4P_LocalLogger: public H4PLogService {
                 void        flush();
                 void        show() override;
 };
-#endif // stm32
 #endif
 
 #endif // H4P_LocalLogger_H

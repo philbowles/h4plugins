@@ -61,8 +61,6 @@ enum H4GM_SENSE:uint8_t {
     ACTIVE_HIGH
 };
 
-//#define NORMALISE(a,b) (!(a ^ b))
-
 class  H4GPIOPin;
 
 using H4GM_FN_BOOL   = function<void(bool)>;
@@ -413,15 +411,6 @@ class EncoderAutoPin: public EncoderPin{
 //      H4P_GPIOManager
 //
 class H4P_GPIOManager: public H4Plugin{//
-
-//        OutputPin*      isOutput(uint8_t p);
-
-        template<typename T, typename... Args>
-        T* pinFactory(bool onof,uint8_t _p,Args... args) {
-            T*  pinclass=new T(_p,args...);
-            pinclass->_pinFactoryCommon(onof);
-            return pinclass;
-        }
         void                _start() override;
         void                _stop() override {
             h4._unHook(_subCmd);
@@ -430,6 +419,13 @@ class H4P_GPIOManager: public H4Plugin{//
         }
         void                _run();
     public:
+        template<typename T, typename... Args>
+        T* pinFactory(bool onof,uint8_t _p,Args... args) {
+            T*  pinclass=new T(_p,args...);
+            pinclass->_pinFactoryCommon(onof);
+            return pinclass;
+        }
+
                 H4GPIOPin*      isManaged(uint8_t p){ return pins.count(p) ? pins[p]:nullptr; }
         static  H4GM_PINMAP     pins;
         H4P_GPIOManager();

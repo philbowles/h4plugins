@@ -30,7 +30,6 @@ SOFTWARE.
 #ifndef H4P_HttpMySQLLogger_HO
 #define H4P_HttpMySQLLogger_HO
 
-#ifndef ARDUINO_ARCH_STM32
 #include <H4PCommon.h>
 #include<H4P_WiFiSelect.h>
 #include<H4P_WiFi.h>
@@ -96,5 +95,4 @@ class H4P_HttpMySQLLogger: public H4PLogService, public asyncHTTPrequest {
             _fail(fnFail),ip(ipaddress),H4PLogService("mysql",filter){
         }
 };
-#endif
 #endif // H4P_HttpMySQLLogger_H

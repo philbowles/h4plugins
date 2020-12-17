@@ -35,9 +35,7 @@ SOFTWARE.
 #include<H4P_BinaryThing.h>
 
 #include<H4P_WiFiSelect.h>
-#ifndef H4P_NO_WIFI
-    #include<H4P_WiFi.h>
-#endif
+#include<H4P_WiFi.h>
 
 extern void h4FactoryReset();
 class H4P_MultiFunctionButton: public H4Plugin{
@@ -45,18 +43,11 @@ class H4P_MultiFunctionButton: public H4Plugin{
             uint8_t             _led;
             H4GM_SENSE          _active;
             H4GM_STAGE_MAP _sm={
-#ifdef H4P_LOG_EVENTS
-                {0,[this](H4GPIOPin*){ _btp->_turn(!_btp->state(),_pName); }},
-#else
-                {0,[this](H4GPIOPin*){ _btp->turn(!_btp->state()); }},
-#endif
-                {H43F_REBOOT,[](H4GPIOPin*){ h4reboot(); }},
-                {H43F_FACTORY,[](H4GPIOPin*){ h4FactoryReset(); }}
-#ifndef H4P_NO_WIFI
-                ,{10000,[](H4GPIOPin*){ h4wifi.forceAP(); }}
-#endif
-            };    
-            H4_FN_VOID      _createMS;
+                {0,[this](H4GPIOPin*){ _btp->toggle(); }},
+                {H4MF_REBOOT,[](H4GPIOPin*){ h4reboot(); }},
+                {H4MF_FACTORY,[](H4GPIOPin*){ h4FactoryReset(); }},
+                {10000,[](H4GPIOPin*){ h4wifi.forceAP(); }}
+            };
 
             void            _greenLight() override {} // no autostart
             void            _hookIn() override;
@@ -66,7 +57,7 @@ class H4P_MultiFunctionButton: public H4Plugin{
             void progress(H4GPIOPin* ptr);
     public:
         H4P_MultiFunctionButton(
-//          the input button            
+//          the input button
             uint8_t pin,
             uint8_t mode,
             H4GM_SENSE b_sense,
@@ -78,5 +69,4 @@ class H4P_MultiFunctionButton: public H4Plugin{
 
 extern __attribute__((weak)) H4P_MultiFunctionButton h4mfb;
 
-//#endif
 #endif // H4P_MultiFunctionButton_H

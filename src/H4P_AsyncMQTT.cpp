@@ -27,7 +27,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_AsyncMQTT.h>
-#ifndef H4P_NO_WIFI
 #include<H4P_AsyncWebServer.h>
 
 void __attribute__((weak)) onMQTTError(uint8_t e,int info){ SYSEVENT(H4P_LOG_MQTT_ERROR,mqttTag(),h4Tag(),"e=%d info=%d",e,info); }
@@ -155,4 +154,3 @@ void H4P_AsyncMQTT::unsubscribeDevice(string topic){
     unsubscribe(CSTR(fullTopic));
     H4EVENT("Unsubscribed from %s\n",CSTR(topic));
 }
-#endif

@@ -33,9 +33,7 @@ SOFTWARE.
 #include<H4PCommon.h>
 #include<H4P_SerialCmd.h>
 #include<H4P_WiFiSelect.h>
-#ifndef H4P_NO_WIFI
 #include<H4P_WiFi.h>
-
 #include<PangolinMQTT.h>
 
 struct H4P_LWT {
@@ -83,6 +81,4 @@ class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
 };
 
     extern __attribute__((weak)) H4P_AsyncMQTT h4mqtt;
-#endif
-
 #endif // H4P_AsyncMQTT_H

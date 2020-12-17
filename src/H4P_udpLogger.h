@@ -31,8 +31,6 @@ SOFTWARE.
 #define H4P_udpLogger_HO
 
 #include<H4P_WiFiSelect.h>
-#ifndef H4P_NO_WIFI
-
 #include<H4PCommon.h>
 
 class H4P_udpLogger: public H4Plugin {
@@ -62,5 +60,4 @@ class H4P_udpLogger: public H4Plugin {
         }
 };
 
-#endif
 #endif // H4P_udpLogger_H

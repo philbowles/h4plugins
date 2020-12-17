@@ -32,8 +32,6 @@ SOFTWARE.
 
 #include<H4PCommon.h>
 #include<H4P_WiFiSelect.h>
-#ifndef H4P_NO_WIFI
-
 #include<H4P_Timekeeper.h>
 
 enum H4P_EPHEMERA {
@@ -65,5 +63,4 @@ class H4P_Sunrise: public H4Plugin {
 
 extern __attribute__((weak)) H4P_Sunrise h4ss;
 
-#endif //Wifi only
 #endif // H4P_Sunrise_H

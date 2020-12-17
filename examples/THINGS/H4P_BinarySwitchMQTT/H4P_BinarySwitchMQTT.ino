@@ -15,19 +15,12 @@ H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
  * h4plugins/h4/off ... etc
  *  
  */
-#ifdef ARDUINO_ARCH_STM32
-  #define UB_ACTIVE ACTIVE_HIGH
-  #define UL_ACTIVE ACTIVE_HIGH
-#else
 // 16 for nodeMCU - change it for your device
   #define USER_BTN 16
   #define UB_ACTIVE ACTIVE_LOW
   #define UL_ACTIVE ACTIVE_LOW
-#endif
 
 #define U_DEBOUNCE  15
-
-
 
 H4P_GPIOManager h4gm;
 H4P_FlasherController h4fc;

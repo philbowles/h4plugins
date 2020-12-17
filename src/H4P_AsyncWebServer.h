@@ -32,7 +32,6 @@ SOFTWARE.
 
 #include<H4PCommon.h>
 #include<H4P_WiFiSelect.h>
-#ifndef H4P_NO_WIFI
 #include<H4P_WiFi.h>
 #include<H4P_BinaryThing.h>
 #include<ESPAsyncWebServer.h>
@@ -89,15 +88,10 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
             };
         }
         static  String      aswsReplace(const String& var);
-/*
-                template<typename T>
-                void uiAdd(const string& name,function<T(void)> f){
-                    _uiAdd(name,H4P_UI_LABEL,[f]{ return stringFromInt(f()); });
-                }
-*/
                 void        uiAddLabelText(const string& name,H4_FN_UITXT f){ _uiAdd(name,H4P_UI_LABEL,f); }
                 void        uiAddLabelNumeric(const string& name,H4_FN_UINUM f){ _uiAdd(name,H4P_UI_LABEL,[f]{ return stringFromInt(f()); }); }
                 void        uiAddBoolean(const string& name,H4_FN_UIBOOL f,H4_FN_UIACTIVE a=nullptr){ _uiAdd(name,H4P_UI_BOOL,[f]{ return stringFromInt(f()); },a); }
+                void        uiAddGPIO();
                 void        uiAddGPIO(uint8_t pin);
 
                 template<typename... Args>
@@ -122,5 +116,4 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
 
 extern __attribute__((weak)) H4P_AsyncWebServer h4asws;
 
-#endif
 #endif // H4P_AsyncWebServer_H

@@ -28,7 +28,6 @@ SOFTWARE.
 */
 
 #include<H4P_PresenceDetector.h>
-#ifndef H4P_NO_WIFI
 #include<H4P_BinaryThing.h>
 #include<H4P_UPNPServer.h>
 //
@@ -151,4 +150,3 @@ H4P_H4DetectorSource::H4P_H4DetectorSource(const string& id): H4P_H4Detector(id)
 }
 #endif // OTA
 #endif // 8266
-#endif // wifi

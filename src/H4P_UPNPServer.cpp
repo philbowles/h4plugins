@@ -28,7 +28,6 @@ SOFTWARE.
 */
 
 #include<H4P_UPNPServer.h>
-#ifndef H4P_NO_WIFI
 
 void H4P_UPNPServer::_hookIn(){
     DEPEND(asws);
@@ -183,5 +182,3 @@ string H4P_UPNPServer::replaceParams(const string& s){ // oh for a working regex
 	}
 	return rv.c_str();	
 }
-
-#endif

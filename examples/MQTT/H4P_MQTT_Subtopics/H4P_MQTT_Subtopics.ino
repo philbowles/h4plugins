@@ -34,11 +34,7 @@ uint32_t myCallback(vector<string> vs){
   }
 }
 
-#ifdef ARDUINO_ARCH_STM32
-  #define U_BOARD_NAME BOARD_NAME
-#else
-  #define U_BOARD_NAME ARDUINO_BOARD
-#endif
+#define U_BOARD_NAME ARDUINO_BOARD
 /*
     Open Serial monitor and try typing any of the following:
 

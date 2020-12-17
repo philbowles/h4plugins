@@ -27,7 +27,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_udpLogger.h>
-#ifndef H4P_NO_WIFI
 
 void H4P_udpLogger::_hookIn(){ DEPEND(wifi); }
 
@@ -58,5 +57,3 @@ void H4P_udpLogger::_start(){
     h4.every(1000,[this](){ rps=0; });
     _upHooks();
 }
-
-#endif

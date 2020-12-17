@@ -30,7 +30,6 @@ SOFTWARE.
 #ifndef H4P_MQTTHeapLogger_HO
 #define H4P_MQTTHeapLogger_HO
 
-#ifndef ARDUINO_ARCH_STM32
 #include <H4PCommon.h>
 #include <H4P_AsyncMQTT.h>
 
@@ -47,5 +46,4 @@ class H4P_MQTTHeapLogger: public H4P_MQTTLogger {
     public:
         H4P_MQTTHeapLogger(uint32_t f): _f(f),H4P_MQTTLogger("heap",H4P_LOG_MQTT_HEAP){}
 };
-#endif
 #endif // H4P_MQTTLogger_H
