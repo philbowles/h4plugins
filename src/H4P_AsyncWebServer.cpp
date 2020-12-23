@@ -210,6 +210,8 @@ void H4P_AsyncWebServer::uiAddInput(const string& name,H4_FN_UITXT f){
 
 void H4P_AsyncWebServer::uiSync(){
     if(_evts && _evts->count()){
-        for(auto const& u:_userItems) if(u.f) _sendSSE(CSTR(u.id),CSTR(u.f()));
+        for(auto const& u:_userItems){
+            if(u.type != H4P_UI_INPUT && u.type != H4P_UI_DROPDOWN && u.f) _sendSSE(CSTR(u.id),CSTR(u.f()));
+        }
     }
 }

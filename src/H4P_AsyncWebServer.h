@@ -75,12 +75,12 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
             VSCMD(_msg);
             VSCMD(_uichg);
 
-                void         _rest(AsyncWebServerRequest *request);
+                void            _rest(AsyncWebServerRequest *request);
 //      service essentials
-                void         _start() override;
-                void         _stop() override;
-                void         _hookIn() override;
-                void         _greenLight() override {}; // do not autostart!
+                void            _start() override;
+                void            _stop() override;
+                void            _hookIn() override;
+                void            _greenLight() override {}; // do not autostart!
     public:
         H4P_AsyncWebServer(H4_FN_VOID onClientConnect=nullptr,H4_FN_VOID onClientDisconnect=nullptr): AsyncWebServer(80),H4Plugin(aswsTag()){
             _onC=onClientConnect;
@@ -113,7 +113,7 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
                     _sendSSE(NULL,buff);
                     free(buff);
                 }
-//                void            uiSetInput(const string& name,const string& value){ _sendSSE(CSTR(name),CSTR(value)); }
+                void            uiSetInput(const string& name,const string& value){ _sendSSE(CSTR(name),CSTR(value)); }
                 void            uiSetBoolean(const string& name,const bool b){ _sendSSE(CSTR(name),CSTR(stringFromInt(b))); }
                 void            uiSetLabel(const string& name,const int f){ _sendSSE(CSTR(name),CSTR(stringFromInt(f))); }
                 void            uiSetLabel(const string& name,const string& value){ _sendSSE(CSTR(name),CSTR(value)); }

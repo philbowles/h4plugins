@@ -49,7 +49,7 @@ function uiItem(d,h="uhang"){
         let a=parseInt(parts[3])
         let title=document.createElement("div");
         title.innerHTML=n;
-        let valu=document.createElement("div");
+        let valu=document.createElement(t<4 ? "div":(t==4 ? "input":"select"));
         valu.id=n;
         valu.className="uv";
         switch(t){
@@ -64,10 +64,38 @@ function uiItem(d,h="uhang"){
                 source.addEventListener(n, function(e){ redgreen(n,parseInt(e.data)); });
                 if(a) {
                     valu.addEventListener("click", function(e){ 
-                        ajax("h4/asws/uib/"+n+","+(valu.classList.value.indexOf("red")==-1 ? 0:1)) },
+                        ajax("h4/asws/uichg/"+n+","+(valu.classList.value.indexOf("red")==-1 ? 0:1)) },
                         {capture: true});
                     title.classList.add("tuia");
                 }
+                break;
+            case 4: // input
+                valu.value=v;
+                valu.addEventListener("blur", function(e){
+                    if(valu.value!=v) {
+                        v=valu.value;
+                        ajax("h4/asws/uichg/"+n+","+v)
+                    }
+                },{capture: true});
+                title.classList.add("tuia");
+                valu.classList.add("tuia");
+                source.addEventListener(n, function(e){ document.getElementById(n).value=e.data; });
+                break;
+            case 5: // droplist
+                let opts=parts.slice(2,parts.length-1)
+                opts.sort()
+                opts.forEach(function(e){
+                    let kv=e.split("=");
+                    let opt=document.createElement("option");
+                    opt.value=kv[1];
+                    opt.innerHTML=kv[0];
+                    valu.appendChild(opt);
+                })
+                valu.addEventListener("change", function(e){ 
+                    ajax("h4/asws/uichg/"+n+","+valu.value) },
+                    {capture: true});
+                title.classList.add("tuia");
+                valu.classList.add("tuia");
                 break;
         }
         hangoff.insertBefore(title,null)
@@ -93,16 +121,13 @@ document.addEventListener("DOMContentLoaded", function() {
     let rr=document.getElementById("reply")
     let cmd=document.getElementById("cmd")
     let msg=document.getElementById("msg")
-    // 
+    // frig ap test
     //wifimode=2
     if(parseInt(document.getElementById("wifi").value)==2) document.getElementById("ap").style.display='inline-grid'
     else {
         source.addEventListener('ui', function(e){ uiItem(e.data) });
 
-        source.onmessage=function(e){
-            let m=e.data;
-            if(m.substr(0,2)!='ka') toaster(e.data)
-        }
+        source.onmessage=function(e){ toaster(e.data) }
 
         source.onmessage({data: "Thank you for using H4/Plugins - please support me on Patreon"});
 

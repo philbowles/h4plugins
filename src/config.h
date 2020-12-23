@@ -26,10 +26,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#define H4P_VERSION "0.5.9"
+#define H4P_VERSION "1.0.0"
 
 // comment this out to prevent and logging by EVENT( whatever ) messages
-#define H4P_LOG_EVENTS
+//#define H4P_LOG_EVENTS
 
 // comment this out to save a little flash if OTA not required
 #define H4P_USE_OTA
@@ -60,7 +60,7 @@ SOFTWARE.
 #define H4MF_REBOOT           2000
 #define H4MF_FACTORY          5000
 
-#define H4WF_OTA_RATE         1000
+#define H4WF_OTA_RATE         1500
 
 #define H4P_IPPD_RATE         5000
 #define H4P_PJ_SPREAD            3
