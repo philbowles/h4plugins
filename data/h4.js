@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let rr=document.getElementById("reply")
     let cmd=document.getElementById("cmd")
     let msg=document.getElementById("msg")
-    // frig ap test
+    // 
     //wifimode=2
     if(parseInt(document.getElementById("wifi").value)==2) document.getElementById("ap").style.display='inline-grid'
     else {

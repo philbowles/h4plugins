@@ -248,10 +248,10 @@ class H4Plugin {
         virtual void        _start() { _upHooks(); }
         virtual void        _stop() { _downHooks(); }
     public:
-        static  vector<H4_FN_VOID>  _factoryChain;
-                H4_FN_VOID          _factoryHook=[this]{};
-                H4_FN_VOID          _rebootHook=[this]{ stop(); };
         static  vector<H4Plugin*>   _plugins;
+        static  vector<H4_FN_VOID>  _factoryChain;
+                H4_FN_VOID          _factoryHook=[]{};
+                H4_FN_VOID          _rebootHook=[this]{ stop(); };
                 string              _pName;
                 uint32_t            _subCmd;
 //       
@@ -282,7 +282,10 @@ class H4Plugin {
                 void        hookConnect(H4_FN_VOID f){ _connected.push_back(f); }
                 void        hookDisconnect(H4_FN_VOID f){ _disconnected.push_back(f); } 
 //
-                string      getConfig(const string& c){ return _cb[c]; }
+        static  string      getConfig(const string& c){ return _cb[c]; }
+        static  int         getConfigInt(const string& c){ return STOI(_cb[c]); }
+        static  void        setConfig(const string& c,const string& v){ _cb[c]=v; }
+        static  void        setConfig(const string& c,const int v){ _cb[c]=stringFromInt(v); }
                 
                 template<typename... Args>
                 void        reply(const char* fmt, Args... args){ // find pub sub size

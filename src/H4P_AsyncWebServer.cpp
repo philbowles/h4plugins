@@ -32,6 +32,8 @@ SOFTWARE.
 #include<H4P_SerialCmd.h>
 #include<H4P_GPIOManager.h>
 
+void __attribute__((weak)) onUiChange(const string& name,const string& value){ h4UserEvent("onUiChange %s now=%s",CSTR(name),CSTR(value)); }
+
 void  H4P_AsyncWebServer::_hookIn(){ 
     DEPEND(wifi);
     H4Plugin* p=isLoaded(onofTag());
@@ -42,27 +44,49 @@ void  H4P_AsyncWebServer::_hookIn(){
     if(isLoaded(mqttTag())) _uiAdd("Pangolin Vn",H4P_UI_LABEL,[]()->string{ return _cb["pmv"]; });
 }
 
+uint32_t H4P_AsyncWebServer::_gpio(vector<string> vs){
+    return guard1(vs,[this](vector<string> vs){
+        if(H4PAYLOAD=="all") uiAddGPIO();
+        else {
+            if(!isNumeric(H4PAYLOAD)) return H4_CMD_NOT_NUMERIC;
+            uint8_t pin=H4PAYLOAD_INT;
+            Serial.printf("uiAdd GPIO pin %d\n",pin);
+            return uiAddGPIO(pin);
+        }
+        return H4_CMD_OK;
+    });
+}
+
 uint32_t H4P_AsyncWebServer::_msg(vector<string> vs){
     return guard1(vs,[this](vector<string> vs){
         uiMessage(H4PAYLOAD);
         return H4_CMD_OK;
     });
 }
-uint32_t H4P_AsyncWebServer::_uib(vector<string> vs){
+
+H4_CMD_ERROR H4P_AsyncWebServer::__uichgCore(const string& a,const string& b,H4_FN_UIACTIVE f){
+    _sendSSE(CSTR(a),CSTR(b));
+    f(a,b);
+    return H4_CMD_OK;
+}
+
+uint32_t H4P_AsyncWebServer::_uichg(vector<string> vs){
     return guardString2(vs,[this](string a,string b){ 
-        if(isNumeric(b)) {
-            uint32_t bv=atoi(CSTR(b));
-            if(bv < 2) {
-                for(auto &u:_userItems){
-                    if(u.id==a){
-                        _sendSSE(CSTR(a),CSTR(b));
-                        u.a(a,b);
-                        return H4_CMD_OK;
+        for(auto &u:_userItems){
+            if(u.id==a){
+                if(u.a){
+                    if(u.type==H4P_UI_BOOL){
+                        if(isNumeric(b)) {
+                            if(atoi(CSTR(b)) > 1) return H4_CMD_PAYLOAD_FORMAT;
+                        } else return H4_CMD_NOT_NUMERIC;
                     }
+                    else _cb[a]=b;
+                    return __uichgCore(a,b,u.a);
                 }
-                return H4_CMD_NAME_UNKNOWN;
-            } else return H4_CMD_PAYLOAD_FORMAT;
-        } else return H4_CMD_NOT_NUMERIC;
+                return H4_CMD_OUT_OF_BOUNDS; // not updateable
+            }
+        }
+        return H4_CMD_NAME_UNKNOWN;
     });
 }
 
@@ -150,16 +174,16 @@ String H4P_AsyncWebServer::aswsReplace(const String& var){
     return _cb.count(v) ? String(CSTR(_cb[v])):"?";
 }
 
-void H4P_AsyncWebServer::uiAddGPIO(){
-    if(isLoaded(gpioTag())){
-        for(auto const& p:H4P_GPIOManager::pins) {
-            Serial.printf("MANAGED GPIO PIN %d\n",p.first);
-            uiAddGPIO(p.first);
-        }
-    } else Serial.printf("FATAL! uiAddGPIO needs h4gm!!!\n");
+void H4P_AsyncWebServer::uiAddDropdown(const string& name,H4P_CONFIG_BLOCK options){
+    string opts="";
+    for(auto const& o:options) opts+=o.first+"="+o.second+",";
+    opts.pop_back();
+    _uiAdd(name,H4P_UI_DROPDOWN,[opts]{ return opts; },onUiChange);
 }
 
-void H4P_AsyncWebServer::uiAddGPIO(uint8_t pin){
+void H4P_AsyncWebServer::uiAddGPIO(){ if(isLoaded(gpioTag())) for(auto const& p:H4P_GPIOManager::pins) uiAddGPIO(p.first); }
+
+H4_CMD_ERROR H4P_AsyncWebServer::uiAddGPIO(uint8_t pin){
     if(isLoaded(gpioTag())){
         H4GPIOPin*  p;
         if(p=h4gm.isManaged(pin)) {
@@ -171,12 +195,21 @@ void H4P_AsyncWebServer::uiAddGPIO(uint8_t pin){
                 _sendSSE(CSTR(name),hp->logicalRead() ? "1":"0");
                 if(f) f(hp);
             };
-            _uiAdd(name,H4P_UI_BOOL,[p]{ return stringFromInt(p->logicalRead()); },nullptr);
-        } //else Serial.printf("FATAL! uiAddGPIO pin %d not managed!\n",pin);
-    } //else Serial.printf("FATAL! uiAddGPIO needs h4gm!!!\n");
+            _uiAdd(name,H4P_UI_BOOL,[p]{ return p->logicalRead() ? "1":"0"; },nullptr);
+            return H4_CMD_OK;
+        } 
+        return H4_CMD_OUT_OF_BOUNDS;
+    }
+    return H4_CMD_NOT_NOW;
 }
 
-void H4P_AsyncWebServer::uiSync(const string& name){
-    H4P_UI_LIST::iterator it;
-    if((it=find_if(_userItems.begin(),_userItems.end(),[name](const H4P_UI_ITEM& i){ return i.id==name; }))!=_userItems.end()) _sendSSE(CSTR(name),CSTR(it->f()));
+void H4P_AsyncWebServer::uiAddInput(const string& name,H4_FN_UITXT f){
+    if(f) _cb[name]=f();
+    _uiAdd(name,H4P_UI_INPUT,[name]{ return _cb[name]; },onUiChange); 
+}
+
+void H4P_AsyncWebServer::uiSync(){
+    if(_evts && _evts->count()){
+        for(auto const& u:_userItems) if(u.f) _sendSSE(CSTR(u.id),CSTR(u.f()));
+    }
 }

@@ -50,7 +50,7 @@ void H4P_BinaryThing::_setSlaves(bool b){
 void H4P_BinaryThing::_setState(bool b) {
     _state=b;
     _setSlaves(b);
-    if(isLoaded(aswsTag())) h4asws.uiSync(onofTag());
+    if(isLoaded(aswsTag())) h4asws.uiSync(); //h4asws.uiSync(onofTag());}
 }
 
 uint32_t H4P_BinaryThing::_slave(vector<string> vs){

@@ -111,7 +111,7 @@ void H4P_AsyncMQTT::_setup(){ // allow for TLS
     }
 }
 
-void H4P_AsyncMQTT::_signal(){ if(isLoaded(aswsTag())){ h4asws.uiSync(uppercase(mqttTag())); }}
+void H4P_AsyncMQTT::_signal(){ if(isLoaded(aswsTag())) h4asws.uiSync(); } //h4asws.uiSync(uppercase(mqttTag())); }}
 
 void H4P_AsyncMQTT::_start(){ 
     autorestart=true;

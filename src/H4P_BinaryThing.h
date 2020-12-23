@@ -67,13 +67,14 @@ class H4P_BinaryThing: public H4Plugin{
                 for(auto s :_slaves) reply("Slave: %s",CSTR(s));
             }
 
-                    void    autoOff(uint32_t T){ _timeout=T; }
-                    void    slave(const string& otherh4){ _slaves.insert(otherh4); }
-                    bool    state() { return _state; }
-                    void    turnOff(){ turn(false); }
-                    void    turnOn(){ turn(true); }
-                    void    toggle(){ turn(!_state); }
-                    void    turn(bool b);
+                    uint32_t getAutoOff(){ return _timeout; }
+                    void     autoOff(uint32_t T){ _timeout=T; }
+                    void     slave(const string& otherh4){ _slaves.insert(otherh4); }
+                    bool     state() { return _state; }
+                    void     turnOff(){ turn(false); }
+                    void     turnOn(){ turn(true); }
+                    void     toggle(){ turn(!_state); }
+                    void     turn(bool b);
 #ifdef H4P_LOG_EVENTS
                     void    _turn(bool b,const string& src);
 #endif
