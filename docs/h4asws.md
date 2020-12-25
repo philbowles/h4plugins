@@ -31,32 +31,50 @@ N.B. The "name" field is only relevant if you are also using the [H4P_UPNPServer
 ```cpp
 #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
-H4P_WiFi h4asws(...
+H4P_WiFi h4wifi(...
+H4P_AsyncWebServer h4asws(...
 ```
 
 ## Dependencies
 
 * [H4P_WiFi](h4wifi.md) Plugin
 
-* You must copy the `data` sub-folder to your sketch folder and upload to SPIFSS. To do this you will need to intall either the [ESP8266 sketch data uploader](https://github.com/esp8266/arduino-esp8266fs-plugin) or the [ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin) (or both) depending on which platform you compile for. 
+* You must copy the `data` sub-folder to your sketch folder and upload to SPIFSS. To do this you will need to intall either the [LittleFS upload tool](https://github.com/earlephilhower/arduino-esp8266littlefs-plugin) or the [ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin) (or both) depending on which platform you compile for. 
 
 
 ## Commands Added
 
 * `h4/asws/msg/X` (payload X = anything: gets sent to message area of webui)
+* `h4/asws/gpio/pin#|all` (payload either "all" or a valid GPIO pin number: adds user GPIO LED
+* `h4/asws/uichg/name,value` (used internally: not normally called by user: set user input item "name" to value
   
 ---
 
 # User-defined fields
 
-Since v0.5.6 user can add their own data fields to the main UI. The user must provide a "setter" function for each field which returns the value to be displayed. Once the web UI is active, i.e. there is at least one browser / viewer, the user is also able to asynchronously update and of his/her fields. 
-Currently available are:
+Since v0.5.6 user can add their own data fields to the main UI.
 
-* Text Labels (from a user `string`-returning function )
-* Numeric Labels (from a user `int`-returning function )
-* Boolean red/green LED (from a user `bool`-returning function )
+## Initial Creation
 
-Boolean fields can also be clickable to send messages back from the UI to switch on/off, start/stop processes. If a clickable Boolena is required, the user must additionally provide a callback "action" function to handle/react to the on/off click
+In `h4Setup` the user creates his/her named UI fields which can be any of:
+
+* Text Labels
+* Numeric Labels
+* Boolean red/green LED (optionally clickable)
+* Input
+* Dropdown List
+
+Boolean fields can also be clickable to send messages back from the UI to switch on/off, start/stop processes. If a clickable Boolean is required, the user must additionally provide a callback "action" function to handle/react to the on/off click). Other updateable fields (input, dropdown) call a single callback `onUiChange`
+
+User may choose to provide single fixed text / numeric / boolean value when field is created - this is best for single static values that will not change.
+
+For more volatile data that may have changed by the time any viewers load the UI, he/she may instead or provide a named function which will provide the appropriate value when the webUI is actually loaded.
+
+## Dynamic updates
+
+Any field can be set asynchronously to any arbitrary value, by calling one of the `uiSet...` functions. Fields which were create originally with a "setter" function can force the setter function to be called - thereby refreshing the field with its latest current value - by calling `uiSync()` (which synchronises *all* such fields in the one call).
+
+---
 
 # API
 
@@ -64,55 +82,61 @@ Boolean fields can also be clickable to send messages back from the UI to switch
 
 ```cpp
 // general
-void onFirstClient(void); // User requests web page: add user items + "setter" functions
-void onLastClient(void); // no viewers: cancel timers, clean up resources etc
-// ui "setter"s
-string fUserStringSetter(void); // user function that returns data for a LabelText UI field
-int fUserIntSetter(void); // user function that returns data for a LabelNumeric UI field
-string fUserBoolSetter(void); // user function that returns data for a Boolean UI field
-// "action" funtion for clickable boolean
-void onUIBoolClick(string name,string value); // name is the user's name for the UI field, value will be "1" or "0"
-
+void onViewers(void); // User requests web page: add user items + "setter" functions
+void onNoViewers(void); // no viewers: cancel timers, clean up resources etc
+void onUiChange(const string& name,const string& ref value); // called when user item <name> changes value
 ```
 
-H4P_AsyncWebserver is a "wrapper" around the [ESPAsyncWebServer](https://github.com/philbowles/ESPAsyncWebServer) library and therefore any funtions offered by that library can be called on `h4asws.` for example `h4.asws.on(...)` to add your own handler.
+H4P_AsyncWebserver is a "wrapper" around the [ESPAsyncWebServer](https://github.com/philbowles/ESPAsyncWebServer) library and therefore any functions offered by that library can be called on `h4asws.` for example `h4.asws.on(...)` to add your own handler.
 
 Do not register a handler for any of the following paths:
 
 * / 
 * /rest
 * /upnp
+* /uichg
 
 As those are use by the plugin itself
 
 ```cpp
 // Constructor
-// onFirstClient callback when first user requests web page: add user items + "setter" functions
-// onLastClient  callback when last viewer close browser: cancel timers, clean up resources etc
-H4P_AsyncWebServer(H4_FN_VOID onFirstClient=nullptr,H4_FN_VOID onLastClients=nullptr):
+// onViewers callback when first user requests web page: add user items + "setter" functions
+// onNoViewers  callback when last viewer closes browser: cancel timers, clean up resources etc
+H4P_AsyncWebServer(H4_FN_VOID onViewers=nullptr,H4_FN_VOID onNoViewers=nullptr):
 //
 // name =name of your own UI field
-// f... = name of "setter" function which returns data of the appropriate type to popultae the field when web page requested
-void uiAddLabelNumeric(const string& name,H4_FN_UINUM fUserIntSetter);
-void uiAddLabelText(const string& name,H4_FN_UITXT fUserStringSetter);
-void uiAddBoolean(const string& name,H4_FN_UIBOOL fUserBoolSetter);
-// change value of exisitng user webUI field
-void uiSetLabelNumeric(const string& name,H4_FN_UINUM fUserIntSetter);
-void uiSetLabelText(const string& name,H4_FN_UITXT fUserStringSetter);
-void uiSetBoolean(const string& name,H4_FN_UIBOOL fUserBoolSetter);
-//
+// setter = name of "setter" function which returns data of the appropriate type to popultae the field when web page requested
+// action = name of "action" function which is called when value changes. If defulted, field is not user-clickable
+// 
 void uiMessage(const string& msg); // msg scrolls in red at bottom of screen 
+void uiAddBoolean(const string& name,const boolean truefalse,H4_FN_UIACTIVE action=nullptr); // create static boolean LED
+void uiAddBoolean(const string& name,H4_FN_UIBOOL setter,H4_FN_UIACTIVE action=nullptr); // dynamic bool set on demand by setter function
+void uiAddDropdown(const string& name,H4P_CONFIG_BLOCK options); // create dropdown list of OPTION/VALUE pairs (see onUiChange callback)
+void uiAddGPIO(); // add output-only boolean LED for every managed GPIO pin
+H4_CMD_ERROR uiAddGPIO(uint8_t pin); // add output-only boolean LED tied to GPIO pin. Returns H4_CMD_OUT_OF_BOUNDS if not a valid pin
+void uiAddInput(const string& name,H4_FN_UITXT setter=nullptr); // add input field with optional intial value dynamically set (see onUiChange callback)
+void uiAddLabel(const string& name,const int value); // Create static numeric label 
+void uiAddLabel(const string& name,H4_FN_UINUM setter);// Create dynamic numeric label set on demand by setter function
+void uiAddLabel(const string& name,const string& value); // Create static text label 
+void uiAddLabel(const string& name,H4_FN_UITXT setter)// Create dynamic text label set on demand by setter function
+void uiMessage(const string& format, Args... args); // works like printf to send message to scrolling alert area of UI in red
+void uiSetInput(const string& name,const string& value); // arbitrarily set input field to value
+void uiSetBoolean(const string& name,const bool truefalse);// arbitrarily set boolean to true or false
+void uiSetLabel(const string& name,const int value);// arbitrarily set numeric value
+void uiSetLabel(const string& name,const string& value);// arbitrarily set text field to value
+void uiSync(); // force all setters to update fields to current value
 
 ```
 
 [Example Code - static fields](../examples/WEBUI/WebUI_StaticFields/WebUI_StaticFields.ino)
 [Example Code - dynamic fields](../examples/WEBUI/WebUI_DynamicFields/WebUI_DynamicFields.ino)
+[Example Code - input fields](../examples/WEBUI/WebUI_InputFields/WebUI_InputFields.ino)
 
 ---
 
 # The REST interface
 
-The REST interface allows the user to enter commands in a similar fashion to the serial commans line or MQTT. The command to be executed is prefixed by`http://< device IP address or name >/rest/` for example `http://192.168.1.104/rest/h4/show/config`. The response is a JSON object.
+The REST interface allows the user to enter commands in a similar fashion to the serial command line or MQTT. The command to be executed is prefixed by`http://< device IP address or name >/rest/` for example `http://192.168.1.104/rest/h4/show/config`. The response is a JSON object.
 
 ![JSONREST](../assets/rest.jpg)
 

@@ -59,6 +59,7 @@ SOFTWARE.
 #define H4MF_TIMEBASE          175
 #define H4MF_REBOOT           2000
 #define H4MF_FACTORY          5000
+#define H4MF_APMODE          10000
 
 #define H4WF_OTA_RATE         1500
 

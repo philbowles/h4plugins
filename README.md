@@ -1,19 +1,15 @@
 ![H4P Logo](/assets/H4PLogo.png)
 
-# Arduino IDE library targeting ESP8266, ESP32 and STM32-NUCLEOxx boards providing IOT functionality including WiFi, MQTT, GPIO management and diagnostic tools
-
-## (WiFi and dependent plugins not available on STM32-NUCLEOxx series)
+# Arduino IDE library targeting ESP8266, ESP32 providing IOT functionality including WiFi, MQTT, GPIO management and diagnostic tools
 
 *All plugins depend upon the presence of the [H4 library](https://github.com/philbowles/H4), which must be installed first.*
 
-[Release Notes v0.5.7](docs/rn057.md)
-Unfortunately, major issues with asyncMqttClient library require that you uninstall it, and throw it away and pretend you never heard of it. It is replaced by [AsyncMQTT](http://github.com/philbowles/asyncmqtt)
+[Release Notes v1.0.0](docs/rn100.md)
 
 ---
+Think of [**H4**](https://github.com/philbowles/H4) and its plugins as "IOT Lego" or an "IOT Swiss Army Knife" (or both) for ESP8266 and ESP32 to get your IOT app up and running in minutes rather than weeks. If you have some basic C / C++ experience then [**H4**](https://github.com/philbowles/H4) and H4Plugins are for you! 
 
 ![H4PluginsFF](/assets/h4plugins.jpg)
-
-Think of H4 and its plugins as "IOT Lego" or an "IOT Swiss Army Knife" (or both) for [**H4**](https://github.com/philbowles/H4) - and if you are not already using H4's advanced scheduling and timing features, why not? Get it now from the link above, as you will need it to use the H4Plugins system.
 
 H4Plugins includes modules for WiFi + OTA, Webserver, MQTT, numerous common types of GPIO handling (e.g. debouncing, rotary encoders), Amazon Alexa voice control, NTP synchronisation, device presence detection, logging to remote MySQL server and extensive diagnostics. By "plugging " together only the required modules, you can rapidly build your own custom firmware or IOT app. Everything you build will be stable and responsive: the plugins work together to allow multiple simultaneous processes to run, so ***no more WDT resets***! As your experience grows you can extend your app / firmware with H4Plugins' well-documented API and runtime command system. Let's see an example of H4Plugins being used as replacement firmware for a SONOFF Basic switch.
 
@@ -48,7 +44,7 @@ H4P_UPNPServer h4upnp("Salon Eiffel Tower");
 H4P_MultiFunctionButton h4mfb(BUTTON_BUILTIN,INPUT,ACTIVE_LOW,15,LED_BUILTIN,ACTIVE_LOW);
 ```
 
-As you can see, all you need to do is list the modules/funcionality you require and provide a few necessary values such as ssid / passwords etc and the plugins link up with each other, exchange messages between themselves and "stitch" everything together into a seamless piece of stable firmware. If you know of anything easier for both beginners and seasoned developers, please let us know.
+As you can see, all you need to do is list the modules/functionality you require and provide a few necessary values such as ssid / passwords etc and the plugins link up with each other, exchange messages between themselves and "stitch" everything together into a seamless piece of stable firmware. If you know of anything easier for both beginners and seasoned developers, please let us know.
 
 The modular design of H4's plugin architecture minimises scarce resources in low-memory MCU targets: You only compile in what you need by choosing the relevant bulding blocks. Detailed diagnostics can be easily included (or completely compiled-out) and controlled at runtime via the serial console, web console,HTTP REST or MQTT depending on which options you choose. It is built on top of the very stable [H4](https://github.com/philbowles/H4) timer/scheduler which traces its ancestry back to "Esparto" - of which one user recently said: *"and now have Esparto modules with months of uptime without an issue"*.
 
@@ -56,7 +52,7 @@ There are over 70 example sketches demonstrating all the features and the API of
 
 Each plugin is also throroughly documented in the links below. *Please make sure you have read and fully understood the documentation for the [H4 library](https://github.com/philbowles/H4) and the relevant Plugin(s) before raising an issue.*
 
-Also please prefer the [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/) group over the github issues mechanism, as I don't look at it that often, nor open my email until it backs up, but I'm on FB pretty much every day.
+Also please prefer the [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/) group over the github issues mechanism, as I don't look at github that often, nor open my email until it backs up, but I'm on FB pretty much every day and you will get a much quicker response.
 
 ---
 
@@ -79,6 +75,7 @@ Simple one-line GPIO management of debouncing, retriggering, pulse counting, tim
 ## Cross-platform code
 
 Some of the plugins (non WiFi-dependent) also run on STM32-NUCLEO boards. Some have been tested also on Raspberry Pi and even Ubuntu linux. 
+***N.B. While this may still be true in many cases, STM32 support has been withdrawn as at v1.0.0***
 
 ![UPNP](/assets/xplat.jpg)
 
@@ -98,16 +95,16 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 * [**H4P_SerialCmd**](docs/h4cmd.md): Send commands from multiple sources to H4 and/or plugins to control and/or diagnose
 * [**H4P_FlasherController**](docs/h4fc.md): One-line coding of multiple simultaneous LED flashing by Square Wave, PWM, abitrary pattern and Morse code
 * [**H4P_GPIOManager**](docs/h4gm.md): One-line coding of debouncing, retriggering, rotary encoding plus numerous other GPIO strategies
-* [**H4P_WiFi**](docs/h4wifi.md): Automatic Connection / reconnection manager + AP configuration + OTA + HTTP REST
-* [**H4P_AsyncWebServer**](docs/h4asws.md): Fully Asynchronous Webserver
-* [**H4P_AsyncMQTT**](docs/h4mqtt.md): Automatic Connection/ reconnection MQTT client allows remote control of H4
+* [**H4P_WiFi**](docs/h4wifi.md): Automatic Connection / reconnection manager + AP configuration + OTA
+* [**H4P_AsyncWebServer**](docs/h4asws.md): Fully Asynchronous Webserver  + HTTP REST handler + user fields manager
+* [**H4P_AsyncMQTT**](docs/h4mqtt.md): Automatic Connection/ reconnection MQTT client (allows remote control of H4)
 * [**H4P_BinarySwitch**](docs/things.md): GPIO object that allows control by commands from multiple sources
 * [**H4P_BinaryThing**](docs/things.md): user-defined functional object that allows control by commands from multiple sources
 * [**H4P_ConditionalSwitch**](docs/things.md): H4P_BinarySwitch that only operates when user-define function returns true
 * [**H4P_ConditionalThing**](docs/things.md): H4P_BinaryThing that only operates when user-define function returns true
 * [**H4P_UPNPServer**](docs/things.md): provides full UPNP device with Alexa voice control, Windows10 Desktop integration
 * [**H4P_MultiFunctionButton**](docs/h4mfnb.md): Tact-button giving on/off, reboot,factory reset and forced AP Mode depending on hold time
-* [**H4P_PersistentStorage**](docs/h4stor.md): Save name/value pairs across reboots (requires SPIFFS)
+* [**H4P_PersistentStorage**](docs/h4stor.md): Save name/value pairs across reboots (requires LittleFS)
 * [**H4P_H4Detector**](docs/h4pd.md): Execute function when specific H4 device joins / leaves network
 * [**H4P_H4DetectorSource**](docs/h4pd.md): Switch default BinarySwitch/Thing when specific H4 device joins / leaves network
 * [**H4P_MDNSDetector**](docs/h4pd.md): Execute function when specific MDNS service/protocol found / lost on network
@@ -121,7 +118,7 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 * [**H4P_Sunrise**](docs/h4tk.md#sunrisesunset) **EXPERIMENTAL** : Gets sunsrise / sunset times from public API give Lat/Long
 * [**H4P_ToneController**](docs/h4tc.md) Buzzer, tones, sirens and...music!
   
-## Diagnostic / Development tools:
+## Diagnostic / Logging / Development tools:
 
 * [**H4P_CmdErrors**](docs/h4ce.md): Provide text error messages instead of error codes to SerialCmd
 * [**H4P_HeapWarn**](docs/h4hw.md): Call user function on low Heap
@@ -129,11 +126,12 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 * [**H4P_LoopCount**](docs/h4qw.md): Display loops/sec for diagnosing bottlencks
 * [**H4P_TaskSniffer**](docs/h4ts.md): Low-level task / queue dumper for H4 + Plugins
 * [**H4P_SerialLogger**](docs/h4logs.md): Event logging to serial monitor
-* [**H4P_LocalLogger**](docs/h4logs.md): Event logging to SPIFFS file
-* [**H4P_MQTTLogger**](docs/h4logs.md): Event logging to MQTT Serve
+* [**H4P_LocalLogger**](docs/h4logs.md): Event logging to LittleFS file
+* [**H4P_MQTTLogger**](docs/h4logs.md): Event logging to MQTT Server
 * [**H4P_MQTTHeapLogger**](docs/h4logs.md): Specialised H4P_MQTTLogger which periodically logs value of free heap
 * [**H4P_MQTTQueueLogger**](docs/h4logs.md): Specialised H4P_MQTTLogger which periodically logs size of Queue
 * [**H4P_HttpMySQLLogger**](docs/mysql.md): log to remote webserver to update MySQL log db (server example provided)
+* [**H4P_Heartbeat**](docs/advanced.md): call user-defined function exry 1 second
   
 ## Specialist Device Drivers
 
@@ -148,7 +146,6 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 * ESP8266 - any board e.g. nodeMCU, Wemos D1 Mini etc
 * ESP8285 - any board e.g. Wemos D1 mini Lite
 * ESP32 - any board e.g. DevKit, Lolin D32
-* STM32-NUCLEO - "official" boards from ST - others may work too
 * SONOFF Basic, S20, SV others may work too if ESP8266 based
 
 ---
@@ -157,13 +154,12 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 
 H4Plugins is tested using
 
-* H4 0.5.4
-* ArduinoIDE 1.8.12
-* ESP8266 core 2.7.1
+* H4 1.0.0
+* ArduinoIDE 1.8.13
+* ESP8266 core 2.7.4
 * ESP32 core 1.0.4
-* STM32-NUCLEO core 1.8.0
 
-Use the ArduinoIDE boards manager to install those versions. Earlier version *may* work, but am only able to offer support on the above.
+Use the ArduinoIDE boards manager to install those versions. Earlier version *may* work, but I am only able to offer support when all the above are in use.
 
 H4Plugins is a standard Arduino library. The simplest method is to download the zip form the link above and then use the menu command: `Sketch / Include Library / Add .ZIP Library...`
 
@@ -171,32 +167,26 @@ First you need to install the [H4](https://github.com/philbowles/H4) library.
 
 Next install the 3rd-party libraries:
 
-* [AsyncMQTT](http://github.com/philbowles/asyncmqtt)
+* [PangolinMQTT](http://github.com/philbowles/PangolinMQTT)
 * [ESP8266 ESPAsyncUDP Library](https://github.com/me-no-dev/ESPAsyncUDP)
-* [ESP8266 ESPAsyncTCP Library](https://github.com/me-no-dev/ESPAsyncTCP)
 * [ESP32 AsyncTCP Library](https://github.com/me-no-dev/AsyncTCP)
 
 The above libraries coexist quite happily if you download all of them to enable targetting both ESP8266 and ESP32.
 
 * [ESPAsyncWebServer](https://github.com/philbowles/ESPAsyncWebServer)
+* [ESP8266 ESPAsyncTCP Library](https://github.com/philbowles/ESPAsyncTCP)
 
-**N.B** If you have previously installed the original version of the above, by "me-no-dev" you *must* uninstall it and use only this patched version. 
-The author seems unwilling to fix several serious bugs - the above version works *and is required* for correct functioning of H4/Plugins
+**N.B** If you have previously installed the original version of either of the above, by "me-no-dev" you *must* uninstall it and use only the patched version. 
+The author seems unwilling/unable to fix several serious bugs - the above version work *and are required* for correct functioning of H4/Plugins.
   
 * Finally, install this H4Plugins library
 
-If using WiFi, you will need to install either the [ESP8266 sketch data uploader](https://github.com/esp8266/arduino-esp8266fs-plugin) or the [ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin) (or both) depending on which platform you compile for. 
+If using WiFi, you will need to install either the [LittleFS upload tool](https://github.com/earlephilhower/arduino-esp8266littlefs-plugin) or the [ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin) (or both) depending on which platform you compile for. 
 
 # Tools / Build Guidelines
 
 To reduce the footprint of the binary code and provide best WiFi / MQTT performance, the following IDE options
 are recommended (if available for the chosen board):
-
-See [Advanced Topics](docs/advanced.md) for how to simply add H4 optimised board definitions that will ensure you get the smallest possible binary (and therefore most likely to be OTA-able)
-
-## Optimised Board Definitions
-
-![Optimised Boards](assets/optismall.jpg)
 
 ## For ALL sketches
 
@@ -204,13 +194,18 @@ See [Advanced Topics](docs/advanced.md) for how to simply add H4 optimised board
 )
 ### **IMPORTANT**
 
-WiFI sketches must reserve SPIFFS space to hold the AP Mode web pages. These take < 64K so allocate the minimum SPIFFS possible that is greater than or equal to 64k and remember to copy the `data` folder to the sketch folder and upload using either the [ESP8266 sketch data uploader](https://github.com/esp8266/arduino-esp8266fs-plugin) or the [ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin) (or both) depending on which platform you compile for.
+WiFi sketches must reserve LittleFS space to hold the configuration web UI pages. These take < 64K so allocate the minimum LittleFS possible that is greater than or equal to 64k and remember to copy the `data` folder to the sketch folder and upload using either the  [LittleFS upload tool](https://github.com/earlephilhower/arduino-esp8266littlefs-plugin) or the [ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin) (or both) depending on which platform you compile for.
+
+## H4 Optimised Board Definitions
+
+See [Advanced Topics](docs/advanced.md) for how to simply add H4 optimised board definitions that will ensure you get the smallest possible binary (and therefore most likely to be OTA-able)
+
+![Optimised Boards](assets/optismall.jpg)
 
 ---
 
 # In the pipeline
 
-* Ethernet manager (for STM32 NUCLEO)
 * Web-driven OTA (by file upload)
 * wifiClient http / https
 * ESP32 Bluetooth detector

@@ -46,7 +46,7 @@ class H4P_MultiFunctionButton: public H4Plugin{
                 {0,[this](H4GPIOPin*){ _btp->toggle(); }},
                 {H4MF_REBOOT,[](H4GPIOPin*){ h4reboot(); }},
                 {H4MF_FACTORY,[](H4GPIOPin*){ h4FactoryReset(); }},
-                {10000,[](H4GPIOPin*){ h4wifi.forceAP(); }}
+                {H4MF_APMODE,[](H4GPIOPin*){ h4wifi.forceAP(); }}
             };
 
             void            _greenLight() override {} // no autostart
