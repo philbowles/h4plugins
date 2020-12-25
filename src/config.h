@@ -28,8 +28,10 @@ SOFTWARE.
 */
 #define H4P_VERSION "1.0.0"
 
+constexpr char* h4pvTag(){ return "h4pv"; }
+
 // comment this out to prevent and logging by EVENT( whatever ) messages
-//#define H4P_LOG_EVENTS
+#define H4P_LOG_EVENTS
 
 // comment this out to save a little flash if OTA not required
 #define H4P_USE_OTA

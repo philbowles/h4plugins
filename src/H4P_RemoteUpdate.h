@@ -46,7 +46,7 @@ class H4P_RemoteUpdate: public H4Plugin, public HTTPUpdate {
                 void        _greenLight(){} // no autostart
                 void        _hookIn(){ DEPEND(wifi); }
                 void        _updateFromUrl(bool fw,bool reboot){
-                    String updateUrl=CSTR(replaceAll((_url+"/"+_cb[boardTag()]+"/"+_cb["date"])," ","_"));
+                    String updateUrl=CSTR(replaceAll((_url+"/"+_cb[boardTag()]+"/"+_cb[h4pvTag()])," ","_"));
                     String version=fw ? CSTR(_cb[h4pvTag()]):CSTR(_cb[h4svTag()]); // tag it
                     H4EVENT("%s [%s]",CSTR(updateUrl),CSTR(version));
                     h4wifi._downHooks();

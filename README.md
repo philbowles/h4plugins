@@ -1,6 +1,6 @@
 ![H4P Logo](/assets/H4PLogo.png)
 
-# Arduino IDE library targeting ESP8266, ESP32 providing IOT functionality including WiFi, MQTT, GPIO management and diagnostic tools
+# Arduino IDE library targeting ESP8266, ESP32 providing IOT functionality including WiFi, MQTT, Logging, Presence Detection, NTP sync, GPIO management and diagnostic tools
 
 *All plugins depend upon the presence of the [H4 library](https://github.com/philbowles/H4), which must be installed first.*
 
@@ -11,7 +11,20 @@ Think of [**H4**](https://github.com/philbowles/H4) and its plugins as "IOT Lego
 
 ![H4PluginsFF](/assets/h4plugins.jpg)
 
-H4Plugins includes modules for WiFi + OTA, Webserver, MQTT, numerous common types of GPIO handling (e.g. debouncing, rotary encoders), Amazon Alexa voice control, NTP synchronisation, device presence detection, logging to remote MySQL server and extensive diagnostics. By "plugging " together only the required modules, you can rapidly build your own custom firmware or IOT app. Everything you build will be stable and responsive: the plugins work together to allow multiple simultaneous processes to run, so ***no more WDT resets***! As your experience grows you can extend your app / firmware with H4Plugins' well-documented API and runtime command system. Let's see an example of H4Plugins being used as replacement firmware for a SONOFF Basic switch.
+H4Plugins includes modules for WiFi + OTA, Webserver, MQTT, numerous common types of GPIO handling (e.g. debouncing, rotary encoders), Amazon Alexa voice control, NTP synchronisation, device presence detection, logging to remote MySQL server and extensive diagnostics. By "plugging " together only the required modules, you can rapidly build your own custom firmware or IOT app. Everything you build will be stable and responsive: the plugins work together to allow multiple simultaneous processes to run, so ***no more WDT resets***! As your experience grows you can extend your app / firmware with H4Plugins' well-documented API and runtime command system. 
+
+---
+# Getting Started
+
+H4 and its plugin system represent a very different way of getting started on ESP8266 from the "standard" examples found all over the web.
+
+There are some very good reasons for that but it means that there are a few things you need to know about H4 and how it works before "diving in" to the H4Plugins system. Spending a few minutes reading [the basics of H4](https://github.com/philbowles/H4#why-do-i-need-it) will save you days and even weeks of effort, so please digest it all before trying some of the 70+ examples in this repo - it will be time well spent!
+
+Once you "get" how H4 and the plugin system work, you will be able to churn out fully working, multi-functional **stable** IOT apps on ESP8266 in only a few lines of code, compared with literally *hundreds* (sometimes even *thousands*!) of lines in the "standard" way of doing things. That's if you can even find anything close to what you need...
+
+So only continue if ( after having read [the basics of H4](https://github.com/philbowles/H4#why-do-i-need-it) ) you now know what *events* are, what *the queue* is and why you need them.
+
+To get a "feel" for just how different H4 and H4Plugins are from all the other examples you will find on the web, let's see an example of H4Plugins being used as replacement firmware for a SONOFF Basic switch.
 
 ## SONOFF Basic Example
 
@@ -44,15 +57,59 @@ H4P_UPNPServer h4upnp("Salon Eiffel Tower");
 H4P_MultiFunctionButton h4mfb(BUTTON_BUILTIN,INPUT,ACTIVE_LOW,15,LED_BUILTIN,ACTIVE_LOW);
 ```
 
-As you can see, all you need to do is list the modules/functionality you require and provide a few necessary values such as ssid / passwords etc and the plugins link up with each other, exchange messages between themselves and "stitch" everything together into a seamless piece of stable firmware. If you know of anything easier for both beginners and seasoned developers, please let us know.
+As you can see, all you need to do is list the modules/functionality you require (each one is a "plugin") and provide a few necessary values such as ssid / passwords etc and the plugins link up with each other, exchange messages between themselves and "stitch" everything together into a seamless piece of stable firmware. If you know of anything easier for both beginners and seasoned developers, please let us know.
 
-The modular design of H4's plugin architecture minimises scarce resources in low-memory MCU targets: You only compile in what you need by choosing the relevant bulding blocks. Detailed diagnostics can be easily included (or completely compiled-out) and controlled at runtime via the serial console, web console,HTTP REST or MQTT depending on which options you choose. It is built on top of the very stable [H4](https://github.com/philbowles/H4) timer/scheduler which traces its ancestry back to "Esparto" - of which one user recently said: *"and now have Esparto modules with months of uptime without an issue"*.
+## Designed for programmers
+
+The modular design of H4's plugin architecture minimises scarce resources in low-memory MCU targets: You only compile in what you need by choosing the relevant bulding blocks. Detailed logging and/or diagnostics can be easily included (or completely compiled-out) and controlled at runtime via the serial console, web console,HTTP REST or MQTT depending on which options you choose. It is built on top of the very stable [H4](https://github.com/philbowles/H4) timer/scheduler which traces its ancestry back to "Esparto" - of which one user recently said: *"and now have Esparto modules with months of uptime without an issue"*.
 
 There are over 70 example sketches demonstrating all the features and the API of all of the plugins. They should be used both as a template for your own sketches and as a learning resource.
 
 Each plugin is also throroughly documented in the links below. *Please make sure you have read and fully understood the documentation for the [H4 library](https://github.com/philbowles/H4) and the relevant Plugin(s) before raising an issue.*
 
 Also please prefer the [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/) group over the github issues mechanism, as I don't look at github that often, nor open my email until it backs up, but I'm on FB pretty much every day and you will get a much quicker response.
+
+## The "Common Command Core" concept
+
+Take a simple device that switches on a relay, perhaps connected to a lamp. Its most fundamental control mechanism is to be switched either ON or OFF.
+
+H4Plugins allows that switching to be done in a number of ways, including:
+
+* Physical GPIO switch
+* MQTT message
+* Web User Interface
+* Serial Console
+* Remote HTTP REST-like interface
+* Internal program code
+* Amazon Alexa Voice command
+
+(Depending on which plugins you choose to include in your app)
+
+H4/Plugins tries to make the format of all those commands as close as possible to being the same and one single, common piece of code is called no matter from which source the event was initiated.
+
+For example, imagine our device is called demo and is on IP 192.168.1.4
+
+* If I am connected to it via a serial console, to turn it on I would type:
+
+`h4/on`
+
+* If I have an MQTT client, I would publish the topic:
+
+`demo/h4/on`
+
+* If I have some other code such as NODE-RED running, I can send an http:// request:
+
+`http://192.168.1.4/rest/h4/on`
+
+* If I click the "Big red button" on the web user interface, the javascript actually sends an ajax request to itself:
+
+`http://192.168.1.4/rest/h4/on`
+
+* I can shout "Alexa! Switch on demo" and the same code that gets run by any / all of the above will execute and turn on the relay -> lamp.
+
+In summary, a command is a command is a command no matter where it comes from. Subject to the necessary quirks of each source, the final part of the command is always the same. This means that when reading the documentation, only that last part of the command described, no matter how simple or how complex its effect is.
+
+If it can be done by *any* of the methods described above, it can - by definition - be done by *all* of them. So in the documentation or support groups you might see "try giving it an h4/reboot" or "what is the result of an h4/show/config?" and how you actually do that to *your* device depends entirely on what plugins you have included: in effect the actual command itself is disconnected from its source - how you choose to get the command into the device is up to you, but the device will do exactkly the same thing whichever method you choose.
 
 ---
 

@@ -77,10 +77,7 @@ uint32_t H4P_SerialCmd::_dispatch(vector<string> vs,uint32_t owner=0){
             if(i->second.fn) return (bind(i->second.fn,CHOP_FRONT(vs)))();
             else return _dispatch(CHOP_FRONT(vs),i->second.levID);
         } else return H4_CMD_UNKNOWN;
-    } else {
-        Serial.printf("FICELLE EPUISE****\n");
-        return H4_CMD_UNKNOWN;
-    }
+    } else return H4_CMD_UNKNOWN;
 }
 
 string H4P_SerialCmd::_errorString(uint32_t err){ return isLoaded(cerrTag()) ? h4ce.getErrorMessage(err):"Error: "+stringFromInt(err); }

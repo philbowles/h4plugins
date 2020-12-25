@@ -8,6 +8,8 @@ Optional: Allows you to "tag" your tasks with a name* so that you can find them
     *keep it to 4 chs or the columns won't line up
 
 */
+H4P_CmdErrors h4ce;
+
 const char* giveTaskName(uint32_t n){
   static H4_INT_MAP mydata={
     {1,"Tick"},
@@ -19,8 +21,6 @@ const char* giveTaskName(uint32_t n){
   return mydata.count(n) ? mydata[n].c_str():"ANON";
 }
 // if you don't want task naming, just delete the above
-
-
 
 void h4setup() {
     h4.everyRandom(5000,10000,[](){ 
@@ -37,7 +37,7 @@ void h4setup() {
       h4.nTimes(11,5000,[](){ // the song is "10 green bottles", but we want to include zero
         uint32_t nBottles=11 - (h4.context->nrq+1);
         Serial.print(nBottles);Serial.println(" green bottles, hangin' on a wall...");
-      },nullptr,99);
+      },nullptr,99); // 99 will give "ANON" !
     },13);
 }
 /*
@@ -47,6 +47,8 @@ void h4setup() {
         that must be called regularly.
 
         If you dont have any, delete the whole function
+
+        NB - SEE H4 config.h as h4UserLoop can be turned off to improve performance
 */
 void h4UserLoop(){
   static long prev=0;

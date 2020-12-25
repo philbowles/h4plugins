@@ -32,7 +32,7 @@ H4_INT_MAP  cmdErrors={
 };
 ```
 
-Merely installing the plugin before [**H4P_SerialCmd**](h4cmd.md) automatically provides the translation without any further ado.
+Merely installing the plugin before any other automatically provides the translation(s) without any further ado.
 
 ---
 
@@ -41,15 +41,14 @@ Merely installing the plugin before [**H4P_SerialCmd**](h4cmd.md) automatically 
 ```cpp
 #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
-H4P_CmdErrors h4ce; // must be created BEFORE H4P_SerialCmd
+H4P_CmdErrors h4ce; // must be created BEFORE any others
 
 
 ```
 
 ## Dependencies
 
-None, but must be included *before* [**H4P_SerialCmd**](h4cmd.md)
-
+None, but must be included *before* other plugins
 ## Commands Added
 
 none
