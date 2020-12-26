@@ -43,7 +43,7 @@ H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Plugin(scmdTag()){
         {"show",       { H4PC_H4, H4PC_SHOW, nullptr}},
         {"all",        { H4PC_SHOW, 0, CMD(all) }},
         {"config",     { H4PC_SHOW, 0, CMD(config) }},
-        {"q",          { H4PC_SHOW, 0, CMD(dumpQ) }},
+        {"q",          { H4PC_SHOW, 0, CMD(showQ) }},
         {"plugins",    { H4PC_SHOW, 0, CMD(plugins) }},
         {"heap",       { H4PC_SHOW, 0, CMD(heap) }},
         {"fs",         { H4PC_SHOW, 0, CMD(showFS)}},
@@ -241,7 +241,7 @@ string H4P_SerialCmd::_dumpTask(task* t){
     return string(buf);
 }
 
-void H4P_SerialCmd::dumpQ(){
+void H4P_SerialCmd::showQ(){
 	reply("Due @tick Type              Min       Max       nRQ");  
     vector<task*> tlist=h4._copyQ();
     sort(tlist.begin(),tlist.end(),[](const task* a, const task* b){ return a->at < b->at; });

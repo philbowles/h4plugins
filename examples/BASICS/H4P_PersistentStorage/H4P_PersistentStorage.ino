@@ -5,7 +5,6 @@ void onChange(const string& name,const string& value){
     Serial.printf("ITEM %s changed to %s\n",CSTR(name),CSTR(value));
 }
 
-
 H4P_PersistentStorage h4ps(onChange);
 
 void h4setup() {

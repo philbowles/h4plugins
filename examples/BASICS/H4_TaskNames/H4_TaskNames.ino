@@ -25,7 +25,7 @@ const char* giveTaskName(uint32_t n){
 void h4setup() {
     h4.everyRandom(5000,10000,[](){ 
     Serial.print(millis());Serial.println(" RUDE INTERRUPTION");
-    h4cmd.dumpQ();
+    h4cmd.showQ();
   },nullptr,4);
 
   h4.every(1000,[]{ Serial.print(millis());Serial.println(" PING "); },nullptr,1);  

@@ -83,7 +83,7 @@ class H4P_SerialCmd: public H4Plugin {
 
         VSCMD(_dump);   // public so logger can use it
 
-                void            dumpQ();
+                void            showQ();
         static  string          _dumpTask(task*);
 //      user
                 void            addCmd(const string& name,uint32_t owner, uint32_t levID,H4_FN_MSG f=nullptr){  _commands.insert(make_pair(name,command {owner,levID,f})); }

@@ -26,7 +26,7 @@ H4_USE_PLUGINS(115200,SMALL_Q,false) // Serial baud rate, Q size, SerialCmd auto
 void qIsLow(bool inDanger){ 
   if(inDanger) {
     Serial.println("Warning, Will Robinson - low Q!!!"); // See 1960s TV SciFi series "Lost in Space" :)
-    h4cmd.dumpQ();
+    h4cmd.showQ();
   }
 }
 

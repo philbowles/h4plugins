@@ -25,8 +25,8 @@ void h4setup() { // H4 constructor starts Serial
     h4cmd.invokeCmd("help"); // Automatically show help at startup
     Serial.println("Show Q caused by invokeCmd");
     h4cmd.invokeCmd("h4/show/q"); // Automatically show H4 queue at startup
-    Serial.println("Show Q caused by call to dumpQ()");
-    h4cmd.dumpQ(); // same as above but more efficient
+    Serial.println("Show Q caused by call to showQ()");
+    h4cmd.showQ(); // same as above but more efficient
     if(h4cmd.invokeCmd("bogus/nonsense")) Serial.println("Invalid command invoked");
     Serial.println("Show all caused by call to all()");
     h4cmd.all(); // show everything

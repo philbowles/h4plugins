@@ -14,6 +14,16 @@ Think of [**H4**](https://github.com/philbowles/H4) and its plugins as "IOT Lego
 H4Plugins includes modules for WiFi + OTA, Webserver, MQTT, numerous common types of GPIO handling (e.g. debouncing, rotary encoders), Amazon Alexa voice control, NTP synchronisation, device presence detection, logging to remote MySQL server and extensive diagnostics. By "plugging " together only the required modules, you can rapidly build your own custom firmware or IOT app. Everything you build will be stable and responsive: the plugins work together to allow multiple simultaneous processes to run, so ***no more WDT resets***! As your experience grows you can extend your app / firmware with H4Plugins' well-documented API and runtime command system. 
 
 ---
+
+# Contents
+
+* [Getting Started](#getting-started)
+* [Examples / Ideas](#examples--applications--ideas)
+* [List of Plugins](#plugins)
+* [Compatible Hardware](#compatible-hardware)
+* [Installation](#installation)
+
+---
 # Getting Started
 
 H4 and its plugin system represent a very different way of getting started on ESP8266 from the "standard" examples found all over the web.
@@ -109,7 +119,7 @@ For example, imagine our device is called demo and is on IP 192.168.1.4
 
 In summary, a command is a command is a command no matter where it comes from. Subject to the necessary quirks of each source, the final part of the command is always the same. This means that when reading the documentation, only that last part of the command described, no matter how simple or how complex its effect is.
 
-If it can be done by *any* of the methods described above, it can - by definition - be done by *all* of them. So in the documentation or support groups you might see "try giving it an h4/reboot" or "what is the result of an h4/show/config?" and how you actually do that to *your* device depends entirely on what plugins you have included: in effect the actual command itself is disconnected from its source - how you choose to get the command into the device is up to you, but the device will do exactkly the same thing whichever method you choose.
+If it can be done by *any* of the methods described above, it can - by definition - be done by *all* of them. So in the documentation or support groups you might see "try giving it an h4/reboot" or "what is the result of an h4/show/config?" and how you actually do that to *your* device depends entirely on what plugins you have included: in effect the actual command itself is disconnected from its source - how you choose to get the command into the device is up to you, but the device will do exactly the same thing whichever method you choose.
 
 ---
 
@@ -149,47 +159,47 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 # Plugins
 ## Core IOT functionality
 
-* [**H4P_SerialCmd**](docs/h4cmd.md): Send commands from multiple sources to H4 and/or plugins to control and/or diagnose
-* [**H4P_FlasherController**](docs/h4fc.md): One-line coding of multiple simultaneous LED flashing by Square Wave, PWM, abitrary pattern and Morse code
-* [**H4P_GPIOManager**](docs/h4gm.md): One-line coding of debouncing, retriggering, rotary encoding plus numerous other GPIO strategies
-* [**H4P_WiFi**](docs/h4wifi.md): Automatic Connection / reconnection manager + AP configuration + OTA
-* [**H4P_AsyncWebServer**](docs/h4asws.md): Fully Asynchronous Webserver  + HTTP REST handler + user fields manager
 * [**H4P_AsyncMQTT**](docs/h4mqtt.md): Automatic Connection/ reconnection MQTT client (allows remote control of H4)
+* [**H4P_AsyncWebServer**](docs/h4asws.md): Fully Asynchronous Webserver  + HTTP REST handler + user fields manager
 * [**H4P_BinarySwitch**](docs/things.md): GPIO object that allows control by commands from multiple sources
 * [**H4P_BinaryThing**](docs/things.md): user-defined functional object that allows control by commands from multiple sources
 * [**H4P_ConditionalSwitch**](docs/things.md): H4P_BinarySwitch that only operates when user-define function returns true
 * [**H4P_ConditionalThing**](docs/things.md): H4P_BinaryThing that only operates when user-define function returns true
-* [**H4P_UPNPServer**](docs/things.md): provides full UPNP device with Alexa voice control, Windows10 Desktop integration
-* [**H4P_MultiFunctionButton**](docs/h4mfnb.md): Tact-button giving on/off, reboot,factory reset and forced AP Mode depending on hold time
-* [**H4P_PersistentStorage**](docs/h4stor.md): Save name/value pairs across reboots (requires LittleFS)
+* [**H4P_FlasherController**](docs/h4fc.md): One-line coding of multiple simultaneous LED flashing by Square Wave, PWM, abitrary pattern and Morse code
+* [**H4P_GPIOManager**](docs/h4gm.md): One-line coding of debouncing, retriggering, rotary encoding plus numerous other GPIO strategies
 * [**H4P_H4Detector**](docs/h4pd.md): Execute function when specific H4 device joins / leaves network
 * [**H4P_H4DetectorSource**](docs/h4pd.md): Switch default BinarySwitch/Thing when specific H4 device joins / leaves network
-* [**H4P_MDNSDetector**](docs/h4pd.md): Execute function when specific MDNS service/protocol found / lost on network
-* [**H4P_MDNSDetectorSource**](docs/h4pd.md): Switch default BinarySwitch/Thing when specific MDNS service/protocol found / lost on network
 * [**H4P_IPDetector**](docs/h4pd.md): Execute function when specific IP address joins / leaves network
 * [**H4P_IPDetectorSource**](docs/h4pd.md): Switch default BinarySwitch/Thing when specific IP address joins / leaves network
+* [**H4P_MDNSDetector**](docs/h4pd.md): Execute function when specific MDNS service/protocol found / lost on network
+* [**H4P_MDNSDetectorSource**](docs/h4pd.md): Switch default BinarySwitch/Thing when specific MDNS service/protocol found / lost on network
+* [**H4P_MultiFunctionButton**](docs/h4mfnb.md): Tact-button giving on/off, reboot,factory reset and forced AP Mode depending on hold time
+* [**H4P_PersistentStorage**](docs/h4stor.md): Save name/value pairs across reboots (requires LittleFS)
+* [**H4P_RemoteUpdate**](docs/h4ru.md): OTA update from remote server
+* [**H4P_SerialCmd**](docs/h4cmd.md): Send commands from multiple sources to H4 and/or plugins to control and/or diagnose
+* [**H4P_Sunrise**](docs/h4tk.md#sunrisesunset) **EXPERIMENTAL** : Gets sunsrise / sunset times from public API give Lat/Long
+* [**H4P_Timekeeper**](docs/h4tk.md): NTP server sync for "clock time" alarms and scheduling
+* [**H4P_ToneController**](docs/h4tc.md) Buzzer, tones, sirens and...music!
 * [**H4P_UPNPDetector**](docs/h4pd.md): Execute function when specific UPNP device USN joins / leaves network
 * [**H4P_UPNPDetectorSource**](docs/h4pd.md): Switch default BinarySwitch/Thing when specific UPNP device USN joins / leaves network
-* [**H4P_RemoteUpdate**](docs/h4ru.md): OTA update from remote server
-* [**H4P_Timekeeper**](docs/h4tk.md): NTP server sync for "clock time" alarms and scheduling
-* [**H4P_Sunrise**](docs/h4tk.md#sunrisesunset) **EXPERIMENTAL** : Gets sunsrise / sunset times from public API give Lat/Long
-* [**H4P_ToneController**](docs/h4tc.md) Buzzer, tones, sirens and...music!
+* [**H4P_UPNPServer**](docs/things.md): provides full UPNP device with Alexa voice control, Windows10 Desktop integration
+* [**H4P_WiFi**](docs/h4wifi.md): Automatic Connection / reconnection manager + AP configuration + OTA
   
 ## Diagnostic / Logging / Development tools:
 
 * [**H4P_CmdErrors**](docs/h4ce.md): Provide text error messages instead of error codes to SerialCmd
 * [**H4P_HeapWarn**](docs/h4hw.md): Call user function on low Heap
-* [**H4P_QueueWarn**](docs/h4qw.md): Call user function on low Queue
-* [**H4P_LoopCount**](docs/h4qw.md): Display loops/sec for diagnosing bottlencks
-* [**H4P_TaskSniffer**](docs/h4ts.md): Low-level task / queue dumper for H4 + Plugins
-* [**H4P_SerialLogger**](docs/h4logs.md): Event logging to serial monitor
-* [**H4P_LocalLogger**](docs/h4logs.md): Event logging to LittleFS file
-* [**H4P_MQTTLogger**](docs/h4logs.md): Event logging to MQTT Server
-* [**H4P_MQTTHeapLogger**](docs/h4logs.md): Specialised H4P_MQTTLogger which periodically logs value of free heap
-* [**H4P_MQTTQueueLogger**](docs/h4logs.md): Specialised H4P_MQTTLogger which periodically logs size of Queue
-* [**H4P_HttpMySQLLogger**](docs/mysql.md): log to remote webserver to update MySQL log db (server example provided)
 * [**H4P_Heartbeat**](docs/advanced.md): call user-defined function exry 1 second
-  
+* [**H4P_HttpMySQLLogger**](docs/mysql.md): log to remote webserver to update MySQL log db (server example provided)
+* [**H4P_LoopCount**](docs/h4qw.md): Display loops/sec for diagnosing bottlencks
+* [**H4P_LocalLogger**](docs/h4logs.md): Event logging to LittleFS file
+* [**H4P_MQTTHeapLogger**](docs/h4logs.md): Specialised H4P_MQTTLogger which periodically logs value of free heap
+* [**H4P_MQTTLogger**](docs/h4logs.md): Event logging to MQTT Server
+* [**H4P_MQTTQueueLogger**](docs/h4logs.md): Specialised H4P_MQTTLogger which periodically logs size of Queue
+* [**H4P_QueueWarn**](docs/h4qw.md): Call user function on low Queue
+* [**H4P_SerialLogger**](docs/h4logs.md): Event logging to serial monitor
+* [**H4P_TaskSniffer**](docs/h4ts.md): Low-level task / queue dumper for H4 + Plugins
+
 ## Specialist Device Drivers
 
 * [**H4P_ExternalSqWave**](docs/h4esw.md): Serial driver for cheap ebay square wave device
@@ -240,7 +250,7 @@ The author seems unwilling/unable to fix several serious bugs - the above versio
 
 If using WiFi, you will need to install either the [LittleFS upload tool](https://github.com/earlephilhower/arduino-esp8266littlefs-plugin) or the [ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin) (or both) depending on which platform you compile for. 
 
-# Tools / Build Guidelines
+## Tools / Build Guidelines
 
 To reduce the footprint of the binary code and provide best WiFi / MQTT performance, the following IDE options
 are recommended (if available for the chosen board):
@@ -258,18 +268,6 @@ WiFi sketches must reserve LittleFS space to hold the configuration web UI pages
 See [Advanced Topics](docs/advanced.md) for how to simply add H4 optimised board definitions that will ensure you get the smallest possible binary (and therefore most likely to be OTA-able)
 
 ![Optimised Boards](assets/optismall.jpg)
-
----
-
-# In the pipeline
-
-* Web-driven OTA (by file upload)
-* wifiClient http / https
-* ESP32 Bluetooth detector
-* ESP32 MDNSDetector
-* ESP32 RemoteUpdate
-
-Plus of course any others you think may be useful. Let me know using one of the links below
 
 ---
 

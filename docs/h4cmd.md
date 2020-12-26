@@ -53,7 +53,7 @@ h4cmd.invokeCmd("h4/some/cmd/with/many/levels","42,666");
 Generally, each plugin also provides functions that correspond to the command-line equivalent, but are more efficient than the invokeCmd method. For example, calling
 
 ```cpp
-h4cmd.dumpQ();
+h4cmd.showQ();
 ```
 
 Has the same effect as typing "h4/show/q" at the console, MQTT publishing a topic of "h4/show/q" or receiving `http://< some ip >/rest/h4/show/q`. The only difference is that the resulting dump of the H4 queue is sent back to the originating source, respectively the console, MQTT server, or the web browser.
@@ -173,7 +173,7 @@ H4P_SerialCmd(bool autoStop=true);
 ```cpp
 void all();
 void config();
-void dumpQ();
+void showQ();
 void h4reboot(); //** provided by h4, use h4.h4reboot(), NOT h4cmd.h4reboot()
 void h4FactoryReset();
 void help();
@@ -193,7 +193,7 @@ Runs all commands from any loaded plugins containing "show", i.e. `h4/show/q` ..
 
 Shows the contents of H4's internal configuration items. Useful for debugging, but will probably only be relevant to expert users.
 
-### dumpQ()
+### showQ()
 
 #### Equivalent command-line: h4/show/q
 
