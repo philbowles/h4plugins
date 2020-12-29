@@ -34,6 +34,7 @@ SOFTWARE.
 #include<H4P_SerialCmd.h>
 #include<H4P_WiFiSelect.h>
 
+
 class H4P_BinaryThing: public H4Plugin{
             uint32_t        _timeout;
             unordered_set<string>   _slaves;
@@ -52,8 +53,9 @@ class H4P_BinaryThing: public H4Plugin{
     public:
             bool            _state=false;
         H4P_BinaryThing(H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): _f(f),_state(initial),_timeout(timer), H4Plugin(onofTag()) {
+            autoOff(timer);
             _cmds={
-                {"auto",   {H4PC_H4, 0, CMDVS(_autoOff)}},
+                {autoTag(),{H4PC_H4, 0, CMDVS(_autoOff)}},
                 {"on",     {H4PC_H4, 0, CMD(turnOn)}},
                 {"off",    {H4PC_H4, 0, CMD(turnOff)}},
                 {"state",  {H4PC_H4, 0, CMD(show)}},
@@ -63,12 +65,15 @@ class H4P_BinaryThing: public H4Plugin{
         }
 
         virtual void show() override { 
-                reply("State: %s auto-off=%d",_state ? "ON":"OFF",_timeout);
-                for(auto s :_slaves) reply("Slave: %s",CSTR(s));
+                reply("State:%d, auto:%d",_state,_timeout);
+                for(auto s :_slaves) reply("slave: %s",CSTR(s));
             }
 
                     uint32_t getAutoOff(){ return _timeout; }
-                    void     autoOff(uint32_t T){ _timeout=T; }
+                    void     autoOff(uint32_t T){ 
+                        _timeout=T;
+                        _cb[autoTag()]=stringFromInt(T);
+                    }
                     void     slave(const string& otherh4){ _slaves.insert(otherh4); }
                     bool     state() { return _state; }
                     void     turnOff(){ turn(false); }

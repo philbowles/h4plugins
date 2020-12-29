@@ -143,7 +143,7 @@ void H4P_UPNPServer::_upnp(AsyncWebServerRequest *request){ // redo
 #else
         if(_cb["gs"]=="Set") _btp->turn(_set);
 #endif
-        _cb[stateTag()]=stringFromInt(_btp->state());
+//        _cb[stateTag()]=stringFromInt(_btp->state());
         request->send(200, "text/xml", CSTR(replaceParams(_soap))); // refac
     },request),nullptr, H4P_TRID_SOAP);
 }

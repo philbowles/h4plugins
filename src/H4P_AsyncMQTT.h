@@ -48,7 +48,7 @@ class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
             string          device;
             string          prefix=string(h4Tag()).append("/");
             struct H4P_LWT  _lwt;
-
+            vector<string>  _reportList={"board","ip","h4pv","h4sv","pmv"};
         VSCMD(_change);
 
                 void        _greenLight() override;
@@ -67,17 +67,29 @@ class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
             _cb["muser"]=user,
             _cb["mpasswd"]=pass;
 
-            _cmds={ {_pName,    { H4PC_H4, 0, CMDVS(_change) }} };
+            _cmds={ 
+                {_pName,    { H4PC_H4, _subCmd, nullptr }}, 
+                {"change",  { _subCmd, 0, CMDVS(_change) }},
+                {"report",  { _subCmd, 0, CMD(report) }}
+            };
         }
+                void        addReportingItem(const string& ri){ _reportList.push_back(ri); }
                 void        change(const string& broker,uint16_t port);
                 void        publishDevice(const string& topic,const string& payload="");
                 void        publishDevice(const string& topic,uint32_t payload){ publishDevice(topic,stringFromInt(payload)); }
+                void        report();
                 void        subscribeDevice(string topic,H4_FN_MSG f,H4PC_CMD_ID root=H4PC_ROOT);
                 void        unsubscribeDevice(string topic);
 
     //          syscall only
                 void        _reply(string msg) override { publishDevice("reply",msg); }
-                void        show() override { reply("Server: %s:%s %s",CSTR(_cb[brokerTag()]),CSTR(_cb[portTag()]),_state() ? "CNX":"DCX"); }
+                void        show() override {
+                    reply("Server: %s, port:%s, %s",CSTR(_cb[brokerTag()]),CSTR(_cb[portTag()]),_state() ? "CNX":"DCX");
+                    string reporting;
+                    for(auto const r:_reportList) reporting+=r+",";
+                    reporting.pop_back();
+                    reply("Report: %s",CSTR(reporting));
+                }
 };
 
     extern __attribute__((weak)) H4P_AsyncMQTT h4mqtt;

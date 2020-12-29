@@ -107,6 +107,7 @@ constexpr const char* cmdhash(){ return "/h4/#"; }
 
 STAG(alive);
 STAG(asws);
+STAG(auto);
 STAG(beat);
 STAG(board)
 STAG(broker);
@@ -117,7 +118,6 @@ STAG(device);
 STAG(esqw);
 STAG(gpio);
 STAG(h4);
-//STAG(h4pv);
 STAG(h4sv);
 STAG(log);
 STAG(mfnb);
@@ -272,7 +272,14 @@ class H4Plugin {
             for(auto const& p:H4Plugin::_plugins) if(p->_pName==x) return p;
             return nullptr;
         }
-        
+        /*
+        static string   pluginList(){
+            string rv="[";
+            for(auto const& p:H4Plugin::_plugins) rv+="\""+p->_pName+"\",";
+            rv.pop_back();
+            return rv+"]";
+        }
+        */
                 void        restart(){ _restart(); };
         virtual void        show(){}
                 void        start();

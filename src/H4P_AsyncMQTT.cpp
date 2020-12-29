@@ -59,7 +59,8 @@ void H4P_AsyncMQTT::_greenLight(){
             subscribe(CSTR(string(device+cmdhash())),0);
             subscribe(CSTR(string(_cb[chipTag()]+cmdhash())),0);
             subscribe(CSTR(string(_cb[boardTag()]+cmdhash())),0);
-            xPublish(CSTR(string(h4Tag()).append("/online")),device);
+//            xPublish(CSTR(string(h4Tag()).append("/online")),device);
+            report();
             _upHooks();
             _signal();
             H4EVENT("MQTT CNX");
@@ -85,8 +86,8 @@ void H4P_AsyncMQTT::_setup(){ // allow for TLS
     device=_cb[deviceTag()];
     setClientId(CSTR(device));
     if(_lwt.topic=="") {
-        _lwt.topic=CSTR(string(prefix).append("offline"));
-        _lwt.payload=CSTR(device);
+        _lwt.topic=CSTR(string(prefix).append(device).append("/offline"));
+        _lwt.payload=CSTR(_cb[chipTag()]);
     }
     setWill(_lwt.topic,_lwt.QOS,_lwt.retain,_lwt.payload);
     prefix+=device+"/";
@@ -111,7 +112,7 @@ void H4P_AsyncMQTT::_setup(){ // allow for TLS
     }
 }
 
-void H4P_AsyncMQTT::_signal(){ if(isLoaded(aswsTag())) h4asws.uiSync(); } //h4asws.uiSync(uppercase(mqttTag())); }}
+void H4P_AsyncMQTT::_signal(){ if(isLoaded(aswsTag())) h4asws.uiSync(); }
 
 void H4P_AsyncMQTT::_start(){ 
     autorestart=true;
@@ -132,6 +133,13 @@ void H4P_AsyncMQTT::change(const string& broker,uint16_t port){ // add creds
 }
 
 void H4P_AsyncMQTT::publishDevice(const string& topic,const string& payload){ xPublish(CSTR(string(prefix+topic)),payload); }
+
+void H4P_AsyncMQTT::report(){
+    string j="{";
+    for(auto const r:_reportList) j+="\""+r+"\":\""+_cb[r]+"\","; //publishDevice(r,_cb[r]);
+    j.pop_back();
+    publishDevice("report",j+"}");
+}
 
 void H4P_AsyncMQTT::subscribeDevice(string topic,H4_FN_MSG f,H4PC_CMD_ID root){
     string fullTopic=device+"/"+topic;
