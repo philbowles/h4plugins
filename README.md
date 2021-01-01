@@ -189,7 +189,7 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 
 * [**H4P_CmdErrors**](docs/h4ce.md): Provide text error messages instead of error codes to SerialCmd
 * [**H4P_HeapWarn**](docs/h4hw.md): Call user function on low Heap
-* [**H4P_Heartbeat**](docs/advanced.md): call user-defined function exry 1 second
+* [**H4P_Heartbeat**](docs/advanced.md): call user-defined function every 1 second
 * [**H4P_HttpMySQLLogger**](docs/mysql.md): log to remote webserver to update MySQL log db (server example provided)
 * [**H4P_LoopCount**](docs/h4qw.md): Display loops/sec for diagnosing bottlencks
 * [**H4P_LocalLogger**](docs/h4logs.md): Event logging to LittleFS file

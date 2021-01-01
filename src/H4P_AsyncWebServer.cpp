@@ -124,7 +124,7 @@ void H4P_AsyncWebServer::_start(){
     _evts=new AsyncEventSource("/evt");
     _evts->onConnect([this](AsyncEventSourceClient *client){
         h4.queueFunction([this,client](){
-            H4EVENT("SSE Client %08x n=%d T/O=%d nC=%d nUI=%d",client,client->lastId(),H4P_ASWS_EVT_TIMEOUT,_evts->count(),_userItems.size());
+            H4EVENT("H=%u SSE Client %08x n=%d T/O=%d nC=%d nUI=%d",ESP.getFreeHeap(),client,client->lastId(),H4P_ASWS_EVT_TIMEOUT,_evts->count(),_userItems.size());
             if(_evts->count()==1) if(_onC) _onC(); // first time only R WE SURE?
             int n=0;
             for(auto const& i:_userItems) _sendSSE("ui",CSTR(string(i.id+","+stringFromInt(i.type)+","+i.f()+","+(i.a ? "1":"0" ))));
