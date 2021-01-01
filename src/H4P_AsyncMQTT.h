@@ -48,7 +48,7 @@ class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
             string          device;
             string          prefix=string(h4Tag()).append("/");
             struct H4P_LWT  _lwt;
-            vector<string>  _reportList={"board","ip","h4pv","h4sv","pmv"};
+            vector<string>  _reportList={"bin","board","ip","h4pv","h4sv","pmv"};
         VSCMD(_change);
 
                 void        _greenLight() override;

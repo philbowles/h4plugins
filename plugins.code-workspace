@@ -12,7 +12,8 @@
             "deque": "cpp",
             "list": "cpp",
             "vector": "cpp",
-            "typeinfo": "cpp"
+            "typeinfo": "cpp",
+            "functional": "cpp"
         }
     }
 }

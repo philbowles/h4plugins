@@ -265,7 +265,16 @@ uint32_t H4P_SerialCmd::_dump(vector<string> vs){
         })(H4PAYLOAD);
     });
 }
-
+/*
+struct FSInfo {
+    size_t totalBytes;
+    size_t usedBytes;
+    size_t blockSize;
+    size_t pageSize;
+    size_t maxOpenFiles;
+    size_t maxPathLength;
+};
+*/
 #ifdef ARDUINO_ARCH_ESP8266
 void H4P_SerialCmd::showFS(){
     uint32_t sigma=0;
@@ -273,8 +282,12 @@ void H4P_SerialCmd::showFS(){
 
     FSInfo info;
     HAL_FS.info(info);
-    reply("totalBytes %d",info.totalBytes);    
-    reply("usedBytes %d",info.usedBytes);    
+    reply("totalBytes %d",info.totalBytes);
+    reply("usedBytes %d",info.usedBytes);
+    reply("blockSize %d",info.blockSize);
+    reply("pageSize %d",info.pageSize);
+    reply("maxOpenFiles %d",info.maxOpenFiles);
+    reply("maxPathLength %d",info.maxPathLength);
     
     Dir dir = HAL_FS.openDir("/");
 

@@ -1,6 +1,6 @@
 ##############################################################
 H4_Wemos_d1mini.name=H4 Optimised Wemos D1 Mini
-H4_Wemos_d1mini.build.board=ESP8266_WEMOS_D1MINI
+H4_Wemos_d1mini.build.board=D1_MINI
 H4_Wemos_d1mini.build.variant=d1_mini
 H4_Wemos_d1mini.upload.tool=esptool
 H4_Wemos_d1mini.upload.maximum_data_size=81920
