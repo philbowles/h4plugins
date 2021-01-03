@@ -139,6 +139,7 @@ void H4P_AsyncMQTT::report(){
     for(auto const r:_reportList) j+="\""+r+"\":\""+_cb[r]+"\","; //publishDevice(r,_cb[r]);
     j.pop_back();
     publishDevice("report",j+"}");
+    H4EVENT("Reporting %s}",CSTR(j));
 }
 
 void H4P_AsyncMQTT::subscribeDevice(string topic,H4_FN_MSG f,H4PC_CMD_ID root){
