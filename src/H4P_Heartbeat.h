@@ -38,11 +38,12 @@ class H4P_Heartbeat: public H4Plugin {
                 H4_FN_VOID  _bf;
 
                 void        _greenLight() override { _start(); }; // autostart
+                void        _hookIn() override; // autostart
                 void        _start() override;
                 void        _stop() override ;
                 void        _run();
     public: 
-        H4P_Heartbeat(H4_FN_VOID beat): _bf(beat),H4Plugin(beatTag()){}
+        H4P_Heartbeat(H4_FN_VOID beat=nullptr): _bf(beat),H4Plugin(beatTag()){}
 
         static string secsToTime(uint32_t sex);
 

@@ -38,10 +38,14 @@ void  H4P_AsyncWebServer::_hookIn(){
     DEPEND(wifi);
     H4Plugin* p=isLoaded(onofTag());
     if(p) _btp=reinterpret_cast<H4P_BinaryThing*>(p);
-    _uiAdd("H4 Vn",H4P_UI_LABEL,[]()->string{ return H4_VERSION; });
-    _uiAdd("H4Plugins Vn",H4P_UI_LABEL,[]()->string{ return _cb[h4pvTag()]; });
-    _uiAdd("UI Vn",H4P_UI_LABEL,[]()->string{ return _cb[h4svTag()]; });
-    if(isLoaded(mqttTag())) _uiAdd("Pangolin Vn",H4P_UI_LABEL,[]()->string{ return _cb["pmv"]; });
+    _uiAdd("Device",H4P_UI_LABEL,_cb[deviceTag()]);
+    _uiAdd("ChipID",H4P_UI_LABEL,_cb[chipTag()]);
+    _uiAdd("Board",H4P_UI_LABEL,_cb[boardTag()]);
+    _uiAdd("IP",H4P_UI_LABEL,"?",[]{ return _cb[ipTag()]; }); // cos we don't know it yet
+    _uiAdd("H4 Vn",H4P_UI_LABEL,H4_VERSION);
+    _uiAdd("H4Plugins Vn",H4P_UI_LABEL,_cb[h4pvTag()]);
+    _uiAdd("UI Vn",H4P_UI_LABEL,_cb[h4svTag()]);
+    if(isLoaded(mqttTag())) _uiAdd("Pangolin Vn",H4P_UI_LABEL,_cb[pmvTag()]);
 }
 
 uint32_t H4P_AsyncWebServer::_gpio(vector<string> vs){
@@ -64,7 +68,7 @@ uint32_t H4P_AsyncWebServer::_msg(vector<string> vs){
     });
 }
 
-H4_CMD_ERROR H4P_AsyncWebServer::__uichgCore(const string& a,const string& b,H4_FN_UIACTIVE f){
+H4_CMD_ERROR H4P_AsyncWebServer::__uichgCore(const string& a,const string& b,H4P_FN_UIACTIVE f){
     _sendSSE(CSTR(a),CSTR(b));
     f(a,b);
     return H4_CMD_OK;
@@ -107,7 +111,9 @@ void H4P_AsyncWebServer::_rest(AsyncWebServerRequest *request){
             if(fl.size()) fl.pop_back();
         }
         j+=fl+"]}";
-        request->send(200,"application/json",CSTR(j));
+        AsyncWebServerResponse *response = request->beginResponse(200, "application/json",CSTR(j));
+        response->addHeader("Access-Control-Allow-Origin","*");
+        request->send(response);
         _lines.clear();
 	},request),nullptr,H4P_TRID_ASWS);
 }
@@ -121,13 +127,16 @@ void H4P_AsyncWebServer::_setBothNames(const string& host,const string& friendly
 
 void H4P_AsyncWebServer::_start(){
 	reset();
+    //uiSetLabel("IP",_cb[ipTag()]); // cos we dont know it @ hookin time :)
     _evts=new AsyncEventSource("/evt");
     _evts->onConnect([this](AsyncEventSourceClient *client){
         h4.queueFunction([this,client](){
             H4EVENT("H=%u SSE Client %08x n=%d T/O=%d nC=%d nUI=%d",ESP.getFreeHeap(),client,client->lastId(),H4P_ASWS_EVT_TIMEOUT,_evts->count(),_userItems.size());
             if(_evts->count()==1) if(_onC) _onC(); // first time only R WE SURE?
-            int n=0;
-            for(auto const& i:_userItems) _sendSSE("ui",CSTR(string(i.id+","+stringFromInt(i.type)+","+i.f()+","+(i.a ? "1":"0" ))));
+            for(auto & i:_userItems) {
+                if(i.f) i.value=i.f();
+                _sendSSE("ui",CSTR(string(i.id+","+stringFromInt(i.type)+","+i.value+","+(i.a ? "1":"0" ))));
+            }
             h4.repeatWhile([this]{ return _evts->count(); },
                 ((H4P_ASWS_EVT_TIMEOUT*3)/4),
                 [this]{ /* _sendSSE("","ka"); */ },
@@ -178,7 +187,7 @@ void H4P_AsyncWebServer::uiAddDropdown(const string& name,H4P_CONFIG_BLOCK optio
     string opts="";
     for(auto const& o:options) opts+=o.first+"="+o.second+",";
     opts.pop_back();
-    _uiAdd(name,H4P_UI_DROPDOWN,[opts]{ return opts; },onUiChange);
+    _uiAdd(name,H4P_UI_DROPDOWN,"",[opts]{ return opts; },onUiChange);
 }
 
 void H4P_AsyncWebServer::uiAddGPIO(){ if(isLoaded(gpioTag())) for(auto const& p:H4P_GPIOManager::pins) uiAddGPIO(p.first); }
@@ -195,7 +204,7 @@ H4_CMD_ERROR H4P_AsyncWebServer::uiAddGPIO(uint8_t pin){
                 _sendSSE(CSTR(name),hp->logicalRead() ? "1":"0");
                 if(f) f(hp);
             };
-            _uiAdd(name,H4P_UI_BOOL,[p]{ return p->logicalRead() ? "1":"0"; },nullptr);
+            _uiAdd(name,H4P_UI_BOOL,"",[p]{ return p->logicalRead() ? "1":"0"; },nullptr);
             return H4_CMD_OK;
         } 
         return H4_CMD_OUT_OF_BOUNDS;
@@ -203,15 +212,21 @@ H4_CMD_ERROR H4P_AsyncWebServer::uiAddGPIO(uint8_t pin){
     return H4_CMD_NOT_NOW;
 }
 
-void H4P_AsyncWebServer::uiAddInput(const string& name,H4_FN_UITXT f){
+void H4P_AsyncWebServer::uiAddInput(const string& name,H4P_FN_UITXT f){
     if(f) _cb[name]=f();
-    _uiAdd(name,H4P_UI_INPUT,[name]{ return _cb[name]; },onUiChange); 
+    _uiAdd(name,H4P_UI_INPUT,"",[name]{ return _cb[name]; },onUiChange); 
 }
 
 void H4P_AsyncWebServer::uiSync(){
     if(_evts && _evts->count()){
-        for(auto const& u:_userItems){
-            if(u.type != H4P_UI_INPUT && u.type != H4P_UI_DROPDOWN && u.f) _sendSSE(CSTR(u.id),CSTR(u.f()));
+        for(auto &u:_userItems){
+            if(u.type != H4P_UI_INPUT && u.type != H4P_UI_DROPDOWN && u.f) {
+                if(u.f) {
+                    u.value=u.f();
+                    _sendSSE(CSTR(u.id),CSTR(u.value));
+                }
+//                else Serial.printf("Ignoring static value %s of %s\n",CSTR(u.value),CSTR(u.id));
+            }
         }
     }
 }

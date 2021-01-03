@@ -1,7 +1,7 @@
 #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 
-H4_FN_UIBOOL randomBool=[]{ return random(0,50) > 25; };
+H4P_FN_UIBOOL randomBool=[]{ return random(0,50) > 25; };
 
 int derivedInt(){ return -1; }
 std::string runtimeText(){ return H4Plugin::getConfig("chip").append("/").append(H4P_VERSION); }

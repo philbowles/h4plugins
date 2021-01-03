@@ -126,16 +126,15 @@ document.addEventListener("DOMContentLoaded", function() {
     if(parseInt(document.getElementById("wifi").value)==2) document.getElementById("ap").style.display='inline-grid'
     else {
         source.addEventListener('ui', function(e){ uiItem(e.data) });
-
         source.onmessage=function(e){ toaster(e.data) }
 
-        source.onmessage({data: "Thank you for using H4/Plugins - please support me on Patreon"});
-
+        toaster("Thank you for using H4/Plugins - please support me on Patreon, see link below");
+/*
         if(has("frnd")){
             frnd=document.getElementById("frnd");
             frnd.style.display='inline-flex'
         }
-
+*/
         document.getElementById("cc").addEventListener('submit', function(e){
             e.preventDefault();
             ajax(cmd.value,true);

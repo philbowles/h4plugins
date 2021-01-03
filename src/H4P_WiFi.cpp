@@ -43,7 +43,7 @@ STAG(tcp)
 
 void H4P_WiFi::_gotIP(){
     _discoDone=false;
-    _cb["ip"]=WiFi.localIP().toString().c_str();
+    _cb[ipTag()]=WiFi.localIP().toString().c_str();
     _cb[ssidTag()]=CSTR(WiFi.SSID());
     _cb[pskTag()]=CSTR(WiFi.psk());
 
@@ -54,14 +54,14 @@ void H4P_WiFi::_gotIP(){
     if(MDNS.begin(CSTR(host))) {
         MDNS.addService(h4Tag(),tcpTag(),666);
         MDNS.addServiceTxt(h4Tag(),tcpTag(),"id",CSTR(_cb[chipTag()]));
-        MDNS.addServiceTxt(h4Tag(),tcpTag(),"ip",CSTR(_cb["ip"]));
+        MDNS.addServiceTxt(h4Tag(),tcpTag(),ipTag(),CSTR(_cb[ipTag()]));
     } //else Serial.println("Error starting mDNS");
   	ArduinoOTA.setHostname(CSTR(host));
 	ArduinoOTA.setRebootOnSuccess(false);	
 	ArduinoOTA.begin();
 #endif
     _cb.erase("opts"); // lose any old AP ssids
-    H4EVENT("IP=%s",CSTR(_cb["ip"]));
+    H4EVENT("IP=%s",CSTR(_cb[ipTag()]));
     _upHooks();
 }
 
@@ -135,7 +135,7 @@ void H4P_WiFi::_startAP(){
     _dnsServer=new DNSServer;
     _dnsServer->start(53, "*", WiFi.softAPIP());
     h4.every(1000,[this](){ _dnsServer->processNextRequest(); },nullptr,H4P_TRID_WFAP,true);
-    _cb["ip"]=WiFi.softAPIP().toString().c_str();
+    _cb[ipTag()]=WiFi.softAPIP().toString().c_str();
     _scan();
     _upHooks();
 }

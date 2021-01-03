@@ -109,16 +109,16 @@ H4P_AsyncWebServer(H4_FN_VOID onViewers=nullptr,H4_FN_VOID onNoViewers=nullptr):
 // action = name of "action" function which is called when value changes. If defulted, field is not user-clickable
 // 
 void uiMessage(const string& msg); // msg scrolls in red at bottom of screen 
-void uiAddBoolean(const string& name,const boolean truefalse,H4_FN_UIACTIVE action=nullptr); // create static boolean LED
-void uiAddBoolean(const string& name,H4_FN_UIBOOL setter,H4_FN_UIACTIVE action=nullptr); // dynamic bool set on demand by setter function
+void uiAddBoolean(const string& name,const boolean truefalse,H4P_FN_UIACTIVE action=nullptr); // create static boolean LED
+void uiAddBoolean(const string& name,H4P_FN_UIBOOL setter,H4P_FN_UIACTIVE action=nullptr); // dynamic bool set on demand by setter function
 void uiAddDropdown(const string& name,H4P_CONFIG_BLOCK options); // create dropdown list of OPTION/VALUE pairs (see onUiChange callback)
 void uiAddGPIO(); // add output-only boolean LED for every managed GPIO pin
 H4_CMD_ERROR uiAddGPIO(uint8_t pin); // add output-only boolean LED tied to GPIO pin. Returns H4_CMD_OUT_OF_BOUNDS if not a valid pin
-void uiAddInput(const string& name,H4_FN_UITXT setter=nullptr); // add input field with optional intial value dynamically set (see onUiChange callback)
+void uiAddInput(const string& name,H4P_FN_UITXT setter=nullptr); // add input field with optional intial value dynamically set (see onUiChange callback)
 void uiAddLabel(const string& name,const int value); // Create static numeric label 
-void uiAddLabel(const string& name,H4_FN_UINUM setter);// Create dynamic numeric label set on demand by setter function
+void uiAddLabel(const string& name,H4P_FN_UINUM setter);// Create dynamic numeric label set on demand by setter function
 void uiAddLabel(const string& name,const string& value); // Create static text label 
-void uiAddLabel(const string& name,H4_FN_UITXT setter)// Create dynamic text label set on demand by setter function
+void uiAddLabel(const string& name,H4P_FN_UITXT setter)// Create dynamic text label set on demand by setter function
 void uiMessage(const string& format, Args... args); // works like printf to send message to scrolling alert area of UI in red
 void uiSetInput(const string& name,const string& value); // arbitrarily set input field to value
 void uiSetBoolean(const string& name,const bool truefalse);// arbitrarily set boolean to true or false

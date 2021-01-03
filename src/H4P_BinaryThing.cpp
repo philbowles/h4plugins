@@ -31,7 +31,7 @@ SOFTWARE.
 #include<H4P_AsyncMQTT.h>
 
 void H4P_BinaryThing::_hookIn() {
-    if(isLoaded(aswsTag())) h4asws._uiAdd(onofTag(),H4P_UI_ONOF,[this]{ return stringFromInt(state()); });
+    if(isLoaded(aswsTag())) h4asws._uiAdd(onofTag(),H4P_UI_ONOF,"",[this]{ return stringFromInt(state()); });
     if(isLoaded(mqttTag())) {
         _cb[stateTag()]=stringFromInt(state());
         h4mqtt.subscribeDevice("slave/#",CMDVS(_slave),H4PC_H4);

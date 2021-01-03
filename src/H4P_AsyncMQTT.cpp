@@ -101,7 +101,7 @@ void H4P_AsyncMQTT::_setup(){ // allow for TLS
         
     if(_cb["muser"]!="") setCredentials(CSTR(_cb["muser"]),CSTR(_cb["mpasswd"])); // optimise tag()
     if(isLoaded(aswsTag())){
-        h4asws._uiAdd(uppercase(mqttTag()),H4P_UI_BOOL,
+        h4asws._uiAdd(uppercase(mqttTag()),H4P_UI_BOOL,"",
             [this]{ return stringFromInt(_state()); },
             [this](const string& a,const string& b){ 
                 if(b=="1") _start();

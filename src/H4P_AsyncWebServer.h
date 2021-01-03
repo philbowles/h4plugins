@@ -47,16 +47,17 @@ enum H4P_UI_TYPE {
     H4P_UI_DROPDOWN
 };
 
-using H4_FN_UITXT      = function<string(void)>;
-using H4_FN_UINUM      = function<int(void)>;
-using H4_FN_UIBOOL     = function<boolean(void)>;
-using H4_FN_UIACTIVE   = function<void(const string&,const string&)>;
+using H4P_FN_UITXT      = function<string(void)>;
+using H4P_FN_UINUM      = function<int(void)>;
+using H4P_FN_UIBOOL     = function<boolean(void)>;
+using H4P_FN_UIACTIVE   = function<void(const string&,const string&)>;
 
 struct H4P_UI_ITEM {    
     string          id;
     H4P_UI_TYPE     type;
-    H4_FN_UITXT     f;
-    H4_FN_UIACTIVE  a;
+    string          value;
+    H4P_FN_UITXT    f;
+    H4P_FN_UIACTIVE a;
 };
 
 using H4P_UI_LIST       = vector<H4P_UI_ITEM>;
@@ -69,7 +70,7 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
             vector<string>      _lines={};
             H4_FN_VOID          _onC,_onD;
 
-            H4_CMD_ERROR        __uichgCore(const string& a,const string& b,H4_FN_UIACTIVE f);
+            H4_CMD_ERROR        __uichgCore(const string& a,const string& b,H4P_FN_UIACTIVE f);
 
             VSCMD(_gpio);
             VSCMD(_msg);
@@ -95,16 +96,16 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
         }
         static  String          aswsReplace(const String& var);
 
-                void            uiAddBoolean(const string& name,const boolean tf,H4_FN_UIACTIVE a=nullptr){ _uiAdd(name,H4P_UI_BOOL,[tf]{ return tf ? "1":"0"; },a); }
-                void            uiAddBoolean(const string& name,H4_FN_UIBOOL f,H4_FN_UIACTIVE a=nullptr){ _uiAdd(name,H4P_UI_BOOL,[f]{ return f() ? "1":"0"; },a); }
+                void            uiAddBoolean(const string& name,const boolean tf,H4P_FN_UIACTIVE a=nullptr){ _uiAdd(name,H4P_UI_BOOL,"?",[tf]{ return tf ? "1":"0"; },a); }
+                void            uiAddBoolean(const string& name,H4P_FN_UIBOOL f,H4P_FN_UIACTIVE a=nullptr){ _uiAdd(name,H4P_UI_BOOL,"?",[f]{ return f() ? "1":"0"; },a); }
                 void            uiAddDropdown(const string& name,H4P_CONFIG_BLOCK options);
                 void            uiAddGPIO();
                 H4_CMD_ERROR    uiAddGPIO(uint8_t pin);
-                void            uiAddInput(const string& name,H4_FN_UITXT f=nullptr);
-                void            uiAddLabel(const string& name,const int v){ _uiAdd(name,H4P_UI_LABEL,[v]{ return stringFromInt(v); }); }
-                void            uiAddLabel(const string& name,H4_FN_UINUM f){ _uiAdd(name,H4P_UI_LABEL,[f]{ return stringFromInt(f()); }); }
-                void            uiAddLabel(const string& name,const string& v){_uiAdd(name,H4P_UI_LABEL,[v]{ return string(v); }); }
-                void            uiAddLabel(const string& name,H4_FN_UITXT f){ _uiAdd(name,H4P_UI_LABEL,[f]{ return f(); }); }
+                void            uiAddInput(const string& name,H4P_FN_UITXT f=nullptr);
+                void            uiAddLabel(const string& name,const int v){ _uiAdd(name,H4P_UI_LABEL,stringFromInt(v)); }
+                void            uiAddLabel(const string& name,H4P_FN_UINUM f){_uiAdd(name,H4P_UI_LABEL,"?",[f]{ return stringFromInt(f()); }); }
+                void            uiAddLabel(const string& name,const string& v){_uiAdd(name,H4P_UI_LABEL,v); }
+                void            uiAddLabel(const string& name,H4P_FN_UITXT f){_uiAdd(name,H4P_UI_LABEL,"?",[f]{ return f(); }); }
 
                 template<typename... Args>
                 void            uiMessage(const string& msg, Args... args){ // variadic T<>
@@ -122,7 +123,7 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
                 void            _reply(string msg) override { _lines.push_back(msg); }
                 void            _setBothNames(const string& host,const string& friendly);
                 void            _sendSSE(const char* name,const char* msg);
-                void            _uiAdd(const string& n,H4P_UI_TYPE t,H4_FN_UITXT f,H4_FN_UIACTIVE a=nullptr){ _userItems.push_back(H4P_UI_ITEM {n,t,f,a}); }
+                void            _uiAdd(const string& n,H4P_UI_TYPE t,const string& v="?",H4P_FN_UITXT f=nullptr,H4P_FN_UIACTIVE a=nullptr){ _userItems.push_back(H4P_UI_ITEM {n,t,f ? f():v,f,a}); }
 };
 
 extern __attribute__((weak)) H4P_AsyncWebServer h4asws;

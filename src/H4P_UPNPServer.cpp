@@ -34,6 +34,7 @@ void H4P_UPNPServer::_hookIn(){
     REQUIREBT;
     if(!h4wifi._getPersistentValue(nameTag(),"upnp ")) if(_name!="") _cb[nameTag()]=_name;
     H4EVENT("UPNP name %s",CSTR(_cb[nameTag()]));
+    h4asws.uiAddLabel("Name",_cb[nameTag()]);
 }
 
 void  H4P_UPNPServer::friendlyName(const string& name){ h4wifi._setPersistentValue(nameTag(),name,true); }

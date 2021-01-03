@@ -27,8 +27,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_Heartbeat.h>
+#include<H4P_AsyncWebServer.h>
 
 uint32_t            H4P_Heartbeat::_uptime=0;
+
+void H4P_Heartbeat::_hookIn() {
+    if(isLoaded(aswsTag())) h4asws.uiAddLabel("Uptime",upTime);
+}
 
 void H4P_Heartbeat::_start() {
     h4._hookLoop([this](){ _run(); },_subCmd);
@@ -44,8 +49,9 @@ void H4P_Heartbeat::_run(){
     uint32_t now=millis();
     uint32_t nowsec=now/1000;
     if(!(now%1000) && nowsec!=_uptime) {
-        _bf();
+        if(_bf) _bf();
         _uptime=nowsec;
+        if(isLoaded(aswsTag())) h4asws.uiSync();
     }
 }
 
