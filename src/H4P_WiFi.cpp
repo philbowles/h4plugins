@@ -76,6 +76,7 @@ void H4P_WiFi::_hookIn(){
     if(!_getPersistentValue(deviceTag(),"H4-")) if(_device!="") _cb[deviceTag()]=_device;
     H4EVENT("Device %s",CSTR(_cb[deviceTag()]));
     _getPersistentValue(h4svTag(),"*");
+    WiFi.persistent(true);
     WiFi.onEvent(_wifiEvent);
 }
 
@@ -119,18 +120,41 @@ void H4P_WiFi::_setPersistentValue(string n,string v,bool reboot){
 }
 
 void H4P_WiFi::_start(){
-    H4Plugin::_factoryChain.push_back(_clearAP);
-    if(HAL_FS.exists("/ap")){
-        stop();
-        _startAP();
-    } else _mcuStart();
+    H4EVENT("_start");
+    H4Plugin::_factoryChain.push_back([this]{ clear(); });
+    show();
+//    if(HAL_FS.exists("/ap")){
+//    stop();
+//        _startAP();
+//    } else _mcuStart();
+    _mcuStart();
+}
+void H4P_WiFi::__apSupport(){
+//    delay(0); // solve 192.168.244.1 probelm ?	
+//    _cb[ipTag()]=WiFi.softAPIP().toString().c_str();
+    _cb[ipTag()]=CSTR(WiFi.softAPIP().toString());//.c_str();
+    H4EVENT("Captive Portal MAC=%s %s",CSTR(WiFi.softAPmacAddress()),CSTR(_cb[ipTag()]));
+    _dnsServer53=new DNSServer;
+    _dnsServer53->start(53, "*", WiFi.softAPIP());
+    _dnsServer443=new DNSServer;
+    _dnsServer443->start(443, "*", WiFi.softAPIP());
+    h4.every(1000,[this](){ 
+        _dnsServer53->processNextRequest();
+        _dnsServer443->processNextRequest();
+    },nullptr,H4P_TRID_WFAP,true);
+    _scan();
+    _upHooks();
 }
 
-void H4P_WiFi::_startAP(){
-    _dnsServer= new DNSServer;
-    WiFi.mode(WIFI_AP);
+void H4P_WiFi::startAP(){
+    //WiFi.softAPdisconnect(wifioff) goes SOMEWHERE!!!
+//    _downHooks();
+    _stopCore();
+//    _dnsServer= new DNSServer;
     WiFi.enableSTA(false); // force AP only
+    WiFi.mode(WIFI_AP);
     WiFi.softAP(CSTR(_cb[deviceTag()]));
+/*
     delay(0); // solve 192.168.244.1 probelm ?	
     _dnsServer=new DNSServer;
     _dnsServer->start(53, "*", WiFi.softAPIP());
@@ -138,15 +162,21 @@ void H4P_WiFi::_startAP(){
     _cb[ipTag()]=WiFi.softAPIP().toString().c_str();
     _scan();
     _upHooks();
+*/
+    __apSupport();
 }
 
 void H4P_WiFi::_stopCore(){
+    H4EVENT("_stopCore");
     h4.cancelSingleton({H4P_TRID_HOTA,H4P_TRID_WFAP});
     if(WiFi.getMode() & WIFI_AP) {
-        if(_dnsServer){
-            _dnsServer->stop();
-            delete _dnsServer;
-            _dnsServer=nullptr;
+        if(_dnsServer53){
+            _dnsServer53->stop();
+            _dnsServer443->stop();
+            delete _dnsServer53;
+            delete _dnsServer443;
+            _dnsServer53=nullptr;
+            _dnsServer443=nullptr;
             _downHooks();
         }
     }
@@ -165,20 +195,38 @@ void H4P_WiFi::clear(){
     WiFi.disconnect(true); 
 	ESP.eraseConfig();
     HAL_FS.remove(CSTR(string("/"+string(deviceTag()))));
-    _clearAP();
+//    _clearAP(); WiFi.softAPdisconnect(wifioff) 
 }
 
 void H4P_WiFi::_startSTA(){
-    _clearAP();
+//    _clearAP();
+    H4EVENT("_startSTA %s %s",CSTR(_cb[ssidTag()]),CSTR(_cb[pskTag()]));
+    WiFi.enableAP(false); 
     WiFi.mode(WIFI_STA);
 	WiFi.setSleepMode(WIFI_NONE_SLEEP);
-    WiFi.enableAP(false); 
 	WiFi.setAutoConnect(true);
 	WiFi.setAutoReconnect(true);
     WiFi.begin(CSTR(_cb[ssidTag()]),CSTR(_cb[pskTag()]));
 }
 
-void H4P_WiFi::_mcuStart(){ if(WiFi.getMode()==WIFI_OFF || WiFi.SSID()=="") _startSTA(); }
+void H4P_WiFi::_mcuStart(){
+    auto mode=WiFi.getMode();
+    H4EVENT("_mcuStart mode=%d",mode);
+    switch(mode){
+        case WIFI_AP_STA:
+            H4EVENT("**** MIXED MODE *********");
+        case WIFI_OFF:
+            _startSTA();
+            break;
+        case WIFI_STA:
+            H4EVENT("Allow auto reconnect");
+            break;
+        case WIFI_AP:
+            H4EVENT("**** COMING UP IN AP MODE *********");
+            __apSupport();
+            break;
+    }
+}
 
 void H4P_WiFi::_stop(){
     _stopCore();
@@ -226,11 +274,11 @@ string H4P_WiFi::_getChipID(){
 void H4P_WiFi::clear(){
     _stop();
 	WiFi.disconnect(true,true);
-    _clearAP();
+//    _clearAP();
 }
 
 void H4P_WiFi::_startSTA(){
-    _clearAP();
+//    _clearAP();
     WiFi.mode(WIFI_STA);
     WiFi.setSleep(false);
     WiFi.enableAP(false); 
@@ -304,11 +352,5 @@ void H4P_WiFi::change(string ssid,string psk){ // add device / name?
     _cb[pskTag()]=psk;
     _startSTA();
 }
-
-void H4P_WiFi::forceAP(){ 
-    H4EVENT("AP MODE FORCED");
-    h4cmd.write("/ap","");
-    h4reboot();
-} // tagify?
 
 void H4P_WiFi::setBothNames(const string& host,const string& friendly){ h4asws._setBothNames(host,friendly); }

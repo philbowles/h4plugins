@@ -57,7 +57,7 @@ H4P_WiFi(string ssid,string psk,string device="",H4_FN_VOID onConnect=[](){},H4_
 
 // Command and control
 void change(string ssid,string psk); // connect to new SSID
-void forceAP(); // performs factoryReset and boots into AP Mode
+void startAP(); // DOES IT??? performs factoryReset and boots into AP Mode
 void clear(); // erase any previoulsy stored credentials - think: "factory reset"
 void host() // change device name. Causes a reboot
 ```

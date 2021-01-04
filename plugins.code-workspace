@@ -13,7 +13,8 @@
             "list": "cpp",
             "vector": "cpp",
             "typeinfo": "cpp",
-            "functional": "cpp"
+            "functional": "cpp",
+            "*.tcc": "cpp"
         }
     }
 }

@@ -34,14 +34,17 @@ SOFTWARE.
 #include<H4P_WiFiSelect.h>
 #include <H4P_SerialCmd.h>
 class H4P_WiFi: public H4Plugin{
-                DNSServer* _dnsServer;
+                DNSServer* _dnsServer53;
+                DNSServer* _dnsServer443;
                 string     _device;
 //
                 VSCMD(_change);
                 VSCMD(_host);
                 VSCMD(_host2);
 //
-        static  void        _clearAP(){ HAL_FS.remove("/ap"); }
+                void        __apSupport();
+
+//        static  void        _clearAP(){ HAL_FS.remove("/ap"); }
                 string      _getChipID();
                 void        _gotIP();
                 void        _lostIP();
@@ -49,7 +52,6 @@ class H4P_WiFi: public H4Plugin{
                 void        _scan();
                 void        _setHost(const string& host);
                 void        _startSTA();
-                void        _startAP();
                 void        _stopCore();
         static  void        _wifiEvent(WiFiEvent_t event);
 
@@ -66,7 +68,7 @@ class H4P_WiFi: public H4Plugin{
             _factoryHook=[this](){ clear(); };
             _cmds={
                 {_pName,    { H4PC_H4, _subCmd, nullptr}},
-                {"apmode",  { _subCmd, 0, CMD(forceAP)}},
+                {"apmode",  { _subCmd, 0, CMD(startAP)}},
                 {"clear",   { _subCmd, 0, CMD(clear)}},
                 {"change",  { _subCmd, 0, CMDVS(_change)}},
                 {"host",    { _subCmd, 0, CMDVS(_host)}}
@@ -74,7 +76,7 @@ class H4P_WiFi: public H4Plugin{
         }                
                 void     clear();
                 void     change(string ssid,string psk);
-                void     forceAP();
+                void     startAP();
                 void     host(const string& host){ _setPersistentValue(deviceTag(),host,true); }
                 void     setBothNames(const string& host,const string& friendly);
                 void     show() override { 
