@@ -82,7 +82,7 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
                 void            _start() override;
                 void            _stop() override;
                 void            _hookIn() override;
-                void            _greenLight() override {}; // do not autostart!
+                void            _greenLight() override { if(isLoaded(gpioTag())) h4cmd.addCmd("gpio",_subCmd,0,CMDVS(_gpio)); }; // do not autostart!
     public:
         H4P_AsyncWebServer(H4_FN_VOID onClientConnect=nullptr,H4_FN_VOID onClientDisconnect=nullptr): AsyncWebServer(80),H4Plugin(aswsTag()){
             _onC=onClientConnect;
@@ -90,7 +90,6 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
 
             _cmds={
                 {_pName,    { H4PC_H4, _subCmd, nullptr}},
-                {"gpio",    { _subCmd, 0, CMDVS(_gpio)}},
                 {"msg",     { _subCmd, 0, CMDVS(_msg)}},
                 {"uichg",   { _subCmd, 0, CMDVS(_uichg)}}
             };
@@ -101,6 +100,7 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
                 void            uiAddLabel(const string& name,const string& v){ _uiAdd(_seq++,name,H4P_UI_LABEL,v); }
                 void            uiAddLabel(const string& name,const int v){ _uiAdd(_seq++,name,H4P_UI_LABEL,stringFromInt(v)); }
                 void            uiAddLabel(const string& name,H4P_FN_UITXT f){ _uiAdd(_seq++,name,H4P_UI_LABEL,"",f); }
+                void            uiAddLabel(const string& name,H4P_FN_UINUM f){ _uiAdd(_seq++,name,H4P_UI_LABEL,"",[f]{ return stringFromInt(f()); }); }
                 void            uiAddGPIO();
                 H4_CMD_ERROR    uiAddGPIO(uint8_t pin);
                 void            uiAddBoolean(const string& name,const boolean tf,H4P_FN_UICHANGE a=nullptr){ _uiAdd(_seq++,name,H4P_UI_BOOL,"",[tf]{ return tf ? "1":"0"; },a); }
@@ -110,9 +110,6 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
 
                 void            uiAddInput(const string& name,H4P_FN_UITXT f=nullptr);
                 void            uiAddInput(const string& name,const string& value);
-                void            uiAddLabel(const string& name,H4P_FN_UINUM f){_uiAdd(name,H4P_UI_LABEL,"?",[f]{ return stringFromInt(f()); }); }
-                void            uiAddLabel(const string& name,const string& v){_uiAdd(name,H4P_UI_LABEL,v); }
-                void            uiAddLabel(const string& name,H4P_FN_UITXT f){_uiAdd(name,H4P_UI_LABEL,"?",[f]{ return f(); }); }
 */
                 void            uiSetInput(const string& name,const string& value){ _sendSSE(CSTR(name),CSTR(value)); }
                 void            uiSetBoolean(const string& name,const bool b){ _sendSSE(CSTR(name),CSTR(stringFromInt(b))); }
