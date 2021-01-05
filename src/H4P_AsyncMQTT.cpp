@@ -59,7 +59,6 @@ void H4P_AsyncMQTT::_greenLight(){
             subscribe(CSTR(string(device+cmdhash())),0);
             subscribe(CSTR(string(_cb[chipTag()]+cmdhash())),0);
             subscribe(CSTR(string(_cb[boardTag()]+cmdhash())),0);
-//            xPublish(CSTR(string(h4Tag()).append("/online")),device);
             report();
             _upHooks();
             _signal();
@@ -101,6 +100,7 @@ void H4P_AsyncMQTT::_setup(){ // allow for TLS
         
     if(_cb["muser"]!="") setCredentials(CSTR(_cb["muser"]),CSTR(_cb["mpasswd"])); // optimise tag()
     if(isLoaded(aswsTag())){
+        /*
         h4asws._uiAdd(uppercase(mqttTag()),H4P_UI_BOOL,"",
             [this]{ return stringFromInt(_state()); },
             [this](const string& a,const string& b){ 
@@ -109,12 +109,13 @@ void H4P_AsyncMQTT::_setup(){ // allow for TLS
                 H4EVENT("MQTT %s by user",b=="1" ? "Started":"Stopped");
                 if(isLoaded(aswsTag())) h4asws.uiMessage("MQTT %s by user",b=="1" ? "Started":"Stopped");
             });
+        */
     }
 }
 
 void H4P_AsyncMQTT::_signal(){ if(isLoaded(aswsTag())) h4asws.uiSync(); }
 
-void H4P_AsyncMQTT::_start(){ 
+void H4P_AsyncMQTT::_start(){
     autorestart=true;
     connect(); 
 }

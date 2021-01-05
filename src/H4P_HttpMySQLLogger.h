@@ -31,7 +31,7 @@ SOFTWARE.
 #define H4P_HttpMySQLLogger_HO
 
 #include <H4PCommon.h>
-#include<H4P_WiFiSelect.h>
+//#include<H4P_WiFiSelect.h>
 #include<H4P_WiFi.h>
 #include <asyncHTTPrequest.h>
 

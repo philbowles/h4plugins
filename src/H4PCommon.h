@@ -105,7 +105,7 @@ enum H4P_LOG_TYPE {
 
 constexpr const char* cmdhash(){ return "/h4/#"; }
 
-STAG(alive);
+//STAG(alive);
 STAG(asws);
 STAG(auto);
 STAG(beat);
@@ -113,12 +113,12 @@ STAG(board)
 STAG(broker);
 STAG(cerr);
 STAG(chip);
-STAG(Condition);
+//STAG(condition);
 STAG(device);
 STAG(esqw);
 STAG(gpio);
 STAG(h4);
-STAG(h4sv);
+STAG(h4UIv);
 STAG(ip);
 STAG(log);
 STAG(mfnb);

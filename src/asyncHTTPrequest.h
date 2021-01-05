@@ -29,14 +29,13 @@
 #define DEBUG_IOTA_HTTP_SET false
 #endif
 
-#include <Arduino.h>
-#include<H4P_WiFiSelect.h>
-#include <xbuf.h>
+#include<Arduino.h>
+#include<H4P_WiFi.h>
+#include<xbuf.h>
 
 #define DEBUG_HTTP(format,...)  if(_debug){\
                                     DEBUG_IOTA_PORT.printf("Debug(%3ld): ", millis()-_requestStartTime);\
                                     DEBUG_IOTA_PORT.printf_P(PSTR(format),##__VA_ARGS__);}
-
 
 #define DEFAULT_RX_TIMEOUT 1                    // Seconds for timeout
 

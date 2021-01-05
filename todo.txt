@@ -5,10 +5,10 @@ TODO:
 SOONER
     Rationalise/Align publishDevice MQTT
     ui input box -> ap mode
+    autoOff -> cb
 #
     error gone away in nodejs
     early abort dependfail
-    wifi/change -> reboot
     stale ui msgbox
     unicorn get version
 SHORTTERM

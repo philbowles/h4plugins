@@ -30,7 +30,7 @@ SOFTWARE.
 #ifndef H4P_udpLogger_HO
 #define H4P_udpLogger_HO
 
-#include<H4P_WiFiSelect.h>
+#include<H4P_WiFi.h>
 #include<H4PCommon.h>
 
 class H4P_udpLogger: public H4Plugin {

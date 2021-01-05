@@ -31,7 +31,7 @@ SOFTWARE.
 #include<H4P_AsyncMQTT.h>
 
 void H4P_BinaryThing::_hookIn() {
-    if(isLoaded(aswsTag())) h4asws._uiAdd(onofTag(),H4P_UI_ONOF,"",[this]{ return stringFromInt(state()); });
+    if(isLoaded(aswsTag())) h4asws._uiAdd(999,onofTag(),H4P_UI_ONOF,"",[this]{ return stringFromInt(state()); });
     if(isLoaded(mqttTag())) {
         _cb[stateTag()]=stringFromInt(state());
         h4mqtt.subscribeDevice("slave/#",CMDVS(_slave),H4PC_H4);
@@ -101,7 +101,7 @@ void H4P_BinaryThing::turn(bool b){
 //      H4P_ConditionalThing
 //
 void H4P_ConditionalThing::_hookIn() {
-    if(isLoaded(aswsTag())) h4asws._uiAdd(ConditionTag(),H4P_UI_BOOL,[this]{ return stringFromInt(_predicate(state())); });
+    if(isLoaded(aswsTag())) h4asws._uiAdd(99,conditionTag(),H4P_UI_BOOL,"",[this]{ return stringFromInt(_predicate(state())); });
     H4P_BinaryThing::_hookIn();
 }
 
@@ -110,6 +110,6 @@ void H4P_ConditionalThing:: _setState(bool b) {
     else if(isLoaded(aswsTag())) h4asws.uiMessage("Unable: condition disarmed");
 }
 
-void H4P_ConditionalThing::syncCondition() { if(isLoaded(aswsTag())) h4asws._sendSSE(ConditionTag(),CSTR(stringFromInt(_predicate(state())))); }
+void H4P_ConditionalThing::syncCondition() { if(isLoaded(aswsTag())) h4asws._sendSSE(conditionTag(),CSTR(stringFromInt(_predicate(state())))); }
 
 #endif

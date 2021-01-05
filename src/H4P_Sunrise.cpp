@@ -28,7 +28,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_Sunrise.h>
-#include<H4P_WiFiSelect.h>
+//#include<H4P_WiFiSelect.h>
 
 #include<H4P_SerialCmd.h>
 #include <WiFiClientSecure.h>

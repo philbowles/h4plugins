@@ -1,6 +1,6 @@
 echo off
 del fs*.bin
-set /p v=<../data/h4sv
+set /p v=<../data/h4UIv
 echo Making version %v%
 
 mklittlefs -c ../data/ fs_1M.bin > nul

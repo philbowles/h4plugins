@@ -30,10 +30,11 @@ SOFTWARE.
 #ifndef H4P_UPNPServer_HO
 #define H4P_UPNPServer_HO
 
-#include<H4P_WiFiSelect.h>
 #include<H4PCommon.h>
 #include<H4P_AsyncWebServer.h>
 #include<H4P_BinaryThing.h>
+
+STAG(alive);
 
 using H4P_FN_USN        =function<void(uint32_t mx,H4P_CONFIG_BLOCK)>;
 using H4P_USN_MAP       =unordered_map<string,H4P_FN_USN>;

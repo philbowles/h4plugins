@@ -31,7 +31,7 @@ SOFTWARE.
 #define H4P_BinarySwitch_HO
 
 #include<H4P_BinaryThing.h>
-#include<H4P_WiFiSelect.h>
+//#include<H4P_WiFiSelect.h>
 
 #include<H4P_GPIOManager.h>
 

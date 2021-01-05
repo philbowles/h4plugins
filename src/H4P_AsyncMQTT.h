@@ -32,7 +32,7 @@ SOFTWARE.
 
 #include<H4PCommon.h>
 #include<H4P_SerialCmd.h>
-#include<H4P_WiFiSelect.h>
+//#include<H4P_WiFiSelect.h>
 #include<H4P_WiFi.h>
 #include<PangolinMQTT.h>
 
@@ -48,7 +48,7 @@ class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
             string          device;
             string          prefix=string(h4Tag()).append("/");
             struct H4P_LWT  _lwt;
-            vector<string>  _reportList={"bin",boardTag(),ipTag(),h4pvTag(),h4svTag(),pmvTag()};
+            vector<string>  _reportList={"bin",boardTag(),ipTag(),h4PvTag(),h4UIvTag(),pmvTag()};
         VSCMD(_change);
 
                 void        _greenLight() override;
@@ -56,7 +56,7 @@ class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
                 void        _setup();
                 void        _signal();
                 void        _start() override;
-                bool        _state() override { return PANGO::TCP; }
+                bool        _state() override { return PANGO::TCP; } // wrong!!!
                 void        _stop() override;
     public:
         H4P_AsyncMQTT(string broker,uint16_t port, string user="",string pass="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr,H4P_LWT lwt={"","",0,false}):

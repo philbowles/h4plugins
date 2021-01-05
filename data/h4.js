@@ -37,6 +37,8 @@ function onofRender(b){
     node.children[0].src=(b ? "on":"of")+".jpg"
 }
 
+function properCase(s){ return s.split(" ").map(function (x){ return x.charAt(0).toUpperCase() + x.slice(1) }).join(" ") }
+
 function uiItem(d,h="uhang"){
     let parts=d.split(",");
     let n=parts[0]
@@ -48,7 +50,7 @@ function uiItem(d,h="uhang"){
         let t=parseInt(parts[1])
         let a=parseInt(parts[3])
         let title=document.createElement("div");
-        title.innerHTML=n;
+        title.innerHTML=properCase(n);
         let valu=document.createElement(t<4 ? "div":(t==4 ? "input":"select"));
         valu.id=n;
         valu.className="uv";
@@ -114,38 +116,28 @@ function uiItem(d,h="uhang"){
     }
 }
 
-function has(id){ return document.getElementById("has"+id).value!="?" } // lose?
-
 document.addEventListener("DOMContentLoaded", function() {
     if(!!window.EventSource) source=new EventSource("/evt");
     let rr=document.getElementById("reply")
     let cmd=document.getElementById("cmd")
     let msg=document.getElementById("msg")
-    // frig ap test
-    //wifimode=2
-    if(parseInt(document.getElementById("wifi").value)==2) document.getElementById("ap").style.display='inline-grid'
-    else {
-        source.addEventListener('ui', function(e){ uiItem(e.data) });
-        source.onmessage=function(e){ toaster(e.data) }
 
-        toaster("Thank you for using H4/Plugins - please support me on Patreon, see link below");
-/*
-        if(has("frnd")){
-            frnd=document.getElementById("frnd");
-            frnd.style.display='inline-flex'
-        }
-*/
-        document.getElementById("cc").addEventListener('submit', function(e){
-            e.preventDefault();
-            ajax(cmd.value,true);
-        },{capture: true});
+    source.addEventListener('ui', function(e){ uiItem(e.data) });
+    source.onmessage=function(e){ toaster(e.data) }
 
-        rr.addEventListener('click', function(e){
-            let lines=rr.value.split("\n")
-            let n=rr.value.substr(0, rr.selectionStart).split("\n").length
-            cmd.value=lines[n-1]
-            ajax(lines[n-1],true)
-        },{capture: true});
-        document.getElementById("qh").addEventListener('click', function(e){ ajax("help",true) },{capture: true});
-    } 
+    toaster("Thank you for using H4/Plugins - please support me on Patreon, see link below");
+        
+    document.getElementById("cc").addEventListener('submit', function(e){
+        e.preventDefault();
+        ajax(cmd.value,true);
+    },{capture: true});
+
+    rr.addEventListener('click', function(e){
+        let lines=rr.value.split("\n")
+        let n=rr.value.substr(0, rr.selectionStart).split("\n").length
+        cmd.value=lines[n-1]
+        ajax(lines[n-1],true)
+    },{capture: true});
+
+    document.getElementById("qh").addEventListener('click', function(e){ ajax("help",true) },{capture: true});
 })

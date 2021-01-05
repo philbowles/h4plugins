@@ -31,7 +31,7 @@ SOFTWARE.
 #define H4P_Sunrise_H
 
 #include<H4PCommon.h>
-#include<H4P_WiFiSelect.h>
+//#include<H4P_WiFiSelect.h>
 #include<H4P_Timekeeper.h>
 
 enum H4P_EPHEMERA {

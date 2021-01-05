@@ -1,4 +1,4 @@
-#include<H4P_WiFiSelect.h>
+//#include<H4P_WiFiSelect.h>
 #include <xbuf.h>
 
 xbuf::xbuf(const uint16_t segSize)

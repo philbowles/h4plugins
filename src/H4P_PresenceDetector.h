@@ -30,7 +30,7 @@ SOFTWARE.
 #ifndef H4P_PresenceDetector_HO
 #define H4P_PresenceDetector_HO
 
-#include<H4P_WiFiSelect.h>
+#include<H4P_WiFi.h>
 #include<H4PCommon.h>
 #include<H4P_SerialCmd.h>
 

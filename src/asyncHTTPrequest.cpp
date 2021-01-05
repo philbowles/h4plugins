@@ -1,4 +1,4 @@
-#include<H4P_WiFiSelect.h>
+//#include<H4P_WiFiSelect.h>
 #include "asyncHTTPrequest.h"
 
 //**************************************************************************************************************

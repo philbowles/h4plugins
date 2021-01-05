@@ -47,5 +47,5 @@
     H4P_SerialCmd       h4cmd(b); \
     H4GM_PINMAP         H4P_GPIOManager::pins; 
     uint32_t            H4Plugin::_nxtSubCmd=H4PC_MAX-1; \
-    H4P_CONFIG_BLOCK    H4Plugin::_cb={{pmvTag(),PANGO_VERSION},{h4pvTag(),H4P_VERSION}};
+    H4P_CONFIG_BLOCK    H4Plugin::_cb={{pmvTag(),PANGO_VERSION},{h4PvTag(),H4P_VERSION}};
 #endif

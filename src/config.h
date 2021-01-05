@@ -28,7 +28,7 @@ SOFTWARE.
 */
 #define H4P_VERSION "1.0.0"
 
-constexpr char* h4pvTag(){ return "h4pv"; }
+constexpr char* h4PvTag(){ return "h4Pv"; }
 
 // comment this out to prevent and logging by EVENT( whatever ) messages
 #define H4P_LOG_EVENTS
@@ -63,6 +63,7 @@ constexpr char* h4pvTag(){ return "h4pv"; }
 #define H4MF_FACTORY          5000
 #define H4MF_APMODE          10000
 
+#define H4WF_AP_RATE          1000
 #define H4WF_OTA_RATE         1500
 
 #define H4P_IPPD_RATE         5000

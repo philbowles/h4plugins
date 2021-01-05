@@ -59,13 +59,13 @@ Firstly you will need the [`mkspiffs`](https://github.com/igrr/mkspiffs) utility
 
 [H4P_RemoteUpdate](h4ru.md) requires the dvices to be named `spiffs_X.Y.Z_1M.bin` and `spiffs_X.Y.Z_4M.bin` where X.Y.Z is the SPIFFS version number, e.g. 0.5.4
 
-The SPIFFS version number must be contained in a file named [`h4sv`](../data/h4sv) in the `data`folder, containg just the X.Y.Z format version number on a single line
+The SPIFFS version number must be contained in a file named [`h4UIv`](../data/h4UIv) in the `data`folder, containg just the X.Y.Z format version number on a single line
 
-A very basic [Windows command-line batch file](../SPIFFS/spiffs.bat) utility has been created which will build both files using the version found in the `data\h4sv` file.
+A very basic [Windows command-line batch file](../SPIFFS/spiffs.bat) utility has been created which will build both files using the version found in the `data\h4UIv` file.
 
 Summary of steps:
 1. edit data folder
-2. edit `h4sv` with latest version number
+2. edit `h4UIv` with latest version number
 3. copy sketch `data` folder to `SPIFFS/data` folder
 4. run spiffs.bat with new version number
 5. copy generated `.bin` files to your update repository

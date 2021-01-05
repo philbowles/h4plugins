@@ -29,7 +29,7 @@ SOFTWARE.
 #include<H4P_MultiFunctionButton.h>
 #include<H4P_FlasherController.h>
 
-#include<H4P_WiFiSelect.h>
+//#include<H4P_WiFiSelect.h>
 #include<H4P_WiFi.h>
 #include<H4P_AsyncMQTT.h>
 

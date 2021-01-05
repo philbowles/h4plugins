@@ -34,7 +34,8 @@ void H4P_UPNPServer::_hookIn(){
     REQUIREBT;
     if(!h4wifi._getPersistentValue(nameTag(),"upnp ")) if(_name!="") _cb[nameTag()]=_name;
     H4EVENT("UPNP name %s",CSTR(_cb[nameTag()]));
-    h4asws.uiAddLabel("Name",_cb[nameTag()]);
+    if(WiFi.getMode()==WIFI_STA) h4asws._uiAdd(2,"name",H4P_UI_LABEL,_cb[nameTag()]);
+//    else h4asws.uiAddInput("name");
 }
 
 void  H4P_UPNPServer::friendlyName(const string& name){ h4wifi._setPersistentValue(nameTag(),name,true); }

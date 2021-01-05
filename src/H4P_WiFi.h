@@ -31,28 +31,38 @@ SOFTWARE.
 #define H4P_WiFi_H
 
 #include<H4PCommon.h>
-#include<H4P_WiFiSelect.h>
+#ifdef ARDUINO_ARCH_ESP8266
+    #include<ESP8266WiFi.h>
+    #include<ESP8266mDNS.h>
+    #include<ESPAsyncTCP.h>
+    #include<ESPAsyncUDP.h>
+#else
+    #include<WiFi.h>
+    #include<AsyncTCP.h>
+    #include<AsyncUDP.h>
+    #include<ESPmDNS.h>
+#endif
+#include<DNSServer.h>
+#include<ArduinoOTA.h>
 #include <H4P_SerialCmd.h>
 class H4P_WiFi: public H4Plugin{
-                DNSServer* _dnsServer53;
-                DNSServer* _dnsServer443;
                 string     _device;
 //
                 VSCMD(_change);
                 VSCMD(_host);
                 VSCMD(_host2);
+//  H/W depedent functions
+                string      HAL_WIFI_chipID();
+                void        HAL_WIFI_setHost(const string& host);
 //
                 void        __apSupport();
 
-//        static  void        _clearAP(){ HAL_FS.remove("/ap"); }
-                string      _getChipID();
                 void        _gotIP();
                 void        _lostIP();
                 void        _mcuStart();
-                void        _scan();
-                void        _setHost(const string& host);
+//                void        _scan();
                 void        _startSTA();
-                void        _stopCore();
+//                void        _stopCore();
         static  void        _wifiEvent(WiFiEvent_t event);
 
                 void        _start() override;

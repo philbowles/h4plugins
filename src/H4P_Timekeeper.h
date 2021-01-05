@@ -32,7 +32,7 @@ SOFTWARE.
 #define H4P_Timekeeper_H
 
 #include<H4PCommon.h>
-#include<H4P_WiFiSelect.h>
+//#include<H4P_WiFiSelect.h>
 #ifdef ARDUINO_ARCH_ESP8266
     #include "sntp.h"
 #else

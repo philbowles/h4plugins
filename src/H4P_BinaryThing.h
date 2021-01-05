@@ -32,8 +32,8 @@ SOFTWARE.
 
 #include<H4PCommon.h>
 #include<H4P_SerialCmd.h>
-#include<H4P_WiFiSelect.h>
 
+STAG(condition);
 
 class H4P_BinaryThing: public H4Plugin{
             uint32_t        _timeout;
