@@ -37,6 +37,8 @@ function onofRender(b){
     node.children[0].src=(b ? "on":"of")+".jpg"
 }
 
+function properCase(s){ return s.split(" ").map(function (x){ return x.charAt(0).toUpperCase() + x.slice(1) }).join(" ") }
+
 function uiItem(d,h="uhang"){
     let parts=d.split(",");
     let n=parts[0]
@@ -48,7 +50,7 @@ function uiItem(d,h="uhang"){
         let t=parseInt(parts[1])
         let a=parseInt(parts[3])
         let title=document.createElement("div");
-        title.innerHTML=n;
+        title.innerHTML=properCase(n);
         let valu=document.createElement(t<4 ? "div":(t==4 ? "input":"select"));
         valu.id=n;
         valu.className="uv";
@@ -124,7 +126,7 @@ document.addEventListener("DOMContentLoaded", function() {
     source.onmessage=function(e){ toaster(e.data) }
 
     toaster("Thank you for using H4/Plugins - please support me on Patreon, see link below");
-    
+        
     document.getElementById("cc").addEventListener('submit', function(e){
         e.preventDefault();
         ajax(cmd.value,true);

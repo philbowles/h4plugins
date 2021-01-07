@@ -32,10 +32,11 @@ SOFTWARE.
 void H4P_UPNPServer::_hookIn(){
     DEPEND(asws);
     REQUIREBT;
-    if(!h4wifi._getPersistentValue(nameTag(),"upnp ")) if(_name!="") _cb[nameTag()]=_name;
+    string dn=uppercase(h4Tag())+" "+deviceTag()+" ";
+    h4wifi._getPersistentValue(nameTag(),dn);
+    //_cb[nameTag()]=_name;
     H4EVENT("UPNP name %s",CSTR(_cb[nameTag()]));
-    if(WiFi.getMode()==WIFI_STA) h4asws._uiAdd(2,"name",H4P_UI_LABEL,_cb[nameTag()]);
-//    else h4asws.uiAddInput("name");
+//    h4asws._uiAdd(2,"name",H4P_UI_LABEL,_cb[nameTag()]);
 }
 
 void  H4P_UPNPServer::friendlyName(const string& name){ h4wifi._setPersistentValue(nameTag(),name,true); }
@@ -101,38 +102,36 @@ string H4P_UPNPServer::__upnpCommon(const string& usn){
 }
 
 void H4P_UPNPServer::_start(){
-    if(!(WiFi.getMode() & WIFI_AP)){
-        _cb["age"]=stringFromInt(H4P_UDP_REFRESH/1000); // fix
-        _cb["udn"]="Socket-1_0-upnp"+_cb[chipTag()];
-        _cb["updt"]=_pups[2];
-        _cb["umfr"]="Belkin International Inc.";
-        _cb["usvc"]=_pups[3];
-        _cb["usid"]=_urn+"serviceId:basicevent1";
+    _cb["age"]=stringFromInt(H4P_UDP_REFRESH/1000); // fix
+    _cb["udn"]="Socket-1_0-upnp"+_cb[chipTag()];
+    _cb["updt"]=_pups[2];
+    _cb["umfr"]="Belkin International Inc.";
+    _cb["usvc"]=_pups[3];
+    _cb["usid"]=_urn+"serviceId:basicevent1";
 
-        _xml=replaceParamsFile("/up.xml");
-        _ucom=replaceParamsFile("/ucom.txt");
-        _soap=H4P_SerialCmd::read("/soap.xml");
+    _xml=replaceParamsFile("/up.xml");
+    _ucom=replaceParamsFile("/ucom.txt");
+    _soap=H4P_SerialCmd::read("/soap.xml");
 // erase redundant _cb?
-        _cb.erase("age");
-        _cb.erase("updt");
-        _cb.erase("umfr");
-        _cb.erase("usvc");
-        _cb.erase("usid");
+    _cb.erase("age");
+    _cb.erase("updt");
+    _cb.erase("umfr");
+    _cb.erase("usvc");
+    _cb.erase("usid");
 //
-        h4asws.on("/we",HTTP_GET, [this](AsyncWebServerRequest *request){ request->send(200,"text/xml",CSTR(_xml)); });
-        h4asws.on("/upnp", HTTP_POST,[this](AsyncWebServerRequest *request){ _upnp(request); },
-            NULL,
-            [](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total){
-                if(!index) request->_tempObject = malloc(total+1);
-                memcpy((uint8_t*) request->_tempObject+index,data,len);
-                if(index + len == total) *((uint8_t*) request->_tempObject+total)='\0';
-            }
-        );
-        _listenUDP();
-        _notify(aliveTag()); // TAG
-        h4.every(H4P_UDP_REFRESH / 3,[this](){ _notify(aliveTag()); },nullptr,H4P_TRID_NTFY,true); // TAG
-        _upHooks();
-    }
+    h4asws.on("/we",HTTP_GET, [this](AsyncWebServerRequest *request){ request->send(200,"text/xml",CSTR(_xml)); });
+    h4asws.on("/upnp", HTTP_POST,[this](AsyncWebServerRequest *request){ _upnp(request); },
+        NULL,
+        [](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total){
+            if(!index) request->_tempObject = malloc(total+1);
+            memcpy((uint8_t*) request->_tempObject+index,data,len);
+            if(index + len == total) *((uint8_t*) request->_tempObject+total)='\0';
+        }
+    );
+    _listenUDP();
+    _notify(aliveTag()); // TAG
+    h4.every(H4P_UDP_REFRESH / 3,[this](){ _notify(aliveTag()); },nullptr,H4P_TRID_NTFY,true); // TAG
+    _upHooks();
 }
 
 void H4P_UPNPServer::_upnp(AsyncWebServerRequest *request){ // redo

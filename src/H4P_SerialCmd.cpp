@@ -265,16 +265,7 @@ uint32_t H4P_SerialCmd::_dump(vector<string> vs){
         })(H4PAYLOAD);
     });
 }
-/*
-struct FSInfo {
-    size_t totalBytes;
-    size_t usedBytes;
-    size_t blockSize;
-    size_t pageSize;
-    size_t maxOpenFiles;
-    size_t maxPathLength;
-};
-*/
+
 #ifdef ARDUINO_ARCH_ESP8266
 void H4P_SerialCmd::showFS(){
     uint32_t sigma=0;

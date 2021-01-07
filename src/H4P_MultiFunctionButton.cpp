@@ -44,10 +44,12 @@ void H4P_MultiFunctionButton::progress(H4GPIOPin* ptr){ // run this as each stag
             H4EVENT("STAGE 2 - will factory reset");
             h4fc.flashLED(H4MF_MEDIUM,_led,_active);
             break;
+/*
         case 3: // over 10 seconds, fast flash
             H4EVENT("STAGE 2 - will force AP");
             h4fc.flashLED(H4MF_FAST,_led,_active);
             break;
+*/
         default: // do nothing if less than 2 seconds
             break;
     }
@@ -55,16 +57,18 @@ void H4P_MultiFunctionButton::progress(H4GPIOPin* ptr){ // run this as each stag
 
 void H4P_MultiFunctionButton::_start(){
     if(isLoaded(wifiTag()) && isLoaded(winkTag())){
-        if(WiFi.getMode() & WIFI_AP) h4fc.flashPWM(1000,5,_led,_active); 
-        else h4fc.stopLED(_led); 
+//        if(!h4wifi.sta()) h4fc.flashPWM(1000,5,_led,_active); 
+//        else 
+        h4fc.stopLED(_led); 
     }
     _upHooks();
 }
 
 void H4P_MultiFunctionButton::_stop(){
     if(isLoaded(wifiTag()) && isLoaded(winkTag())){
-        if(WiFi.getMode() & WIFI_AP) h4fc.stopLED(_led); 
-        else h4fc.flashMorse("... --- ...   ",H4MF_TIMEBASE,_led,_active);
+//        if(!h4wifi.sta()) h4fc.stopLED(_led); 
+//        else 
+        h4fc.flashMorse("... --- ...   ",H4MF_TIMEBASE,_led,_active);
     }
     _downHooks();
 }

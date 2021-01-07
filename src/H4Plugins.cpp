@@ -48,8 +48,8 @@ void h4StartPlugins(){
 }
 
 void h4FactoryReset(){
-    H4::_runRebootChain();
-    for(auto &c:H4Plugin::_factoryChain) c();
+//    H4::_runRebootChain();
+    for(auto const &c:H4Plugin::_factoryChain) c();
     h4rebootCore();
 }
 
@@ -88,13 +88,15 @@ void H4Plugin::_startup(){
 }
 
 void H4Plugin::start() {
+    H4EVENT("H4Plugin::start() %s state=%d",CSTR(_pName),state());
     if(!state()){
         H4EVENT("svc start %s",CSTR(_pName));
         _start(); // call the overrideable
     }
 }
 
-void H4Plugin::stop() { 
+void H4Plugin::stop() {
+    H4EVENT("H4Plugin::stop() %s state=%d",CSTR(_pName),state());
     if(state()){
         _stop(); // call the overrideable
         H4EVENT("svc stop %s",CSTR(_pName));

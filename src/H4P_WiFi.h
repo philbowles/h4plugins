@@ -44,59 +44,72 @@ SOFTWARE.
 #endif
 #include<DNSServer.h>
 #include<ArduinoOTA.h>
-#include <H4P_SerialCmd.h>
+#include<H4P_SerialCmd.h>
+
 class H4P_WiFi: public H4Plugin{
                 string     _device;
 //
                 VSCMD(_change);
                 VSCMD(_host);
                 VSCMD(_host2);
-//  H/W depedent functions
+//  H/W dependent functions
                 string      HAL_WIFI_chipID();
                 void        HAL_WIFI_setHost(const string& host);
 //
-                void        __apSupport();
-
                 void        _gotIP();
                 void        _lostIP();
-                void        _mcuStart();
-//                void        _scan();
-                void        _startSTA();
-//                void        _stopCore();
         static  void        _wifiEvent(WiFiEvent_t event);
+    protected:
+                void        HAL_WIFI_startSTA();
 
                 void        _start() override;
-                bool        _state() override { return WiFi.status() == WL_CONNECTED; }
                 void        _stop() override;
-                void        _greenLight() override;
                 void        _hookIn() override;
+
+        virtual void        _mcuStart();
     public:
 //          included here against better wishes due to compiler bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89605
         H4P_WiFi(string ssid,string psk,string device="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): _device(device),H4Plugin(wifiTag(),onC,onD){
             _cb[ssidTag()]=ssid;
             _cb[pskTag()]=psk;
-            _factoryHook=[this](){ clear(); };
+            _factoryHook=[this](){ Serial.printf("WiFi factory hook\n"); clear(); };
+            _rebootHook=[this](){ Serial.printf("WiFi reboot hook - so what?\n"); _downHooks(); };
             _cmds={
                 {_pName,    { H4PC_H4, _subCmd, nullptr}},
-                {"apmode",  { _subCmd, 0, CMD(startAP)}},
                 {"clear",   { _subCmd, 0, CMD(clear)}},
                 {"change",  { _subCmd, 0, CMDVS(_change)}},
                 {"host",    { _subCmd, 0, CMDVS(_host)}}
             };
         }                
-                void     clear();
-                void     change(string ssid,string psk);
-                void     startAP();
-                void     host(const string& host){ _setPersistentValue(deviceTag(),host,true); }
-                void     setBothNames(const string& host,const string& friendly);
-                void     show() override { 
+                void        clear();
+                void        change(string ssid,string psk);
+                void        host(const string& host){ _setPersistentValue(deviceTag(),host,true); }
+                void        setBothNames(const string& host,const string& friendly);
+                void        show() override { 
                     WiFi.printDiag(Serial);
                     reply("Device %s Status: %d",CSTR(_cb[deviceTag()]),WiFi.status());
                 }
 //          syscall only        
-                bool     _getPersistentValue(string v,string prefix);
-                void     _setPersistentValue(string n,string v,bool reboot);
+                bool        _getPersistentValue(string v,string prefix);
+                void        _setPersistentValue(string n,string v,bool reboot);
 };
+
+class H4P_WiFiAP: public H4P_WiFi{
+//                void        _start() override;
+//                void        _stop() override;
+//                void        _hookIn() override;
+
+                void        _mcuStart() override;
+    public:
+        H4P_WiFiAP(H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): H4P_WiFi("","","",onC,onD){}
+
+                void        startAP();
+};
+
+#ifdef H4P_USE_AP
+    extern __attribute__((weak)) H4P_WiFiAP h4wifi;
+#else
     extern __attribute__((weak)) H4P_WiFi h4wifi;
-    
+#endif
+
 #endif // H4P_WiFi_H

@@ -3,10 +3,14 @@ TODO:
     ret type on guard 1
 
 SOONER
+    shift host2 to upnp
     Rationalise/Align publishDevice MQTT
     ui input box -> ap mode
     autoOff -> cb
-    _xxx cmds hidden, eg. _uichg, _host2 eyc
+    optomise all if(nullptr) to || etc
+    optomise all upnp -> name tag()
+    passthru ap config params
+    js - type = password if n includes "pass"
 #
     error gone away in nodejs
     early abort dependfail

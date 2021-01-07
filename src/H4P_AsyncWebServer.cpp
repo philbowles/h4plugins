@@ -37,43 +37,8 @@ void  H4P_AsyncWebServer::_hookIn(){
     DEPEND(wifi);
     H4Plugin* p=isLoaded(onofTag());
     if(p) _btp=reinterpret_cast<H4P_BinaryThing*>(p);
-
-    _uiAdd(3,boardTag(),H4P_UI_LABEL);
-    _uiAdd(4,chipTag(),H4P_UI_LABEL);
-    if(WiFi.getMode()==WIFI_STA){
-        _uiAdd(1,deviceTag(),H4P_UI_LABEL);
-        _uiAdd(5,ipTag(),H4P_UI_LABEL,"",[]{ return _cb[ipTag()]; }); // cos we don't know it yet
-        _uiAdd(6,"H4v",H4P_UI_LABEL,H4_VERSION);
-        _uiAdd(7,h4PvTag(),H4P_UI_LABEL);
-        _uiAdd(8,h4UIvTag(),H4P_UI_LABEL);
-        if(isLoaded(mqttTag())) _uiAdd(8,"Pangolin Vn",H4P_UI_LABEL,_cb[pmvTag()]);
-    }
-    else {
-//        _uiAdd(1,"Device",H4P_UI_INPUT,_cb[deviceTag()],nullptr,onUiChange); 
-        WiFi.enableSTA(true);
-        int n=WiFi.scanNetworks();
-        H4P_CONFIG_BLOCK ssids;
-        for (uint8_t i = 0; i < n; i++) {
-            string ss=CSTR(WiFi.SSID(i));
-            ssids[CSTR(WiFi.SSID(i))]=ss;
-        }
-/*
-        h4asws.uiAddInput(deviceTag());
-        if(isLoaded(nameTag())) h4asws.uiAddInput(nameTag());
-        h4asws.uiAddDropdown(ssidTag(),ssids);
-        h4asws.uiAddInput(pskTag());
-        h4asws._uiAdd("Connect to SSID -> ",H4P_UI_BOOL,"",
-            nullptr,
-            [this](const string& a,const string& b){ 
-                H4EVENT("User config connect to %s/%s",CSTR(_cb[ssidTag()]),CSTR(_cb[pskTag()]));
-                H4EVENT("device / friendly %s/%s",CSTR(_cb[deviceTag()]),CSTR(_cb[nameTag()]));
-                //h4wifi.setBothNames(_cb[deviceTag()],_cb[nameTag()]);
-                //h4wifi.change(_cb[ssidTag()],_cb[pskTag()]);
-           });
-*/
-        WiFi.scanDelete();
-        WiFi.enableSTA(false); // force AP only
-    }
+    if(isLoaded(gpioTag())) h4cmd.addCmd("gpio",_subCmd,0,CMDVS(_gpio));
+    if(!HAL_FS.exists(h4UIvTag())) Serial.printf("FATAL: No webUI files!!! *************************\n");
 }
 
 uint32_t H4P_AsyncWebServer::_gpio(vector<string> vs){
@@ -98,7 +63,8 @@ uint32_t H4P_AsyncWebServer::_msg(vector<string> vs){
 
 H4_CMD_ERROR H4P_AsyncWebServer::__uichgCore(const string& a,const string& b,H4P_FN_UICHANGE f){
     _sendSSE(CSTR(a),CSTR(b));
-    f(b);
+    if(f) f(b);
+    else onUiChange(a,b);
     return H4_CMD_OK;
 }
 
@@ -111,6 +77,7 @@ void H4P_AsyncWebServer::_uiAdd(int seq,const string& i,H4P_UI_TYPE t,const stri
             else value=_cb[i]; // assume its backed by CB variable
         }
     }
+//    Serial.printf("_uiAdd id=%03d item=%16s type=%d value=%s f=%08x c=%08x\n",seq,CSTR(i),t,CSTR(value),f ? &f:0,c ? &c:0);
     _userItems[seq]={i,t,value,f,c};
 }
 
@@ -119,16 +86,13 @@ uint32_t H4P_AsyncWebServer::_uichg(vector<string> vs){
         for(auto &i:_userItems){
             H4P_UI_ITEM u=i.second;
             if(u.id==a){
-                if(u.c){
-                    if(u.type==H4P_UI_BOOL){
-                        if(isNumeric(b)) {
-                            if(atoi(CSTR(b)) > 1) return H4_CMD_PAYLOAD_FORMAT;
-                        } else return H4_CMD_NOT_NUMERIC;
-                    }
-                    else _cb[a]=b;
-                    return __uichgCore(a,b,u.c);
+                if(u.type==H4P_UI_BOOL){
+                    if(isNumeric(b)) {
+                        if(atoi(CSTR(b)) > 1) return H4_CMD_PAYLOAD_FORMAT;
+                    } else return H4_CMD_NOT_NUMERIC;
                 }
-                return H4_CMD_OUT_OF_BOUNDS; // not updateable
+                _cb[a]=b;
+                return __uichgCore(a,b,u.c);
             }
         }
         return H4_CMD_NAME_UNKNOWN;
@@ -185,22 +149,9 @@ void H4P_AsyncWebServer::_start(){
 
     on("/",HTTP_GET, [this](AsyncWebServerRequest *request){
         H4EVENT("Root %s",request->client()->remoteIP().toString().c_str());
-        _cb[wifiTag()]=stringFromInt(WiFi.getMode());
         request->send(HAL_FS,"/sta.htm",String(),false,aswsReplace);
     });
-/*
-    on("/",HTTP_POST, [this](AsyncWebServerRequest *request){
-        H4EVENT("Root POST %s",request->client()->remoteIP().toString().c_str());
-    	H4P_CONFIG_BLOCK rp;
-	    int params = request->params();
-	    for(int i=0;i<params;i++){
-		    AsyncWebParameter* p = request->getParam(i);
-		    rp[CSTR(p->name())]=CSTR(p->value());
-	    }
-        h4wifi.setBothNames(rp[deviceTag()],rp[nameTag()]);
-        h4wifi.change(rp[ssidTag()],rp[pskTag()]);
-    });
-*/
+
 	on("/rest",HTTP_GET,[this](AsyncWebServerRequest *request){ _rest(request); });
 
     serveStatic("/", HAL_FS, "/").setCacheControl("max-age=31536000");
@@ -222,17 +173,17 @@ String H4P_AsyncWebServer::aswsReplace(const String& var){
 void H4P_AsyncWebServer::show(){ 
     for(auto &i:_userItems) {
         H4P_UI_ITEM u=i.second;
-        reply("id=%d item=%s value=%s f=%08x c=%08x",i.first,CSTR(u.id),CSTR(u.value),&u.f,&u.c);
+        reply("id=%03d item=%16s type=%d f=%08x c=%08x value=%s ",i.first,CSTR(u.id),u.type,u.f ? &u.f:0,u.c ? &u.c:0,CSTR(u.value));
     }
 }
-/*
-void H4P_AsyncWebServer::uiAddDropdown(const string& name,H4P_CONFIG_BLOCK options){
+
+void H4P_AsyncWebServer::uiAddDropdown(const string& name,H4P_CONFIG_BLOCK options,H4P_FN_UICHANGE onChange){
     string opts="";
     for(auto const& o:options) opts+=o.first+"="+o.second+",";
     opts.pop_back();
-//    _uiAdd(name,H4P_UI_DROPDOWN,"",[opts]{ return opts; },onUiChange);
+    _uiAdd(_seq++,name,H4P_UI_DROPDOWN,opts,nullptr,onChange); // optimise
 }
-*/
+
 void H4P_AsyncWebServer::uiAddGPIO(){ if(isLoaded(gpioTag())) for(auto const& p:H4P_GPIOManager::pins) uiAddGPIO(p.first); }
 
 H4_CMD_ERROR H4P_AsyncWebServer::uiAddGPIO(uint8_t pin){
@@ -254,15 +205,16 @@ H4_CMD_ERROR H4P_AsyncWebServer::uiAddGPIO(uint8_t pin){
     }
     return H4_CMD_NOT_NOW;
 }
-/*
-void H4P_AsyncWebServer::uiAddInput(const string& name,H4P_FN_UITXT f){
+
+void H4P_AsyncWebServer::uiAddInput(const string& name,H4P_FN_UITXT f,H4P_FN_UICHANGE onChange){
     if(f) _cb[name]=f();
-    _uiAdd(name,H4P_UI_INPUT,"",[name]{ return _cb[name]; },onUiChange); 
+    _uiAdd(_seq++,name,H4P_UI_INPUT,"",nullptr,onChange); 
 }
-void H4P_AsyncWebServer::uiAddInput(const string& name,const string& value){
-    _uiAdd(name,H4P_UI_INPUT,_cb[name],nullptr,onUiChange); 
+
+void H4P_AsyncWebServer::uiAddInput(const string& name,const string& value,H4P_FN_UICHANGE onChange){
+    _uiAdd(_seq++,name,H4P_UI_INPUT,_cb[name],nullptr,onChange); 
 }
-*/
+
 void H4P_AsyncWebServer::uiSync(){
     if(_evts && _evts->count()){
         for(auto &i:_userItems){

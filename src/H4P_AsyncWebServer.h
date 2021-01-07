@@ -37,6 +37,8 @@ SOFTWARE.
 
 #define H4P_ASWS_EVT_TIMEOUT    30000
 
+extern void onUiChange(const string& name,const string& value);
+
 enum H4P_UI_TYPE {
     H4P_UI_LABEL,
     H4P_UI_TEXT,
@@ -82,7 +84,7 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
                 void            _start() override;
                 void            _stop() override;
                 void            _hookIn() override;
-                void            _greenLight() override { if(isLoaded(gpioTag())) h4cmd.addCmd("gpio",_subCmd,0,CMDVS(_gpio)); }; // do not autostart!
+                void            _greenLight() override {};
     public:
         H4P_AsyncWebServer(H4_FN_VOID onClientConnect=nullptr,H4_FN_VOID onClientDisconnect=nullptr): AsyncWebServer(80),H4Plugin(aswsTag()){
             _onC=onClientConnect;
@@ -105,12 +107,12 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
                 H4_CMD_ERROR    uiAddGPIO(uint8_t pin);
                 void            uiAddBoolean(const string& name,const boolean tf,H4P_FN_UICHANGE a=nullptr){ _uiAdd(_seq++,name,H4P_UI_BOOL,"",[tf]{ return tf ? "1":"0"; },a); }
                 void            uiAddBoolean(const string& name,H4P_FN_UIBOOL f,H4P_FN_UICHANGE a=nullptr){ _uiAdd(_seq++,name,H4P_UI_BOOL,"",[f]{ return f() ? "1":"0"; },a); }
-/*
-                void            uiAddDropdown(const string& name,H4P_CONFIG_BLOCK options);
 
-                void            uiAddInput(const string& name,H4P_FN_UITXT f=nullptr);
-                void            uiAddInput(const string& name,const string& value);
-*/
+                void            uiAddDropdown(const string& name,H4P_CONFIG_BLOCK options,H4P_FN_UICHANGE onChange=nullptr);
+
+                void            uiAddInput(const string& name,H4P_FN_UITXT f=nullptr,H4P_FN_UICHANGE onChange=nullptr);
+                void            uiAddInput(const string& name,const string& value,H4P_FN_UICHANGE onChange=nullptr);
+
                 void            uiSetInput(const string& name,const string& value){ _sendSSE(CSTR(name),CSTR(value)); }
                 void            uiSetBoolean(const string& name,const bool b){ _sendSSE(CSTR(name),CSTR(stringFromInt(b))); }
                 void            uiSetLabel(const string& name,const int f){ _sendSSE(CSTR(name),CSTR(stringFromInt(f))); }

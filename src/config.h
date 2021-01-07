@@ -57,11 +57,11 @@ constexpr char* h4PvTag(){ return "h4Pv"; }
 
 #define H4MF_SLOW              250
 #define H4MF_MEDIUM            125
-#define H4MF_FAST               25
+//#define H4MF_FAST               25
 #define H4MF_TIMEBASE          175
 #define H4MF_REBOOT           2000
 #define H4MF_FACTORY          5000
-#define H4MF_APMODE          10000
+//#define H4MF_APMODE          10000
 
 #define H4WF_AP_RATE          1000
 #define H4WF_OTA_RATE         1500
