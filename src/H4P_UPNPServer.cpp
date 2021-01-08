@@ -29,14 +29,20 @@ SOFTWARE.
 
 #include<H4P_UPNPServer.h>
 
+//constexpr char* xh4dTag(){ return "X-H4-DEVICE"; }
+
 void H4P_UPNPServer::_hookIn(){
     DEPEND(asws);
     REQUIREBT;
     string dn=uppercase(h4Tag())+" "+deviceTag()+" ";
-    h4wifi._getPersistentValue(nameTag(),dn);
-    //_cb[nameTag()]=_name;
+    if(!h4wifi._getPersistentValue(nameTag(),dn)) if(_name!="") _cb[nameTag()]=_name;
     H4EVENT("UPNP name %s",CSTR(_cb[nameTag()]));
-//    h4asws._uiAdd(2,"name",H4P_UI_LABEL,_cb[nameTag()]);
+/*    // sniff neighbours
+    _listenTag("NT",_pups.back(),[this](uint32_t mx,H4P_CONFIG_BLOCK blok,bool dora){ 
+        if(dora) _otherH4s.insert(blok[xh4dTag()]);
+        else _otherH4s.erase(blok[xh4dTag()]);
+    });
+*/
 }
 
 void  H4P_UPNPServer::friendlyName(const string& name){ h4wifi._setPersistentValue(nameTag(),name,true); }
@@ -78,17 +84,20 @@ void H4P_UPNPServer::_listenUDP(){
                         }
                     }
                     else {
+//                        Serial.printf("NOTIFY??? %s sz=%d from %s\n",CSTR(msg),msg.size(),CSTR(ip.toString()));
+//                        for (auto const &h :uhdrs) Serial.printf("UH: %s=%s\n",CSTR(h.first),CSTR(h.second));
                         if (msg[0] == 'N') { //OTIFY
-                            string usn=uhdrs["USN"];
-                            if(_detect.count(usn)) _detect[usn](mx,uhdrs);
+                            for(auto const& d:_detect){
+                                string tag=d.first;
+                                if(uhdrs.count(tag) && uhdrs[tag].find(d.second.first)!=string::npos) d.second.second(mx,uhdrs,uhdrs["NTS"].find(aliveTag())!=string::npos);
+                            }
                         }
-                    } 
+                    }
                 }
             },stringFromBuff(packet.data(), packet.length()),packet.remoteIP(), packet.remotePort()),nullptr, H4P_TRID_UDPM);
         });
     }
 }
-
 
 string H4P_UPNPServer::__makeUSN(const string& s){
 	string full=_uuid+_cb["udn"];

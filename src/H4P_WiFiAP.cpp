@@ -29,27 +29,11 @@ SOFTWARE.
 #include<H4PCommon.h>
 #include<H4P_WiFi.h>
 #include<H4P_AsyncWebServer.h>
-/*
-                                             H / W - D E P E N D E N T   F U N C T I O N S
-*/
-#ifdef ARDUINO_ARCH_ESP8266
-//
-//                                                                                                  ESP8266
-//
-#else
-//
-//                                                                                                  ESP32
-//
-#endif
-/*
-                                                                                                 C O M M O N   F U N C T I O N S
-*/
-/*
-void H4P_WiFiAP::_hookIn(){
-    H4P_WiFi::_hookIn();
-}
-*/
-void H4P_WiFiAP::_mcuStart(){
+
+//diag
+#include<H4P_SerialCmd.h>
+
+void H4P_WiFiAP::_start(){
     auto mode=WiFi.getMode();
     H4EVENT("APMODE _mcuStart mode=%d stored",mode);
     if(mode==WIFI_AP) startAP();
@@ -83,8 +67,6 @@ void H4P_WiFiAP::startAP(){
     _cb[ssidTag()]=CSTR(WiFi.SSID(0)); // ensure internal value if user never changes droplist
     WiFi.scanDelete();
 
-    H4EVENT("AP _hookIn modify ui Items");
-
     h4asws._uiAdd(-1,ssidTag(),H4P_UI_DROPDOWN,opts);
     h4asws._uiAdd(0,pskTag(),H4P_UI_INPUT);
     h4asws._uiAdd(1,deviceTag(),H4P_UI_INPUT,_cb[deviceTag()]); 
@@ -95,25 +77,22 @@ void H4P_WiFiAP::startAP(){
             h4.queueFunction([this](){
                 H4EVENT("APAPAP User config connect to %s/%s",CSTR(_cb[ssidTag()]),CSTR(_cb[pskTag()]));
                 H4EVENT("APAPAP device / friendly %s/%s",CSTR(_cb[deviceTag()]),CSTR(_cb[nameTag()]));
-                setBothNames(_cb[deviceTag()],_cb[nameTag()]);
+//                setBothNames(_cb[deviceTag()],_cb[nameTag()]);
+                _save(deviceTag());
+                _save(nameTag());
                 change(_cb[ssidTag()],_cb[pskTag()]);
             });
     });
 
     WiFi.enableSTA(false); // force AP only
-    //h4asws.show();
 
     WiFi.mode(WIFI_AP);
     H4EVENT("ENTER AP MODE %s MAC=%s",CSTR(_cb[deviceTag()]),CSTR(WiFi.softAPmacAddress()));
     WiFi.softAP(CSTR(_cb[deviceTag()]));
     _cb[ipTag()]=CSTR(WiFi.softAPIP().toString());//.c_str();
-
-//    H4EVENT("Captive portal on %s",CSTR(_cb[ipTag()]));
-//    if(!_dns53) _dns53=new DNSServer;
-//    else Serial.printf("DOUBLE DIP DNS!!!\n");
     _dns53=new DNSServer;
     _dns53->start(53, "*", WiFi.softAPIP());
-    h4.every(100,[](){ _dns53->processNextRequest(); },nullptr,H4P_TRID_WFAP,true);
+    h4.every(100,[](){ _dns53->processNextRequest(); },nullptr,H4P_TRID_WFAP);
 
-    _upHooks(); // only for h4asws ?? or avoid udp crash
+    h4asws.start(); // DONT run uphooks!
 }

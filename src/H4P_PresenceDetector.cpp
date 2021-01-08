@@ -39,8 +39,7 @@ void H4P_UPNPDetector::_hookIn() {
 }
 
 void H4P_UPNPDetector::_start(){
-    h4upnp._listenUSN(_id,[this](uint32_t mx,H4P_CONFIG_BLOCK uh){
-        bool direction=uh["NTS"].find(aliveTag())!=string::npos;
+    h4upnp._listenTag("USN",_id,[this](uint32_t mx,H4P_CONFIG_BLOCK uh,bool direction){
         h4.cancel(_pinger);
         if(direction) _pinger=h4.once(mx,[this](){ _inout(false); },nullptr,H4P_TRID_UDPU);
         _inout(direction);

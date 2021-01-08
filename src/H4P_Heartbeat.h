@@ -43,7 +43,7 @@ class H4P_Heartbeat: public H4Plugin {
                 void        _stop() override ;
                 void        _run();
     public: 
-        H4P_Heartbeat(H4_FN_VOID beat=nullptr): _bf(beat),H4Plugin(beatTag()){}
+        H4P_Heartbeat(H4_FN_VOID beat=nullptr): _bf(beat),H4Plugin("beat"){}
 
         static string secsToTime(uint32_t sex);
 

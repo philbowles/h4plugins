@@ -50,7 +50,6 @@ void H4GPIOPin::_pinFactoryCommon(bool onof){ // optimise for no logging
         H4P_BinaryThing* btp=reinterpret_cast<H4P_BinaryThing*>(H4Plugin::isLoaded(onofTag()));
         if(btp){
             onEvent=[this,btp](H4GPIOPin* pp){ 
-                Serial.printf("BTP onEvent pp -> %d\n",pp->logicalRead());
                 if(pp->style==H4GM_PS_LATCHING) {
                     if(pp->nEvents) btp->toggle(); // POTENTIAL BUG! if btp already commanded on, 1st time wont toggle
     #ifdef H4P_LOG_EVENTS
@@ -179,7 +178,6 @@ void RepeatingPin::sendEvent() {
 
 MultistagePin::MultistagePin(uint8_t _p,uint8_t _g,H4GM_STYLE _s,uint8_t _a,uint32_t _t,H4GM_STAGE_MAP _m,H4GM_FN_EVENT _c=[](H4GPIOPin*){}): DebouncedPin(_p,_g,_s,_a,_t,_c),stageMap(_m){}
 void MultistagePin::sendEvent(){
-    Serial.printf("MultistagePin::sendEvent state=%d\n",state);
     if(state){
         stage=0;
         for(auto const& s:stageMap) {
@@ -216,7 +214,6 @@ void PolledPin::read(){
 AnalogAveragePin::AnalogAveragePin(uint8_t _p,uint32_t _f,uint32_t n,H4GM_FN_EVENT _c): _n(n), PolledPin(_p,INPUT,H4GM_PS_THRESHA,ACTIVE_HIGH,_f,true,_c) {}
 void AnalogAveragePin::read(){
     _samples.push_back(analogRead(pin));
-//    Serial.printf("sample %u=%u\n",_samples.size(),_samples.back());
     if(_samples.size() == _n){
         state=std::accumulate( _samples.begin(), _samples.end(), 0) / _samples.size();
         _samples.clear();

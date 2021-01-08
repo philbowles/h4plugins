@@ -40,7 +40,7 @@ void H4P_PersistentStorage::_hookIn() {
     _factoryHook=[this](){ clear(); };
 }
 
-H4P_PersistentStorage::H4P_PersistentStorage(H4P_FN_PSCHANGE f): _f(f), H4Plugin(storTag()){
+H4P_PersistentStorage::H4P_PersistentStorage(H4P_FN_PSCHANGE f): _f(f), H4Plugin("stor"){
     _cmds={
         {_pName,    { H4PC_H4, _subCmd, nullptr}},
         {"clear",   { _subCmd, 0, CMD(clear)}},

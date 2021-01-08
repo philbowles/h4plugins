@@ -27,6 +27,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_ExternalSqWave.h>
+
 uint32_t H4P_ExternalSqWave::guardInt4(vector<string> vs,function<void(uint32_t,uint32_t,uint32_t,uint32_t)> f){
     return guard1(vs,[f,this](vector<string> vs){
         auto vi=expectInt(H4PAYLOAD);
@@ -76,7 +77,7 @@ uint32_t H4P_ExternalSqWave::_dsweep(vector<string> vs){ return __sweep(vs,'D',H
 //
 //      H4P_ExternalSqWave
 //
-H4P_ExternalSqWave::H4P_ExternalSqWave(uint8_t rx,uint8_t tx,uint32_t initialF,uint32_t initialD): SoftwareSerial(rx,tx), H4Plugin(esqwTag()){ 
+H4P_ExternalSqWave::H4P_ExternalSqWave(uint8_t rx,uint8_t tx,uint32_t initialF,uint32_t initialD): SoftwareSerial(rx,tx), H4Plugin("esqw"){ 
     uint32_t H4PC_ESW_SET=++_nxtSubCmd;
     uint32_t H4PC_ESW_SWEEP=++_nxtSubCmd;
     _cmds={

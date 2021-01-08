@@ -105,38 +105,30 @@ enum H4P_LOG_TYPE {
 
 constexpr const char* cmdhash(){ return "/h4/#"; }
 
-//STAG(alive);
 STAG(asws);
 STAG(auto);
-STAG(beat);
 STAG(board)
 STAG(broker);
 STAG(cerr);
 STAG(chip);
-//STAG(condition);
 STAG(device);
-STAG(esqw);
 STAG(gpio);
 STAG(h4);
 STAG(h4UIv);
 STAG(ip);
 STAG(log);
-STAG(mfnb);
 STAG(mqtt);
 STAG(msg);
 STAG(name);
 STAG(onof);
 STAG(pmv);
 STAG(port);
-STAG(psk);
-STAG(qwrn);
-STAG(rupd);
+STAG(psk); // chg password
 STAG(scmd);
 STAG(snif);
 STAG(src);
 STAG(ssid);
 STAG(state);
-STAG(stor);
 STAG(time);
 STAG(upnp);
 STAG(user);
@@ -158,7 +150,7 @@ STAG(wifi);
 #ifdef H4P_LOG_EVENTS
     #define SYSEVENT(e,s,t,x,...) { h4cmd.logEventType(e,s,t,x, ##__VA_ARGS__); }
     #define H4EVENT(x,...) { h4cmd.logEventType(H4P_LOG_H4,_pName,h4Tag(),x, ##__VA_ARGS__); }
-    #define DEPENDFAIL(x) { Serial.print("FATAL: ");Serial.print(CSTR(_pName));Serial.print(" needs ");Serial.println(x##Tag());return; }
+    #define DEPENDFAIL(x) { Serial.printf("FATAL: %s needs %s\n",CSTR(_pName),x##Tag());return; }
     #define h4UserEvent(x,...) { h4cmd.logEventType(H4P_LOG_USER,userTag(),h4Tag(),x, ##__VA_ARGS__); }
 #else
     #define SYSEVENT(e,x,...)
@@ -184,32 +176,32 @@ enum trustedIds {
   H4P_TRID_PWM1,
   H4P_TRID_GPIO,
   H4P_TRID_DBNC,
-  H4P_TRID_RPTP,
+  H4P_TRID_RPTP, // 55
   H4P_TRID_POLL,
   H4P_TRID_MULT,
   H4P_TRID_TRIG,
   H4P_TRID_SQWV,
-  H4P_TRID_HOTA,
+  H4P_TRID_HOTA, // 60
   H4P_TRID_WFAP,
   H4P_TRID_MQMS,
   H4P_TRID_MQRC,
   H4P_TRID_ASWS,
-  H4P_TRID_SOAP,
+  H4P_TRID_SOAP, // 65
   H4P_TRID_UDPM,
   H4P_TRID_UDPS,
   H4P_TRID_UDPU,
   H4P_TRID_NTFY,
-  H4P_TRID_SCMD,
+  H4P_TRID_SCMD, // 70
   H4P_TRID_HLOG,
   H4P_TRID_QLOG,
   H4P_TRID_MLRQ,
   H4P_TRID_BTTO,
-  H4P_TRID_IPPD,
+  H4P_TRID_IPPD, // 75
   H4P_TRID_TIME,
   H4P_TRID_SYNC,
   H4P_TRID_DALY,
   H4P_TRID_LOOP,
-  H4P_TRID_SHOT,
+  H4P_TRID_SHOT, // 80
   H4P_TRID_SSET
 };
 

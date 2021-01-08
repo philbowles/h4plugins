@@ -76,7 +76,7 @@ class H4P_CmdErrors: public H4Plugin {
             {H4P_TRID_PATN,"PATN"},
             {H4P_TRID_PP1x,"PP1X"},
             {H4P_TRID_PWM1,"PWM1"},
-            {H4P_TRID_GPIO,"GPIO"},
+            {H4P_TRID_GPIO,gpioTag()},
             {H4P_TRID_DBNC,"DBNC"},
             {H4P_TRID_RPTP,"RPTP"},
             {H4P_TRID_POLL,"POLL"},
@@ -87,19 +87,19 @@ class H4P_CmdErrors: public H4Plugin {
             {H4P_TRID_WFAP,"WFAP"},
             {H4P_TRID_MQMS,"MQMS"},
             {H4P_TRID_MQRC,"MQRC"},
-            {H4P_TRID_ASWS,"ASWS"},
+            {H4P_TRID_ASWS,aswsTag()},
             {H4P_TRID_SOAP,"SOAP"},
             {H4P_TRID_UDPM,"UDPM"},
             {H4P_TRID_UDPS,"UDPS"},
             {H4P_TRID_UDPU,"UDPU"},
             {H4P_TRID_NTFY,"UNFY"},
-            {H4P_TRID_SCMD,"SCMD"},
+            {H4P_TRID_SCMD,scmdTag()},
             {H4P_TRID_HLOG,"HLOG"},
             {H4P_TRID_QLOG,"QLOG"},
             {H4P_TRID_MLRQ,"MLRQ"},
             {H4P_TRID_BTTO,"BTTO"},
             {H4P_TRID_IPPD,"IPPD"},
-            {H4P_TRID_TIME,"TIME"},
+            {H4P_TRID_TIME,timeTag()},
             {H4P_TRID_SYNC,"SYNC"},
             {H4P_TRID_DALY,"DALY"},
             {H4P_TRID_SHOT,"AT_T"},
@@ -123,7 +123,7 @@ class H4P_CmdErrors: public H4Plugin {
         }
         
         string      getTaskName(uint32_t e){
-            return taskNames.count(e) ? taskNames[e]:giveTaskName(e);
+            return uppercase(taskNames.count(e) ? taskNames[e]:giveTaskName(e));
         }
 };
 

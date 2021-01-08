@@ -59,13 +59,10 @@ void H4P_Timekeeper::__HALsetTimezone(int tzo){
 
 void H4P_Timekeeper::sync(){
 	long stamp=sntp_get_current_timestamp();
-//    Serial.printf("**************** SYNC S=%u tzo=%d %s\n",stamp,_tzo,sntp_get_real_time(stamp));
 	if(stamp > 30000){ // 28800 +leeway: default is GMT+8
         stamp+=(_tzo*60);
 		vector<string> dp=split(replaceAll(sntp_get_real_time(stamp + _fDST(stamp)),"  "," ")," ");
-//        dumpvs(dp);
         _mss00=parseTime(dp[3])-millis();
-//        Serial.printf("**************** SYNC S=%u tzo=%d %s ms00=%u\n",stamp,_tzo,sntp_get_real_time(stamp + _fDST(stamp)),_mss00);
 	}
 }
 #else 
@@ -187,7 +184,6 @@ string H4P_Timekeeper::minutesFromNow(uint32_t m){
 }
 
 int H4P_Timekeeper::parseTime(const string& ts){ // in milliseconds!
-//    Serial.printf("parseTime %s\n",CSTR(ts));
 	vector<string> parts=split(ts,":");
     uint32_t    h,m,s=0;
     switch(parts.size()){

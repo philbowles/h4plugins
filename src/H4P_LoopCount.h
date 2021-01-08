@@ -49,8 +49,8 @@ class H4P_LoopCount: public H4Plugin {
             uint32_t    _freq;
 
             void        _start() override {
-                h4.every(_freq,[]{
-                    Serial.printf("%u\n",h4Nloops);
+                h4.every(_freq,[this]{
+                    H4EVENT("%u\n",h4Nloops);
                     h4Nloops=0;
                 },nullptr,H4P_TRID_LOOP,true);
             }

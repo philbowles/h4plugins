@@ -41,6 +41,7 @@ SOFTWARE.
     #include<AsyncTCP.h>
     #include<AsyncUDP.h>
     #include<ESPmDNS.h>
+    #include<map> // WHY???
 #endif
 #include<DNSServer.h>
 #include<ArduinoOTA.h>
@@ -54,6 +55,7 @@ class H4P_WiFi: public H4Plugin{
                 VSCMD(_host2);
 //  H/W dependent functions
                 string      HAL_WIFI_chipID();
+                void        HAL_WIFI_clear();
                 void        HAL_WIFI_setHost(const string& host);
 //
                 void        _gotIP();
@@ -66,14 +68,14 @@ class H4P_WiFi: public H4Plugin{
                 void        _stop() override;
                 void        _hookIn() override;
 
-        virtual void        _mcuStart();
+//        virtual void        _mcuStart();
     public:
 //          included here against better wishes due to compiler bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89605
         H4P_WiFi(string ssid,string psk,string device="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): _device(device),H4Plugin(wifiTag(),onC,onD){
             _cb[ssidTag()]=ssid;
             _cb[pskTag()]=psk;
-            _factoryHook=[this](){ Serial.printf("WiFi factory hook\n"); clear(); };
-            _rebootHook=[this](){ Serial.printf("WiFi reboot hook - so what?\n"); _downHooks(); };
+            _factoryHook=[this](){ clear(); };
+            _rebootHook=[this](){ _downHooks(); };
             _cmds={
                 {_pName,    { H4PC_H4, _subCmd, nullptr}},
                 {"clear",   { _subCmd, 0, CMD(clear)}},
@@ -95,14 +97,11 @@ class H4P_WiFi: public H4Plugin{
 };
 
 class H4P_WiFiAP: public H4P_WiFi{
-//                void        _start() override;
-//                void        _stop() override;
-//                void        _hookIn() override;
-
-                void        _mcuStart() override;
+                void        _save(const char* s){ H4P_SerialCmd::write(CSTR(string("/").append(s)),_cb[s]); }
+                void        _start() override;
     public:
         H4P_WiFiAP(H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): H4P_WiFi("","","",onC,onD){}
-
+        
                 void        startAP();
 };
 

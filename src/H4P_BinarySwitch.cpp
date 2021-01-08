@@ -34,8 +34,9 @@ void H4P_ConditionalSwitch::syncCondition(){ if(isLoaded(aswsTag())) h4asws._sen
 void H4P_ConditionalSwitch::_hookIn() {
     REQUIRE(gpio);
     H4P_BinarySwitch::_hookIn();
-    if(isLoaded(aswsTag())) h4asws._uiAdd(100,conditionTag(),H4P_UI_BOOL,"",[this]{ return stringFromInt(_predicate(state())); });
+    if(isLoaded(aswsTag())) h4asws._uiAdd(998,conditionTag(),H4P_UI_BOOL,"",[this]{ return stringFromInt(_predicate(state())); });
 }
+
 void H4P_ConditionalSwitch::_setState(bool b) { 
     if(_predicate(b)) H4P_BinarySwitch::_setState(b);
     else if(isLoaded(aswsTag())) h4asws.uiMessage("Unable: condition disarmed");

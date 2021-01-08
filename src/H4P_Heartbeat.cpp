@@ -32,7 +32,7 @@ SOFTWARE.
 uint32_t            H4P_Heartbeat::_uptime=0;
 
 void H4P_Heartbeat::_hookIn() {
-    if(isLoaded(aswsTag())) h4asws._uiAdd(9,"uptime",H4P_UI_LABEL,"",upTime);
+    if(isLoaded(aswsTag())) h4asws._uiAdd(11,"uptime",H4P_UI_LABEL,"",upTime);
 }
 
 void H4P_Heartbeat::_start() {

@@ -38,7 +38,7 @@ void  H4P_AsyncWebServer::_hookIn(){
     H4Plugin* p=isLoaded(onofTag());
     if(p) _btp=reinterpret_cast<H4P_BinaryThing*>(p);
     if(isLoaded(gpioTag())) h4cmd.addCmd("gpio",_subCmd,0,CMDVS(_gpio));
-    if(!HAL_FS.exists(h4UIvTag())) Serial.printf("FATAL: No webUI files!!! *************************\n");
+//    if(!HAL_FS.exists(CSTR(string("/"+string(h4UIvTag()))))) Serial.printf("FATAL: No webUI files!!!\n");
 }
 
 uint32_t H4P_AsyncWebServer::_gpio(vector<string> vs){
@@ -47,7 +47,6 @@ uint32_t H4P_AsyncWebServer::_gpio(vector<string> vs){
         else {
             if(!isNumeric(H4PAYLOAD)) return H4_CMD_NOT_NUMERIC;
             uint8_t pin=H4PAYLOAD_INT;
-            Serial.printf("uiAdd GPIO pin %d\n",pin);
             return uiAddGPIO(pin);
         }
         return H4_CMD_OK;
@@ -61,9 +60,9 @@ uint32_t H4P_AsyncWebServer::_msg(vector<string> vs){
     });
 }
 
-H4_CMD_ERROR H4P_AsyncWebServer::__uichgCore(const string& a,const string& b,H4P_FN_UICHANGE f){
+H4_CMD_ERROR H4P_AsyncWebServer::__uichgCore(const string& a,const string& b,H4P_FN_UICHANGE chg){
     _sendSSE(CSTR(a),CSTR(b));
-    if(f) f(b);
+    if(chg) chg(b);
     else onUiChange(a,b);
     return H4_CMD_OK;
 }
@@ -73,11 +72,11 @@ void H4P_AsyncWebServer::_uiAdd(int seq,const string& i,H4P_UI_TYPE t,const stri
     if(c) value=_cb[i]; // change function implies input / dropdown etc: backed by CB variable
     else {
         if(value=="") { // when no intial value given...
-            if(f) value=f(); // if dynamic, sync it, or...
-            else value=_cb[i]; // assume its backed by CB variable
+//            if(f) value=f(); // if dynamic, sync it, or...
+//            else value=_cb[i]; // assume its backed by CB variable
+            value=f ? f():_cb[i];
         }
     }
-//    Serial.printf("_uiAdd id=%03d item=%16s type=%d value=%s f=%08x c=%08x\n",seq,CSTR(i),t,CSTR(value),f ? &f:0,c ? &c:0);
     _userItems[seq]={i,t,value,f,c};
 }
 
@@ -139,8 +138,8 @@ void H4P_AsyncWebServer::_start(){
             }
             h4.repeatWhile([this]{ return _evts->count(); },
                 ((H4P_ASWS_EVT_TIMEOUT*3)/4),
-                [this]{ /* _sendSSE("","ka"); */ },
-                [this]{ if(_onD) _onD(); }, // ???
+                [this]{ },
+                [this]{ if(_onD) _onD(); },
                 H4P_TRID_SSET,true
             );
         });
@@ -157,7 +156,7 @@ void H4P_AsyncWebServer::_start(){
     serveStatic("/", HAL_FS, "/").setCacheControl("max-age=31536000");
     // 404 ?
     begin();
-    _upHooks();
+    if(WiFi.getMode()==WIFI_STA) _upHooks();
 }
 
 void H4P_AsyncWebServer::_stop(){ 
@@ -205,13 +204,14 @@ H4_CMD_ERROR H4P_AsyncWebServer::uiAddGPIO(uint8_t pin){
     }
     return H4_CMD_NOT_NOW;
 }
-
+/*
 void H4P_AsyncWebServer::uiAddInput(const string& name,H4P_FN_UITXT f,H4P_FN_UICHANGE onChange){
     if(f) _cb[name]=f();
-    _uiAdd(_seq++,name,H4P_UI_INPUT,"",nullptr,onChange); 
+    _uiAdd(_seq++,name,H4P_UI_INPUT,_cb[name],f,onChange); 
 }
-
+*/
 void H4P_AsyncWebServer::uiAddInput(const string& name,const string& value,H4P_FN_UICHANGE onChange){
+    if(value!="") _cb[name]=value;
     _uiAdd(_seq++,name,H4P_UI_INPUT,_cb[name],nullptr,onChange); 
 }
 

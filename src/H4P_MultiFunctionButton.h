@@ -44,13 +44,12 @@ class H4P_MultiFunctionButton: public H4Plugin{
                 {0,[this](H4GPIOPin*){ _btp->toggle(); }},
                 {H4MF_REBOOT,[](H4GPIOPin*){ h4reboot(); }},
                 {H4MF_FACTORY,[](H4GPIOPin*){ h4FactoryReset(); }}//,
-//                {H4MF_APMODE,[](H4GPIOPin*){ Serial.printf("BUTTON->AP MODE"); h4wifi.startAP(); }}
             };
 
-            void            _greenLight() override {} // no autostart
+//            void            _greenLight() override {} // no autostart
             void            _hookIn() override;
-            void            _start() override;
-            void            _stop() override;
+//            void            _start() override;
+//            void            _stop() override;
             
             void progress(H4GPIOPin* ptr);
     public:

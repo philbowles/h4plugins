@@ -63,9 +63,9 @@ class H4P_SerialCmd: public H4Plugin {
         void            _run();        
         void            _greenLight(){ start(); }
         void            _start() override {
+            reply("H4P %s\n",CSTR(_cb[h4PvTag()]));
             h4._hookLoop([this](){ _run(); },_subCmd);
             H4Plugin::_start();
-            Serial.printf("H4P Version %s\n",CSTR(_cb[h4PvTag()]));
         }
         void            _stop() override {
             h4._unHook(_subCmd);

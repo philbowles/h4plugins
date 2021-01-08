@@ -62,7 +62,7 @@ class H4P_RemoteUpdate: public H4Plugin, public HTTPUpdate {
                     }
                 }
     public:
-        H4P_RemoteUpdate(const string& url,const char* bin): H4Plugin(rupdTag()){
+        H4P_RemoteUpdate(const string& url,const char* bin): H4Plugin("rupd"){
             _url+=url;
             _cb["bin"]=bin;
             _cmds={

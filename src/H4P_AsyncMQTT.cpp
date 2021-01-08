@@ -39,44 +39,46 @@ uint32_t H4P_AsyncMQTT::_change(vector<string> vs){
 }
 
 void H4P_AsyncMQTT::_greenLight(){
-    _setup();
+    if(WiFi.getMode()==WIFI_STA) {
+        _setup();
 
-    onError(onMQTTError);
+        onError(onMQTTError);
 
-    onMessage([this](const char* topic, const uint8_t* payload, size_t length, uint8_t qos, bool retain,bool dup){
-        h4.queueFunction(
-            bind([](string topic, string pload){ 
-                h4cmd._executeCmd(CSTR(string(mqttTag()).append("/").append(topic)),pload); 
-            },string(topic),stringFromBuff((uint8_t*) payload,length)),
-        nullptr,H4P_TRID_MQMS);
-    });
-
-    onConnect([this](bool b){
-        h4.queueFunction([this](){
-            h4.cancelSingleton(H4P_TRID_MQRC);
-            _discoDone=false;
-            subscribe(CSTR(string("all").append(cmdhash())),0);
-            subscribe(CSTR(string(device+cmdhash())),0);
-            subscribe(CSTR(string(_cb[chipTag()]+cmdhash())),0);
-            subscribe(CSTR(string(_cb[boardTag()]+cmdhash())),0);
-            report();
-            _upHooks();
-            _signal();
-            H4EVENT("MQTT CNX");
+        onMessage([this](const char* topic, const uint8_t* payload, size_t length, uint8_t qos, bool retain,bool dup){
+            h4.queueFunction(
+                bind([](string topic, string pload){ 
+                    h4cmd._executeCmd(CSTR(string(mqttTag()).append("/").append(topic)),pload); 
+                },string(topic),stringFromBuff((uint8_t*) payload,length)),
+            nullptr,H4P_TRID_MQMS);
         });
-    });
 
-    onDisconnect([this](int8_t reason){
-        if(!_discoDone){
-            h4.queueFunction([this,reason](){
-                _discoDone=true;
-                _downHooks();
+        onConnect([this](bool b){
+            h4.queueFunction([this](){
+                h4.cancelSingleton(H4P_TRID_MQRC);
+                _discoDone=false;
+                subscribe(CSTR(string("all").append(cmdhash())),0);
+                subscribe(CSTR(string(device+cmdhash())),0);
+                subscribe(CSTR(string(_cb[chipTag()]+cmdhash())),0);
+                subscribe(CSTR(string(_cb[boardTag()]+cmdhash())),0);
+                report();
+                _upHooks();
                 _signal();
-                H4EVENT("MQTT DCX %d",reason);
-                if(autorestart && WiFi.status()==WL_CONNECTED) h4.every(H4MQ_RETRY,[this](){ connect(); },nullptr,H4P_TRID_MQRC,true);
+                H4EVENT("MQTT CNX");
             });
-        }
-    });
+        });
+
+        onDisconnect([this](int8_t reason){
+            if(!_discoDone){
+                h4.queueFunction([this,reason](){
+                    _discoDone=true;
+                    _downHooks();
+                    _signal();
+                    H4EVENT("MQTT DCX %d",reason);
+                    if(autorestart && WiFi.status()==WL_CONNECTED) h4.every(H4MQ_RETRY,[this](){ connect(); },nullptr,H4P_TRID_MQRC,true);
+                });
+            }
+        });
+    }
 }
 
 void H4P_AsyncMQTT::_hookIn() { DEPEND(wifi); }
@@ -100,16 +102,14 @@ void H4P_AsyncMQTT::_setup(){ // allow for TLS
         
     if(_cb["muser"]!="") setCredentials(CSTR(_cb["muser"]),CSTR(_cb["mpasswd"])); // optimise tag()
     if(isLoaded(aswsTag())){
-        /*
-        h4asws._uiAdd(uppercase(mqttTag()),H4P_UI_BOOL,"",
+        h4asws._uiAdd(95,uppercase(mqttTag()),H4P_UI_BOOL,"",
             [this]{ return stringFromInt(_state()); },
-            [this](const string& a,const string& b){ 
+            [this](const string& b){ 
                 if(b=="1") _start();
                 else _stop();
                 H4EVENT("MQTT %s by user",b=="1" ? "Started":"Stopped");
                 if(isLoaded(aswsTag())) h4asws.uiMessage("MQTT %s by user",b=="1" ? "Started":"Stopped");
             });
-        */
     }
 }
 

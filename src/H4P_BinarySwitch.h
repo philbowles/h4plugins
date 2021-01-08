@@ -30,11 +30,8 @@ SOFTWARE.
 #ifndef H4P_BinarySwitch_HO
 #define H4P_BinarySwitch_HO
 
-#include<H4P_BinaryThing.h>
-//#include<H4P_WiFiSelect.h>
-
 #include<H4P_GPIOManager.h>
-
+#include<H4P_BinaryThing.h>
 class H4P_BinarySwitch: public H4P_BinaryThing{
 //
     protected:

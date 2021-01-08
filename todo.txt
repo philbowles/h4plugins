@@ -1,15 +1,16 @@
 
-TODO:
-    ret type on guard 1
+TODO:SOONER
+apmode config mqtt rupd
 
-SOONER
-    shift host2 to upnp
-    Rationalise/Align publishDevice MQTT
-    ui input box -> ap mode
+    fs 32 extar stats
+    move signalling into wifi / mqtt
+    shift host2 to upnp // shud we though?
+    //Rationalise/Align publishDevice MQTT
+
     autoOff -> cb
-    optomise all if(nullptr) to || etc
-    optomise all upnp -> name tag()
-    passthru ap config params
+    optimise all if(nullptr) to || etc
+    optimise all upnp -> name tag()
+    passthru ap config params in ctor
     js - type = password if n includes "pass"
 #
     error gone away in nodejs
@@ -25,6 +26,7 @@ SHORTTERM
     ps discard(x)
     jitter on loggers freq
 MEDIUMTERM
+    upnp grid :)
     dynamic cmds flash / siren etc
     remote client get
     ESp32 MDNS detector

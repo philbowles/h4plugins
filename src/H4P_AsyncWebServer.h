@@ -110,8 +110,8 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
 
                 void            uiAddDropdown(const string& name,H4P_CONFIG_BLOCK options,H4P_FN_UICHANGE onChange=nullptr);
 
-                void            uiAddInput(const string& name,H4P_FN_UITXT f=nullptr,H4P_FN_UICHANGE onChange=nullptr);
-                void            uiAddInput(const string& name,const string& value,H4P_FN_UICHANGE onChange=nullptr);
+//                void            uiAddInput(const string& name,H4P_FN_UITXT f=nullptr,H4P_FN_UICHANGE onChange=nullptr);
+                void            uiAddInput(const string& name,const string& value="",H4P_FN_UICHANGE onChange=nullptr);
 
                 void            uiSetInput(const string& name,const string& value){ _sendSSE(CSTR(name),CSTR(value)); }
                 void            uiSetBoolean(const string& name,const bool b){ _sendSSE(CSTR(name),CSTR(stringFromInt(b))); }

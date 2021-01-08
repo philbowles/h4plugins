@@ -46,7 +46,7 @@ void H4P_udpLogger::_listenUDP(){
                     }
                     Serial.printf("From %s:%d %u %u %u%% rate=%u/sec (max %u)\n",CSTR(ip.toString()),port,micros(),heapnow,pcnow,rps,maxrate);
                 },stringFromBuff(packet.data(), packet.length()),packet.remoteIP(), packet.remotePort()),nullptr, H4P_TRID_UDPM);
-            } //else Serial.printf("IGNORED %u > %u\n",ESP.getFreeHeap(),limit);
+            }
         });
     }
 }

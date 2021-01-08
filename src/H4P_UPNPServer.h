@@ -36,29 +36,30 @@ SOFTWARE.
 
 STAG(alive);
 
-using H4P_FN_USN        =function<void(uint32_t mx,H4P_CONFIG_BLOCK)>;
-using H4P_USN_MAP       =unordered_map<string,H4P_FN_USN>;
+using H4P_FN_TAGMATCH   =function<void(uint32_t mx,H4P_CONFIG_BLOCK,bool)>;
+using H4P_TAG_MAP       =unordered_map<string,pair<string,H4P_FN_TAGMATCH>>;
 
 class H4P_UPNPServer: public H4Plugin {
         H4P_BinaryThing* _btp;
         AsyncUDP 	    _udp;
         IPAddress		_ubIP;
-        H4P_USN_MAP     _detect;
+        H4P_TAG_MAP     _detect;
+//        unordered_set<string>     _otherH4s;
 
         VSCMD(_friendly);
 
-            string              _uuid="uuid:";
-            string              _urn="Belkin:";
+                string          _uuid="uuid:";
+                string          _urn="Belkin:";
 
             vector<string>      _pups={
-                "",
-                "upnp:rootdevice"
-            };
+                    "",
+                    "upnp:rootdevice"
+                };
 
-            string          _name;
-            string          _soap;
-            string          _ucom;
-            string          _xml;
+                string          _name;
+                string          _soap;
+                string          _ucom;
+                string          _xml;
 
                 string          __makeUSN(const string& s);
                 string          __upnpCommon(const string& usn);
@@ -87,9 +88,14 @@ class H4P_UPNPServer: public H4Plugin {
         }
 
              void           friendlyName(const string& name);
-             void           show() override { reply("Friendly Name: %s",CSTR(_cb[nameTag()])); }
+             void           show() override { 
+                 reply("Name: %s",CSTR(_cb[nameTag()]));
+//                 reply("Neighbours:");
+//                 for(auto const& o:_otherH4s) reply(CSTR(o));
+            }
 //          _syscall only
-             void           _listenUSN(const string& usn,H4P_FN_USN f){ _detect[usn]=f; }
+             void           _listenTag(const string& tag,const string& value,H4P_FN_TAGMATCH f){ _detect[tag]=make_pair(value,f); }
+             void           _listenUSN(const string& usn,H4P_FN_TAGMATCH f){ _listenTag("USN",usn,f); }
 };
     extern __attribute__((weak)) H4P_UPNPServer h4upnp;
 

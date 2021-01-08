@@ -52,41 +52,15 @@ void H4P_WiFi::HAL_WIFI_startSTA(){
     WiFi.begin(CSTR(_cb[ssidTag()]),CSTR(_cb[pskTag()]));
 }
 
-void H4P_WiFi::clear(){ 
-    H4EVENT("clear()");
-	stop();
-	ESP.eraseConfig();
-    HAL_FS.remove(CSTR(string("/"+string(deviceTag()))));
-    WiFi.mode(WIFI_OFF); // cos i dont believe dico true works
-//    show();
-}
-
-void H4P_WiFi::_mcuStart(){
-    auto mode=WiFi.getMode();
-    H4EVENT("_mcuStart mode=%d",mode);
-//diagnostics
-    switch(mode){
-        case WIFI_AP_STA:
-            H4EVENT("**** MIXED MODE *********");
-        case WIFI_OFF:
-            H4EVENT("**** WIFI OFF *********");
-            break;
-        case WIFI_STA:
-            H4EVENT("Allow auto reconnect");
-            break;
-        case WIFI_AP:
-            H4EVENT("**** COMING UP IN AP MODE *********");
-            break;
-    }
-//
-    if(mode!=WIFI_STA || WiFi.SSID()=="") HAL_WIFI_startSTA();
-}
+void H4P_WiFi::HAL_WIFI_clear(){ } // lose?ESP.eraseConfig(); }
 
 void H4P_WiFi::_stop(){
     H4EVENT("_stop");
     h4.cancelSingleton(H4P_TRID_HOTA);
     WiFi.disconnect(true); // does this actually turn WiFi off?
+    ESP.eraseConfig();
 }
+
 /*
 ESP8266
 
@@ -126,7 +100,6 @@ string H4P_WiFi::HAL_WIFI_chipID(){
 void H4P_WiFi::HAL_WIFI_setHost(const string& host){ WiFi.setHostname(CSTR(host)); }
 
 void H4P_WiFi::HAL_WIFI_startSTA(){
-//    _clearAP();
     WiFi.mode(WIFI_STA);
     WiFi.setSleep(false);
     WiFi.enableAP(false); 
@@ -134,15 +107,11 @@ void H4P_WiFi::HAL_WIFI_startSTA(){
     WiFi.begin(CSTR(_cb[ssidTag()]),CSTR(_cb[pskTag()]));
 }
 
-void H4P_WiFi::clear(){
-    _stop();
-}
-
-void H4P_WiFi::_mcuStart(){ WiFi.begin(); }
+void H4P_WiFi::HAL_WIFI_clear(){}
 
 void H4P_WiFi::_stop(){
     h4.cancelSingleton(H4P_TRID_HOTA);
-    WiFi.disconnect(true,false);
+    WiFi.disconnect(true,true);
 }
 /* ESP32
 * WiFi Events
@@ -186,20 +155,36 @@ void H4P_WiFi::_stop(){
 
 void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
     switch(event) {
-        case SYSTEM_EVENT_STA_STOP:
         case SYSTEM_EVENT_STA_LOST_IP:
+//            Serial.printf("32 EVENT SYSTEM_EVENT_STA_LOST_IP\n");
 			h4.queueFunction([](){ h4wifi._lostIP(); }); // ? if?
-			//h4.queueFunction([](){ h4wifi._lostIP(); }); // ? if?
             break;
 		case SYSTEM_EVENT_STA_GOT_IP:
+//            Serial.printf("32323232 EVENT SYSTEM_EVENT_STA_GOT_IP\n");
 			h4.queueFunction([](){ h4wifi._gotIP(); });
 			break;
+//        default:
+//            Serial.printf("32323232 FNOZE %d\n",event);
+//            break;
 	}
 }
 #endif
 /*
                                                                                                  C O M M O N   F U N C T I O N S
 */
+void H4P_WiFi::clear(){ 
+    H4EVENT("clear()");
+	stop();
+    HAL_FS.remove(CSTR(string("/"+string(deviceTag()))));
+    WiFi.mode(WIFI_OFF); // cos i dont believe disco true works
+    HAL_WIFI_clear();
+}
+
+void H4P_WiFi::_start(){
+    H4EVENT("_mcuStart mode=%d",WiFi.getMode());
+    if(WiFi.getMode()!=WIFI_STA || WiFi.SSID()=="") HAL_WIFI_startSTA();
+}
+
 uint32_t H4P_WiFi::_change(vector<string> vs){ return guardString2(vs,[this](string a,string b){ change(a,b); return H4_CMD_OK; }); }
 
 bool H4P_WiFi::_getPersistentValue(string v,string prefix){
@@ -242,7 +227,6 @@ void H4P_WiFi::_hookIn(){
     WiFi.persistent(true);
     WiFi.onEvent(_wifiEvent);
 
-//    Serial.printf("WiFi _hookIn - set ui items\n");
     h4asws._uiAdd(4,boardTag(),H4P_UI_LABEL);
     h4asws._uiAdd(5,chipTag(),H4P_UI_LABEL);
     h4asws._uiAdd(1,deviceTag(),H4P_UI_LABEL);
@@ -255,7 +239,6 @@ void H4P_WiFi::_hookIn(){
         h4asws._uiAdd(2,"name",H4P_UI_LABEL,"",[]{ return _cb[nameTag()]; }); // cos we don't know it yet
         h4cmd.addCmd("host2",_subCmd,0,CMDVS(_host2));
     }
-//    h4asws.show();
 }
 
 uint32_t H4P_WiFi::_host(vector<string> vs){
@@ -279,17 +262,10 @@ void H4P_WiFi::_lostIP(){
 }
 
 void H4P_WiFi::_setPersistentValue(string n,string v,bool reboot){
-    string oldvalue=_cb[n];
-    if(oldvalue!=v){
+    if(_cb[n]!=v){
         H4P_SerialCmd::write("/"+n,v);
         if(reboot) h4reboot();
     }
-}
-
-void H4P_WiFi::_start(){
-    H4EVENT("_start");
-    show();
-    _mcuStart();
 }
 
 void H4P_WiFi::change(string ssid,string psk){ // add device / name?
@@ -297,6 +273,7 @@ void H4P_WiFi::change(string ssid,string psk){ // add device / name?
     _cb[ssidTag()]=ssid;
     _cb[pskTag()]=psk;
     HAL_WIFI_startSTA();
+    h4cmd.showFS();
     h4reboot();
 }
 

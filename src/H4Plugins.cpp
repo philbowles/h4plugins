@@ -48,7 +48,6 @@ void h4StartPlugins(){
 }
 
 void h4FactoryReset(){
-//    H4::_runRebootChain();
     for(auto const &c:H4Plugin::_factoryChain) c();
     h4rebootCore();
 }
@@ -88,32 +87,27 @@ void H4Plugin::_startup(){
 }
 
 void H4Plugin::start() {
-    H4EVENT("H4Plugin::start() %s state=%d",CSTR(_pName),state());
     if(!state()){
-        H4EVENT("svc start %s",CSTR(_pName));
+        _up=true;
         _start(); // call the overrideable
     }
 }
 
 void H4Plugin::stop() {
-    H4EVENT("H4Plugin::stop() %s state=%d",CSTR(_pName),state());
     if(state()){
+        _up=false;
         _stop(); // call the overrideable
-        H4EVENT("svc stop %s",CSTR(_pName));
     }
 }
 
 void H4Plugin::_upHooks(){ 
-    _up=true;
     SYSEVENT(H4P_LOG_SVC_UP,"svc",_pName,"UP");
     for(auto const& c:_connected) c();
 }
 
 void H4Plugin::_downHooks(){
-    // reverse? 
     for(auto const& c:_disconnected) c();
     SYSEVENT(H4P_LOG_SVC_DOWN,"svc",_pName,"DN");
-    _up=false;
 }
 //
 //      H4PlogService

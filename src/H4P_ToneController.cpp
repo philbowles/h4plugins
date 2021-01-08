@@ -171,12 +171,9 @@ void H4P_ToneController::metronome(uint32_t tempo){
             timing[order[i]]=timing[order[i-2]]*2;
             timing[order[i+1]]=(timing[order[i]]*3)/2;
         }
-        /*
-        Serial.printf("Tempo=%d\n",tempo);
-        for(auto const& o:order) Serial.printf("%c=%d\n",o,timing[o]);
-        */
     }
 }
+
 void H4P_ToneController::multiVox(H4P_TUNE tune,uint32_t tempo,int transpose){
     metronome(tempo);
     int i=tune.size()-1;
@@ -217,19 +214,6 @@ void H4P_Voice::_decompose(const string& n,int transpose,H4_FN_VOID chain){//,ui
     string note(n);
     char effect=note.back();note.pop_back();
     char duration=note.back();note.pop_back();
-/* 
-    Serial.printf("T=%u RAW NOTE P%d %s value=%s d=%c(%d) e=%c f1=%d xp=%d f2=%d\n",
-        millis(),
-        _pin,
-        CSTR(n),
-        CSTR(note),
-        duration,
-        H4P_ToneController::timing[duration],
-        effect,
-        H4P_ToneController::xpose[H4P_ToneController::notes[note]],
-        transpose,
-        H4P_ToneController::_transpose(note,transpose));
-*/
     if(H4P_ToneController::notes.count(note)) _tone(H4P_ToneController::_transpose(note,transpose),effect,H4P_ToneController::timing[duration],chain);
 }
 
