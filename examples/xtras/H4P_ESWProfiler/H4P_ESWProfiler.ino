@@ -1,5 +1,5 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
+H4_USE_PLUGINS(115200,5,false) // Serial baud rate, Q size, SerialCmd autostop
 //
 #ifdef ARDUINO_ARCH_ESP32
   #define D7 27

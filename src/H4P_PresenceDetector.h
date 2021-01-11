@@ -92,7 +92,7 @@ class H4P_IPDetectorSource: public H4P_IPDetector{
     public:
         H4P_IPDetectorSource(const string& pid,const string& id);
 };
-#ifdef H4P_USE_OTA
+//#ifdef H4P_USE_OTA
 class H4P_MDNSDetector: public H4PDetector {
         string _service;
         string _protocol;
@@ -122,6 +122,6 @@ class H4P_H4DetectorSource: public H4P_H4Detector{
         H4P_H4DetectorSource(const string& local);
 };
 
-#endif // OTA
+//#endif // OTA
 #endif // esp8266
 #endif // H4P_PresenceDetector_HO

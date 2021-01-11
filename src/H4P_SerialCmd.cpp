@@ -34,20 +34,20 @@ H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Plugin(scmdTag()){
         {h4Tag(),      { 0, H4PC_H4, nullptr}},
         {"help",       { 0, 0, CMD(help) }},
         {"info",       { H4PC_SVC,  0, CMDVS(_svcInfo) }},
-        {"reboot",     { H4PC_H4, 0, CMD(h4reboot) }},
-        {"factory",    { H4PC_H4, 0, CMD(h4FactoryReset) }},
-        {"svc",        { H4PC_H4, H4PC_SVC, nullptr}},
+        {"reboot",     { H4PC_H4,   0, CMD(h4reboot) }},
+        {"factory",    { H4PC_H4,   0, CMD(h4FactoryReset) }},
+        {"dump",       { H4PC_H4,   0, CMDVS(_dump)}},
+        {"svc",        { H4PC_H4,   H4PC_SVC, nullptr}},
         {"restart",    { H4PC_SVC,  0, CMDVS(_svcRestart) }},
         {"start",      { H4PC_SVC,  0, CMDVS(_svcStart) }},
         {"stop",       { H4PC_SVC,  0, CMDVS(_svcStop) }},
-        {"show",       { H4PC_H4, H4PC_SHOW, nullptr}},
+        {"show",       { H4PC_H4,   H4PC_SHOW, nullptr}},
         {"all",        { H4PC_SHOW, 0, CMD(all) }},
         {"config",     { H4PC_SHOW, 0, CMD(config) }},
         {"q",          { H4PC_SHOW, 0, CMD(showQ) }},
         {"plugins",    { H4PC_SHOW, 0, CMD(plugins) }},
         {"heap",       { H4PC_SHOW, 0, CMD(heap) }},
-        {"fs",         { H4PC_SHOW, 0, CMD(showFS)}},
-        {"dump",       { H4PC_H4, 0, CMDVS(_dump)}},
+        {"fs",         { H4PC_SHOW, 0, CMD(showFS)}}
     }; 
     if(autoStop) QTHIS(stop);
 }
@@ -293,6 +293,9 @@ void H4P_SerialCmd::showFS(){
 void H4P_SerialCmd::showFS(){
     uint32_t sigma=0;
     uint32_t n=0;
+
+    reply("totalBytes %d",HAL_FS.totalBytes());
+    reply("usedBytes %d",HAL_FS.usedBytes());
 
     File root = HAL_FS.open("/");
  

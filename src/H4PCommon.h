@@ -145,7 +145,7 @@ STAG(wifi);
 #define CMDNULL ([this](vector<string>)->uint32_t{ return H4_CMD_OK; })
 #define CMDVS(x) ([this](vector<string> vs)->uint32_t{ return x(vs); })
 #define VSCMD(x) uint32_t x(vector<string>)
-#define QTHIS(f) h4.queueFunction([this]{ f(); })
+#define QTHIS(f) h4.queueFunction([this]{ (f)(); })
 
 #ifdef H4P_LOG_EVENTS
     #define SYSEVENT(e,s,t,x,...) { h4cmd.logEventType(e,s,t,x, ##__VA_ARGS__); }

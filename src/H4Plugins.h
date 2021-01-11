@@ -2,7 +2,9 @@
 #define H4P_PLUGINS_H
 
 #include<config.h>
-
+#if H4P_USE_WIFI_AP
+    #pragma message("Using Wifi AP - Make sure you have made arrangements!")
+#endif
 #include<H4P_CmdErrors.h>
 #include<H4P_Heartbeat.h>
 #include<H4P_SerialCmd.h>
@@ -15,9 +17,8 @@
 #include<H4P_GPIOManager.h>
 #include<H4P_FlasherController.h>
 #include<H4P_ToneController.h>
-
-#include<H4P_PersistentStorage.h>
 #include<H4P_WiFi.h>
+#include<H4P_PersistentStorage.h>
 #include<H4P_AsyncWebServer.h>
 #include<H4P_AsyncMQTT.h>
 #ifdef H4P_LOG_EVENTS

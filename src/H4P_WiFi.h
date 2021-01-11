@@ -27,8 +27,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_WiFi_H
-#define H4P_WiFi_H
+#pragma once
 
 #include<H4PCommon.h>
 #ifdef ARDUINO_ARCH_ESP8266
@@ -53,27 +52,32 @@ class H4P_WiFi: public H4Plugin{
                 VSCMD(_change);
                 VSCMD(_host);
                 VSCMD(_host2);
-//  H/W dependent functions
+
                 string      HAL_WIFI_chipID();
-                void        HAL_WIFI_clear();
                 void        HAL_WIFI_setHost(const string& host);
 //
+                void        _coreStart();
                 void        _gotIP();
                 void        _lostIP();
         static  void        _wifiEvent(WiFiEvent_t event);
-    protected:
-                void        HAL_WIFI_startSTA();
-
                 void        _start() override;
                 void        _stop() override;
                 void        _hookIn() override;
-
-//        virtual void        _mcuStart();
     public:
+                void        HAL_WIFI_startSTA(); // ESP32 FFS
 //          included here against better wishes due to compiler bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89605
+#if H4P_USE_WIFI_AP
+                void        _save(const string& s){ H4P_SerialCmd::write("/"+s,_cb[s]); }
+                void        startAP();
+
+        H4P_WiFi(H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): H4Plugin(wifiTag(),onC,onD){
+            _cb[ssidTag()]=uppercase(h4Tag());
+            _cb[pskTag()]=uppercase(h4Tag());
+#else
         H4P_WiFi(string ssid,string psk,string device="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): _device(device),H4Plugin(wifiTag(),onC,onD){
             _cb[ssidTag()]=ssid;
             _cb[pskTag()]=psk;
+#endif
             _factoryHook=[this](){ clear(); };
             _rebootHook=[this](){ _downHooks(); };
             _cmds={
@@ -88,27 +92,12 @@ class H4P_WiFi: public H4Plugin{
                 void        host(const string& host){ _setPersistentValue(deviceTag(),host,true); }
                 void        setBothNames(const string& host,const string& friendly);
                 void        show() override { 
-                    WiFi.printDiag(Serial);
-                    reply("Device %s Status: %d",CSTR(_cb[deviceTag()]),WiFi.status());
+                    reply("Device %s Mode=%d Status: %d",CSTR(_cb[deviceTag()]),WiFi.getMode(),WiFi.status());
+                    reply("SSID %s PSK=%s",CSTR(WiFi.SSID()),CSTR(WiFi.psk()));
                 }
 //          syscall only        
                 bool        _getPersistentValue(string v,string prefix);
                 void        _setPersistentValue(string n,string v,bool reboot);
 };
 
-class H4P_WiFiAP: public H4P_WiFi{
-                void        _save(const char* s){ H4P_SerialCmd::write(CSTR(string("/").append(s)),_cb[s]); }
-                void        _start() override;
-    public:
-        H4P_WiFiAP(H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): H4P_WiFi("","","",onC,onD){}
-        
-                void        startAP();
-};
-
-#ifdef H4P_USE_AP
-    extern __attribute__((weak)) H4P_WiFiAP h4wifi;
-#else
-    extern __attribute__((weak)) H4P_WiFi h4wifi;
-#endif
-
-#endif // H4P_WiFi_H
+extern __attribute__((weak)) H4P_WiFi h4wifi;

@@ -1,0 +1,301 @@
+22:31:46.310 -> h4 wifi->h4: Device inputs chip C40A24
+22:31:46.310 -> h4 mqtt->h4: Subscribed to /slave/#
+22:31:46.404 -> h4 upnp->h4: UPNP name UI Input Tester
+22:31:46.404 -> H4P 1.0.0
+22:31:46.404 -> 
+22:31:46.404 -> SVC UP svc->scmd: UP
+22:31:46.404 -> SVC UP svc->cerr: UP
+22:31:46.404 -> SVC UP svc->gpio: UP
+22:31:46.497 -> 
+22:31:46.497 -> Brownout detector was triggered
+22:31:46.497 -> 
+22:31:46.544 -> ets Jun  8 2016 00:22:57
+22:31:46.544 -> 
+22:31:46.544 -> rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+22:31:46.544 -> configsip: 0, SPIWP:0xee
+22:31:46.544 -> clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+22:31:46.544 -> mode:DIO, clock div:1
+22:31:46.544 -> load:0x3fff0018,len:4
+22:31:46.544 -> load:0x3fff001c,len:1044
+22:31:46.544 -> load:0x40078000,len:8896
+22:31:46.544 -> load:0x40080400,len:5816
+22:31:46.544 -> entry 0x400806ac
+22:31:47.085 -> h4 wifi->h4: Device inputs chip C40A24
+22:31:47.085 -> h4 mqtt->h4: Subscribed to /slave/#
+22:31:47.187 -> h4 upnp->h4: UPNP name UI Input Tester
+22:31:47.187 -> H4P 1.0.0
+22:31:47.187 -> 
+22:31:47.187 -> SVC UP svc->scmd: UP
+22:31:47.187 -> SVC UP svc->cerr: UP
+22:31:47.187 -> SVC UP svc->gpio: UP
+22:31:47.256 -> SVC UP svc->beat: UP
+22:31:47.256 -> SVC UP svc->onof: UP
+22:31:47.529 -> h4 wifi->h4: IP=192.168.1.238
+22:31:47.529 -> SVC UP svc->wifi: UP
+22:31:47.529 -> SVC UP svc->asws: UP
+22:31:47.630 -> SVC UP svc->upnp: UP
+22:31:47.630 -> h4 mqtt->h4: Reporting {"bin":"","board":"LOLIN32","ip":"192.168.1.238","h4Pv":"1.0.0","h4UIv":"1.0.0","pmv":"1.0.0","state":"0","auto":"2000"}
+22:31:47.630 -> SVC UP svc->mqtt: UP
+22:31:47.630 -> h4 mqtt->h4: MQTT CNX
+22:32:00.216 -> Guru Meditation Error: Core  1 panic'ed (InstrFetchProhibited). Exception was unhandled.
+22:32:00.216 -> Core 1 register dump:
+22:32:00.216 -> PC      : 0x3ffd7eb9  PS      : 0x00060d30  A0      : 0x800e6456  A1      : 0x3ffb1f10  
+22:32:00.216 -> A2      : 0x3ffd7e78  A3      : 0xd63513ea  A4      : 0x3ffb32f0  A5      : 0x3ffc2968  
+22:32:00.216 -> A6      : 0x3ffd7e5c  A7      : 0x3ffb0060  A8      : 0x800e5869  A9      : 0x3ffb1e30  
+22:32:00.216 -> A10     : 0x3ffd7e78  A11     : 0x3ffc2968  A12     : 0xd63513ea  A13     : 0x3ffd8ed4  
+22:32:00.216 -> A14     : 0x3ffb1e4c  A15     : 0x3ffd900c  SAR     : 0x00000010  EXCCAUSE: 0x00000014  
+22:32:00.263 -> EXCVADDR: 0x3ffd7eb8  LBEG    : 0x4000c46c  LEND    : 0x4000c477  LCOUNT  : 0x00000000  
+22:32:00.263 -> 
+22:32:00.263 -> Backtrace: 0x3ffd7eb9:0x3ffb1f10 0x400e6453:0x3ffb1f30 0x400e64c9:0x3ffb1f50 0x400e654e:0x3ffb1f90 0x400f8551:0x3ffb1fb0 0x40088b7d:0x3ffb1fd0
+22:32:00.263 -> 
+22:32:00.263 -> Rebooting...
+22:32:00.263 -> ets Jun  8 2016 00:22:57
+22:32:00.263 -> 
+22:32:00.263 -> rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+22:32:00.263 -> configsip: 0, SPIWP:0xee
+22:32:00.263 -> clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+22:32:00.263 -> mode:DIO, clock div:1
+22:32:00.263 -> load:0x3fff0018,len:4
+22:32:00.263 -> load:0x3fff001c,len:1044
+22:32:00.263 -> load:0x40078000,len:8896
+22:32:00.263 -> load:0x40080400,len:5816
+22:32:00.263 -> entry 0x400806ac
+22:32:00.826 -> h4 wifi->h4: Device inputs chip C40A24
+22:32:00.826 -> h4 mqtt->h4: Subscribed to /slave/#
+22:32:00.919 -> h4 upnp->h4: UPNP name UI Input Tester
+22:32:00.919 -> H4P 1.0.0
+22:32:00.919 -> 
+22:32:00.919 -> SVC UP svc->scmd: UP
+22:32:00.919 -> SVC UP svc->cerr: UP
+22:32:00.919 -> SVC UP svc->gpio: UP
+22:32:01.013 -> 
+22:32:01.013 -> Brownout detector was triggered
+22:32:01.013 -> 
+22:32:01.013 -> ets Jun  8 2016 00:22:57
+22:32:01.013 -> 
+22:32:01.013 -> rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+22:32:01.013 -> configsip: 0, SPIWP:0xee
+22:32:01.013 -> clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+22:32:01.013 -> mode:DIO, clock div:1
+22:32:01.013 -> load:0x3fff0018,len:4
+22:32:01.013 -> load:0x3fff001c,len:1044
+22:32:01.013 -> load:0x40078000,len:8896
+22:32:01.013 -> load:0x40080400,len:5816
+22:32:01.013 -> entry 0x400806ac
+22:32:01.576 -> h4 wifi->h4: Device inputs chip C40A24
+22:32:01.576 -> h4 mqtt->h4: Subscribed to /slave/#
+22:32:01.669 -> h4 upnp->h4: UPNP name UI Input Tester
+22:32:01.669 -> H4P 1.0.0
+22:32:01.669 -> 
+22:32:01.669 -> SVC UP svc->scmd: UP
+22:32:01.669 -> SVC UP svc->cerr: UP
+22:32:01.669 -> SVC UP svc->gpio: UP
+22:32:01.810 -> SVC UP svc->beat: UP
+22:32:01.810 -> SVC UP svc->onof: UP
+22:32:02.091 -> h4 wifi->h4: IP=192.168.1.238
+22:32:02.091 -> SVC UP svc->wifi: UP
+22:32:02.091 -> SVC UP svc->asws: UP
+22:32:02.185 -> SVC UP svc->upnp: UP
+22:32:02.279 -> h4 mqtt->h4: Reporting {"bin":"","board":"LOLIN32","ip":"192.168.1.238","h4Pv":"1.0.0","h4UIv":"1.0.0","pmv":"1.0.0","state":"0","auto":"2000"}
+22:32:02.279 -> SVC UP svc->mqtt: UP
+22:32:02.279 -> h4 mqtt->h4: MQTT CNX
+22:38:51.022 -> h4 wifi->h4: Device inputs chip C40A24
+22:38:51.022 -> h4 mqtt->h4: Subscribed to /slave/#
+22:38:51.123 -> h4 upnp->h4: UPNP name UI Input Tester
+22:38:51.123 -> H4P 1.0.0
+22:38:51.123 -> 
+22:38:51.123 -> SVC UP svc->scmd: UP
+22:38:51.123 -> SVC UP svc->cerr: UP
+22:38:51.123 -> SVC UP svc->gpio: UP
+22:38:51.191 -> 
+22:38:51.191 -> Brownout detector was triggered
+22:38:51.191 -> 
+22:38:51.226 -> ets Jun  8 2016 00:22:57
+22:38:51.226 -> 
+22:38:51.226 -> rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+22:38:51.226 -> configsip: 0, SPIWP:0xee
+22:38:51.226 -> clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+22:38:51.226 -> mode:DIO, clock div:1
+22:38:51.226 -> load:0x3fff0018,len:4
+22:38:51.226 -> load:0x3fff001c,len:1044
+22:38:51.226 -> load:0x40078000,len:8896
+22:38:51.226 -> load:0x40080400,len:5816
+22:38:51.226 -> entry 0x400806ac
+22:38:51.768 -> h4 wifi->h4: Device inputs chip C40A24
+22:38:51.768 -> h4 mqtt->h4: Subscribed to /slave/#
+22:38:51.870 -> h4 upnp->h4: UPNP name UI Input Tester
+22:38:51.870 -> H4P 1.0.0
+22:38:51.870 -> 
+22:38:51.870 -> SVC UP svc->scmd: UP
+22:38:51.870 -> SVC UP svc->cerr: UP
+22:38:51.870 -> SVC UP svc->gpio: UP
+22:38:51.938 -> SVC UP svc->beat: UP
+22:38:51.938 -> SVC UP svc->onof: UP
+22:38:52.209 -> h4 wifi->h4: IP=192.168.1.238
+22:38:52.209 -> SVC UP svc->wifi: UP
+22:38:52.209 -> SVC UP svc->asws: UP
+22:38:52.310 -> SVC UP svc->upnp: UP
+22:38:52.310 -> h4 mqtt->h4: Reporting {"bin":"","board":"LOLIN32","ip":"192.168.1.238","h4Pv":"1.0.0","h4UIv":"1.0.0","pmv":"1.0.0","state":"0","auto":"2000"}
+22:38:52.310 -> SVC UP svc->mqtt: UP
+22:38:52.310 -> h4 mqtt->h4: MQTT CNX
+22:38:54.444 -> h4 asws->h4: Root 192.168.1.20
+22:38:55.984 -> h4 asws->h4: Root 192.168.1.20
+22:38:56.121 -> h4 asws->h4: SSE Client 3ffd3a30 n=0 T/O=30000 nC=1 nUI=18
+22:41:00.968 -> h4 asws->h4: _rest 192.168.1.20
+22:41:00.968 -> CMD asws->h4: h4/toggle
+22:41:00.968 -> h4 user->onof: ON
+22:41:02.159 -> h4 asws->h4: _rest 192.168.1.20
+22:41:02.159 -> CMD asws->h4: h4/toggle
+22:41:02.159 -> h4 user->onof: OFF
+23:25:00.011 -> SVC DOWN svc->mqtt: DN
+23:25:00.011 -> h4 mqtt->h4: MQTT DCX -13
+23:25:03.091 -> h4 asws->h4: SSE Client 3ffba4a4 n=0 T/O=30000 nC=1 nUI=18
+23:25:10.040 -> h4 mqtt->h4: Reporting {"bin":"","board":"LOLIN32","ip":"192.168.1.238","h4Pv":"1.0.0","h4UIv":"1.0.0","pmv":"1.0.0","state":"0","auto":"2000"}
+23:25:10.040 -> SVC UP svc->mqtt: UP
+23:25:10.040 -> h4 mqtt->h4: MQTT CNX
+00:00:01.022 -> Guru Meditation Error: Core  1 panic'ed (InstrFetchProhibited). Exception was unhandled.
+00:00:01.022 -> Core 1 register dump:
+00:00:01.022 -> PC      : 0x0000002c  PS      : 0x00060d30  A0      : 0x800d27bc  A1      : 0x3ffb1ed0  
+00:00:01.022 -> A2      : 0x3ffd9148  A3      : 0x3ffb1eec  A4      : 0x3ffb1ee8  A5      : 0x3ffb1c88  
+00:00:01.022 -> A6      : 0x00000020  A7      : 0x3ffb0060  A8      : 0x801744ec  A9      : 0x3ffb1be0  
+00:00:01.022 -> A10     : 0x3ffd9148  A11     : 0x3ffd9148  A12     : 0x00000003  A13     : 0x00000900  
+00:00:01.022 -> A14     : 0x1fffffa0  A15     : 0x00000001  SAR     : 0x0000000a  EXCCAUSE: 0x00000014  
+00:00:01.022 -> EXCVADDR: 0x0000002c  LBEG    : 0x4000c2e0  LEND    : 0x4000c2f6  LCOUNT  : 0xffffffff  
+00:00:01.022 -> 
+00:00:01.022 -> Backtrace: 0x0000002c:0x3ffb1ed0 0x400d27b9:0x3ffb1ef0 0x400e5eab:0x3ffb1f10 0x400e6aa1:0x3ffb1f30 0x400e6b31:0x3ffb1f50 0x400e6bb6:0x3ffb1f90 0x400f8bb9:0x3ffb1fb0 0x40088b7d:0x3ffb1fd0
+00:00:01.022 -> 
+00:00:01.022 -> Rebooting...
+00:00:01.057 -> ets Jun  8 2016 00:22:57
+00:00:01.057 -> 
+00:00:01.057 -> rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+00:00:01.057 -> configsip: 0, SPIWP:0xee
+00:00:01.057 -> clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+00:00:01.057 -> mode:DIO, clock div:1
+00:00:01.057 -> load:0x3fff0018,len:4
+00:00:01.057 -> load:0x3fff001c,len:1044
+00:00:01.057 -> load:0x40078000,len:8896
+00:00:01.057 -> load:0x40080400,len:5816
+00:00:01.057 -> entry 0x400806ac
+00:00:01.607 -> h4 wifi->h4: Device inputs chip C40A24
+00:00:01.641 -> h4 mqtt->h4: Subscribed to /slave/#
+00:00:01.710 -> h4 upnp->h4: UPNP name UI Input Tester
+00:00:01.710 -> H4P 1.0.0
+00:00:01.710 -> 
+00:00:01.710 -> SVC UP svc->scmd: UP
+00:00:01.710 -> SVC UP svc->cerr: UP
+00:00:01.710 -> SVC UP svc->gpio: UP
+00:00:01.779 -> 
+00:00:01.779 -> Brownout detector was triggered
+00:00:01.779 -> 
+00:00:01.814 -> ets Jun  8 2016 00:22:57
+00:00:01.814 -> 
+00:00:01.814 -> rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+00:00:01.814 -> configsip: 0, SPIWP:0xee
+00:00:01.814 -> clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+00:00:01.814 -> mode:DIO, clock div:1
+00:00:01.814 -> load:0x3fff0018,len:4
+00:00:01.814 -> load:0x3fff001c,len:1044
+00:00:01.814 -> load:0x40078000,len:8896
+00:00:01.814 -> load:0x40080400,len:5816
+00:00:01.814 -> entry 0x400806ac
+00:00:02.361 -> h4 wifi->h4: Device inputs chip C40A24
+00:00:02.396 -> h4 mqtt->h4: Subscribed to /slave/#
+00:00:02.466 -> h4 upnp->h4: UPNP name UI Input Tester
+00:00:02.466 -> H4P 1.0.0
+00:00:02.466 -> 
+00:00:02.466 -> SVC UP svc->scmd: UP
+00:00:02.466 -> SVC UP svc->cerr: UP
+00:00:02.466 -> SVC UP svc->gpio: UP
+00:00:02.568 -> SVC UP svc->beat: UP
+00:00:02.568 -> SVC UP svc->onof: UP
+00:00:02.812 -> h4 wifi->h4: IP=192.168.1.238
+00:00:02.812 -> SVC UP svc->wifi: UP
+00:00:02.812 -> SVC UP svc->asws: UP
+00:00:02.915 -> SVC UP svc->upnp: UP
+00:00:03.189 -> h4 mqtt->h4: Reporting {"bin":"","board":"LOLIN32","ip":"192.168.1.238","h4Pv":"1.0.0","h4UIv":"1.0.0","pmv":"1.0.0","state":"0","auto":"2000"}
+00:00:03.189 -> SVC UP svc->mqtt: UP
+00:00:03.189 -> h4 mqtt->h4: MQTT CNX
+00:00:17.883 ->  WILL NEVER SEE!!! NOTIFY * HTTP/1.1
+00:00:17.883 -> Host: 239.255.255.250:1900
+00:00:17.883 -> NT: uuid:e91301fd-9208-4396-8465-e40e5bbcc2b9
+00:00:17.883 -> NTS: ssdp:alive
+00:00:17.883 -> Location: http://192.168.1.20:2869/upnphost/udhisapi.dll?content=uuid:e91301fd-9208-4396-8465-e40e5bbcc2b9
+00:00:17.883 -> USN: uuid:e91301fd-9208-4396-8465-e40e5bbcc2b9
+00:00:17.883 -> Cache-Control: max-age=900
+00:00:17.883 -> Server: Microsoft-Windows/10.0 UPnP/1.0 UPnP-Device-Host/1.0
+00:00:17.883 -> OPT:"http://schemas.upnp.org/upnp/1/0/"; ns=01
+00:00:17.883 -> 01-NLS: 535c06ce084da4f15bba6bf454133b8e
+00:00:17.883 -> 
+00:00:17.883 ->  sz=449 from 192.168.1.20 [DET sz=-1142830518] // FFFF FFFF BBE1 CA4A
+00:00:17.900 -> UH: SERVER= Microsoft-Windows/10.0 UPnP/1.0 UPnP-Device-Host/1.0
+00:00:17.900 -> UH: CACHE-CONTROL= max-age=900
+00:00:17.900 -> UH: USN= uuid:e91301fd-9208-4396-8465-e40e5bbcc2b9
+00:00:17.900 -> UH: 01-NLS= 535c06ce084da4f15bba6bf454133b8e
+00:00:17.900 -> UH: OPT="http://schemas.upnp.org/upnp/1/0/"; ns=01
+00:00:17.900 -> UH: HOST= 239.255.255.250:1900
+00:00:17.900 -> UH: LOCATION= http://192.168.1.20:2869/upnphost/udhisapi.dll?content=uuid:e91301fd-9208-4396-8465-e40e5bbcc2b9
+00:00:17.900 -> UH: NT= uuid:e91301fd-9208-4396-8465-e40e5bbcc2b9
+00:00:17.900 -> UH: NTS= ssdp:alive
+00:00:17.900 -> Guru Meditation Error: Core  1 panic'ed (LoadProhibited). Exception was unhandled.
+00:00:17.968 -> Core 1 register dump:
+00:00:17.968 -> PC      : 0x40167adb  PS      : 0x00060330  A0      : 0x800e2764  A1      : 0x3ffb1ce0  
+00:00:17.968 -> A2      : 0x3ffb1e84  A3      : 0xbbe1ca4e  A4      : 0x63600395  A5      : 0x3ffc2968  
+00:00:17.968 -> A6      : 0x3ffb1c9c  A7      : 0x3ffb1c9c  A8      : 0x3ffb1e8c  A9      : 0x3ffb1c40  
+00:00:17.968 -> A10     : 0x00000014  A11     : 0x3ffb1c9c  A12     : 0x00000014  A13     : 0x3ffb1ce0  
+00:00:17.968 -> A14     : 0x3ffb1c60  A15     : 0x00000008  SAR     : 0x00000004  EXCCAUSE: 0x0000001c  
+00:00:17.968 -> EXCVADDR: 0xbbe1ca4e  LBEG    : 0x400014fd  LEND    : 0x4000150d  LCOUNT  : 0xfffffffc  
+00:00:17.968 -> 
+00:00:17.968 -> Backtrace: 0x40167adb:0x3ffb1ce0 0x400e2761:0x3ffb1d00 0x400e2b26:0x3ffb1ec0 0x400d9aea:0x3ffb1f10 0x400e6aab:0x3ffb1f30 0x400e6b31:0x3ffb1f50 0x400e6bb6:0x3ffb1f90 0x400f8bb9:0x3ffb1fb0 0x40088b7d:0x3ffb1fd0
+00:00:17.968 -> 
+00:00:17.968 -> Rebooting...
+00:00:18.001 -> ets Jun  8 2016 00:22:57
+00:00:18.001 -> 
+00:00:18.001 -> rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+00:00:18.001 -> configsip: 0, SPIWP:0xee
+00:00:18.001 -> clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+00:00:18.001 -> mode:DIO, clock div:1
+00:00:18.001 -> load:0x3fff0018,len:4
+00:00:18.001 -> load:0x3fff001c,len:1044
+00:00:18.001 -> load:0x40078000,len:8896
+00:00:18.001 -> load:0x40080400,len:5816
+00:00:18.001 -> entry 0x400806ac
+00:00:18.574 -> h4 wifi->h4: Device inputs chip C40A24
+00:00:18.574 -> h4 mqtt->h4: Subscribed to /slave/#
+00:00:18.676 -> h4 upnp->h4: UPNP name UI Input Tester
+00:00:18.676 -> H4P 1.0.0
+00:00:18.676 -> 
+00:00:18.676 -> SVC UP svc->scmd: UP
+00:00:18.676 -> SVC UP svc->cerr: UP
+00:00:18.676 -> SVC UP svc->gpio: UP
+00:00:18.743 -> 
+00:00:18.743 -> Brownout detector was triggered
+00:00:18.743 -> 
+00:00:18.776 -> ets Jun  8 2016 00:22:57
+00:00:18.776 -> 
+00:00:18.776 -> rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+00:00:18.776 -> configsip: 0, SPIWP:0xee
+00:00:18.776 -> clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+00:00:18.776 -> mode:DIO, clock div:1
+00:00:18.776 -> load:0x3fff0018,len:4
+00:00:18.776 -> load:0x3fff001c,len:1044
+00:00:18.776 -> load:0x40078000,len:8896
+00:00:18.776 -> load:0x40080400,len:5816
+00:00:18.776 -> entry 0x400806ac
+00:00:19.316 -> h4 wifi->h4: Device inputs chip C40A24
+00:00:19.316 -> h4 mqtt->h4: Subscribed to /slave/#
+00:00:19.418 -> h4 upnp->h4: UPNP name UI Input Tester
+00:00:19.418 -> H4P 1.0.0
+00:00:19.418 -> 
+00:00:19.418 -> SVC UP svc->scmd: UP
+00:00:19.418 -> SVC UP svc->cerr: UP
+00:00:19.418 -> SVC UP svc->gpio: UP
+00:00:19.484 -> SVC UP svc->beat: UP
+00:00:19.484 -> SVC UP svc->onof: UP
+00:00:19.788 -> h4 wifi->h4: IP=192.168.1.238
+00:00:19.788 -> SVC UP svc->wifi: UP
+00:00:19.788 -> SVC UP svc->asws: UP
+00:00:19.855 -> SVC UP svc->upnp: UP
+00:00:19.923 -> h4 mqtt->h4: Reporting {"bin":"","board":"LOLIN32","ip":"192.168.1.238","h4Pv":"1.0.0","h4UIv":"1.0.0","pmv":"1.0.0","state":"0","auto":"2000"}
+00:00:19.923 -> SVC UP svc->mqtt: UP
+00:00:19.923 -> h4 mqtt->h4: MQTT CNX
+00:00:48.684 -> h4 asws->h4: SSE Client 3ffd8670 n=0 T/O=30000 nC=1 nUI=18

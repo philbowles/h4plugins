@@ -28,31 +28,10 @@ SOFTWARE.
 */
 #include<H4PCommon.h>
 #include<H4P_WiFi.h>
-#include<H4P_AsyncWebServer.h>
-
-//diag
 #include<H4P_SerialCmd.h>
+#include<H4P_AsyncWebserver.h>
 
-void H4P_WiFiAP::_start(){
-    auto mode=WiFi.getMode();
-    H4EVENT("APMODE _mcuStart mode=%d stored",mode);
-    if(mode==WIFI_AP) startAP();
-    else {
-        if(WiFi.SSID()==""){
-            H4EVENT("APMODE NO CONFIG: Cannot Allow auto reconnect");
-            startAP();
-        }
-        else {
-            if(mode==WIFI_STA) { H4EVENT("STA configured %s, let it run",CSTR(WiFi.SSID())); }
-            else {
-                H4EVENT("must be OFF, but config for %s so force STA",CSTR(WiFi.SSID()));
-                HAL_WIFI_startSTA();
-            }
-        }
-    }
-}
-
-void H4P_WiFiAP::startAP(){
+void H4P_WiFi::startAP(){
     static DNSServer* _dns53=nullptr;
 
     WiFi.enableSTA(true);
@@ -75,9 +54,6 @@ void H4P_WiFiAP::startAP(){
         nullptr,
         [this](const string& b){
             h4.queueFunction([this](){
-                H4EVENT("APAPAP User config connect to %s/%s",CSTR(_cb[ssidTag()]),CSTR(_cb[pskTag()]));
-                H4EVENT("APAPAP device / friendly %s/%s",CSTR(_cb[deviceTag()]),CSTR(_cb[nameTag()]));
-//                setBothNames(_cb[deviceTag()],_cb[nameTag()]);
                 _save(deviceTag());
                 _save(nameTag());
                 change(_cb[ssidTag()],_cb[pskTag()]);
@@ -88,7 +64,9 @@ void H4P_WiFiAP::startAP(){
 
     WiFi.mode(WIFI_AP);
     H4EVENT("ENTER AP MODE %s MAC=%s",CSTR(_cb[deviceTag()]),CSTR(WiFi.softAPmacAddress()));
+    WiFi.printDiag(Serial);
     WiFi.softAP(CSTR(_cb[deviceTag()]));
+  
     _cb[ipTag()]=CSTR(WiFi.softAPIP().toString());//.c_str();
     _dns53=new DNSServer;
     _dns53->start(53, "*", WiFi.softAPIP());

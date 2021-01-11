@@ -1,5 +1,5 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,20,false) // Serial baud rate, larger Q size for scheduling, SerialCmd autostop
+H4_USE_PLUGINS(115200,5,false) // Serial baud rate, larger Q size for scheduling, SerialCmd autostop
 #define TONE  D8
 
 H4P_ToneController h4tc;

@@ -111,7 +111,7 @@ H4P_IPDetectorSource::H4P_IPDetectorSource(const string& pid,const string& id): 
         };
     }
 }
-#ifdef H4P_USE_OTA
+//#ifdef H4P_USE_OTA
 //
 //      MDNS
 //
@@ -147,5 +147,5 @@ H4P_H4DetectorSource::H4P_H4DetectorSource(const string& id): H4P_H4Detector(id)
         };
     }
 }
-#endif // OTA
+//#endif // OTA
 #endif // 8266

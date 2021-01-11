@@ -27,14 +27,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #define H4P_VERSION "1.0.0"
-
 constexpr char* h4PvTag(){ return "h4Pv"; }
+
+// Make sure you read the documentation and have arrangements in place for using AP mode :)
+#define H4P_USE_WIFI_AP 1 
 
 // comment this out to prevent and logging by EVENT( whatever ) messages
 #define H4P_LOG_EVENTS
 
 // comment this out to save a little flash if OTA not required
-#define H4P_USE_OTA
+//#define H4P_USE_OTA
 /*
             TWEAKABLES
 */

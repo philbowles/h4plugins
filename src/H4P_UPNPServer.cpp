@@ -37,6 +37,7 @@ void H4P_UPNPServer::_hookIn(){
     string dn=uppercase(h4Tag())+" "+deviceTag()+" ";
     if(!h4wifi._getPersistentValue(nameTag(),dn)) if(_name!="") _cb[nameTag()]=_name;
     H4EVENT("UPNP name %s",CSTR(_cb[nameTag()]));
+    H4EVENT("***** DIAG N of _detect items=%d",_detect.size());
 /*    // sniff neighbours
     _listenTag("NT",_pups.back(),[this](uint32_t mx,H4P_CONFIG_BLOCK blok,bool dora){ 
         if(dora) _otherH4s.insert(blok[xh4dTag()]);
@@ -57,46 +58,63 @@ uint32_t H4P_UPNPServer::_friendly(vector<string> vs){
 void H4P_UPNPServer::__upnpSend(uint32_t mx,const string s,IPAddress ip,uint16_t port){
 	h4.nTimesRandom(H4P_UDP_REPEAT,0,mx,bind([this](IPAddress ip,uint16_t port,string s) {
 		_udp.writeTo((uint8_t *)CSTR(s), s.size(), ip, port);
-		},ip,port,s),nullptr,H4P_TRID_UDPS); // name this!!
+	},ip,port,s),nullptr,H4P_TRID_UDPS); // name this!!
 }
 
-void H4P_UPNPServer::_listenUDP(){
-    if(_udp.listenMulticast(_ubIP, 1900)) {
-        _udp.onPacket([this](AsyncUDPPacket packet) {
-            h4.queueFunction(bind([this](string msg, IPAddress ip, uint16_t port) {
-                if(msg.size() > 50){
-                    H4P_CONFIG_BLOCK uhdrs;
-                    vector<string> hdrs = split(msg, "\r\n");
-                    while (hdrs.back() == "") hdrs.pop_back();
-                    for (auto const &h :vector<string>(++hdrs.begin(), hdrs.end())) {
-                        size_t p = h.find(":");
-                        if (p != string::npos) {
-                            string key=uppercase(string(h.begin(),h.begin()+p));
-                            uhdrs[key]=trim(string(h.begin()+p+1,h.end()));
-                        }
-                    }
-                    uint32_t mx=1000 * atoi(CSTR(replaceAll(uhdrs["CACHE-CONTROL"],"max-age=","")));
-                    if (msg[0] == 'M') { //-SEARCH
-                        string ST = uhdrs["ST"];
-                        if (ST==_pups[1]) { // make tag
-                            string tail=((ST==_pups[1]) ? ST:"");
-                            __upnpSend(mx, "HTTP/1.1 200 OK\r\nST:" + ST +"\r\n" +__upnpCommon(tail), ip,port);
-                        }
-                    }
-                    else {
-//                        Serial.printf("NOTIFY??? %s sz=%d from %s\n",CSTR(msg),msg.size(),CSTR(ip.toString()));
-//                        for (auto const &h :uhdrs) Serial.printf("UH: %s=%s\n",CSTR(h.first),CSTR(h.second));
-                        if (msg[0] == 'N') { //OTIFY
-                            for(auto const& d:_detect){
-                                string tag=d.first;
-                                if(uhdrs.count(tag) && uhdrs[tag].find(d.second.first)!=string::npos) d.second.second(mx,uhdrs,uhdrs["NTS"].find(aliveTag())!=string::npos);
-                            }
-                        }
-                    }
+void H4P_UPNPServer::_handlePacket(string p,IPAddress ip,uint16_t port){
+    static bool cursed=false;
+    if(cursed) Serial.printf("I BEEN RECURSED!!!!!!!!!!!!!!!!!!!*********************\n");
+    cursed=true;
+    Serial.printf("IN  pkt sz=%d\n", p.size());
+    if(p.size() > 50){
+        H4P_CONFIG_BLOCK uhdrs;
+        vector<string> hdrs = split(p, "\r\n");
+        Serial.printf("nlines=%d\n",hdrs.size());
+        while (hdrs.back() == "") hdrs.pop_back();
+        if(hdrs.size() > 4){
+            for (auto const &h :vector<string>(++hdrs.begin(), hdrs.end())) {
+                vector<string> parts=split(h,":");
+                if(parts.size()){
+                    string key=uppercase(parts[0]);
+                    uhdrs[key]=join(vector<string>(++parts.begin(),parts.end()),":");
+                } else Serial.printf("NO COLONS %s\n",CSTR(h)); 
+            }
+        } else Serial.printf("TiNY BLOCK Nh=%d\n",hdrs.size()); 
+
+        if(_detect.size()) Serial.printf("DETECT CORRUPTION 2 sz=%d\n",_detect.size());
+        uint32_t mx=1000 * atoi(CSTR(replaceAll(uhdrs["CACHE-CONTROL"],"max-age=","")));
+        if (p[0] == 'M') { //-SEARCH
+            string ST = uhdrs["ST"];
+            if (ST==_pups[1]) { // make tag
+                string tail=((ST==_pups[1]) ? ST:"");
+                __upnpSend(mx, "HTTP/1.1 200 OK\r\nST:" + ST +"\r\n" +__upnpCommon(tail), ip,port);
+            }
+        }
+        else {
+            if(_detect.size()) Serial.printf("DETECT CORRUPTION 3 sz=%d\n",_detect.size());
+            if (p[0] == 'N') { //OTIFY
+                for(auto const& d:_detect){
+                    Serial.printf(" WILL NEVER SEE!!! %s sz=%d [DET sz=%d]\n",CSTR(p),p.size(),_detect.size());
+                    for (auto const &h :uhdrs) Serial.printf("UH: %s=%s\n",CSTR(h.first),CSTR(h.second));
+                    string tag=d.first;
+                    if(uhdrs.count(tag) && uhdrs[tag].find(d.second.first)!=string::npos) d.second.second(mx,uhdrs,uhdrs["NTS"].find(aliveTag())!=string::npos);
                 }
-            },stringFromBuff(packet.data(), packet.length()),packet.remoteIP(), packet.remotePort()),nullptr, H4P_TRID_UDPM);
-        });
-    }
+            }
+        }
+    } else Serial.printf("WTF SHORT SHIT %s\n",CSTR(p));
+    cursed=false;
+    Serial.printf("OUT pkt sz=%d\n", p.size());
+}
+
+void H4P_UPNPServer::_listenUDP(){ 
+    if(!_udp.listenMulticast(_ubIP, 1900)) return; // some kinda error?
+    _udp.onPacket([this](AsyncUDPPacket packet){
+        Serial.printf("pkt sz=%d\n",packet.length());
+        string pkt=stringFromBuff(packet.data(),packet.length());
+        IPAddress ip=packet.remoteIP();
+        uint16_t port=packet.remotePort();
+        h4.queueFunction([this,pkt,ip,port](){ _handlePacket(pkt,ip,port); });
+    }); 
 }
 
 string H4P_UPNPServer::__makeUSN(const string& s){
@@ -139,7 +157,7 @@ void H4P_UPNPServer::_start(){
     );
     _listenUDP();
     _notify(aliveTag()); // TAG
-    h4.every(H4P_UDP_REFRESH / 3,[this](){ _notify(aliveTag()); },nullptr,H4P_TRID_NTFY,true); // TAG
+    h4.every(H4P_UDP_REFRESH / 2,[this](){ _notify(aliveTag()); },nullptr,H4P_TRID_NTFY,true); // TAG
     _upHooks();
 }
 
