@@ -34,7 +34,7 @@ void H4P_ConditionalSwitch::syncCondition(){ if(isLoaded(aswsTag())) h4asws._sen
 void H4P_ConditionalSwitch::_hookIn() {
     REQUIRE(gpio);
     H4P_BinarySwitch::_hookIn();
-    if(isLoaded(aswsTag())) h4asws._uiAdd(998,conditionTag(),H4P_UI_BOOL,"",[this]{ return stringFromInt(_predicate(state())); });
+    if(isLoaded(aswsTag())) h4asws._uiAdd(H4P_UIO_COND,conditionTag(),H4P_UI_BOOL,"",[this]{ return stringFromInt(_predicate(state())); });
 }
 
 void H4P_ConditionalSwitch::_setState(bool b) { 

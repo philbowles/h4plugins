@@ -113,7 +113,7 @@ void H4P_WiFi::HAL_WIFI_startSTA(){
 
 void H4P_WiFi::_start(){ Serial.printf("H4P_WiFi::_start() 32\n"); WiFi.begin(); };
 /*
-#if H4P_USE_WFIF_AP
+#if H4P_USE_WIFI_AP
 void H4P_WiFi::_coreStart(){ 
     auto mode=WiFi.getMode();
     Serial.printf("H4P_WiFi AP::::_coreStart() 32 mode=%d psk=%s\n",mode,CSTR(WiFi.psk()));
@@ -145,7 +145,7 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
 /*
                                                                                                  C O M M O N   F U N C T I O N S
 */
-#if H4P_USE_WFIF_AP
+#if H4P_USE_WIFI_AP
 void H4P_WiFi::_coreStart(){ 
     auto mode=WiFi.getMode();
     Serial.printf("H4P_WiFi AP::::_coreStart() 32 mode=%d psk=%s\n",mode,CSTR(WiFi.psk()));
@@ -153,7 +153,7 @@ void H4P_WiFi::_coreStart(){
 }
 #else
 void H4P_WiFi::_coreStart(){
-    Serial.printf(" ESP32 H4P_WiFi::_coreStart()\n");
+    Serial.printf("COMMON H4P_WiFi::_coreStart()\n");
     if(WiFi.psk()=="H4") h4wifi.HAL_WIFI_startSTA();
 }
 #endif
@@ -212,23 +212,23 @@ void H4P_WiFi::_hookIn(){
     _cb[boardTag()]=replaceAll(H4_BOARD,"ESP8266_","");
     if(!_getPersistentValue(deviceTag(),"H4-")) if(_device!="") _cb[deviceTag()]=_device;
     H4EVENT("Device %s chip %s",CSTR(_cb[deviceTag()]),CSTR(_cb[chipTag()]));
-    _getPersistentValue(h4UIvTag(),"NO UI! ");
+    _getPersistentValue(h4UITag(),"NO UI! ");
     WiFi.persistent(true);
     WiFi.onEvent(_wifiEvent);
 
-    h4asws._uiAdd(4,boardTag(),H4P_UI_LABEL);
-    h4asws._uiAdd(5,chipTag(),H4P_UI_LABEL);
-    h4asws._uiAdd(1,deviceTag(),H4P_UI_LABEL);
-    h4asws._uiAdd(6,ipTag(),H4P_UI_LABEL,"",[]{ return _cb[ipTag()]; }); // cos we don't know it yet
-    h4asws._uiAdd(7,"H4v",H4P_UI_LABEL,H4_VERSION);
-    h4asws._uiAdd(8,h4PvTag(),H4P_UI_LABEL);
+    h4asws._uiAdd(H4P_UIO_BOARD,boardTag(),H4P_UI_LABEL);
+    h4asws._uiAdd(H4P_UIO_CHIP,chipTag(),H4P_UI_LABEL);
+    h4asws._uiAdd(H4P_UIO_DEVICE,deviceTag(),H4P_UI_LABEL);
+    h4asws._uiAdd(H4P_UIO_IP,ipTag(),H4P_UI_LABEL,"",[]{ return _cb[ipTag()]; }); // cos we don't know it yet
+    h4asws._uiAdd(H4P_UIO_H4V,h4Tag(),H4P_UI_LABEL,H4_VERSION);
+    h4asws._uiAdd(H4P_UIO_H4PV,h4pTag(),H4P_UI_LABEL);
 #if H4P_USE_WIFI_AP
-    _cb[h4UIvTag()]=_cb[h4UIvTag()]+"ap";
+    _cb[h4UITag()]=_cb[h4UITag()]+"ap";
 #endif
-    h4asws._uiAdd(9,h4UIvTag(),H4P_UI_LABEL);
-    if(isLoaded(mqttTag())) h4asws._uiAdd(10,"Pangolin Vn",H4P_UI_LABEL,_cb[pmvTag()]);
+    h4asws._uiAdd(H4P_UIO_H4UIV,h4UITag(),H4P_UI_LABEL);
+// shift this
     if(isLoaded(upnpTag())) {
-        h4asws._uiAdd(2,"name",H4P_UI_LABEL,"",[]{ return _cb[nameTag()]; }); // cos we don't know it yet
+        h4asws._uiAdd(H4P_UIO_NAME,"name",H4P_UI_LABEL,"",[]{ return _cb[nameTag()]; }); // cos we don't know it yet
         h4cmd.addCmd("host2",_subCmd,0,CMDVS(_host2));
     }
 }

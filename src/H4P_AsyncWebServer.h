@@ -64,7 +64,8 @@ struct H4P_UI_ITEM {
 using H4P_UI_LIST       = std::map<int,H4P_UI_ITEM>;
 
 class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
-            uint32_t            _seq=100;
+//            H4P_UI_ORDER        _seq=H4P_UIO_USER;
+            uint32_t            _seq=H4P_UIO_USER;
             uint32_t            _evtID=0;
             H4P_BinaryThing*    _btp=nullptr;
             AsyncEventSource*   _evts;
@@ -110,7 +111,6 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
 
                 void            uiAddDropdown(const string& name,H4P_CONFIG_BLOCK options,H4P_FN_UICHANGE onChange=nullptr);
 
-//                void            uiAddInput(const string& name,H4P_FN_UITXT f=nullptr,H4P_FN_UICHANGE onChange=nullptr);
                 void            uiAddInput(const string& name,const string& value="",H4P_FN_UICHANGE onChange=nullptr);
 
                 void            uiSetInput(const string& name,const string& value){ _sendSSE(CSTR(name),CSTR(value)); }
@@ -130,7 +130,7 @@ class H4P_AsyncWebServer: public AsyncWebServer, public H4Plugin {
 //          syscall only
                 void            _reply(string msg) override { _lines.push_back(msg); }
                 void            _sendSSE(const char* name,const char* msg);
-                void            _uiAdd(int seq,const string& i,H4P_UI_TYPE t,const string& v="",H4P_FN_UITXT f=nullptr,H4P_FN_UICHANGE a=nullptr);
+                void            _uiAdd(uint32_t seq,const string& i,H4P_UI_TYPE t,const string& v="",H4P_FN_UITXT f=nullptr,H4P_FN_UICHANGE a=nullptr);
 };
 
 extern __attribute__((weak)) H4P_AsyncWebServer h4asws;

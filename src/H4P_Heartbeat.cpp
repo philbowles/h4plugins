@@ -32,17 +32,23 @@ SOFTWARE.
 uint32_t            H4P_Heartbeat::_uptime=0;
 
 void H4P_Heartbeat::_hookIn() {
-    if(isLoaded(aswsTag())) h4asws._uiAdd(11,"uptime",H4P_UI_LABEL,"",upTime);
+    if(isLoaded(aswsTag())) {
+        if(WiFi.getMode()!=WIFI_AP) h4asws._uiAdd(H4P_UIO_UP,"uptime",H4P_UI_LABEL,"",upTime);
+    }
 }
 
 void H4P_Heartbeat::_start() {
-    h4._hookLoop([this](){ _run(); },_subCmd);
-    H4Plugin::_start();
+    if(WiFi.getMode()!=WIFI_AP) {
+        h4._hookLoop([this](){ _run(); },_subCmd);
+        H4Plugin::_start();
+    }
 }
 
 void H4P_Heartbeat::_stop() {
-    h4._unHook(_subCmd);
-    H4Plugin::_stop();
+    if(WiFi.getMode()!=WIFI_AP) {
+        h4._unHook(_subCmd);
+        H4Plugin::_stop();
+    }
 }
 
 void H4P_Heartbeat::_run(){

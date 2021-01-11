@@ -38,7 +38,7 @@ void  H4P_AsyncWebServer::_hookIn(){
     H4Plugin* p=isLoaded(onofTag());
     if(p) _btp=reinterpret_cast<H4P_BinaryThing*>(p);
     if(isLoaded(gpioTag())) h4cmd.addCmd("gpio",_subCmd,0,CMDVS(_gpio));
-//    if(!HAL_FS.exists(CSTR(string("/"+string(h4UIvTag()))))) Serial.printf("FATAL: No webUI files!!!\n");
+//    if(!HAL_FS.exists(CSTR(string("/"+string(h4UITag()))))) Serial.printf("FATAL: No webUI files!!!\n");
 }
 
 uint32_t H4P_AsyncWebServer::_gpio(vector<string> vs){
@@ -67,7 +67,7 @@ H4_CMD_ERROR H4P_AsyncWebServer::__uichgCore(const string& a,const string& b,H4P
     return H4_CMD_OK;
 }
 
-void H4P_AsyncWebServer::_uiAdd(int seq,const string& i,H4P_UI_TYPE t,const string& v,H4P_FN_UITXT f,H4P_FN_UICHANGE c){
+void H4P_AsyncWebServer::_uiAdd(uint32_t seq,const string& i,H4P_UI_TYPE t,const string& v,H4P_FN_UITXT f,H4P_FN_UICHANGE c){
     string value=v;
     if(c) value=_cb[i]; // change function implies input / dropdown etc: backed by CB variable
     else {
@@ -197,19 +197,14 @@ H4_CMD_ERROR H4P_AsyncWebServer::uiAddGPIO(uint8_t pin){
                 _sendSSE(CSTR(name),hp->logicalRead() ? "1":"0");
                 if(f) f(hp);
             };
-            _uiAdd(300+pin,name,H4P_UI_BOOL,"",[p]{ return p->logicalRead() ? "1":"0"; });
+            _uiAdd(H4P_UIO_GPIO+pin,name,H4P_UI_BOOL,"",[p]{ return p->logicalRead() ? "1":"0"; });
             return H4_CMD_OK;
         } 
         return H4_CMD_OUT_OF_BOUNDS;
     }
     return H4_CMD_NOT_NOW;
 }
-/*
-void H4P_AsyncWebServer::uiAddInput(const string& name,H4P_FN_UITXT f,H4P_FN_UICHANGE onChange){
-    if(f) _cb[name]=f();
-    _uiAdd(_seq++,name,H4P_UI_INPUT,_cb[name],f,onChange); 
-}
-*/
+
 void H4P_AsyncWebServer::uiAddInput(const string& name,const string& value,H4P_FN_UICHANGE onChange){
     if(value!="") _cb[name]=value;
     _uiAdd(_seq++,name,H4P_UI_INPUT,_cb[name],nullptr,onChange); 

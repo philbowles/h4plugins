@@ -31,36 +31,49 @@ SOFTWARE.
 #include<H4P_SerialCmd.h>
 #include<H4P_AsyncWebserver.h>
 
+#if H4P_USE_WIFI_AP
 void H4P_WiFi::startAP(){
     static DNSServer* _dns53=nullptr;
+    string opts="No Networks!";
 
     WiFi.enableSTA(true);
-
     int n=WiFi.scanNetworks();
-    string opts;
-    for (uint8_t i = 0; i < n; i++){
-        string ss=CSTR(WiFi.SSID(i));
-        opts+=ss+"="+ss+",";
-    }
-    opts.pop_back();
-    _cb[ssidTag()]=CSTR(WiFi.SSID(0)); // ensure internal value if user never changes droplist
+    if(n){
+        for (uint8_t i = 0; i < n; i++){
+            string ss=CSTR(WiFi.SSID(i));
+            opts+=ss+"="+ss+",";
+        }
+        opts.pop_back();
+        _cb[ssidTag()]=CSTR(WiFi.SSID(0)); // ensure internal value if user never changes droplist
+    } else Serial.printf("NO NETWORKS FOUND!!!\n");
     WiFi.scanDelete();
+    WiFi.enableSTA(false); // force AP only
 
-    h4asws._uiAdd(-1,ssidTag(),H4P_UI_DROPDOWN,opts);
-    h4asws._uiAdd(0,pskTag(),H4P_UI_INPUT);
-    h4asws._uiAdd(1,deviceTag(),H4P_UI_INPUT,_cb[deviceTag()]); 
-    if(isLoaded(upnpTag())) h4asws._uiAdd(2,nameTag(),H4P_UI_INPUT,"",[]{ return _cb[nameTag()]; }); // cos we don't know it yet
-    h4asws._uiAdd(3,"Connect...",H4P_UI_BOOL,"",
+    h4asws._uiAdd(H4P_UIO_SSID,ssidTag(),H4P_UI_DROPDOWN,opts);
+    h4asws._uiAdd(H4P_UIO_PSK,pskTag(),H4P_UI_INPUT);
+    h4asws._uiAdd(H4P_UIO_DEVICE,deviceTag(),H4P_UI_INPUT,_cb[deviceTag()]); 
+    if(isLoaded(upnpTag())) h4asws._uiAdd(H4P_UIO_NAME,nameTag(),H4P_UI_INPUT,"",[]{ return _cb[nameTag()]; }); // cos we don't know it yet
+
+    if(isLoaded(mqttTag())){
+        h4asws._uiAdd(H4P_UIO_MQB,brokerTag(),H4P_UI_INPUT);
+        h4asws._uiAdd(H4P_UIO_MQP,portTag(),H4P_UI_INPUT);
+        h4asws._uiAdd(H4P_UIO_MQU,mQuserTag(),H4P_UI_INPUT);
+        h4asws._uiAdd(H4P_UIO_MQK,mQpassTag(),H4P_UI_INPUT);
+    }
+
+    h4asws._uiAdd(H4P_UIO_GO4IT,"GO!",H4P_UI_BOOL,"",
         nullptr,
         [this](const string& b){
             h4.queueFunction([this](){
+                if(isLoaded(mqttTag())){
+                    _cb["mqconf"]=_cb[brokerTag()]+","+_cb[portTag()]+","+_cb[mQuserTag()]+","+_cb[mQpassTag()];
+                    _save("mqconf");
+                }
                 _save(deviceTag());
                 _save(nameTag());
                 change(_cb[ssidTag()],_cb[pskTag()]);
             });
     });
-
-    WiFi.enableSTA(false); // force AP only
 
     WiFi.mode(WIFI_AP);
     H4EVENT("ENTER AP MODE %s MAC=%s",CSTR(_cb[deviceTag()]),CSTR(WiFi.softAPmacAddress()));
@@ -74,3 +87,4 @@ void H4P_WiFi::startAP(){
 
     h4asws.start(); // DONT run uphooks!
 }
+#endif

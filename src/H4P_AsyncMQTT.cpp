@@ -81,7 +81,22 @@ void H4P_AsyncMQTT::_greenLight(){
     }
 }
 
-void H4P_AsyncMQTT::_hookIn() { DEPEND(wifi); }
+void H4P_AsyncMQTT::_hookIn() { 
+    DEPEND(wifi);
+
+#if H4P_USE_WIFI_AP
+    if(h4wifi._getPersistentValue("mqconf","")){
+        Serial.printf("GOT MQTT CONFIG %s\n",CSTR(_cb["mqconf"]));
+        vector<string> mqconf=split(_cb["mqconf"],",");
+        _cb[brokerTag()]=mqconf[0];
+        _cb[portTag()]=mqconf[1];
+        _cb[mQuserTag()]=mqconf[2],
+        _cb[mQpassTag()]=mqconf[3];
+        Serial.printf("Sanity %s:%s %s/%s\n",CSTR(mqconf[0]),CSTR(mqconf[1]),CSTR(mqconf[2]),CSTR(mqconf[3]));
+    } else Serial.printf("NO **********************  MQTT CONFIG\n");
+#endif
+
+}
 
 void H4P_AsyncMQTT::_setup(){ // allow for TLS
     device=_cb[deviceTag()];
@@ -100,9 +115,14 @@ void H4P_AsyncMQTT::_setup(){ // allow for TLS
         setServer(IPAddress(PARAM_INT(0),PARAM_INT(1),PARAM_INT(2),PARAM_INT(3)),port);
     } else setServer(CSTR(broker),port);
         
-    if(_cb["muser"]!="") setCredentials(CSTR(_cb["muser"]),CSTR(_cb["mpasswd"])); // optimise tag()
+    if(_cb[mQuserTag()]!="") setCredentials(CSTR(_cb[mQuserTag()]),CSTR(_cb[mQpassTag()])); // optimise tag()
+    
     if(isLoaded(aswsTag())){
-        h4asws._uiAdd(95,uppercase(mqttTag()),H4P_UI_BOOL,"",
+        h4asws._uiAdd(H4P_UIO_PMV,"Pangolin",H4P_UI_LABEL,_cb[pmvTag()]);
+        h4asws._uiAdd(H4P_UIO_MQB,brokerTag(),H4P_UI_LABEL);
+        h4asws._uiAdd(H4P_UIO_MQP,portTag(),H4P_UI_LABEL);
+        if(WiFi.getMode()!=WIFI_AP){
+            h4asws._uiAdd(H4P_UIO_MQTT,uppercase(mqttTag()),H4P_UI_BOOL,"",
             [this]{ return stringFromInt(_state()); },
             [this](const string& b){ 
                 if(b=="1") _start();
@@ -110,14 +130,17 @@ void H4P_AsyncMQTT::_setup(){ // allow for TLS
                 H4EVENT("MQTT %s by user",b=="1" ? "Started":"Stopped");
                 if(isLoaded(aswsTag())) h4asws.uiMessage("MQTT %s by user",b=="1" ? "Started":"Stopped");
             });
+        }
     }
 }
 
 void H4P_AsyncMQTT::_signal(){ if(isLoaded(aswsTag())) h4asws.uiSync(); }
 
 void H4P_AsyncMQTT::_start(){
-    autorestart=true;
-    connect(); 
+//    if(WiFi.getMode()!=WIFI_AP){
+        autorestart=true;
+        connect();
+//    } else Serial.printf("DONT COME UP IN AP MODE!!!");
 }
 
 void H4P_AsyncMQTT::_stop(){

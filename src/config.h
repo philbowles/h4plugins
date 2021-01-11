@@ -27,10 +27,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #define H4P_VERSION "1.0.0"
-constexpr char* h4PvTag(){ return "h4Pv"; }
+constexpr char* h4pTag(){ return "h4P"; }
 
 // Make sure you read the documentation and have arrangements in place for using AP mode :)
-#define H4P_USE_WIFI_AP 1 
+#define H4P_USE_WIFI_AP 1
 
 // comment this out to prevent and logging by EVENT( whatever ) messages
 #define H4P_LOG_EVENTS
@@ -43,7 +43,7 @@ constexpr char* h4PvTag(){ return "h4Pv"; }
 #ifndef H4PCONFIG_H
 #define H4PCONFIG_H
 
-#define H4P_REPLY_BUFFER    512
+#define H4P_REPLY_BUFFER       512
 
 #define H4ESW_MAX_F         150000
 #define H4ESW_MAX_D            100

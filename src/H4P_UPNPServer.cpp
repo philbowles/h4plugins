@@ -65,11 +65,11 @@ void H4P_UPNPServer::_handlePacket(string p,IPAddress ip,uint16_t port){
     static bool cursed=false;
     if(cursed) Serial.printf("I BEEN RECURSED!!!!!!!!!!!!!!!!!!!*********************\n");
     cursed=true;
-    Serial.printf("IN  pkt sz=%d\n", p.size());
+//    Serial.printf("IN  pkt sz=%d\n", p.size());
     if(p.size() > 50){
         H4P_CONFIG_BLOCK uhdrs;
         vector<string> hdrs = split(p, "\r\n");
-        Serial.printf("nlines=%d\n",hdrs.size());
+//        Serial.printf("nlines=%d\n",hdrs.size());
         while (hdrs.back() == "") hdrs.pop_back();
         if(hdrs.size() > 4){
             for (auto const &h :vector<string>(++hdrs.begin(), hdrs.end())) {
@@ -103,13 +103,13 @@ void H4P_UPNPServer::_handlePacket(string p,IPAddress ip,uint16_t port){
         }
     } else Serial.printf("WTF SHORT SHIT %s\n",CSTR(p));
     cursed=false;
-    Serial.printf("OUT pkt sz=%d\n", p.size());
+//    Serial.printf("OUT pkt sz=%d\n", p.size());
 }
 
 void H4P_UPNPServer::_listenUDP(){ 
     if(!_udp.listenMulticast(_ubIP, 1900)) return; // some kinda error?
     _udp.onPacket([this](AsyncUDPPacket packet){
-        Serial.printf("pkt sz=%d\n",packet.length());
+//        Serial.printf("pkt sz=%d\n",packet.length());
         string pkt=stringFromBuff(packet.data(),packet.length());
         IPAddress ip=packet.remoteIP();
         uint16_t port=packet.remotePort();

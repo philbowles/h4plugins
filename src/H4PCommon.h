@@ -114,10 +114,12 @@ STAG(chip);
 STAG(device);
 STAG(gpio);
 STAG(h4);
-STAG(h4UIv);
+STAG(h4UI);
 STAG(ip);
 STAG(log);
+STAG(mQpass);
 STAG(mqtt);
+STAG(mQuser);
 STAG(msg);
 STAG(name);
 STAG(onof);
@@ -205,12 +207,37 @@ enum trustedIds {
   H4P_TRID_SSET
 };
 
-enum H4PC_CMD_ID{
+enum H4PC_CMD_ID {
     H4PC_ROOT,
     H4PC_H4,
     H4PC_SHOW,
     H4PC_SVC,
     H4PC_MAX
+};
+
+enum H4P_UI_ORDER:uint32_t {
+    H4P_UIO_SSID,
+    H4P_UIO_PSK,
+    H4P_UIO_DEVICE,
+    H4P_UIO_NAME,
+    H4P_UIO_CHIP,
+    H4P_UIO_BOARD,
+    H4P_UIO_IP,
+    H4P_UIO_H4V,
+    H4P_UIO_H4PV,
+    H4P_UIO_H4UIV,
+    H4P_UIO_UP,
+    H4P_UIO_MQTT,
+    H4P_UIO_PMV,
+    H4P_UIO_MQB,
+    H4P_UIO_MQP,
+    H4P_UIO_MQU,
+    H4P_UIO_MQK,
+    H4P_UIO_GO4IT,
+    H4P_UIO_USER,
+    H4P_UIO_COND,
+    H4P_UIO_ONOF,
+    H4P_UIO_GPIO
 };
 
 class H4Plugin {

@@ -1,8 +1,7 @@
 
 TODO:SOONER
-apmode config mqtt rupd
-
-    fs 32 extar stats
+    manifest const UI order
+    apmode config mqtt rupd
     move signalling into wifi / mqtt
     shift host2 to upnp // shud we though?
     //Rationalise/Align publishDevice MQTT
