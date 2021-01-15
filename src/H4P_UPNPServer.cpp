@@ -37,7 +37,7 @@ void H4P_UPNPServer::_hookIn(){
     string dn=uppercase(h4Tag())+" "+deviceTag()+" ";
     if(!h4wifi._getPersistentValue(nameTag(),dn)) if(_name!="") _cb[nameTag()]=_name;
     H4EVENT("UPNP name %s",CSTR(_cb[nameTag()]));
-    H4EVENT("***** DIAG N of _detect items=%d",_detect.size());
+    h4asws._uiAdd(H4P_UIO_NAME,"name",H4P_UI_LABEL,"",[]{ return _cb[nameTag()]; }); // cos we don't know it yet
 /*    // sniff neighbours
     _listenTag("NT",_pups.back(),[this](uint32_t mx,H4P_CONFIG_BLOCK blok,bool dora){ 
         if(dora) _otherH4s.insert(blok[xh4dTag()]);
@@ -45,6 +45,8 @@ void H4P_UPNPServer::_hookIn(){
     });
 */
 }
+
+uint32_t H4P_UPNPServer::_host2(vector<string> vs){ return guardString2(vs,[this](string a,string b){ setBothNames(a,b); return H4_CMD_OK; }); }
 
 void  H4P_UPNPServer::friendlyName(const string& name){ h4wifi._setPersistentValue(nameTag(),name,true); }
 
@@ -65,11 +67,11 @@ void H4P_UPNPServer::_handlePacket(string p,IPAddress ip,uint16_t port){
     static bool cursed=false;
     if(cursed) Serial.printf("I BEEN RECURSED!!!!!!!!!!!!!!!!!!!*********************\n");
     cursed=true;
-//    Serial.printf("IN  pkt sz=%d\n", p.size());
+    Serial.printf("IN  pkt sz=%d\n", p.size());
     if(p.size() > 50){
         H4P_CONFIG_BLOCK uhdrs;
         vector<string> hdrs = split(p, "\r\n");
-//        Serial.printf("nlines=%d\n",hdrs.size());
+        Serial.printf("nlines=%d\n",hdrs.size());
         while (hdrs.back() == "") hdrs.pop_back();
         if(hdrs.size() > 4){
             for (auto const &h :vector<string>(++hdrs.begin(), hdrs.end())) {
@@ -103,13 +105,13 @@ void H4P_UPNPServer::_handlePacket(string p,IPAddress ip,uint16_t port){
         }
     } else Serial.printf("WTF SHORT SHIT %s\n",CSTR(p));
     cursed=false;
-//    Serial.printf("OUT pkt sz=%d\n", p.size());
+    Serial.printf("OUT pkt sz=%d\n", p.size());
 }
 
 void H4P_UPNPServer::_listenUDP(){ 
     if(!_udp.listenMulticast(_ubIP, 1900)) return; // some kinda error?
     _udp.onPacket([this](AsyncUDPPacket packet){
-//        Serial.printf("pkt sz=%d\n",packet.length());
+        Serial.printf("pkt sz=%d\n",packet.length());
         string pkt=stringFromBuff(packet.data(),packet.length());
         IPAddress ip=packet.remoteIP();
         uint16_t port=packet.remotePort();
@@ -208,4 +210,9 @@ string H4P_UPNPServer::replaceParams(const string& s){ // oh for a working regex
         ++i;
 	}
 	return rv.c_str();	
+}
+
+void H4P_UPNPServer::setBothNames(const string& hostname,const string& friendly){ 
+    h4wifi._setPersistentValue(nameTag(),friendly,false);
+    h4wifi.host(hostname);
 }

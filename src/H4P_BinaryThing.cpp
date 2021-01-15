@@ -31,12 +31,7 @@ SOFTWARE.
 #include<H4P_AsyncMQTT.h>
 
 void H4P_BinaryThing::_hookIn() {
-    if(isLoaded(mqttTag())) {
-        _cb[stateTag()]=stringFromInt(state());
-        h4mqtt.subscribeDevice("slave/#",CMDVS(_slave),H4PC_H4);
-        h4mqtt.addReportingItem(stateTag());
-        h4mqtt.addReportingItem(autoTag());
-    }
+    HOOK_IF_LOADED(mqtt);
     if(isLoaded(aswsTag())) if(WiFi.getMode()!=WIFI_AP) h4asws._uiAdd(H4P_UIO_ONOF,onofTag(),H4P_UI_ONOF,"",[this]{ return stringFromInt(state()); });
 }
 
@@ -70,6 +65,14 @@ uint32_t H4P_BinaryThing::_slave(vector<string> vs){
 }
 void H4P_BinaryThing::_start() { 
     H4Plugin::_start();
+    // from hookin
+    if(isLoaded(mqttTag())) {
+        _cb[stateTag()]=stringFromInt(state());
+        h4mqtt.subscribeDevice("slave/#",CMDVS(_slave),H4PC_H4); // not until etc mqtt runn1ng!
+        h4mqtt.addReportingItem(stateTag());
+        h4mqtt.addReportingItem(autoTag());
+    }
+
     if(_f) _f(_state);
     turn(_state);
 }

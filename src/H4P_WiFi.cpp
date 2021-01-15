@@ -55,31 +55,7 @@ void H4P_WiFi::HAL_WIFI_startSTA(){
 }
 
 void H4P_WiFi::_start(){ Serial.printf("H4P_WiFi::_start() 8266\n"); _coreStart(); }
-/*
-#if H4P_USE_WIFI_AP
-void H4P_WiFi::_coreStart(){ 
-    auto mode=WiFi.getMode();
-    Serial.printf("H4P_WiFi AP::::_coreStart() 8266 mode=%d psk=%s\n",mode,CSTR(WiFi.psk()));
-    if(mode==WIFI_AP || WiFi.psk()=="H4") startAP();
-}
-#else
-void H4P_WiFi::_coreStart(){ 
-    auto mode=WiFi.getMode();
-    Serial.printf("H4P_WiFi::_coreStart() 8266 mode=%d\n",mode);
-    switch(mode){
-        case WIFI_OFF:
-            HAL_WIFI_startSTA();
-            break;
-        case WIFI_STA:
-            if(WiFi.psk()=="H4") HAL_WIFI_startSTA();
-            break;
-        case WIFI_AP:
-            HAL_WIFI_startSTA();
-            break;
-    }
-}
-#endif
-*/
+
 void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
     switch(event) {
         case WIFI_EVENT_STAMODE_DISCONNECTED:
@@ -104,43 +80,123 @@ void H4P_WiFi::HAL_WIFI_setHost(const string& host){ WiFi.setHostname(CSTR(host)
 
 void H4P_WiFi::HAL_WIFI_startSTA(){
     Serial.printf("H4P_WiFi::HAL_WIFI_startSTA 32 %s %s\n",CSTR(_cb[ssidTag()]),CSTR(_cb[pskTag()]));
-    WiFi.mode(WIFI_STA);
-    WiFi.enableAP(false); 
+//    WiFi.mode(WIFI_STA);
     WiFi.setSleep(false);
 	WiFi.setAutoReconnect(true);
+    Serial.printf("BEGIN 32 %s %s\n",CSTR(_cb[ssidTag()]),CSTR(_cb[pskTag()]));
     WiFi.begin(CSTR(_cb[ssidTag()]),CSTR(_cb[pskTag()]));
+    WiFi.printDiag(Serial);
 }
 
-void H4P_WiFi::_start(){ Serial.printf("H4P_WiFi::_start() 32\n"); WiFi.begin(); };
-/*
-#if H4P_USE_WIFI_AP
-void H4P_WiFi::_coreStart(){ 
-    auto mode=WiFi.getMode();
-    Serial.printf("H4P_WiFi AP::::_coreStart() 32 mode=%d psk=%s\n",mode,CSTR(WiFi.psk()));
-    if(mode==WIFI_AP || WiFi.psk()=="H4") startAP();
-}
-#else
-void H4P_WiFi::_coreStart(){
-    Serial.printf(" ESP32 H4P_WiFi::_coreStart()\n");
-    if(WiFi.psk()=="H4") h4wifi.HAL_WIFI_startSTA();
-}
-#endif
-*/
+void H4P_WiFi::_start(){ 
+    Serial.printf("H4P_WiFi::_start() 32 initial mode is %d\n",WiFi.getMode()); 
+    WiFi.begin();
+    WiFi.printDiag(Serial); // need this just to see what stae we are in! Nuts, I know!
+};
+
 void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
+
+    Serial.printf("[WiFi-event] event: %d\n", event);
+
+    switch (event) {
+        case SYSTEM_EVENT_WIFI_READY: 
+            Serial.println("WiFi interface ready");
+			h4.queueFunction([](){ h4wifi._coreStart(); });
+            break;
+        case SYSTEM_EVENT_SCAN_DONE:
+            Serial.println("Completed scan for access points");
+            break;
+        case SYSTEM_EVENT_STA_START:
+            Serial.println("WiFi client started");
+            break;
+        case SYSTEM_EVENT_STA_STOP:
+            Serial.println("WiFi clients stopped");
+            break;
+        case SYSTEM_EVENT_STA_CONNECTED:
+            Serial.println("Connected to access point");
+            break;
+        case SYSTEM_EVENT_STA_DISCONNECTED:
+            Serial.println("Disconnected from WiFi access point");
+            break;
+        case SYSTEM_EVENT_STA_AUTHMODE_CHANGE:
+            Serial.println("Authentication mode of access point has changed");
+            break;
+        case SYSTEM_EVENT_STA_GOT_IP:
+            Serial.print("Obtained IP address: ");
+            Serial.println(WiFi.localIP());
+			h4.queueFunction([](){ h4wifi._gotIP(); });
+            break;
+        case SYSTEM_EVENT_STA_LOST_IP:
+            Serial.println("Lost IP address and IP address is reset to 0");
+			h4.queueFunction([](){ h4wifi._lostIP(); });
+            break;
+        case SYSTEM_EVENT_STA_WPS_ER_SUCCESS:
+            Serial.println("WiFi Protected Setup (WPS): succeeded in enrollee mode");
+            break;
+        case SYSTEM_EVENT_STA_WPS_ER_FAILED:
+            Serial.println("WiFi Protected Setup (WPS): failed in enrollee mode");
+            break;
+        case SYSTEM_EVENT_STA_WPS_ER_TIMEOUT:
+            Serial.println("WiFi Protected Setup (WPS): timeout in enrollee mode");
+            break;
+        case SYSTEM_EVENT_STA_WPS_ER_PIN:
+            Serial.println("WiFi Protected Setup (WPS): pin code in enrollee mode");
+            break;
+        case SYSTEM_EVENT_AP_START:
+            Serial.println("WiFi access point started");
+            break;
+        case SYSTEM_EVENT_AP_STOP:
+            Serial.println("WiFi access point  stopped");
+            break;
+        case SYSTEM_EVENT_AP_STACONNECTED:
+            Serial.println("Client connected");
+            break;
+        case SYSTEM_EVENT_AP_STADISCONNECTED:
+            Serial.println("Client disconnected");
+            break;
+        case SYSTEM_EVENT_AP_STAIPASSIGNED:
+            Serial.println("Assigned IP address to client");
+            break;
+        case SYSTEM_EVENT_AP_PROBEREQRECVED:
+            Serial.println("Received probe request");
+            break;
+        case SYSTEM_EVENT_GOT_IP6:
+            Serial.println("IPv6 is preferred");
+            break;
+        case SYSTEM_EVENT_ETH_START:
+            Serial.println("Ethernet started");
+            break;
+        case SYSTEM_EVENT_ETH_STOP:
+            Serial.println("Ethernet stopped");
+            break;
+        case SYSTEM_EVENT_ETH_CONNECTED:
+            Serial.println("Ethernet connected");
+            break;
+        case SYSTEM_EVENT_ETH_DISCONNECTED:
+            Serial.println("Ethernet disconnected");
+            break;
+        case SYSTEM_EVENT_ETH_GOT_IP:
+            Serial.println("Obtained IP address");
+            break;
+        default: break;
+    }
+}
+/*
     Serial.printf("ESP32 WIFI EVENT %d\n",event);
     switch(event) {
         case SYSTEM_EVENT_WIFI_READY:
-            Serial.printf("SYSTEM_EVENT_WIFI_READY");
+            Serial.printf("SYSTEM_EVENT_WIFI_READY\n");
 			h4.queueFunction([](){ h4wifi._coreStart(); });
             break;
         case SYSTEM_EVENT_STA_LOST_IP:
 			h4.queueFunction([](){ h4wifi._lostIP(); });
             break;
 		case SYSTEM_EVENT_STA_GOT_IP:
-			h4.queueFunction([](){ h4wifi._gotIP(); WiFi.printDiag(Serial); });
+			h4.queueFunction([](){ h4wifi._gotIP(); });
 			break;
 	}
 }
+*/
 #endif
 /*
                                                                                                  C O M M O N   F U N C T I O N S
@@ -148,13 +204,18 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
 #if H4P_USE_WIFI_AP
 void H4P_WiFi::_coreStart(){ 
     auto mode=WiFi.getMode();
-    Serial.printf("H4P_WiFi AP::::_coreStart() 32 mode=%d psk=%s\n",mode,CSTR(WiFi.psk()));
-    if(mode==WIFI_AP || WiFi.psk()=="H4") startAP();
+    Serial.printf("H4P_WiFi AP::_coreStart() 32 mode=%d ssid=%s psk=%s\n",mode,CSTR(WiFi.SSID()),CSTR(WiFi.psk()));
+    if(WiFi.psk()=="H4"|| WiFi.psk()=="") startAP();
+    else {
+//        _cb[ssidTag()]=CSTR(WiFi.SSID());
+//        _cb[pskTag()]=CSTR(WiFi.psk());
+//        h4wifi.HAL_WIFI_startSTA();
+    }
 }
 #else
 void H4P_WiFi::_coreStart(){
     Serial.printf("COMMON H4P_WiFi::_coreStart()\n");
-    if(WiFi.psk()=="H4") h4wifi.HAL_WIFI_startSTA();
+    if(WiFi.psk()=="H4" || WiFi.psk()=="") h4wifi.HAL_WIFI_startSTA();
 }
 #endif
 
@@ -171,8 +232,7 @@ void H4P_WiFi::clear(){
     WiFi.begin("H4","H4"); 
     show();
 	stop();
-    HAL_FS.remove(CSTR(string("/"+string(deviceTag()))));
-    HAL_FS.remove(CSTR(string("/"+string(nameTag()))));
+    _wipe({deviceTag(),nameTag()});
 }
 
 uint32_t H4P_WiFi::_change(vector<string> vs){ return guardString2(vs,[this](string a,string b){ change(a,b); return H4_CMD_OK; }); }
@@ -226,11 +286,6 @@ void H4P_WiFi::_hookIn(){
     _cb[h4UITag()]=_cb[h4UITag()]+"ap";
 #endif
     h4asws._uiAdd(H4P_UIO_H4UIV,h4UITag(),H4P_UI_LABEL);
-// shift this
-    if(isLoaded(upnpTag())) {
-        h4asws._uiAdd(H4P_UIO_NAME,"name",H4P_UI_LABEL,"",[]{ return _cb[nameTag()]; }); // cos we don't know it yet
-        h4cmd.addCmd("host2",_subCmd,0,CMDVS(_host2));
-    }
 }
 
 uint32_t H4P_WiFi::_host(vector<string> vs){
@@ -242,10 +297,7 @@ uint32_t H4P_WiFi::_host(vector<string> vs){
     });
 }
 
-uint32_t H4P_WiFi::_host2(vector<string> vs){ return guardString2(vs,[this](string a,string b){ setBothNames(a,b); return H4_CMD_OK; }); }
-
 void H4P_WiFi::_lostIP(){
-//    H4EVENT("_lostIP() done=%d",_discoDone);
     h4.cancelSingleton(H4P_TRID_HOTA);
     if(!_discoDone){
         _downHooks();
@@ -266,9 +318,4 @@ void H4P_WiFi::change(string ssid,string psk){ // add device / name?
     _cb[pskTag()]=psk;
     HAL_WIFI_startSTA();
     h4reboot();
-}
-
-void H4P_WiFi::setBothNames(const string& hostname,const string& friendly){ 
-    if(isLoaded(upnpTag())) _setPersistentValue(nameTag(),friendly,false);
-    host(hostname);
 }

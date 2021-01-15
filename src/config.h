@@ -28,6 +28,7 @@ SOFTWARE.
 */
 #define H4P_VERSION "1.0.0"
 constexpr char* h4pTag(){ return "h4P"; }
+constexpr char* httpTag(){ return "http://"; }
 
 // Make sure you read the documentation and have arrangements in place for using AP mode :)
 #define H4P_USE_WIFI_AP 1
@@ -40,7 +41,7 @@ constexpr char* h4pTag(){ return "h4P"; }
 /*
             TWEAKABLES
 */
-#ifndef H4PCONFIG_H
+#ifndef H4PCONFIG_Hq
 #define H4PCONFIG_H
 
 #define H4P_REPLY_BUFFER       512

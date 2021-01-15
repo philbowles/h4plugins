@@ -14,7 +14,7 @@
 <manufacturerURL>https://github.com/philbowles/H4</manufacturerURL>
 <modelDescription>Chez ToiioT H4</modelDescription>
 <modelName>%board%</modelName>
-<modelNumber>%h4pv%</modelNumber>
+<modelNumber>%h4P%</modelNumber>
 <modelURL>/</modelURL>
 <serialNumber>%chip%</serialNumber>
 <UDN>uuid:%udn%</UDN>

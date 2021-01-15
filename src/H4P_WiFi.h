@@ -51,7 +51,7 @@ class H4P_WiFi: public H4Plugin{
 //
                 VSCMD(_change);
                 VSCMD(_host);
-                VSCMD(_host2);
+//                VSCMD(_host2);
 
                 string      HAL_WIFI_chipID();
                 void        HAL_WIFI_setHost(const string& host);
@@ -86,11 +86,11 @@ class H4P_WiFi: public H4Plugin{
                 {"change",  { _subCmd, 0, CMDVS(_change)}},
                 {"host",    { _subCmd, 0, CMDVS(_host)}}
             };
-        }                
+        }
                 void        clear();
                 void        change(string ssid,string psk);
                 void        host(const string& host){ _setPersistentValue(deviceTag(),host,true); }
-                void        setBothNames(const string& host,const string& friendly);
+//                void        setBothNames(const string& host,const string& friendly);
                 void        show() override { 
                     reply("Device %s Mode=%d Status: %d",CSTR(_cb[deviceTag()]),WiFi.getMode(),WiFi.status());
                     reply("SSID %s PSK=%s",CSTR(WiFi.SSID()),CSTR(WiFi.psk()));
@@ -98,6 +98,8 @@ class H4P_WiFi: public H4Plugin{
 //          syscall only        
                 bool        _getPersistentValue(string v,string prefix);
                 void        _setPersistentValue(string n,string v,bool reboot);
+                void        _wipe(const string &t){ HAL_FS.remove(CSTR(string("/"+t))); }
+                void        _wipe(initializer_list<char*> l){ for(auto const& t:l) _wipe(t); }
 };
 
 extern __attribute__((weak)) H4P_WiFi h4wifi;

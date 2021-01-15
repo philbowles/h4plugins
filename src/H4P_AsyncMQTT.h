@@ -47,7 +47,7 @@ class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
             string          device;
             string          prefix=string(h4Tag()).append("/");
             struct H4P_LWT  _lwt;
-            vector<string>  _reportList={"bin",boardTag(),ipTag(),h4pTag(),h4UITag(),pmvTag()};
+            unordered_set<string>  _reportList={"bin",boardTag(),ipTag(),h4pTag(),h4UITag(),pmvTag()};
         VSCMD(_change);
 
                 void        _greenLight() override;
@@ -63,17 +63,6 @@ class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
         H4P_AsyncMQTT(H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr,H4P_LWT lwt={"","",0,false}):
             _lwt(lwt), H4Plugin(mqttTag(),onC,onD)
         {
-            /*
-            if(h4wifi._getPersistentValue("mqconf","")){
-//                Serial.printf("GOT MQTT CONFIG %s\n",CSTR(_cb["mqconf"]));
-                vector<string> mqconf=split(_cb["mqconf"],",");
-                _cb[brokerTag()]=mqconf[0];
-                _cb[portTag()]=mqconf[1];
-                _cb[mQuserTag()]=mqconf[2],
-                _cb[mQpassTag()]=mqconf[3];
-//                Serial.printf("Sanity %s:%s %s/%s\n",CSTR(mqconf[0]),CSTR(mqconf[1]),CSTR(mqconf[2]),CSTR(mqconf[3]));
-            } // else Serial.printf("NO **********************  MQTT CONFIG\n");
-            */
 #else
         H4P_AsyncMQTT(string broker,uint16_t port, string user="",string pass="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr,H4P_LWT lwt={"","",0,false}):
             _lwt(lwt), H4Plugin(mqttTag(),onC,onD)
@@ -83,16 +72,18 @@ class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
             _cb[mQuserTag()]=user,
             _cb[mQpassTag()]=pass;
 #endif
+            _factoryHook=[](){ h4wifi._wipe(mqconfTag()); };
             _cmds={ 
                 {_pName,    { H4PC_H4, _subCmd, nullptr }}, 
                 {"change",  { _subCmd, 0, CMDVS(_change) }},
                 {"report",  { _subCmd, 0, CMD(report) }}
             };
         }
-                void        addReportingItem(const string& ri){ _reportList.push_back(ri); }
+                void        addReportingItem(const string& ri){ _reportList.insert(ri); }
                 void        change(const string& broker,uint16_t port);
-                void        publishDevice(const string& topic,const string& payload="");
-                void        publishDevice(const string& topic,uint32_t payload){ publishDevice(topic,stringFromInt(payload)); }
+
+                void        publishDevice(const string& topic,const string& payload,uint8_t qos=0, bool retain=false){ xPublish(CSTR(string(prefix+topic)),payload,qos,retain); }
+                void        publishDevice(const string& topic,uint32_t payload,uint8_t qos=0, bool retain=false){ publishDevice(topic,stringFromInt(payload),qos,retain); }
                 void        report();
                 void        subscribeDevice(string topic,H4_FN_MSG f,H4PC_CMD_ID root=H4PC_ROOT);
                 void        unsubscribeDevice(string topic);

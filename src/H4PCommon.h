@@ -117,6 +117,7 @@ STAG(h4);
 STAG(h4UI);
 STAG(ip);
 STAG(log);
+STAG(mqconf);
 STAG(mQpass);
 STAG(mqtt);
 STAG(mQuser);
@@ -126,6 +127,7 @@ STAG(onof);
 STAG(pmv);
 STAG(port);
 STAG(psk); // chg password
+STAG(rupd);
 STAG(scmd);
 STAG(snif);
 STAG(src);
@@ -220,6 +222,7 @@ enum H4P_UI_ORDER:uint32_t {
     H4P_UIO_PSK,
     H4P_UIO_DEVICE,
     H4P_UIO_NAME,
+    H4P_UIO_RUPD,
     H4P_UIO_CHIP,
     H4P_UIO_BOARD,
     H4P_UIO_IP,

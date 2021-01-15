@@ -44,9 +44,11 @@ class H4P_UPNPServer: public H4Plugin {
         AsyncUDP 	    _udp;
         IPAddress		_ubIP;
         H4P_TAG_MAP     _detect;
+
 //        unordered_set<string>     _otherH4s;
 
-        VSCMD(_friendly);
+                VSCMD(_friendly);
+                VSCMD(_host2);
 
                 string          _uuid="uuid:";
                 string          _urn="Belkin:";
@@ -84,16 +86,21 @@ class H4P_UPNPServer: public H4Plugin {
             _pups.push_back(_urn+"device:controllee:1");
             _pups.push_back(_urn+"service:basicevent:1");
             _ubIP=IPAddress(239,255,255,250);
-            _factoryHook=[this](){ HAL_FS.remove(CSTR(string("/"+string(nameTag())))); };
-            _cmds={ {upnpTag(),{H4PC_H4, 0, CMDVS(_friendly)}} };
+            _factoryHook=[](){ h4wifi._wipe(nameTag()); };
+            _cmds={ 
+                {_pName,    { H4PC_H4, _subCmd, nullptr}},
+                {"name",    {_subCmd, 0, CMDVS(_friendly)}},
+                {"host2",   {_subCmd, 0, CMDVS(_host2)}}
+            };
         }
 
-             void           friendlyName(const string& name);
-             void           show() override { 
-                 reply("Name: %s",CSTR(_cb[nameTag()]));
-//                 reply("Neighbours:");
-//                 for(auto const& o:_otherH4s) reply(CSTR(o));
-            }
+                void           friendlyName(const string& name);
+                void           setBothNames(const string& host,const string& friendly);
+                void           show() override { 
+                    reply("Name: %s",CSTR(_cb[nameTag()]));
+    //                 reply("Neighbours:");
+    //                 for(auto const& o:_otherH4s) reply(CSTR(o));
+                }
 //          _syscall only
              void           _listenTag(const string& tag,const string& value,H4P_FN_TAGMATCH f){ _detect[tag]=make_pair(value,f); }
              void           _listenUSN(const string& usn,H4P_FN_TAGMATCH f){ _listenTag("USN",usn,f); }

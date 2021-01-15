@@ -31,29 +31,43 @@ SOFTWARE.
 #include<H4P_SerialCmd.h>
 #include<H4P_AsyncWebserver.h>
 
+constexpr char* uuTag(){ return "Update URL"; }
+
 #if H4P_USE_WIFI_AP
 void H4P_WiFi::startAP(){
     static DNSServer* _dns53=nullptr;
-    string opts="No Networks!";
+    string opts;
 
-    WiFi.enableSTA(true);
+    Serial.printf("H4P_WiFi::startAP DISCO mode=%d\n",WiFi.getMode());
+    WiFi.disconnect(false,false); // prb 32 only: abandon curretn blank attempt or no scan possible
+    Serial.printf("H4P_WiFi::startAP POST  mode=%d\n",WiFi.getMode());
+//    WiFi.enableSTA(false); // force AP only
+//    Serial.printf("H4P_WiFi::startAP DISCO mode=%d\n",WiFi.getMode());
     int n=WiFi.scanNetworks();
-    if(n){
+    if(n>0){
         for (uint8_t i = 0; i < n; i++){
             string ss=CSTR(WiFi.SSID(i));
+            Serial.printf("Found %s\n",CSTR(ss));
             opts+=ss+"="+ss+",";
         }
         opts.pop_back();
         _cb[ssidTag()]=CSTR(WiFi.SSID(0)); // ensure internal value if user never changes droplist
-    } else Serial.printf("NO NETWORKS FOUND!!!\n");
+    } elsehttps://www.youtube.com/watch?v=1oKTdxYyJA8
     WiFi.scanDelete();
-    WiFi.enableSTA(false); // force AP only
+//    WiFi.enableSTA(false); // force AP only
 
+//    Serial.printf("UI add %s etc n=%d *%s* len=%d\n",ssidTag(),n,CSTR(opts),opts.size());
     h4asws._uiAdd(H4P_UIO_SSID,ssidTag(),H4P_UI_DROPDOWN,opts);
     h4asws._uiAdd(H4P_UIO_PSK,pskTag(),H4P_UI_INPUT);
-    h4asws._uiAdd(H4P_UIO_DEVICE,deviceTag(),H4P_UI_INPUT,_cb[deviceTag()]); 
-    if(isLoaded(upnpTag())) h4asws._uiAdd(H4P_UIO_NAME,nameTag(),H4P_UI_INPUT,"",[]{ return _cb[nameTag()]; }); // cos we don't know it yet
+    h4asws._uiAdd(H4P_UIO_DEVICE,deviceTag(),H4P_UI_INPUT,_cb[deviceTag()]);
 
+    Serial.printf("UI add maybe name\n");
+    if(isLoaded(upnpTag())) h4asws._uiAdd(H4P_UIO_NAME,nameTag(),H4P_UI_INPUT);
+
+    Serial.printf("UI add maybe rupd\n");
+    if(isLoaded(rupdTag())) h4asws._uiAdd(H4P_UIO_RUPD,uuTag(),H4P_UI_INPUT);
+
+    Serial.printf("UI add maybe mqtt\n");
     if(isLoaded(mqttTag())){
         h4asws._uiAdd(H4P_UIO_MQB,brokerTag(),H4P_UI_INPUT);
         h4asws._uiAdd(H4P_UIO_MQP,portTag(),H4P_UI_INPUT);
@@ -61,25 +75,26 @@ void H4P_WiFi::startAP(){
         h4asws._uiAdd(H4P_UIO_MQK,mQpassTag(),H4P_UI_INPUT);
     }
 
+    Serial.printf("UI add always go\n");
     h4asws._uiAdd(H4P_UIO_GO4IT,"GO!",H4P_UI_BOOL,"",
         nullptr,
         [this](const string& b){
             h4.queueFunction([this](){
                 if(isLoaded(mqttTag())){
-                    _cb["mqconf"]=_cb[brokerTag()]+","+_cb[portTag()]+","+_cb[mQuserTag()]+","+_cb[mQpassTag()];
-                    _save("mqconf");
+                    _cb[mqconfTag()]=_cb[brokerTag()]+","+_cb[portTag()]+","+_cb[mQuserTag()]+","+_cb[mQpassTag()];
+                    _save(mqconfTag());
                 }
+                _cb[rupdTag()]=_cb[uuTag()];
+                _save(rupdTag());
                 _save(deviceTag());
                 _save(nameTag());
                 change(_cb[ssidTag()],_cb[pskTag()]);
             });
     });
-
     WiFi.mode(WIFI_AP);
     H4EVENT("ENTER AP MODE %s MAC=%s",CSTR(_cb[deviceTag()]),CSTR(WiFi.softAPmacAddress()));
-    WiFi.printDiag(Serial);
+    show(); //WiFi.printDiag(Serial);
     WiFi.softAP(CSTR(_cb[deviceTag()]));
-  
     _cb[ipTag()]=CSTR(WiFi.softAPIP().toString());//.c_str();
     _dns53=new DNSServer;
     _dns53->start(53, "*", WiFi.softAPIP());

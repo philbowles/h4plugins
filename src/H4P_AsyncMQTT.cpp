@@ -39,6 +39,7 @@ uint32_t H4P_AsyncMQTT::_change(vector<string> vs){
 }
 
 void H4P_AsyncMQTT::_greenLight(){
+    Serial.printf("FOR FUX ACHE %d\n",WiFi.getMode());
     if(WiFi.getMode()==WIFI_STA) {
         _setup();
 
@@ -83,17 +84,16 @@ void H4P_AsyncMQTT::_greenLight(){
 
 void H4P_AsyncMQTT::_hookIn() { 
     DEPEND(wifi);
-
 #if H4P_USE_WIFI_AP
-    if(h4wifi._getPersistentValue("mqconf","")){
-        Serial.printf("GOT MQTT CONFIG %s\n",CSTR(_cb["mqconf"]));
-        vector<string> mqconf=split(_cb["mqconf"],",");
+    if(h4wifi._getPersistentValue(mqconfTag(),"")){
+        vector<string> mqconf=split(_cb[mqconfTag()],",");
         _cb[brokerTag()]=mqconf[0];
         _cb[portTag()]=mqconf[1];
-        _cb[mQuserTag()]=mqconf[2],
-        _cb[mQpassTag()]=mqconf[3];
-        Serial.printf("Sanity %s:%s %s/%s\n",CSTR(mqconf[0]),CSTR(mqconf[1]),CSTR(mqconf[2]),CSTR(mqconf[3]));
-    } else Serial.printf("NO **********************  MQTT CONFIG\n");
+        _cb[mQuserTag()]=mqconf.size() > 2 ? mqconf[2]:"";
+        _cb[mQpassTag()]=mqconf.size() > 3 ? mqconf[3]:"";
+//        Serial.printf("Sanity %s:%s %s/%s\n",CSTR(_cb[brokerTag()]),CSTR(_cb[portTag()]),CSTR(_cb[mQuserTag()]),CSTR(_cb[mQpassTag()]));
+    }
+    _cb.erase(mqconfTag());
 #endif
 
 }
@@ -156,11 +156,9 @@ void H4P_AsyncMQTT::change(const string& broker,uint16_t port){ // add creds
     start();
 }
 
-void H4P_AsyncMQTT::publishDevice(const string& topic,const string& payload){ xPublish(CSTR(string(prefix+topic)),payload); }
-
 void H4P_AsyncMQTT::report(){
     string j="{";
-    for(auto const r:_reportList) j+="\""+r+"\":\""+_cb[r]+"\","; //publishDevice(r,_cb[r]);
+    for(auto const r:_reportList) j+="\""+r+"\":\""+_cb[r]+"\",";
     j.pop_back();
     publishDevice("report",j+"}");
     H4EVENT("Reporting %s}",CSTR(j));

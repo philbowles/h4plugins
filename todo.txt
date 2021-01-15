@@ -1,38 +1,26 @@
-
 TODO:SOONER
-    manifest const UI order
-    apmode config mqtt rupd
     move signalling into wifi / mqtt
-    shift host2 to upnp // shud we though?
-    //Rationalise/Align publishDevice MQTT
-
-    autoOff -> cb
-    optimise all if(nullptr) to || etc
-    optimise all upnp -> name tag()
-    passthru ap config params in ctor
     js - type = password if n includes "pass"
-#
-    error gone away in nodejs
-    early abort dependfail
-    stale ui msgbox
-    unicorn get version
 SHORTTERM
+    autoOff -> cb
     getstartingheap
-    schedule in cheztoi
     H4_TIMER from at,daily
     adv docs + / example creating your own commands
     retval on ps inc/dec
     ps discard(x)
     jitter on loggers freq
 MEDIUMTERM
-    upnp grid :)
+    passthru ap config params in ctor
+#    upnp grid :)
     dynamic cmds flash / siren etc
     remote client get
     ESp32 MDNS detector
     ESp32 tonecontroller
     templatise / macrofy dependent module detection (and std hookins for runnables?)
 LONGTERM
+    upnp analyser device
     dynamic add gpio / thing etc
     ESP32 bluetooth PD
     rf bridge
     fix switch.ps1 to use soap etc (revert a la esparto)
+    schedule in cheztoi - now node red :)

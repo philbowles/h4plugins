@@ -41,29 +41,35 @@ class H4P_RemoteUpdate: public H4Plugin, public ESP8266HTTPUpdate {
 class H4P_RemoteUpdate: public H4Plugin, public HTTPUpdate {
 #endif
                 WiFiClient  _c;
-                string      _url="http://";
+                string      _url;
                 void        _entropise(H4_FN_VOID f){ h4.onceRandom(H4P_PJ_LO,H4P_PJ_HI * H4P_RUPD_STRETCH,f); }
-                void        _greenLight(){} // no autostart
-                void        _hookIn(){ DEPEND(wifi); _url+="/"+_cb[deviceTag()]; }
+                void        _greenLight(){
+                    if(h4wifi._getPersistentValue(rupdTag(),"")) _url=_cb[rupdTag()];
+                    _cb[rupdTag()]=httpTag()+_url; 
+//                    Serial.printf("_greenLight %s\n",CSTR(_cb[rupdTag()]));
+                } // no autostart
+                void        _hookIn(){ DEPEND(wifi); }
                 void        _updateFromUrl(bool fw,bool reboot){
-                    //h4wifi._downHooks();
-                    t_httpUpdate_return rv=fw ? update(_c,CSTR(_url)):updateSpiffs(_c,CSTR(_url));
+                    string endpoint=_cb[rupdTag()]+"/"+_cb[deviceTag()];
+                    t_httpUpdate_return rv=fw ? update(_c,CSTR(endpoint)):updateSpiffs(_c,CSTR(endpoint));
                     switch(rv){
                         case HTTP_UPDATE_OK:
                             if(reboot) h4reboot();
                             break;
                         case HTTP_UPDATE_NO_UPDATES:
-                            //h4wifi._upHooks();
                             H4EVENT("Already up to date");
                             break;
                         default:
-                            //h4wifi._upHooks();
                             H4EVENT("FAIL %d: %s", getLastError(), getLastErrorString().c_str());
                     }
                 }
     public:
-        H4P_RemoteUpdate(const string& url,const char* bin): H4Plugin("rupd"){
-            _url+=url;
+ #if H4P_USE_WIFI_AP
+        H4P_RemoteUpdate(const char* bin): H4Plugin(rupdTag()){
+#else
+        H4P_RemoteUpdate(const string& url,const char* bin): _url(url), H4Plugin(rupdTag()){
+#endif
+            _factoryHook=[](){ h4wifi._wipe(rupdTag()); };
             _cb["bin"]=bin;
             _cmds={
                 {_pName,       { H4PC_H4,_subCmd  , nullptr}},
@@ -72,11 +78,12 @@ class H4P_RemoteUpdate: public H4Plugin, public HTTPUpdate {
                 {"fw",         { _subCmd, 0, CMD(fw)}}
             }; 
         }
+
         void both(){
             _entropise([this]{ _updateFromUrl(false,false); }); // spiffs, no reboot
             fw(); // fw + reboot
         }
-        void show() override { reply("url: %s",CSTR(_url)); }
+        void show() override { reply("url: %s",CSTR(_cb[rupdTag()])); }
         void fs(){ _entropise([this]{ _updateFromUrl(false,true); }); }
         void fw(){ _entropise([this]{ _updateFromUrl(true,true); }); }
 };

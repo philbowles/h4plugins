@@ -76,7 +76,7 @@ function uiItem(d,h="uhang"){
                 valu.addEventListener("blur", function(e){
                     if(valu.value!=v) {
                         v=valu.value;
-                        ajax("h4/asws/uichg/"+n+","+v)
+                        ajax("h4/asws/uichg/"+n+","+v.replace("http://",""))
                     }
                 },{capture: true});
                 title.classList.add("tuia");

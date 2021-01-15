@@ -70,32 +70,42 @@ H4_CMD_ERROR H4P_AsyncWebServer::__uichgCore(const string& a,const string& b,H4P
 void H4P_AsyncWebServer::_uiAdd(uint32_t seq,const string& i,H4P_UI_TYPE t,const string& v,H4P_FN_UITXT f,H4P_FN_UICHANGE c){
     string value=v;
     if(c) value=_cb[i]; // change function implies input / dropdown etc: backed by CB variable
-    else {
-        if(value=="") { // when no intial value given...
-//            if(f) value=f(); // if dynamic, sync it, or...
-//            else value=_cb[i]; // assume its backed by CB variable
-            value=f ? f():_cb[i];
-        }
-    }
+    else if(value=="") value=f ? f():_cb[i];
     _userItems[seq]={i,t,value,f,c};
 }
 
 uint32_t H4P_AsyncWebServer::_uichg(vector<string> vs){
-    return guardString2(vs,[this](string a,string b){ 
-        for(auto &i:_userItems){
-            H4P_UI_ITEM u=i.second;
-            if(u.id==a){
-                if(u.type==H4P_UI_BOOL){
-                    if(isNumeric(b)) {
-                        if(atoi(CSTR(b)) > 1) return H4_CMD_PAYLOAD_FORMAT;
-                    } else return H4_CMD_NOT_NUMERIC;
+    dumpvs(vs);
+    string payload;
+    string extra;
+    vector<string> vg;
+    switch(vs.size()){
+        case 0:
+            return H4_CMD_TOO_FEW_PARAMS;
+        case 2:
+            extra="/"+vs[1];
+        case 1:
+            payload=vs[0]+extra;
+            Serial.printf("UICHG %s\n",CSTR(payload));
+            vg=split(payload,",");
+            if(vg.size()>2) return H4_CMD_TOO_MANY_PARAMS;
+            if(vg.size()<2) return H4_CMD_TOO_FEW_PARAMS;
+            for(auto &i:_userItems){
+                H4P_UI_ITEM u=i.second;
+                if(u.id==vg[0]){
+                    if(u.type==H4P_UI_BOOL){
+                        if(isNumeric(vg[1])) {
+                            if(atoi(CSTR(vg[1])) > 1) return H4_CMD_PAYLOAD_FORMAT;
+                        } else return H4_CMD_NOT_NUMERIC;
+                    }
+                    _cb[vg[0]]=vg[1];
+                    return __uichgCore(vg[0],vg[1],u.c);
                 }
-                _cb[a]=b;
-                return __uichgCore(a,b,u.c);
             }
-        }
-        return H4_CMD_NAME_UNKNOWN;
-    });
+            return H4_CMD_NAME_UNKNOWN;
+        default:
+            return H4_CMD_TOO_MANY_PARAMS;
+    }
 }
 
 void H4P_AsyncWebServer::_rest(AsyncWebServerRequest *request){

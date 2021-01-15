@@ -256,8 +256,8 @@ bool  asyncHTTPrequest::_parseURL(String url){
     int hostBeg = 0;
     _URL = new URL;
     _URL->scheme = new char[8];
-    strcpy(_URL->scheme, "HTTP://");
-    if(url.substring(0,7).equalsIgnoreCase("HTTP://")){
+    strcpy(_URL->scheme, httpTag());
+    if(url.substring(0,7).equalsIgnoreCase(httpTag())){
         hostBeg += 7; 
     }
     else if(url.substring(0,8).equalsIgnoreCase("HTTPS://")){
