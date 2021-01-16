@@ -1,5 +1,4 @@
-#ifndef H4P_PLUGINS_H
-#define H4P_PLUGINS_H
+#pragma once
 
 #include<config.h>
 #if H4P_USE_WIFI_AP
@@ -38,7 +37,7 @@
 #include<H4P_BinarySwitch.h>
 #include<H4P_MultiFunctionButton.h>
 
-//force  static initialisation
+//force  static initialisation order
 
 #define H4_USE_PLUGINS(s,q,b) \
     H4 h4(s,q); \
@@ -48,4 +47,3 @@
     H4GM_PINMAP         H4P_GPIOManager::pins; 
     uint32_t            H4Plugin::_nxtSubCmd=H4PC_MAX-1; \
     H4P_CONFIG_BLOCK    H4Plugin::_cb={{pmvTag(),PANGO_VERSION},{h4pTag(),H4P_VERSION}};
-#endif

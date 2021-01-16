@@ -27,17 +27,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #define H4P_VERSION "1.0.0"
-constexpr char* h4pTag(){ return "h4P"; }
-constexpr char* httpTag(){ return "http://"; }
+/*
+        HARDWARE ASSUMPTIONS
 
-// Make sure you read the documentation and have arrangements in place for using AP mode :)
-#define H4P_USE_WIFI_AP 1
+        Most boards have a builtin LED where they have this will be defined by LED_BUILTIN
+        of you want to use a differetn one, change H4P_SIGNAL_LED to your chosen GPIO (NOT ARDUINO DIGOTAL PIN NUMBER!!!)
 
-// comment this out to prevent and logging by EVENT( whatever ) messages
+        Also it is very common for builtin LEDs to be "Active Low" meaning it is ON when the pin is driven to GND = "LOW" = 0
+        if yours is Active HIGH (ON when the pin id driven to Vcc = HIGH = 1 ) then change H4P_SIGNAL_SENSE to 1
+
+        These affect the way wifi, mqtt and multfunction buttons do their signalling
+        H4P_SIGNAL_TIMEBASE is the speed at which the signal pattern cycles - see the documentation for flashPattern API
+*/
+#define H4P_SIGNAL_LED      LED_BUILTIN
+#define H4P_SIGNAL_SENSE    0
+#define H4P_SIGNAL_TIMEBASE 175
+/*
+        DIAGNOSTICS
+        comment out H4P_LOG_EVENTS to prevent any logging by EVENT( whatever ) messages
+        Increases perfirmance, reduces binary size, increases free heap, but ...
+        
+        **********************************************************************
+        YOU MUST H4P_LOG_EVENTS DEFINED AND INCLUDE ALL SERIAL MONITOR OUTPUT
+        WHEN SUBMITTING BUG REPORTS
+        ***********************************************************************
+*/
 #define H4P_LOG_EVENTS
 
-// comment this out to save a little flash if OTA not required
-//#define H4P_USE_OTA
+
+// Make sure you read the documentation and have arrangements in place for using AP mode :)
+#define H4P_USE_WIFI_AP 0
+
 /*
             TWEAKABLES
 */
@@ -60,8 +80,6 @@ constexpr char* httpTag(){ return "http://"; }
 
 #define H4MF_SLOW              250
 #define H4MF_MEDIUM            125
-//#define H4MF_FAST               25
-#define H4MF_TIMEBASE          175
 #define H4MF_REBOOT           2000
 #define H4MF_FACTORY          5000
 //#define H4MF_APMODE          10000
@@ -81,5 +99,8 @@ constexpr char* httpTag(){ return "http://"; }
 #define H4P_TIME_RESYNC    3600000
 
 #define H4P_SAFE_MINIMUM     20000
+
+constexpr char* h4pTag(){ return "h4P"; }
+constexpr char* httpTag(){ return "http://"; }
 
 #endif

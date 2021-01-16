@@ -36,7 +36,7 @@ SOFTWARE.
 STAG(condition);
 
 class H4P_BinaryThing: public H4Plugin{
-            uint32_t        _timeout;
+            uint32_t                _timeout;
             unordered_set<string>   _slaves;
     protected:
             H4BS_FN_SWITCH  _f;

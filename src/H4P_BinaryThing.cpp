@@ -30,8 +30,12 @@ SOFTWARE.
 #include<H4P_AsyncMQTT.h>
 
 void H4P_BinaryThing::_hookIn() {
-    HOOK_IF_LOADED(mqtt);
-    if(WiFi.getMode()!=WIFI_AP) h4wifi._uiAdd(H4P_UIO_ONOF,onofTag(),H4P_UI_ONOF,"",[this]{ return stringFromInt(state()); });
+    if(isLoaded(wifiTag())){
+        if(WiFi.getMode()==WIFI_STA) {
+            h4wifi._uiAdd(H4P_UIO_ONOF,onofTag(),H4P_UI_ONOF,"",[this]{ return stringFromInt(state()); });
+            if(isLoaded(mqttTag())) h4mqtt.hookConnect([this](){ h4mqtt.subscribeDevice("slave/#",CMDVS(_slave),H4PC_H4); });
+        }
+    }
 }
 
 void H4P_BinaryThing::_publish(bool b){ if(isLoaded(mqttTag())) h4mqtt.publishDevice(stateTag(),b); }
@@ -47,7 +51,7 @@ void H4P_BinaryThing::_setState(bool b) {
     _state=b;
     _cb[stateTag()]=stringFromInt(b);
     _setSlaves(b);
-    h4wifi.uiSync(); //h4wifi.uiSync(onofTag());}
+    if(isLoaded(wifiTag())) h4wifi.uiSync();
 }
 
 uint32_t H4P_BinaryThing::_slave(vector<string> vs){
@@ -62,16 +66,9 @@ uint32_t H4P_BinaryThing::_slave(vector<string> vs){
     show();
     return H4_CMD_OK;
 }
+
 void H4P_BinaryThing::_start() { 
     H4Plugin::_start();
-    // from hookin
-    if(isLoaded(mqttTag())) {
-        _cb[stateTag()]=stringFromInt(state());
-        h4mqtt.subscribeDevice("slave/#",CMDVS(_slave),H4PC_H4); // not until etc mqtt runn1ng!
-        h4mqtt.addReportingItem(stateTag());
-        h4mqtt.addReportingItem(autoTag());
-    }
-
     if(_f) _f(_state);
     turn(_state);
 }

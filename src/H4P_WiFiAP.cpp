@@ -38,15 +38,12 @@ void H4P_WiFi::_startAP(){
     static DNSServer* _dns53=nullptr;
     string opts;
 
-//    Serial.printf("H4P_WiFi::_startAP DISCO mode=%d\n",WiFi.getMode());
     HAL_WIFI_disconnect();
-//    Serial.printf("H4P_WiFi::_startAP POST  mode=%d\n",WiFi.getMode());
 
     int n=WiFi.scanNetworks();
     if(n>0){
         for (uint8_t i = 0; i < n; i++){
             string ss=CSTR(WiFi.SSID(i));
-//            Serial.printf("Found %s\n",CSTR(ss));
             opts+=ss+"="+ss+",";
         }
         opts.pop_back();
@@ -73,11 +70,7 @@ void H4P_WiFi::_startAP(){
         nullptr,
         [this](const string& b){
             h4.queueFunction([this](){
-                if(isLoaded(mqttTag())){
-                    h4mqtt.change(_cb[brokerTag()],STOI(_cb[portTag()]),_cb[mQuserTag()],_cb[mQpassTag()]);
-//                    _cb[mqconfTag()]=_cb[brokerTag()]+","+_cb[portTag()]+","+_cb[mQuserTag()]+","+_cb[mQpassTag()];
-//                    _save(mqconfTag());
-                }
+                if(isLoaded(mqttTag()))h4mqtt.change(_cb[brokerTag()],STOI(_cb[portTag()]),_cb[mQuserTag()],_cb[mQpassTag()]);
                 _cb[rupdTag()]=_cb[uuTag()];
                 _save(rupdTag());
                 _save(deviceTag());

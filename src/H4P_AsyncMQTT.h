@@ -32,6 +32,7 @@ SOFTWARE.
 
 #include<H4PCommon.h>
 #include<H4P_SerialCmd.h>
+#include<H4P_FlasherController.h>
 #include<H4P_WiFi.h>
 #include<PangolinMQTT.h>
 
@@ -49,11 +50,10 @@ class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
             struct H4P_LWT  _lwt;
             unordered_set<string>  _reportList={"bin",boardTag(),ipTag(),h4pTag(),h4UITag(),pmvTag()};
         VSCMD(_change);
-
-                void        _greenLight() override;
+                void        _badSignal(){ h4wifi.signal(". .    ",H4P_SIGNAL_TIMEBASE/2); }
+                void        _greenLight() override {}; //do not autostart!
                 void        _hookIn() override;
                 void        _setup();
-                void        _signal();
                 void        _start() override;
                 bool        _state() override { return PANGO::TCP; } // wrong!!!
                 void        _stop() override;
@@ -87,7 +87,6 @@ class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
                 void        report();
                 void        subscribeDevice(string topic,H4_FN_MSG f,H4PC_CMD_ID root=H4PC_ROOT);
                 void        unsubscribeDevice(string topic);
-
     //          syscall only
                 void        _reply(string msg) override { publishDevice("reply",msg); }
                 void        show() override {

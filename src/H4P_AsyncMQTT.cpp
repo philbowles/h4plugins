@@ -41,50 +41,6 @@ uint32_t H4P_AsyncMQTT::_change(vector<string> vs){
     });
 }
 
-void H4P_AsyncMQTT::_greenLight(){
-//    Serial.printf("FOR FUX ACHE %d\n",WiFi.getMode());
-    if(WiFi.getMode()==WIFI_STA) {
-        _setup();
-
-        onError(onMQTTError);
-
-        onMessage([this](const char* topic, const uint8_t* payload, size_t length, uint8_t qos, bool retain,bool dup){
-            h4.queueFunction(
-                bind([](string topic, string pload){ 
-                    h4cmd._executeCmd(CSTR(string(mqttTag()).append("/").append(topic)),pload); 
-                },string(topic),stringFromBuff((uint8_t*) payload,length)),
-            nullptr,H4P_TRID_MQMS);
-        });
-
-        onConnect([this](bool b){
-            h4.queueFunction([this](){
-                h4.cancelSingleton(H4P_TRID_MQRC);
-                _discoDone=false;
-                subscribe(CSTR(string("all").append(cmdhash())),0);
-                subscribe(CSTR(string(device+cmdhash())),0);
-                subscribe(CSTR(string(_cb[chipTag()]+cmdhash())),0);
-                subscribe(CSTR(string(_cb[boardTag()]+cmdhash())),0);
-                report();
-                _upHooks();
-                _signal();
-                H4EVENT("MQTT CNX");
-            });
-        });
-
-        onDisconnect([this](int8_t reason){
-            if(!_discoDone){
-                h4.queueFunction([this,reason](){
-                    _discoDone=true;
-                    _downHooks();
-                    _signal();
-                    H4EVENT("MQTT DCX %d",reason);
-                    if(autorestart && WiFi.status()==WL_CONNECTED) h4.every(H4MQ_RETRY,[this](){ connect(); },nullptr,H4P_TRID_MQRC,true);
-                });
-            }
-        });
-    }
-}
-
 void H4P_AsyncMQTT::_hookIn() { 
     DEPEND(wifi);
 #if H4P_USE_WIFI_AP
@@ -98,32 +54,58 @@ void H4P_AsyncMQTT::_hookIn() {
     }
     _cb.erase(mqconfTag());
 #endif
+    onError(onMQTTError);
 
-}
-
-void H4P_AsyncMQTT::_setup(){ // allow for TLS
     device=_cb[deviceTag()];
     setClientId(CSTR(device));
     if(_lwt.topic=="") {
-        _lwt.topic=CSTR(string(prefix).append(device).append("/offline"));
+        _lwt.topic=CSTR(string(prefix+device+"/offline"));
         _lwt.payload=CSTR(_cb[chipTag()]);
     }
     setWill(_lwt.topic,_lwt.QOS,_lwt.retain,_lwt.payload);
     prefix+=device+"/";
 
-    string broker=_cb[brokerTag()];
-    uint16_t port=atoi(CSTR(_cb[portTag()]));
-    if(atoi(CSTR(broker))) {
-        vector<string> vs=split(broker,".");
-        setServer(IPAddress(PARAM_INT(0),PARAM_INT(1),PARAM_INT(2),PARAM_INT(3)),port);
-    } else setServer(CSTR(broker),port);
-        
-    if(_cb[mQuserTag()]!="") setCredentials(CSTR(_cb[mQuserTag()]),CSTR(_cb[mQpassTag()])); // optimise tag()
-    
-    h4wifi._uiAdd(H4P_UIO_PMV,"Pangolin",H4P_UI_LABEL,_cb[pmvTag()]);
-    h4wifi._uiAdd(H4P_UIO_MQB,brokerTag(),H4P_UI_LABEL);
-    h4wifi._uiAdd(H4P_UIO_MQP,portTag(),H4P_UI_LABEL);
-    if(WiFi.getMode()!=WIFI_AP){
+    onMessage([this](const char* topic, const uint8_t* payload, size_t length, uint8_t qos, bool retain,bool dup){
+        h4.queueFunction(
+            bind([](string topic, string pload){ 
+                h4cmd._executeCmd(CSTR(string(mqttTag()).append("/").append(topic)),pload); 
+            },string(topic),stringFromBuff((uint8_t*) payload,length)),
+        nullptr,H4P_TRID_MQMS);
+    });
+
+    onConnect([this](bool b){
+        h4.queueFunction([this](){
+            h4wifi.signalOff();
+            h4.cancelSingleton(H4P_TRID_MQRC);
+            _discoDone=false;
+            subscribe(CSTR(string("all").append(cmdhash())),0);
+            subscribe(CSTR(string(device+cmdhash())),0);
+            subscribe(CSTR(string(_cb[chipTag()]+cmdhash())),0);
+            subscribe(CSTR(string(_cb[boardTag()]+cmdhash())),0);
+            report();
+            _upHooks();
+            h4wifi.uiSync();
+            H4EVENT("MQTT CNX");
+        });
+    });
+
+    onDisconnect([this](int8_t reason){
+        if(!_discoDone){
+            h4.queueFunction([this,reason](){
+                _badSignal();//h4wifi.signal("..    ",H4P_SIGNAL_TIMEBASE/2);
+                _discoDone=true;
+                _downHooks();
+                h4wifi.uiSync();
+                H4EVENT("MQTT DCX %d",reason);
+                if(autorestart && WiFi.status()==WL_CONNECTED) h4.every(H4MQ_RETRY,[this](){ connect(); },nullptr,H4P_TRID_MQRC,true);
+            });
+        }
+    });
+
+    if(WiFi.getMode()==WIFI_STA){
+        h4wifi._uiAdd(H4P_UIO_PMV,"Pangolin",H4P_UI_LABEL,_cb[pmvTag()]);
+        h4wifi._uiAdd(H4P_UIO_MQB,brokerTag(),H4P_UI_LABEL,"",[]{ return _cb[brokerTag()]; }); // cos we don't know it yet
+        h4wifi._uiAdd(H4P_UIO_MQP,portTag(),H4P_UI_LABEL,"",[]{ return _cb[portTag()]; }); // cos we don't know it yet
         h4wifi._uiAdd(H4P_UIO_MQTT,uppercase(mqttTag()),H4P_UI_BOOL,"",
         [this]{ return stringFromInt(_state()); },
         [this](const string& b){ 
@@ -135,11 +117,24 @@ void H4P_AsyncMQTT::_setup(){ // allow for TLS
     }
 }
 
-void H4P_AsyncMQTT::_signal(){ h4wifi.uiSync(); }
+void H4P_AsyncMQTT::_setup(){ // allow for TLS
+    string broker=_cb[brokerTag()];
+    uint16_t port=atoi(CSTR(_cb[portTag()]));
+    if(atoi(CSTR(broker))) {
+        vector<string> vs=split(broker,".");
+        setServer(IPAddress(PARAM_INT(0),PARAM_INT(1),PARAM_INT(2),PARAM_INT(3)),port);
+    } else setServer(CSTR(broker),port);
+        
+    if(_cb[mQuserTag()]!="") setCredentials(CSTR(_cb[mQuserTag()]),CSTR(_cb[mQpassTag()])); // optimise tag()
+}
 
 void H4P_AsyncMQTT::_start(){
-    autorestart=true;
-    connect();
+    if(WiFi.getMode()==WIFI_STA) {
+        _badSignal();
+        _setup();
+        autorestart=true;
+        connect();
+    }
 }
 
 void H4P_AsyncMQTT::_stop(){
@@ -154,10 +149,10 @@ void H4P_AsyncMQTT::change(const string& broker,uint16_t port,const string& user
     _cb[portTag()]=stringFromInt(port);
     _cb[mQuserTag()]=user;
     _cb[mQpassTag()]=passwd;
-
+#if H4P_USE_WIFI_AP
     _cb[mqconfTag()]=_cb[brokerTag()]+","+_cb[portTag()]+","+_cb[mQuserTag()]+","+_cb[mQpassTag()];
     h4wifi._save(mqconfTag());
-
+#endif
     _setup();
     start();
 }

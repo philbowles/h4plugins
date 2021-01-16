@@ -29,6 +29,7 @@ SOFTWARE.
 #include<H4PCommon.h>
 #include<H4P_WiFi.h>
 #include<H4P_SerialCmd.h>
+#include<H4P_FlasherController.h>
 #include<H4P_GPIOManager.h>
 #include<H4P_VerboseMessages.h>
 
@@ -59,7 +60,10 @@ void H4P_WiFi::HAL_WIFI_startSTA(){
     WiFi.begin(CSTR(_cb[ssidTag()]),CSTR(_cb[pskTag()]));
 }
 
-void H4P_WiFi::_start(){ _coreStart(); }
+void H4P_WiFi::_start(){     
+    _badSignal();
+    _coreStart();
+}
 
 void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
     switch(event) {
@@ -90,7 +94,10 @@ void H4P_WiFi::HAL_WIFI_startSTA(){
     WiFi.begin(CSTR(_cb[ssidTag()]),CSTR(_cb[pskTag()]));
 }
 
-void H4P_WiFi::_start(){ WiFi.begin(); };
+void H4P_WiFi::_start(){ 
+    _badSignal();
+    WiFi.begin();
+ };
 
 void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
 /*
@@ -193,30 +200,24 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
 			break;
 	}
 }
-
 #endif
 /*
                                                                                                  C O M M O N   F U N C T I O N S
 */
 #if H4P_USE_WIFI_AP
-//void H4P_WiFi::_coreStart(){ if(WiFi.psk()=="H4" || WiFi.psk()=="") _startAP(); }
-void H4P_WiFi::_coreStart(){ if(_cannotConnectSTA()) _startAP(); }
+    void H4P_WiFi::_coreStart(){ if(_cannotConnectSTA()) _startAP(); }
 #else
-//void H4P_WiFi::_coreStart(){ if(WiFi.psk()=="H4" || WiFi.psk()=="") h4wifi.HAL_WIFI_startSTA(); }
-void H4P_WiFi::_coreStart(){ if(_cannotConnectSTA()) h4wifi.HAL_WIFI_startSTA(); }
+    void H4P_WiFi::_coreStart(){ if(_cannotConnectSTA()) h4wifi.HAL_WIFI_startSTA(); }
 #endif
 
 void H4P_WiFi::_stop(){
-//    Serial.printf("H4P_WiFi::_stop() common\n");
     h4.cancelSingleton(H4P_TRID_HOTA);
     WiFi.mode(WIFI_OFF);
 }
 
 void H4P_WiFi::clear(){ 
-//    Serial.printf("H4P_WiFi::_clear() common\n");
-    // === eraseConfig :)
     WiFi.mode(WIFI_STA);
-    WiFi.begin("H4","H4"); // becos it wont allow "",""
+    WiFi.begin("H4","H4"); // // === eraseConfig :) becos it wont allow "",""
     show();
 	stop();
     _wipe({deviceTag(),nameTag()});
@@ -231,6 +232,7 @@ bool H4P_WiFi::_getPersistentValue(string v,string prefix){
 }
 
 void H4P_WiFi::_gotIP(){
+    signalOff();
     _discoDone=false;
     _cb[ipTag()]=WiFi.localIP().toString().c_str();
     _cb[ssidTag()]=CSTR(WiFi.SSID());
@@ -256,6 +258,7 @@ void H4P_WiFi::_gotIP(){
 }
 
 void H4P_WiFi::_hookIn(){
+    DEPEND(wink);
     _cb[chipTag()]=HAL_WIFI_chipID();
     _cb[boardTag()]=replaceAll(H4_BOARD,"ESP8266_","");
     if(!_getPersistentValue(deviceTag(),"H4-")) if(_device!="") _cb[deviceTag()]=_device;
@@ -280,50 +283,6 @@ void H4P_WiFi::_hookIn(){
     _uiAdd(H4P_UIO_H4UIV,h4UITag(),H4P_UI_LABEL);
 }
 
-uint32_t H4P_WiFi::_host(vector<string> vs){
-    return guard1(vs,[this](vector<string> vs){
-        return ([this](string h){
-            host(h); 
-            return H4_CMD_OK;
-        })(H4PAYLOAD);
-    });
-}
-
-void H4P_WiFi::_lostIP(){
-    h4.cancelSingleton(H4P_TRID_HOTA);
-    if(!_discoDone){
-        _stopWebserver();
-        _downHooks();
-        _discoDone=true;
-    }
-}
-
-void H4P_WiFi::_setPersistentValue(string n,string v,bool reboot){
-    if(_cb[n]!=v){
-        H4P_SerialCmd::write("/"+n,v);
-        if(reboot) h4reboot();
-    }
-}
-
-void H4P_WiFi::change(string ssid,string psk){ // add device / name?
-    stop();
-    _cb[ssidTag()]=ssid;
-    _cb[pskTag()]=psk;
-    HAL_WIFI_startSTA();
-    h4reboot();
-}
-/*
- ex asws
-*/
-/*
-void  H4P_WiFi::_hookIn(){ 
-    DEPEND(wifi);
-    H4Plugin* p=isLoaded(onofTag());
-    if(p) _btp=reinterpret_cast<H4P_BinaryThing*>(p);
-    if(isLoaded(gpioTag())) h4cmd.addCmd("gpio",_subCmd,0,CMDVS(_gpio));
-//    if(!HAL_FS.exists(CSTR(string("/"+string(h4UITag()))))) Serial.printf("FATAL: No webUI files!!!\n");
-}
-*/
 uint32_t H4P_WiFi::_gpio(vector<string> vs){
     return guard1(vs,[this](vector<string> vs){
         if(H4PAYLOAD=="all") uiAddGPIO();
@@ -336,11 +295,32 @@ uint32_t H4P_WiFi::_gpio(vector<string> vs){
     });
 }
 
+uint32_t H4P_WiFi::_host(vector<string> vs){
+    return guard1(vs,[this](vector<string> vs){
+        return ([this](string h){
+            host(h); 
+            return H4_CMD_OK;
+        })(H4PAYLOAD);
+    });
+}
+
+void H4P_WiFi::_lostIP(){
+    h4.cancelSingleton(H4P_TRID_HOTA);
+    if(!_discoDone) _stopWebserver();
+}
+
 uint32_t H4P_WiFi::_msg(vector<string> vs){
     return guard1(vs,[this](vector<string> vs){
         uiMessage(H4PAYLOAD);
         return H4_CMD_OK;
     });
+}
+
+void H4P_WiFi::_setPersistentValue(string n,string v,bool reboot){
+    if(_cb[n]!=v){
+        H4P_SerialCmd::write("/"+n,v);
+        if(reboot) h4reboot();
+    }
 }
 
 H4_CMD_ERROR H4P_WiFi::__uichgCore(const string& a,const string& b,H4P_FN_UICHANGE chg){
@@ -396,7 +376,7 @@ void H4P_WiFi::_rest(AsyncWebServerRequest *request){
         H4EVENT("_rest %s",request->client()->remoteIP().toString().c_str());
 		string chop=replaceAll(CSTR(request->url()),"/rest/","");
         string msg="";
-        uint32_t res=h4cmd._simulatePayload(CSTR(chop),"rest");
+        uint32_t res=h4cmd._simulatePayload(CSTR(chop),wifiTag());
         if(isLoaded(vmTag())) msg=h4vm.getErrorMessage(res);
         string j="{\"res\":"+stringFromInt(res)+",\"msg\":\""+msg+"\",\"lines\":[";
         string fl;
@@ -415,7 +395,10 @@ void H4P_WiFi::_rest(AsyncWebServerRequest *request){
 	},request),nullptr,H4P_TRID_REST);
 }
 
-void H4P_WiFi::_sendSSE(const char* name,const char* msg){ if(_evts && _evts->count()) _evts->send(msg,name,_evtID); }
+void H4P_WiFi::_sendSSE(const char* name,const char* msg){
+    static uint32_t _evtID=0;
+    if(_evts && _evts->count()) _evts->send(msg,name,_evtID++);
+}
 
 void H4P_WiFi::_startWebserver(){
 	reset();
@@ -441,7 +424,7 @@ void H4P_WiFi::_startWebserver(){
 
     on("/",HTTP_GET, [this](AsyncWebServerRequest *request){
         H4EVENT("Root %s",request->client()->remoteIP().toString().c_str());
-        request->send(HAL_FS,"/sta.htm",String(),false,aswsReplace);
+        request->send(HAL_FS,"/sta.htm",String(),false,_aswsReplace);
     });
 
 	on("/rest",HTTP_GET,[this](AsyncWebServerRequest *request){ _rest(request); });
@@ -450,12 +433,29 @@ void H4P_WiFi::_startWebserver(){
     begin();
 }
 
-void H4P_WiFi::_stopWebserver(){ end(); }
+void H4P_WiFi::_stopWebserver(){ 
+    _badSignal();
+    end();
+    _downHooks();
+    _discoDone=true;
+}
 
-String H4P_WiFi::aswsReplace(const String& var){
+String H4P_WiFi::_aswsReplace(const String& var){
     string v=CSTR(var);
     return _cb.count(v) ? String(CSTR(_cb[v])):"?";
 }
+
+void H4P_WiFi::change(string ssid,string psk){ // add device / name?
+    stop();
+    _cb[ssidTag()]=ssid;
+    _cb[pskTag()]=psk;
+    HAL_WIFI_startSTA();
+    h4reboot();
+}
+
+void H4P_WiFi::signal(const char* pattern,uint32_t timebase){ h4fc.flashMorse(pattern,timebase,H4P_SIGNAL_LED,H4P_SIGNAL_SENSE); }
+
+void H4P_WiFi::signalOff(){ h4fc.stopLED(H4P_SIGNAL_LED); }
 
 void H4P_WiFi::uiAddDropdown(const string& name,H4P_CONFIG_BLOCK options,H4P_FN_UICHANGE onChange){
     string opts="";
