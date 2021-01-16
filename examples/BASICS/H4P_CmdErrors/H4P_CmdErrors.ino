@@ -1,7 +1,7 @@
 #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,5,false) // Serial baud rate, Q size, SerialCmd autostop
 
-H4P_CmdErrors h4ce; // must be created BEFORE any other plugins
+H4P_VerboseMessages h4vm; // must be created BEFORE any other plugins
 H4P_SerialLogger h4sl; // not essential but helps to see whats going on
 
 /*
@@ -26,7 +26,7 @@ H4P_SerialLogger h4sl; // not essential but helps to see whats going on
 
 */
 void h4setup() { // H4 constructor starts Serial
-    Serial.println("H4P_CmdErrors Example v"H4P_VERSION);
+    Serial.println("H4P_VerboseMessages Example v"H4P_VERSION);
 
     h4.every(1000,[]{}); // do nothing, but have something in Q to see!
     
@@ -37,7 +37,7 @@ void h4setup() { // H4 constructor starts Serial
     h4cmd.showQ(); // same as above but more efficient
 
     uint32_t  errorCode=h4cmd.invokeCmd("bogus/nonsense");
-    if(errorCode) Serial.println((h4ce.getErrorMessage(errorCode)).c_str());
+    if(errorCode) Serial.println((h4vm.getErrorMessage(errorCode)).c_str());
     Serial.println("Show all caused by call to all()");
     h4cmd.all(); // show everything
 }

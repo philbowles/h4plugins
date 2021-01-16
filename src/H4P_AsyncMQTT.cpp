@@ -27,19 +27,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_AsyncMQTT.h>
-#include<H4P_AsyncWebServer.h>
+#include<H4P_WiFi.h>
 
 void __attribute__((weak)) onMQTTError(uint8_t e,int info){ SYSEVENT(H4P_LOG_MQTT_ERROR,mqttTag(),h4Tag(),"e=%d info=%d",e,info); }
 
 uint32_t H4P_AsyncMQTT::_change(vector<string> vs){
-    return guardString2(vs,[this](string a,string b){ 
-        if(isNumeric(b)) change(a,atoi(CSTR(b)));
-        else return H4_CMD_NOT_NUMERIC;
+    return guard1(vs,[this](vector<string> vs){
+        auto vg=split(H4PAYLOAD,",");
+        if(vg.size()!=4) return H4_CMD_PAYLOAD_FORMAT;
+        if(!isNumeric(vg[1])) return H4_CMD_NOT_NUMERIC;
+        change(vg[0],STOI(vg[1]),vg[2],vg[3]); // change this to a vs?
+        return H4_CMD_OK;
     });
 }
 
 void H4P_AsyncMQTT::_greenLight(){
-    Serial.printf("FOR FUX ACHE %d\n",WiFi.getMode());
+//    Serial.printf("FOR FUX ACHE %d\n",WiFi.getMode());
     if(WiFi.getMode()==WIFI_STA) {
         _setup();
 
@@ -117,30 +120,26 @@ void H4P_AsyncMQTT::_setup(){ // allow for TLS
         
     if(_cb[mQuserTag()]!="") setCredentials(CSTR(_cb[mQuserTag()]),CSTR(_cb[mQpassTag()])); // optimise tag()
     
-    if(isLoaded(aswsTag())){
-        h4asws._uiAdd(H4P_UIO_PMV,"Pangolin",H4P_UI_LABEL,_cb[pmvTag()]);
-        h4asws._uiAdd(H4P_UIO_MQB,brokerTag(),H4P_UI_LABEL);
-        h4asws._uiAdd(H4P_UIO_MQP,portTag(),H4P_UI_LABEL);
-        if(WiFi.getMode()!=WIFI_AP){
-            h4asws._uiAdd(H4P_UIO_MQTT,uppercase(mqttTag()),H4P_UI_BOOL,"",
-            [this]{ return stringFromInt(_state()); },
-            [this](const string& b){ 
-                if(b=="1") _start();
-                else _stop();
-                H4EVENT("MQTT %s by user",b=="1" ? "Started":"Stopped");
-                if(isLoaded(aswsTag())) h4asws.uiMessage("MQTT %s by user",b=="1" ? "Started":"Stopped");
-            });
-        }
+    h4wifi._uiAdd(H4P_UIO_PMV,"Pangolin",H4P_UI_LABEL,_cb[pmvTag()]);
+    h4wifi._uiAdd(H4P_UIO_MQB,brokerTag(),H4P_UI_LABEL);
+    h4wifi._uiAdd(H4P_UIO_MQP,portTag(),H4P_UI_LABEL);
+    if(WiFi.getMode()!=WIFI_AP){
+        h4wifi._uiAdd(H4P_UIO_MQTT,uppercase(mqttTag()),H4P_UI_BOOL,"",
+        [this]{ return stringFromInt(_state()); },
+        [this](const string& b){ 
+            if(b=="1") _start();
+            else _stop();
+            H4EVENT("MQTT %s by user",b=="1" ? "Started":"Stopped");
+            h4wifi.uiMessage("MQTT %s by user",b=="1" ? "Started":"Stopped");
+        });
     }
 }
 
-void H4P_AsyncMQTT::_signal(){ if(isLoaded(aswsTag())) h4asws.uiSync(); }
+void H4P_AsyncMQTT::_signal(){ h4wifi.uiSync(); }
 
 void H4P_AsyncMQTT::_start(){
-//    if(WiFi.getMode()!=WIFI_AP){
-        autorestart=true;
-        connect();
-//    } else Serial.printf("DONT COME UP IN AP MODE!!!");
+    autorestart=true;
+    connect();
 }
 
 void H4P_AsyncMQTT::_stop(){
@@ -148,10 +147,17 @@ void H4P_AsyncMQTT::_stop(){
     disconnect(true);
 }
 
-void H4P_AsyncMQTT::change(const string& broker,uint16_t port){ // add creds
+void H4P_AsyncMQTT::change(const string& broker,uint16_t port,const string& user,const string& passwd){ // add creds
+    H4EVENT("MQTT change to %s:%d user=%s",CSTR(broker),port,CSTR(user));
     H4Plugin::stop();
     _cb[brokerTag()]=broker;
     _cb[portTag()]=stringFromInt(port);
+    _cb[mQuserTag()]=user;
+    _cb[mQpassTag()]=passwd;
+
+    _cb[mqconfTag()]=_cb[brokerTag()]+","+_cb[portTag()]+","+_cb[mQuserTag()]+","+_cb[mQpassTag()];
+    h4wifi._save(mqconfTag());
+
     _setup();
     start();
 }

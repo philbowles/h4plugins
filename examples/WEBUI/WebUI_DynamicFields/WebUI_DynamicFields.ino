@@ -9,7 +9,7 @@ H4_TIMER  T1;
 
 void onViewers(){
   Serial.printf("Ever get that feeling someone is watching you?\n");
-  T1=h4.every(1000,[](){ h4asws.uiSync(); });
+  T1=h4.every(1000,[](){ h4wifi.uiSync(); });
 }
 // Release global resources when ui is no longer required as all browsers closed
 void onNoViewers(){ h4.cancel(T1); }
@@ -27,13 +27,12 @@ string upTime(){
 }
 
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","uidynamic");
-H4P_AsyncWebServer h4asws(onViewers,onNoViewers);
 
 void h4setup(){ 
-    h4asws.uiAddLabel("Static Text 2",runtimeText);  
-    h4asws.uiAddLabel("Static int 2",derivedInt);  
-    h4asws.uiAddLabel("Heap",[](){ return ESP.getFreeHeap(); });  
-    h4asws.uiAddLabel("Millis",millis);  
-    h4asws.uiAddLabel("Uptime",upTime);
-    h4asws.uiAddBoolean("Random Bool",randomBool); 
+    h4wifi.uiAddLabel("Static Text 2",runtimeText);  
+    h4wifi.uiAddLabel("Static int 2",derivedInt);  
+    h4wifi.uiAddLabel("Heap",[](){ return ESP.getFreeHeap(); });  
+    h4wifi.uiAddLabel("Millis",millis);  
+    h4wifi.uiAddLabel("Uptime",upTime);
+    h4wifi.uiAddBoolean("Random Bool",randomBool); 
 }

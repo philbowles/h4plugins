@@ -80,7 +80,7 @@ class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
             };
         }
                 void        addReportingItem(const string& ri){ _reportList.insert(ri); }
-                void        change(const string& broker,uint16_t port);
+                void        change(const string& broker,uint16_t port,const string& user,const string& passwd);
 
                 void        publishDevice(const string& topic,const string& payload,uint8_t qos=0, bool retain=false){ xPublish(CSTR(string(prefix+topic)),payload,qos,retain); }
                 void        publishDevice(const string& topic,uint32_t payload,uint8_t qos=0, bool retain=false){ publishDevice(topic,stringFromInt(payload),qos,retain); }

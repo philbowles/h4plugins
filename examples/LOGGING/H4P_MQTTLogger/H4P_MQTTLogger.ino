@@ -20,10 +20,6 @@ void onMQTTDisconnect(){
 
 H4P_AsyncMQTT h4mqtt("192.168.1.4",1883,"","",onMQTTConnect,onMQTTDisconnect);
 
-H4P_AsyncWebServer h4asws;
-
-
-
 void h4setup(){
     h4UserEvent("Log tester %d",666); // like printf
 }

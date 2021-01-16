@@ -27,15 +27,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_Heartbeat.h>
-#include<H4P_AsyncWebServer.h>
+#include<H4P_WiFi.h>
 
 uint32_t            H4P_Heartbeat::_uptime=0;
 
-void H4P_Heartbeat::_hookIn() {
-    if(isLoaded(aswsTag())) {
-        if(WiFi.getMode()!=WIFI_AP) h4asws._uiAdd(H4P_UIO_UP,"uptime",H4P_UI_LABEL,"",upTime);
-    }
-}
+void H4P_Heartbeat::_hookIn() { if(WiFi.getMode()!=WIFI_AP) h4wifi._uiAdd(H4P_UIO_UP,"uptime",H4P_UI_LABEL,"",upTime); }
 
 void H4P_Heartbeat::_start() {
     if(WiFi.getMode()!=WIFI_AP) {
@@ -57,7 +53,7 @@ void H4P_Heartbeat::_run(){
     if(!(now%1000) && nowsec!=_uptime) {
         if(_bf) _bf();
         _uptime=nowsec;
-        if(isLoaded(aswsTag())) h4asws.uiSync();
+        h4wifi.uiSync();
     }
 }
 

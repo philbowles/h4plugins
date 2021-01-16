@@ -8,7 +8,7 @@ Optional: Allows you to "tag" your tasks with a name* so that you can find them
     *keep it to 4 chs or the columns won't line up
 
 */
-H4P_CmdErrors h4ce;
+H4P_VerboseMessages h4vm;
 
 const char* giveTaskName(uint32_t n){
   static H4_INT_MAP mydata={

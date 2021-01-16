@@ -87,7 +87,7 @@ void onNoViewers(void); // no viewers: cancel timers, clean up resources etc
 void onUiChange(const string& name,const string& ref value); // called when user item <name> changes value
 ```
 
-H4P_AsyncWebserver is a "wrapper" around the [ESPAsyncWebServer](https://github.com/philbowles/ESPAsyncWebServer) library and therefore any functions offered by that library can be called on `h4asws.` for example `h4.asws.on(...)` to add your own handler.
+H4P_AsyncWebserver is a "wrapper" around the [ESPAsyncWebServer](https://github.com/philbowles/ESPAsyncWebServer) library and therefore any functions offered by that library can be called on `h4wifi.` for example `h4.asws.on(...)` to add your own handler.
 
 Do not register a handler for any of the following paths:
 
@@ -172,8 +172,8 @@ When "prettified" it looks like this:
 }
 ```
 
-* `res` is the response code [List](h4ce.md)
-* `msg` is the corresponding error message if [H4P_CmdErrors](h4ce.md) is used
+* `res` is the response code [List](h4vm.md)
+* `msg` is the corresponding error message if [H4P_VerboseMessages](h4vm.md) is used
 * `lines` is an array of the same output that would have been sent a line at a time to the serial console
 
 ---

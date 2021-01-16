@@ -14,7 +14,7 @@ class myLogger: public H4PLogService {
 
 
 
-H4P_CmdErrors h4ce;
+H4P_VerboseMessages h4vm;
 
 
 //H4P_SerialLogger h4sl;

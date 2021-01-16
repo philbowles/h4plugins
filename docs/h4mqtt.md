@@ -122,7 +122,7 @@ You may wonder why you get a `vector<string>` when there is only 1 item: the pay
 
 No matter how many parts there are to the message, the payload is always the last item. To make life easier H4 has macros `H4PAYLOAD` if you are expecting a string and `H4PAYLOAD_INT` if you are expecting a number.
 
-Your callback then "does it thing" but *must* return a value showing if it succeeded or not. It can be any of the following [List](h4ce.md)
+Your callback then "does it thing" but *must* return a value showing if it succeeded or not. It can be any of the following [List](h4vm.md)
 
 ## Simple example
 

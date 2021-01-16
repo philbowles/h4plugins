@@ -66,7 +66,7 @@ function uiItem(d,h="uhang"){
                 source.addEventListener(n, function(e){ redgreen(n,parseInt(e.data)); });
                 if(a) {
                     valu.addEventListener("click", function(e){ 
-                        ajax("h4/asws/uichg/"+n+","+(valu.classList.value.indexOf("red")==-1 ? 0:1)) },
+                        ajax("h4/wifi/uichg/"+n+","+(valu.classList.value.indexOf("red")==-1 ? 0:1)) },
                         {capture: true});
                     title.classList.add("tuia");
                 }
@@ -76,7 +76,7 @@ function uiItem(d,h="uhang"){
                 valu.addEventListener("blur", function(e){
                     if(valu.value!=v) {
                         v=valu.value;
-                        ajax("h4/asws/uichg/"+n+","+v.replace("http://",""))
+                        ajax("h4/wifi/uichg/"+n+","+v.replace("http://",""))
                     }
                 },{capture: true});
                 title.classList.add("tuia");
@@ -94,7 +94,7 @@ function uiItem(d,h="uhang"){
                     valu.appendChild(opt);
                 })
                 valu.addEventListener("change", function(e){ 
-                    ajax("h4/asws/uichg/"+n+","+valu.value) },
+                    ajax("h4/wifi/uichg/"+n+","+valu.value) },
                     {capture: true});
                 title.classList.add("tuia");
                 valu.classList.add("tuia");

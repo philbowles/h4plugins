@@ -7,7 +7,7 @@ H4_USE_PLUGINS(115200,5,false) // Serial baud rate, Q size, SerialCmd autostop
   #define D5 25
 #endif
 
-H4P_CmdErrors h4ce;
+H4P_VerboseMessages h4vm;
 
 
 H4P_ExternalSqWave h4esw(D6,D5,100,50); // start @ F=100Hz, DC = 50% 

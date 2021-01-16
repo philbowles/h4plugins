@@ -21,7 +21,6 @@ H4P_GPIOManager h4gm;
 H4P_FlasherController h4fc;
 H4P_WiFi h4wifi(WIFI_SSID,WIFI_PASS);
 H4P_AsyncMQTT h4mqtt(MQTT_SERVER,MQTT_PORT);
-H4P_AsyncWebServer h4asws;
 H4P_BinarySwitch h4onof(RELAY_BUILTIN,ACTIVE_HIGH,OFF);
 H4P_UPNPServer h4upnp; // friendly name defaults to "upnp <chip id>"
 H4P_MultiFunctionButton h4mfb(BUTTON_BUILTIN,INPUT,ACTIVE_LOW,15,LED_BUILTIN,ACTIVE_LOW);

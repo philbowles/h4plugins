@@ -14,7 +14,7 @@ H4P_USE_PLUGINS KEYWORD1
 #######################################
 
 H4Plugin	KEYWORD1
-H4P_CmdErrors	KEYWORD1
+H4P_VerboseMessages	KEYWORD1
 H4P_SerialCmd	KEYWORD1
 H4P_SerialLogger	KEYWORD1
 H4P_TaskSniffer	KEYWORD1
@@ -23,7 +23,6 @@ H4P_GPIOManager	KEYWORD1
 H4P_FlasherController	KEYWORD1
 H4P_PersistentStorage	KEYWORD1
 H4P_WiFi	KEYWORD1
-H4P_AsyncWebServer	KEYWORD1
 H4P_AsyncMQTT	KEYWORD1
 H4P_LocalLogger	KEYWORD1
 H4P_MQTTLogger	KEYWORD1

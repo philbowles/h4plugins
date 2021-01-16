@@ -27,12 +27,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_BinaryThing.h>
-#include<H4P_AsyncWebServer.h>
 #include<H4P_AsyncMQTT.h>
 
 void H4P_BinaryThing::_hookIn() {
     HOOK_IF_LOADED(mqtt);
-    if(isLoaded(aswsTag())) if(WiFi.getMode()!=WIFI_AP) h4asws._uiAdd(H4P_UIO_ONOF,onofTag(),H4P_UI_ONOF,"",[this]{ return stringFromInt(state()); });
+    if(WiFi.getMode()!=WIFI_AP) h4wifi._uiAdd(H4P_UIO_ONOF,onofTag(),H4P_UI_ONOF,"",[this]{ return stringFromInt(state()); });
 }
 
 void H4P_BinaryThing::_publish(bool b){ if(isLoaded(mqttTag())) h4mqtt.publishDevice(stateTag(),b); }
@@ -48,7 +47,7 @@ void H4P_BinaryThing::_setState(bool b) {
     _state=b;
     _cb[stateTag()]=stringFromInt(b);
     _setSlaves(b);
-    if(isLoaded(aswsTag())) h4asws.uiSync(); //h4asws.uiSync(onofTag());}
+    h4wifi.uiSync(); //h4wifi.uiSync(onofTag());}
 }
 
 uint32_t H4P_BinaryThing::_slave(vector<string> vs){
@@ -104,15 +103,15 @@ void H4P_BinaryThing::turn(bool b){
 //      H4P_ConditionalThing
 //
 void H4P_ConditionalThing::_hookIn() {
-    if(isLoaded(aswsTag())) h4asws._uiAdd(H4P_UI_COND,conditionTag(),H4P_UI_BOOL,"",[this]{ return stringFromInt(_predicate(state())); });
+    h4wifi._uiAdd(H4P_UI_COND,conditionTag(),H4P_UI_BOOL,"",[this]{ return stringFromInt(_predicate(state())); });
     H4P_BinaryThing::_hookIn();
 }
 
 void H4P_ConditionalThing:: _setState(bool b) { 
     if(_predicate(b)) H4P_BinaryThing::_setState(b);
-    else if(isLoaded(aswsTag())) h4asws.uiMessage("Unable: condition disarmed");
+    else h4wifi.uiMessage("Unable: condition disarmed");
 }
 
-void H4P_ConditionalThing::syncCondition() { if(isLoaded(aswsTag())) h4asws._sendSSE(conditionTag(),CSTR(stringFromInt(_predicate(state())))); }
+void H4P_ConditionalThing::syncCondition() { h4wifi._sendSSE(conditionTag(),CSTR(stringFromInt(_predicate(state())))); }
 
 #endif

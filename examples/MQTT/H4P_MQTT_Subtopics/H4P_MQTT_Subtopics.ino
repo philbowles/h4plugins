@@ -17,7 +17,7 @@ void onMQTTDisconnect(){
 
 
 
-H4P_CmdErrors h4ce;
+H4P_VerboseMessages h4vm;
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","testbed");
 H4P_AsyncMQTT h4mqtt("192.168.1.4",1883,"","",onMQTTConnect,onMQTTDisconnect); // no username / pword
 

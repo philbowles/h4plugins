@@ -26,7 +26,7 @@ h4/some/cmd/with/many/levels/42,666
 
 The payload is "42,666" and the command is handled exactly the same way as an MQTT command with a topic of `h4/some/cmd/with/many/levels` and  payload of "42,666"
 
-This allows a consistent interface for all command handling irrespective of the source. See the [**H4P_AsyncWebServer** (http "REST")](h4asws.md) and [**H4P_AsyncMQTT**](h4mqtt.md) plugins for examples of this in action.
+This allows a consistent interface for all command handling irrespective of the source. See the [**H4P_AsyncWebServer** (http "REST")](h4wifi.md) and [**H4P_AsyncMQTT**](h4mqtt.md) plugins for examples of this in action.
 
 The following external events all cause the same action: rebooting the device
 
@@ -70,7 +70,7 @@ H4P_SerialCmd h4cmd(... // optional autoStop true/false parameter: true=peforman
 
 ## Dependencies
 
-none, but when preceded by [H4P_CmdErrors](h4ce.md) numeric codes are translated to meaningful messages
+none, but when preceded by [H4P_VerboseMessages](h4vm.md) numeric codes are translated to meaningful messages
 
 ---
 
@@ -118,7 +118,7 @@ If there is no "sensible" alternative then the "Silent failure" rule applies.
 
 #### Error Codes
 
-Meaningful error messages will only be shown if the [**H4P_CmdErrors**](h4ce.md) plugin is also loaded. (If it is, then it must be loaded *before* SerialCmd)
+Meaningful error messages will only be shown if the [**H4P_VerboseMessages**](h4vm.md) plugin is also loaded. (If it is, then it must be loaded *before* SerialCmd)
 Otherwise a simple code is returned:
 
 ```cpp
@@ -144,7 +144,7 @@ Otherwise a simple code is returned:
 * h4/svc/state/scmd 
 * h4/svc/stop/scmd 
 * 
-SerialCmd can be safely stopped - it will continue to provide command functionality to other plugins that depend upon it. e.g. [**H4P_AsyncWebServer** (http "REST")](h4asws.md) and [**H4P_AsyncMQTT**](h4mqtt.md) but it will no longer accept serial commands on its own behalf. Thus it can only be done once from the serial console*. Unloading `scmd` will show a huge performance improvement (+50% ish), so it is worth considering once testing is complete, especially for devices that will be deployed remotely and will never be able to recive serial commands. (see autoStop parameter below)
+SerialCmd can be safely stopped - it will continue to provide command functionality to other plugins that depend upon it. e.g. [**H4P_AsyncWebServer** (http "REST")](h4wifi.md) and [**H4P_AsyncMQTT**](h4mqtt.md) but it will no longer accept serial commands on its own behalf. Thus it can only be done once from the serial console*. Unloading `scmd` will show a huge performance improvement (+50% ish), so it is worth considering once testing is complete, especially for devices that will be deployed remotely and will never be able to recive serial commands. (see autoStop parameter below)
 
 (* It can be restarted remotely, e.g. via MQTT or http/REST)
 
@@ -235,7 +235,7 @@ Shows all commands available across all installed plugins
 
 Shows a list of all currently loaded plugins/service
 
-Some plugins depend on others ( see for example [**H4P_CmdErrors**](h4ce.md) ), The plugin shortname is the identifier that plugins use to see which other plugins are installed.
+Some plugins depend on others ( see for example [**H4P_VerboseMessages**](h4vm.md) ), The plugin shortname is the identifier that plugins use to see which other plugins are installed.
 
 ---
 

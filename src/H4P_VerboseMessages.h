@@ -27,13 +27,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_CmdErrors_HO
-#define H4P_CmdErrors_HO
+#ifndef H4P_VerboseMessages_HO
+#define H4P_VerboseMessages_HO
 
 #include<H4PCommon.h>
 
 extern const char* giveTaskName(uint32_t id);
-class H4P_CmdErrors: public H4Plugin {
+class H4P_VerboseMessages: public H4Plugin {
         H4_INT_MAP  cmdErrors={
             {H4_CMD_OK,"OK"},
             {H4_CMD_UNKNOWN,"Unknown cmd"},
@@ -87,7 +87,7 @@ class H4P_CmdErrors: public H4Plugin {
             {H4P_TRID_WFAP,"WFAP"},
             {H4P_TRID_MQMS,"MQMS"},
             {H4P_TRID_MQRC,"MQRC"},
-            {H4P_TRID_ASWS,aswsTag()},
+            {H4P_TRID_REST,"REST"},
             {H4P_TRID_SOAP,"SOAP"},
             {H4P_TRID_UDPM,"UDPM"},
             {H4P_TRID_UDPS,"UDPS"},
@@ -108,7 +108,7 @@ class H4P_CmdErrors: public H4Plugin {
         };
         virtual void        _greenLight(){ start(); }
     public:
-        H4P_CmdErrors(): H4Plugin(cerrTag()) {}
+        H4P_VerboseMessages(): H4Plugin(vmTag()) {}
 
         string      getErrorMessage(uint32_t e){
             return cmdErrors.count(e) ? cmdErrors[e]:string("No such error (")+stringFromInt(e)+")";
@@ -127,6 +127,6 @@ class H4P_CmdErrors: public H4Plugin {
         }
 };
 
-extern __attribute__((weak)) H4P_CmdErrors h4ce;
+extern __attribute__((weak)) H4P_VerboseMessages h4vm;
 
-#endif // H4P_CmdErrors_H
+#endif // H4P_VerboseMessages_H

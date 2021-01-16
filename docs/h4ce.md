@@ -41,7 +41,7 @@ Merely installing the plugin before any other automatically provides the transla
 ```cpp
 #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
-H4P_CmdErrors h4ce; // must be created BEFORE any others
+H4P_VerboseMessages h4vm; // must be created BEFORE any others
 
 
 ```
@@ -64,7 +64,7 @@ string  getTaskType(uint32_t taskType);
 string  getTaskName(uint32_t taskId); // any taskId
 ```
 
-[Example Code](../examples/BASICS/H4P_CmdErrors/H4P_CmdErrors.ino)
+[Example Code](../examples/BASICS/H4P_VerboseMessages/H4P_VerboseMessages.ino)
 
 ---
 

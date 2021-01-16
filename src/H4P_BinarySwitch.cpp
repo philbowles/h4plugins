@@ -27,17 +27,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_BinarySwitch.h>
-#include<H4P_AsyncWebServer.h>
+#include<H4P_WiFi.h>
 
-void H4P_ConditionalSwitch::syncCondition(){ if(isLoaded(aswsTag())) h4asws._sendSSE(conditionTag(),CSTR(stringFromInt(_predicate(state())))); }
+void H4P_ConditionalSwitch::syncCondition(){ h4wifi._sendSSE(conditionTag(),CSTR(stringFromInt(_predicate(state())))); }
 
 void H4P_ConditionalSwitch::_hookIn() {
     REQUIRE(gpio);
     H4P_BinarySwitch::_hookIn();
-    if(isLoaded(aswsTag())) h4asws._uiAdd(H4P_UIO_COND,conditionTag(),H4P_UI_BOOL,"",[this]{ return stringFromInt(_predicate(state())); });
+    h4wifi._uiAdd(H4P_UIO_COND,conditionTag(),H4P_UI_BOOL,"",[this]{ return stringFromInt(_predicate(state())); });
 }
 
 void H4P_ConditionalSwitch::_setState(bool b) { 
     if(_predicate(b)) H4P_BinarySwitch::_setState(b);
-    else if(isLoaded(aswsTag())) h4asws.uiMessage("Unable: condition disarmed");
+    else h4wifi.uiMessage("Unable: condition disarmed");
 }

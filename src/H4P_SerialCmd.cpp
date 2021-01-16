@@ -27,7 +27,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_SerialCmd.h>
-#include<H4P_CmdErrors.h>
+#include<H4P_VerboseMessages.h>
 
 H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Plugin(scmdTag()){
     _cmds={
@@ -80,7 +80,7 @@ uint32_t H4P_SerialCmd::_dispatch(vector<string> vs,uint32_t owner=0){
     } else return H4_CMD_UNKNOWN;
 }
 
-string H4P_SerialCmd::_errorString(uint32_t err){ return isLoaded(cerrTag()) ? h4ce.getErrorMessage(err):"Error: "+stringFromInt(err); }
+string H4P_SerialCmd::_errorString(uint32_t err){ return isLoaded(vmTag()) ? h4vm.getErrorMessage(err):"Error: "+stringFromInt(err); }
 
 uint32_t H4P_SerialCmd::_executeCmd(string topic, string pload){
 	vector<string> vs=split(CSTR(topic),"/");
@@ -225,15 +225,15 @@ void H4P_SerialCmd::all(){
 // ifdef log events?
 const char* __attribute__((weak)) giveTaskName(uint32_t id){ return "ANON"; }
 string H4P_SerialCmd::_dumpTask(task* t){
-    H4Plugin* p=isLoaded(cerrTag()); // v inefficient, but, hey!
+    H4Plugin* p=isLoaded(vmTag()); // v inefficient, but, hey!
 
     char buf[128];
     uint32_t type=t->uid/100;
     uint32_t id=t->uid%100;
     sprintf(buf,"%09lu %s/%s %s %9d %9d %9d",
         t->at,
-        p ? CSTR(h4ce.getTaskType(type)):CSTR(stringFromInt(type,"%04u")),
-        p ? CSTR(h4ce.getTaskName(id)):CSTR(stringFromInt(id,"%04u")),
+        p ? CSTR(h4vm.getTaskType(type)):CSTR(stringFromInt(type,"%04u")),
+        p ? CSTR(h4vm.getTaskName(id)):CSTR(stringFromInt(id,"%04u")),
         t->singleton ? "S":" ",
         t->rmin,
         t->rmax,

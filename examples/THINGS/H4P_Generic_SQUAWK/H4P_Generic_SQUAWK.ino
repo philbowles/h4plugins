@@ -28,7 +28,6 @@ H4P_GPIOManager h4gm;
 H4P_FlasherController h4fc;
 H4P_WiFi h4wifi(WIFI_SSID,WIFI_PASS);
 H4P_AsyncMQTT h4mqtt(MQTT_SERVER,MQTT_PORT,MQTT_USER,MQTT_PASS,onMQTTConnect,onMQTTDisconnect);
-H4P_AsyncWebServer h4asws;
 H4P_ConditionalSwitch h4onof(SQUAWK,ACTIVE_HIGH,OFF,[](bool){ return armed; });
 H4P_UPNPServer h4upnp;
 H4P_RemoteUpdate h4ru(REMOTE_UPDATE_URL,__FILE__);

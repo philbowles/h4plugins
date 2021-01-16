@@ -29,9 +29,14 @@ SOFTWARE.
 #include<H4PCommon.h>
 #include<H4P_WiFi.h>
 #include<H4P_SerialCmd.h>
-#include<H4P_AsyncWebserver.h>
+#include<H4P_GPIOManager.h>
+#include<H4P_VerboseMessages.h>
 
 STAG(tcp)
+
+void __attribute__((weak)) onUiChange(const string& name,const string& value){ h4UserEvent("onUiChange %s now=%s",CSTR(name),CSTR(value)); }
+void __attribute__((weak)) onViewers(){}
+void __attribute__((weak)) onNoViewers(){}
 
 /*
                                              H / W - D E P E N D E N T   F U N C T I O N S
@@ -42,19 +47,19 @@ STAG(tcp)
 //
 string H4P_WiFi::HAL_WIFI_chipID(){ return stringFromInt(ESP.getChipId(),"%06X"); }
 
+void H4P_WiFi::HAL_WIFI_disconnect(){ WiFi.disconnect(false); }// prb 32 only: abandon curretn blank attempt or no scan possible
+
 void H4P_WiFi::HAL_WIFI_setHost(const string& host){ WiFi.hostname(CSTR(host)); } // change ????
 
 void H4P_WiFi::HAL_WIFI_startSTA(){
-    WiFi.mode(WIFI_STA);
-    WiFi.enableAP(false); 
+    WiFi.mode(WIFI_STA); // poss lose?
 	WiFi.setSleepMode(WIFI_NONE_SLEEP);
 	WiFi.setAutoConnect(true);
 	WiFi.setAutoReconnect(true);
-    Serial.printf("HAL_WIFI_startSTA %s %s\n",CSTR(_cb[ssidTag()]),CSTR(_cb[pskTag()]));
     WiFi.begin(CSTR(_cb[ssidTag()]),CSTR(_cb[pskTag()]));
 }
 
-void H4P_WiFi::_start(){ Serial.printf("H4P_WiFi::_start() 8266\n"); _coreStart(); }
+void H4P_WiFi::_start(){ _coreStart(); }
 
 void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
     switch(event) {
@@ -75,27 +80,20 @@ string H4P_WiFi::HAL_WIFI_chipID(){
     uint64_t macAddressTrunc = macAddress << 40;
     return stringFromInt(macAddressTrunc >> 40,"%06X");
 }
+void H4P_WiFi::HAL_WIFI_disconnect(){ WiFi.disconnect(false,false); }// prb 32 only: abandon curretn blank attempt or no scan possible
 
 void H4P_WiFi::HAL_WIFI_setHost(const string& host){ WiFi.setHostname(CSTR(host)); }
 
 void H4P_WiFi::HAL_WIFI_startSTA(){
-    Serial.printf("H4P_WiFi::HAL_WIFI_startSTA 32 %s %s\n",CSTR(_cb[ssidTag()]),CSTR(_cb[pskTag()]));
-//    WiFi.mode(WIFI_STA);
     WiFi.setSleep(false);
 	WiFi.setAutoReconnect(true);
-    Serial.printf("BEGIN 32 %s %s\n",CSTR(_cb[ssidTag()]),CSTR(_cb[pskTag()]));
     WiFi.begin(CSTR(_cb[ssidTag()]),CSTR(_cb[pskTag()]));
-    WiFi.printDiag(Serial);
 }
 
-void H4P_WiFi::_start(){ 
-    Serial.printf("H4P_WiFi::_start() 32 initial mode is %d\n",WiFi.getMode()); 
-    WiFi.begin();
-    WiFi.printDiag(Serial); // need this just to see what stae we are in! Nuts, I know!
-};
+void H4P_WiFi::_start(){ WiFi.begin(); };
 
 void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
-
+/*
     Serial.printf("[WiFi-event] event: %d\n", event);
 
     switch (event) {
@@ -181,11 +179,10 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
         default: break;
     }
 }
-/*
+*/
     Serial.printf("ESP32 WIFI EVENT %d\n",event);
     switch(event) {
         case SYSTEM_EVENT_WIFI_READY:
-            Serial.printf("SYSTEM_EVENT_WIFI_READY\n");
 			h4.queueFunction([](){ h4wifi._coreStart(); });
             break;
         case SYSTEM_EVENT_STA_LOST_IP:
@@ -196,40 +193,30 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
 			break;
 	}
 }
-*/
+
 #endif
 /*
                                                                                                  C O M M O N   F U N C T I O N S
 */
 #if H4P_USE_WIFI_AP
-void H4P_WiFi::_coreStart(){ 
-    auto mode=WiFi.getMode();
-    Serial.printf("H4P_WiFi AP::_coreStart() 32 mode=%d ssid=%s psk=%s\n",mode,CSTR(WiFi.SSID()),CSTR(WiFi.psk()));
-    if(WiFi.psk()=="H4"|| WiFi.psk()=="") startAP();
-    else {
-//        _cb[ssidTag()]=CSTR(WiFi.SSID());
-//        _cb[pskTag()]=CSTR(WiFi.psk());
-//        h4wifi.HAL_WIFI_startSTA();
-    }
-}
+//void H4P_WiFi::_coreStart(){ if(WiFi.psk()=="H4" || WiFi.psk()=="") _startAP(); }
+void H4P_WiFi::_coreStart(){ if(_cannotConnectSTA()) _startAP(); }
 #else
-void H4P_WiFi::_coreStart(){
-    Serial.printf("COMMON H4P_WiFi::_coreStart()\n");
-    if(WiFi.psk()=="H4" || WiFi.psk()=="") h4wifi.HAL_WIFI_startSTA();
-}
+//void H4P_WiFi::_coreStart(){ if(WiFi.psk()=="H4" || WiFi.psk()=="") h4wifi.HAL_WIFI_startSTA(); }
+void H4P_WiFi::_coreStart(){ if(_cannotConnectSTA()) h4wifi.HAL_WIFI_startSTA(); }
 #endif
 
 void H4P_WiFi::_stop(){
-    Serial.printf("H4P_WiFi::_stop() common\n");
+//    Serial.printf("H4P_WiFi::_stop() common\n");
     h4.cancelSingleton(H4P_TRID_HOTA);
     WiFi.mode(WIFI_OFF);
 }
 
 void H4P_WiFi::clear(){ 
-    Serial.printf("H4P_WiFi::_clear() common\n");
+//    Serial.printf("H4P_WiFi::_clear() common\n");
     // === eraseConfig :)
     WiFi.mode(WIFI_STA);
-    WiFi.begin("H4","H4"); 
+    WiFi.begin("H4","H4"); // becos it wont allow "",""
     show();
 	stop();
     _wipe({deviceTag(),nameTag()});
@@ -264,6 +251,7 @@ void H4P_WiFi::_gotIP(){
 	ArduinoOTA.begin(); // matching end???
 
     H4EVENT("IP=%s",CSTR(_cb[ipTag()]));
+    _startWebserver();
     _upHooks();
 }
 
@@ -276,16 +264,20 @@ void H4P_WiFi::_hookIn(){
     WiFi.persistent(true);
     WiFi.onEvent(_wifiEvent);
 
-    h4asws._uiAdd(H4P_UIO_BOARD,boardTag(),H4P_UI_LABEL);
-    h4asws._uiAdd(H4P_UIO_CHIP,chipTag(),H4P_UI_LABEL);
-    h4asws._uiAdd(H4P_UIO_DEVICE,deviceTag(),H4P_UI_LABEL);
-    h4asws._uiAdd(H4P_UIO_IP,ipTag(),H4P_UI_LABEL,"",[]{ return _cb[ipTag()]; }); // cos we don't know it yet
-    h4asws._uiAdd(H4P_UIO_H4V,h4Tag(),H4P_UI_LABEL,H4_VERSION);
-    h4asws._uiAdd(H4P_UIO_H4PV,h4pTag(),H4P_UI_LABEL);
+    H4Plugin* p=isLoaded(onofTag());
+    if(p) _btp=reinterpret_cast<H4P_BinaryThing*>(p);
+    if(isLoaded(gpioTag())) h4cmd.addCmd("gpio",_subCmd,0,CMDVS(_gpio));
+
+    _uiAdd(H4P_UIO_BOARD,boardTag(),H4P_UI_LABEL);
+    _uiAdd(H4P_UIO_CHIP,chipTag(),H4P_UI_LABEL);
+    _uiAdd(H4P_UIO_DEVICE,deviceTag(),H4P_UI_LABEL);
+    _uiAdd(H4P_UIO_IP,ipTag(),H4P_UI_LABEL,"",[]{ return _cb[ipTag()]; }); // cos we don't know it yet
+    _uiAdd(H4P_UIO_H4V,h4Tag(),H4P_UI_LABEL,H4_VERSION);
+    _uiAdd(H4P_UIO_H4PV,h4pTag(),H4P_UI_LABEL);
 #if H4P_USE_WIFI_AP
     _cb[h4UITag()]=_cb[h4UITag()]+"ap";
 #endif
-    h4asws._uiAdd(H4P_UIO_H4UIV,h4UITag(),H4P_UI_LABEL);
+    _uiAdd(H4P_UIO_H4UIV,h4UITag(),H4P_UI_LABEL);
 }
 
 uint32_t H4P_WiFi::_host(vector<string> vs){
@@ -300,6 +292,7 @@ uint32_t H4P_WiFi::_host(vector<string> vs){
 void H4P_WiFi::_lostIP(){
     h4.cancelSingleton(H4P_TRID_HOTA);
     if(!_discoDone){
+        _stopWebserver();
         _downHooks();
         _discoDone=true;
     }
@@ -318,4 +311,194 @@ void H4P_WiFi::change(string ssid,string psk){ // add device / name?
     _cb[pskTag()]=psk;
     HAL_WIFI_startSTA();
     h4reboot();
+}
+/*
+ ex asws
+*/
+/*
+void  H4P_WiFi::_hookIn(){ 
+    DEPEND(wifi);
+    H4Plugin* p=isLoaded(onofTag());
+    if(p) _btp=reinterpret_cast<H4P_BinaryThing*>(p);
+    if(isLoaded(gpioTag())) h4cmd.addCmd("gpio",_subCmd,0,CMDVS(_gpio));
+//    if(!HAL_FS.exists(CSTR(string("/"+string(h4UITag()))))) Serial.printf("FATAL: No webUI files!!!\n");
+}
+*/
+uint32_t H4P_WiFi::_gpio(vector<string> vs){
+    return guard1(vs,[this](vector<string> vs){
+        if(H4PAYLOAD=="all") uiAddGPIO();
+        else {
+            if(!isNumeric(H4PAYLOAD)) return H4_CMD_NOT_NUMERIC;
+            uint8_t pin=H4PAYLOAD_INT;
+            return uiAddGPIO(pin);
+        }
+        return H4_CMD_OK;
+    });
+}
+
+uint32_t H4P_WiFi::_msg(vector<string> vs){
+    return guard1(vs,[this](vector<string> vs){
+        uiMessage(H4PAYLOAD);
+        return H4_CMD_OK;
+    });
+}
+
+H4_CMD_ERROR H4P_WiFi::__uichgCore(const string& a,const string& b,H4P_FN_UICHANGE chg){
+    _sendSSE(CSTR(a),CSTR(b));
+    if(chg) chg(b);
+    else onUiChange(a,b);
+    return H4_CMD_OK;
+}
+
+void H4P_WiFi::_uiAdd(uint32_t seq,const string& i,H4P_UI_TYPE t,const string& v,H4P_FN_UITXT f,H4P_FN_UICHANGE c){
+    string value=v;
+    if(c) value=_cb[i]; // change function implies input / dropdown etc: backed by CB variable
+    else if(value=="") value=f ? f():_cb[i];
+    _userItems[seq]={i,t,value,f,c};
+}
+
+uint32_t H4P_WiFi::_uichg(vector<string> vs){
+    dumpvs(vs);
+    string payload;
+    string extra;
+    vector<string> vg;
+    switch(vs.size()){
+        case 0:
+            return H4_CMD_TOO_FEW_PARAMS;
+        case 2:
+            extra="/"+vs[1];
+        case 1:
+            payload=vs[0]+extra;
+            Serial.printf("UICHG %s\n",CSTR(payload));
+            vg=split(payload,",");
+            if(vg.size()>2) return H4_CMD_TOO_MANY_PARAMS;
+            if(vg.size()<2) return H4_CMD_TOO_FEW_PARAMS;
+            for(auto &i:_userItems){
+                H4P_UI_ITEM u=i.second;
+                if(u.id==vg[0]){
+                    if(u.type==H4P_UI_BOOL){
+                        if(isNumeric(vg[1])) {
+                            if(atoi(CSTR(vg[1])) > 1) return H4_CMD_PAYLOAD_FORMAT;
+                        } else return H4_CMD_NOT_NUMERIC;
+                    }
+                    _cb[vg[0]]=vg[1];
+                    return __uichgCore(vg[0],vg[1],u.c);
+                }
+            }
+            return H4_CMD_NAME_UNKNOWN;
+        default:
+            return H4_CMD_TOO_MANY_PARAMS;
+    }
+}
+
+void H4P_WiFi::_rest(AsyncWebServerRequest *request){
+	h4.queueFunction(bind([this](AsyncWebServerRequest *request){
+        H4EVENT("_rest %s",request->client()->remoteIP().toString().c_str());
+		string chop=replaceAll(CSTR(request->url()),"/rest/","");
+        string msg="";
+        uint32_t res=h4cmd._simulatePayload(CSTR(chop),"rest");
+        if(isLoaded(vmTag())) msg=h4vm.getErrorMessage(res);
+        string j="{\"res\":"+stringFromInt(res)+",\"msg\":\""+msg+"\",\"lines\":[";
+        string fl;
+        if(!res){
+            for(auto &l:_lines){
+                if(l.back()=='\n') l.pop_back();
+                fl+="\""+l+"\",";
+            }
+            if(fl.size()) fl.pop_back();
+        }
+        j+=fl+"]}";
+        AsyncWebServerResponse *response = request->beginResponse(200, "application/json",CSTR(j));
+        response->addHeader("Access-Control-Allow-Origin","*");
+        request->send(response);
+        _lines.clear();
+	},request),nullptr,H4P_TRID_REST);
+}
+
+void H4P_WiFi::_sendSSE(const char* name,const char* msg){ if(_evts && _evts->count()) _evts->send(msg,name,_evtID); }
+
+void H4P_WiFi::_startWebserver(){
+	reset();
+    _evts=new AsyncEventSource("/evt");
+    _evts->onConnect([this](AsyncEventSourceClient *client){
+        h4.queueFunction([this,client](){
+            H4EVENT("SSE Client %08x n=%d T/O=%d nC=%d nUI=%d",client,client->lastId(),H4P_ASWS_EVT_TIMEOUT,_evts->count(),_userItems.size());
+            if(_evts->count()==1) onViewers(); //if(_onC) _onC(); // first time only R WE SURE?
+            for(auto & i:_userItems) {
+                H4P_UI_ITEM u=i.second;
+                if(u.f) u.value=u.f(); // auto-sync delayed fields
+                _sendSSE("ui",CSTR(string(u.id+","+stringFromInt(u.type)+","+u.value+","+(u.c ? "1":"0" ))));
+            }
+            h4.repeatWhile([this]{ return _evts->count(); },
+                ((H4P_ASWS_EVT_TIMEOUT*3)/4),
+                [this]{ },
+                [this]{ onNoViewers(); },
+                H4P_TRID_SSET,true
+            );
+        });
+    });
+    addHandler(_evts);
+
+    on("/",HTTP_GET, [this](AsyncWebServerRequest *request){
+        H4EVENT("Root %s",request->client()->remoteIP().toString().c_str());
+        request->send(HAL_FS,"/sta.htm",String(),false,aswsReplace);
+    });
+
+	on("/rest",HTTP_GET,[this](AsyncWebServerRequest *request){ _rest(request); });
+
+    serveStatic("/", HAL_FS, "/").setCacheControl("max-age=31536000");
+    begin();
+}
+
+void H4P_WiFi::_stopWebserver(){ end(); }
+
+String H4P_WiFi::aswsReplace(const String& var){
+    string v=CSTR(var);
+    return _cb.count(v) ? String(CSTR(_cb[v])):"?";
+}
+
+void H4P_WiFi::uiAddDropdown(const string& name,H4P_CONFIG_BLOCK options,H4P_FN_UICHANGE onChange){
+    string opts="";
+    for(auto const& o:options) opts+=o.first+"="+o.second+",";
+    opts.pop_back();
+    _uiAdd(_seq++,name,H4P_UI_DROPDOWN,opts,nullptr,onChange); // optimise
+}
+
+void H4P_WiFi::uiAddGPIO(){ if(isLoaded(gpioTag())) for(auto const& p:H4P_GPIOManager::pins) uiAddGPIO(p.first); }
+
+H4_CMD_ERROR H4P_WiFi::uiAddGPIO(uint8_t pin){
+    if(isLoaded(gpioTag())){
+        H4GPIOPin*  p;
+        if(p=h4gm.isManaged(pin)) {
+            char buf[32];
+            snprintf(buf,31,"GP%02d(Type%02d)",pin,p->style);
+            string name(buf);
+            H4GM_FN_EVENT f=p->onEvent;
+            p->onEvent=[this,name,f](H4GPIOPin* hp){
+                _sendSSE(CSTR(name),hp->logicalRead() ? "1":"0");
+                if(f) f(hp);
+            };
+            _uiAdd(H4P_UIO_GPIO+pin,name,H4P_UI_BOOL,"",[p]{ return p->logicalRead() ? "1":"0"; });
+            return H4_CMD_OK;
+        } 
+        return H4_CMD_OUT_OF_BOUNDS;
+    }
+    return H4_CMD_NOT_NOW;
+}
+
+void H4P_WiFi::uiAddInput(const string& name,const string& value,H4P_FN_UICHANGE onChange){
+    if(value!="") _cb[name]=value;
+    _uiAdd(_seq++,name,H4P_UI_INPUT,_cb[name],nullptr,onChange); 
+}
+
+void H4P_WiFi::uiSync(){
+    if(_evts && _evts->count()){
+        for(auto &i:_userItems){
+            H4P_UI_ITEM u=i.second;
+            if(u.f) { // refakta syncCore
+                if(u.f) u.value=u.f();
+                _sendSSE(CSTR(u.id),CSTR(u.value));
+            }
+        }
+    }
 }

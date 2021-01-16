@@ -31,7 +31,7 @@ SOFTWARE.
 #define H4P_UPNPServer_HO
 
 #include<H4PCommon.h>
-#include<H4P_AsyncWebServer.h>
+#include<H4P_WiFi.h>
 #include<H4P_BinaryThing.h>
 
 STAG(alive);

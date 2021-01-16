@@ -105,11 +105,10 @@ enum H4P_LOG_TYPE {
 
 constexpr const char* cmdhash(){ return "/h4/#"; }
 
-STAG(asws);
+//STAG(asws);
 STAG(auto);
 STAG(board)
 STAG(broker);
-STAG(cerr);
 STAG(chip);
 STAG(device);
 STAG(gpio);
@@ -136,6 +135,7 @@ STAG(state);
 STAG(time);
 STAG(upnp);
 STAG(user);
+STAG(vm);
 STAG(wink);
 STAG(wifi);
 
@@ -189,7 +189,7 @@ enum trustedIds {
   H4P_TRID_WFAP,
   H4P_TRID_MQMS,
   H4P_TRID_MQRC,
-  H4P_TRID_ASWS,
+  H4P_TRID_REST,
   H4P_TRID_SOAP, // 65
   H4P_TRID_UDPM,
   H4P_TRID_UDPS,

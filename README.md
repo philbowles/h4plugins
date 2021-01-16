@@ -61,7 +61,6 @@ H4P_GPIOManager h4gm;
 H4P_FlasherController h4fc;
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","eiffel");
 H4P_AsyncMQTT h4mqtt("192.168.1.4",1883);
-H4P_AsyncWebServer h4asws;
 H4P_BinarySwitch h4onof(RELAY_BUILTIN,ACTIVE_HIGH,OFF);
 H4P_UPNPServer h4upnp("Salon Eiffel Tower");
 H4P_MultiFunctionButton h4mfb(BUTTON_BUILTIN,INPUT,ACTIVE_LOW,15,LED_BUILTIN,ACTIVE_LOW);
@@ -160,7 +159,6 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
 ## Core IOT functionality
 
 * [**H4P_AsyncMQTT**](docs/h4mqtt.md): Automatic Connection/ reconnection MQTT client (allows remote control of H4)
-* [**H4P_AsyncWebServer**](docs/h4asws.md): Fully Asynchronous Webserver  + HTTP REST handler + user fields manager
 * [**H4P_BinarySwitch**](docs/things.md): GPIO object that allows control by commands from multiple sources
 * [**H4P_BinaryThing**](docs/things.md): user-defined functional object that allows control by commands from multiple sources
 * [**H4P_ConditionalSwitch**](docs/things.md): H4P_BinarySwitch that only operates when user-define function returns true
@@ -187,7 +185,7 @@ When you think that H4Plugins also has "plug and play" rotary encoder handling, 
   
 ## Diagnostic / Logging / Development tools:
 
-* [**H4P_CmdErrors**](docs/h4ce.md): Provide text error messages instead of error codes to SerialCmd
+* [**H4P_VerboseMessages**](docs/h4vm.md): Provide text error messages instead of error codes to SerialCmd
 * [**H4P_HeapWarn**](docs/h4hw.md): Call user function on low Heap
 * [**H4P_Heartbeat**](docs/advanced.md): call user-defined function every 1 second
 * [**H4P_HttpMySQLLogger**](docs/mysql.md): log to remote webserver to update MySQL log db (server example provided)
