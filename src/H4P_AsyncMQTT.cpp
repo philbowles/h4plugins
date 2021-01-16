@@ -101,7 +101,9 @@ void H4P_AsyncMQTT::_hookIn() {
             });
         }
     });
+}
 
+void H4P_AsyncMQTT::_greenLight(){
     if(WiFi.getMode()==WIFI_STA){
         h4wifi._uiAdd(H4P_UIO_PMV,"Pangolin",H4P_UI_LABEL,_cb[pmvTag()]);
         h4wifi._uiAdd(H4P_UIO_MQB,brokerTag(),H4P_UI_LABEL,"",[]{ return _cb[brokerTag()]; }); // cos we don't know it yet
@@ -163,6 +165,14 @@ void H4P_AsyncMQTT::report(){
     j.pop_back();
     publishDevice("report",j+"}");
     H4EVENT("Reporting %s}",CSTR(j));
+}
+
+void H4P_AsyncMQTT::show(){
+    reply("Server: %s, port:%s, %s",CSTR(_cb[brokerTag()]),CSTR(_cb[portTag()]),_state() ? "CNX":"DCX");
+    string reporting;
+    for(auto const r:_reportList) reporting+=r+",";
+    reporting.pop_back();
+    reply("Report: %s",CSTR(reporting));
 }
 
 void H4P_AsyncMQTT::subscribeDevice(string topic,H4_FN_MSG f,H4PC_CMD_ID root){

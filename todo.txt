@@ -1,5 +1,5 @@
 TODO:SOONER
-    move signalling into wifi / mqtt
+    signalling ap mode
     js - type = password if n includes "pass"
 SHORTTERM
     autoOff -> cb

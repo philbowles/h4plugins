@@ -26,6 +26,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#pragma once
+
 #define H4P_VERSION "1.0.0"
 /*
         HARDWARE ASSUMPTIONS
@@ -54,16 +56,11 @@ SOFTWARE.
 */
 #define H4P_LOG_EVENTS
 
-
 // Make sure you read the documentation and have arrangements in place for using AP mode :)
 #define H4P_USE_WIFI_AP 0
-
 /*
             TWEAKABLES
 */
-#ifndef H4PCONFIG_Hq
-#define H4PCONFIG_H
-
 #define H4P_REPLY_BUFFER       512
 
 #define H4ESW_MAX_F         150000
@@ -82,10 +79,10 @@ SOFTWARE.
 #define H4MF_MEDIUM            125
 #define H4MF_REBOOT           2000
 #define H4MF_FACTORY          5000
-//#define H4MF_APMODE          10000
 
-#define H4WF_AP_RATE          1000
+#define H4WF_AP_RATE           500
 #define H4WF_OTA_RATE         1500
+#define H4P_ASWS_EVT_TIMEOUT 30000
 
 #define H4P_IPPD_RATE         5000
 #define H4P_PJ_SPREAD            3
@@ -98,9 +95,7 @@ SOFTWARE.
 #define H4P_TIME_HOLDOFF      2000
 #define H4P_TIME_RESYNC    3600000
 
-#define H4P_SAFE_MINIMUM     20000
+//#define H4P_SAFE_MINIMUM     20000
 
 constexpr char* h4pTag(){ return "h4P"; }
 constexpr char* httpTag(){ return "http://"; }
-
-#endif

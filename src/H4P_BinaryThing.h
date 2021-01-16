@@ -43,7 +43,7 @@ class H4P_BinaryThing: public H4Plugin{
 
                     uint32_t _autoOff(vector<string> vs){ return guardInt1(vs,bind(&H4P_BinaryThing::autoOff,this,_1)); }
 
-            virtual void     _hookIn() override ;
+            virtual void     _greenLight() override ;
                     void     _publish(bool b);
                     void     _setSlaves(bool b);
             virtual void     _setState(bool b);

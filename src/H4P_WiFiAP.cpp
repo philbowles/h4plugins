@@ -56,9 +56,7 @@ void H4P_WiFi::_startAP(){
     h4wifi._uiAdd(H4P_UIO_DEVICE,deviceTag(),H4P_UI_INPUT,_cb[deviceTag()]);
 
     if(isLoaded(upnpTag())) h4wifi._uiAdd(H4P_UIO_NAME,nameTag(),H4P_UI_INPUT);
-
     if(isLoaded(rupdTag())) h4wifi._uiAdd(H4P_UIO_RUPD,uuTag(),H4P_UI_INPUT);
-
     if(isLoaded(mqttTag())){
         h4wifi._uiAdd(H4P_UIO_MQB,brokerTag(),H4P_UI_INPUT);
         h4wifi._uiAdd(H4P_UIO_MQP,portTag(),H4P_UI_INPUT);
@@ -80,13 +78,14 @@ void H4P_WiFi::_startAP(){
     });
     WiFi.mode(WIFI_AP);
     H4EVENT("ENTER AP MODE %s MAC=%s",CSTR(_cb[deviceTag()]),CSTR(WiFi.softAPmacAddress()));
- //   show(); //WiFi.printDiag(Serial);
+
     WiFi.softAP(CSTR(_cb[deviceTag()]));
     _cb[ipTag()]=CSTR(WiFi.softAPIP().toString());//.c_str();
     _dns53=new DNSServer;
     _dns53->start(53, "*", WiFi.softAPIP());
-    h4.every(100,[](){ _dns53->processNextRequest(); },nullptr,H4P_TRID_WFAP);
+    h4.every(H4WF_AP_RATE,[](){ _dns53->processNextRequest(); },nullptr,H4P_TRID_WFAP);
 
-    h4wifi.start(); // DONT run uphooks!
+    //h4wifi.start(); // DONT run uphooks!
+    _startWebserver();
 }
 #endif

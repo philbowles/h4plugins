@@ -59,7 +59,6 @@ std::unordered_map<char,string>	H4P_FlasherController::_morse={
 	{'z',"--.."}
 };
 #endif /////////////////////////////////////// _MORSE_SUPPORT
-
 //
 //      H4P_FlasherController
 //

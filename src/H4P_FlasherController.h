@@ -62,8 +62,7 @@ class H4P_FlasherController: public H4Plugin {
         H4P_FlasherController(): H4Plugin(winkTag()){}
              
 		void 			flashLED(uint32_t rate, uint8_t pin,uint8_t active=HIGH);
-		void 			flashMorse(const char *pattern, uint32_t timebase, uint8_t pin,uint8_t active=HIGH);
-		
+		void 			flashMorse(const char *pattern, uint32_t timebase, uint8_t pin,uint8_t active=HIGH);	
 #ifdef H4FC_MORSE_SUPPORT
 		static std::unordered_map<char,string> _morse; // tidy
 		void 	        flashMorseText(const char * pattern,uint32_t timebase,uint8_t pin,uint8_t active=HIGH);

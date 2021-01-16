@@ -29,7 +29,7 @@ SOFTWARE.
 #include<H4P_BinaryThing.h>
 #include<H4P_AsyncMQTT.h>
 
-void H4P_BinaryThing::_hookIn() {
+void H4P_BinaryThing::_greenLight() {
     if(isLoaded(wifiTag())){
         if(WiFi.getMode()==WIFI_STA) {
             h4wifi._uiAdd(H4P_UIO_ONOF,onofTag(),H4P_UI_ONOF,"",[this]{ return stringFromInt(state()); });

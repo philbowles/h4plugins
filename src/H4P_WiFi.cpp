@@ -35,10 +35,9 @@ SOFTWARE.
 
 STAG(tcp)
 
-void __attribute__((weak)) onUiChange(const string& name,const string& value){ h4UserEvent("onUiChange %s now=%s",CSTR(name),CSTR(value)); }
+void __attribute__((weak)) onUiChange(const string& name,const string& value){ } //h4UserEvent("onUiChange %s now=%s",CSTR(name),CSTR(value)); }
 void __attribute__((weak)) onViewers(){}
 void __attribute__((weak)) onNoViewers(){}
-
 /*
                                              H / W - D E P E N D E N T   F U N C T I O N S
 */
@@ -187,7 +186,6 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
     }
 }
 */
-    Serial.printf("ESP32 WIFI EVENT %d\n",event);
     switch(event) {
         case SYSTEM_EVENT_WIFI_READY:
 			h4.queueFunction([](){ h4wifi._coreStart(); });
@@ -204,23 +202,22 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
 /*
                                                                                                  C O M M O N   F U N C T I O N S
 */
+H4_CMD_ERROR H4P_WiFi::__uichgCore(const string& a,const string& b,H4P_FN_UICHANGE chg){
+    _sendSSE(CSTR(a),CSTR(b));
+    if(chg) chg(b);
+    else onUiChange(a,b);
+    return H4_CMD_OK;
+}
+
 #if H4P_USE_WIFI_AP
     void H4P_WiFi::_coreStart(){ if(_cannotConnectSTA()) _startAP(); }
 #else
     void H4P_WiFi::_coreStart(){ if(_cannotConnectSTA()) h4wifi.HAL_WIFI_startSTA(); }
 #endif
 
-void H4P_WiFi::_stop(){
-    h4.cancelSingleton(H4P_TRID_HOTA);
-    WiFi.mode(WIFI_OFF);
-}
-
-void H4P_WiFi::clear(){ 
-    WiFi.mode(WIFI_STA);
-    WiFi.begin("H4","H4"); // // === eraseConfig :) becos it wont allow "",""
-    show();
-	stop();
-    _wipe({deviceTag(),nameTag()});
+String H4P_WiFi::_aswsReplace(const String& var){
+    string v=CSTR(var);
+    return _cb.count(v) ? String(CSTR(_cb[v])):"?";
 }
 
 uint32_t H4P_WiFi::_change(vector<string> vs){ return guardString2(vs,[this](string a,string b){ change(a,b); return H4_CMD_OK; }); }
@@ -246,7 +243,7 @@ void H4P_WiFi::_gotIP(){
         MDNS.addService(h4Tag(),tcpTag(),666);
         MDNS.addServiceTxt(h4Tag(),tcpTag(),"id",CSTR(_cb[chipTag()]));
         MDNS.addServiceTxt(h4Tag(),tcpTag(),ipTag(),CSTR(_cb[ipTag()]));
-    } //else Serial.println("Error starting mDNS");
+    }
 
   	ArduinoOTA.setHostname(CSTR(host));
 	ArduinoOTA.setRebootOnSuccess(false);	
@@ -255,6 +252,18 @@ void H4P_WiFi::_gotIP(){
     H4EVENT("IP=%s",CSTR(_cb[ipTag()]));
     _startWebserver();
     _upHooks();
+}
+
+uint32_t H4P_WiFi::_gpio(vector<string> vs){
+    return guard1(vs,[this](vector<string> vs){
+        if(H4PAYLOAD=="all") uiAddGPIO();
+        else {
+            if(!isNumeric(H4PAYLOAD)) return H4_CMD_NOT_NUMERIC;
+            uint8_t pin=H4PAYLOAD_INT;
+            return uiAddGPIO(pin);
+        }
+        return H4_CMD_OK;
+    });
 }
 
 void H4P_WiFi::_hookIn(){
@@ -283,18 +292,6 @@ void H4P_WiFi::_hookIn(){
     _uiAdd(H4P_UIO_H4UIV,h4UITag(),H4P_UI_LABEL);
 }
 
-uint32_t H4P_WiFi::_gpio(vector<string> vs){
-    return guard1(vs,[this](vector<string> vs){
-        if(H4PAYLOAD=="all") uiAddGPIO();
-        else {
-            if(!isNumeric(H4PAYLOAD)) return H4_CMD_NOT_NUMERIC;
-            uint8_t pin=H4PAYLOAD_INT;
-            return uiAddGPIO(pin);
-        }
-        return H4_CMD_OK;
-    });
-}
-
 uint32_t H4P_WiFi::_host(vector<string> vs){
     return guard1(vs,[this](vector<string> vs){
         return ([this](string h){
@@ -314,61 +311,6 @@ uint32_t H4P_WiFi::_msg(vector<string> vs){
         uiMessage(H4PAYLOAD);
         return H4_CMD_OK;
     });
-}
-
-void H4P_WiFi::_setPersistentValue(string n,string v,bool reboot){
-    if(_cb[n]!=v){
-        H4P_SerialCmd::write("/"+n,v);
-        if(reboot) h4reboot();
-    }
-}
-
-H4_CMD_ERROR H4P_WiFi::__uichgCore(const string& a,const string& b,H4P_FN_UICHANGE chg){
-    _sendSSE(CSTR(a),CSTR(b));
-    if(chg) chg(b);
-    else onUiChange(a,b);
-    return H4_CMD_OK;
-}
-
-void H4P_WiFi::_uiAdd(uint32_t seq,const string& i,H4P_UI_TYPE t,const string& v,H4P_FN_UITXT f,H4P_FN_UICHANGE c){
-    string value=v;
-    if(c) value=_cb[i]; // change function implies input / dropdown etc: backed by CB variable
-    else if(value=="") value=f ? f():_cb[i];
-    _userItems[seq]={i,t,value,f,c};
-}
-
-uint32_t H4P_WiFi::_uichg(vector<string> vs){
-    dumpvs(vs);
-    string payload;
-    string extra;
-    vector<string> vg;
-    switch(vs.size()){
-        case 0:
-            return H4_CMD_TOO_FEW_PARAMS;
-        case 2:
-            extra="/"+vs[1];
-        case 1:
-            payload=vs[0]+extra;
-            Serial.printf("UICHG %s\n",CSTR(payload));
-            vg=split(payload,",");
-            if(vg.size()>2) return H4_CMD_TOO_MANY_PARAMS;
-            if(vg.size()<2) return H4_CMD_TOO_FEW_PARAMS;
-            for(auto &i:_userItems){
-                H4P_UI_ITEM u=i.second;
-                if(u.id==vg[0]){
-                    if(u.type==H4P_UI_BOOL){
-                        if(isNumeric(vg[1])) {
-                            if(atoi(CSTR(vg[1])) > 1) return H4_CMD_PAYLOAD_FORMAT;
-                        } else return H4_CMD_NOT_NUMERIC;
-                    }
-                    _cb[vg[0]]=vg[1];
-                    return __uichgCore(vg[0],vg[1],u.c);
-                }
-            }
-            return H4_CMD_NAME_UNKNOWN;
-        default:
-            return H4_CMD_TOO_MANY_PARAMS;
-    }
 }
 
 void H4P_WiFi::_rest(AsyncWebServerRequest *request){
@@ -398,6 +340,13 @@ void H4P_WiFi::_rest(AsyncWebServerRequest *request){
 void H4P_WiFi::_sendSSE(const char* name,const char* msg){
     static uint32_t _evtID=0;
     if(_evts && _evts->count()) _evts->send(msg,name,_evtID++);
+}
+
+void H4P_WiFi::_setPersistentValue(string n,string v,bool reboot){
+    if(_cb[n]!=v){
+        H4P_SerialCmd::write("/"+n,v);
+        if(reboot) h4reboot();
+    }
 }
 
 void H4P_WiFi::_startWebserver(){
@@ -433,6 +382,11 @@ void H4P_WiFi::_startWebserver(){
     begin();
 }
 
+void H4P_WiFi::_stop(){
+    h4.cancelSingleton(H4P_TRID_HOTA);
+    WiFi.mode(WIFI_OFF);
+}
+
 void H4P_WiFi::_stopWebserver(){ 
     _badSignal();
     end();
@@ -440,17 +394,64 @@ void H4P_WiFi::_stopWebserver(){
     _discoDone=true;
 }
 
-String H4P_WiFi::_aswsReplace(const String& var){
-    string v=CSTR(var);
-    return _cb.count(v) ? String(CSTR(_cb[v])):"?";
+void H4P_WiFi::_uiAdd(uint32_t seq,const string& i,H4P_UI_TYPE t,const string& v,H4P_FN_UITXT f,H4P_FN_UICHANGE c){
+    string value=v;
+    if(c) value=_cb[i]; // change function implies input / dropdown etc: backed by CB variable
+    else if(value=="") value=f ? f():_cb[i];
+    _userItems[seq]={i,t,value,f,c};
 }
 
+uint32_t H4P_WiFi::_uichg(vector<string> vs){
+    dumpvs(vs);
+    string payload;
+    string extra;
+    vector<string> vg;
+    switch(vs.size()){
+        case 0:
+            return H4_CMD_TOO_FEW_PARAMS;
+        case 2:
+            extra="/"+vs[1];
+        case 1:
+            payload=vs[0]+extra;
+            vg=split(payload,",");
+            if(vg.size()>2) return H4_CMD_TOO_MANY_PARAMS;
+            if(vg.size()<2) return H4_CMD_TOO_FEW_PARAMS;
+            for(auto &i:_userItems){
+                H4P_UI_ITEM u=i.second;
+                if(u.id==vg[0]){
+                    if(u.type==H4P_UI_BOOL){
+                        if(isNumeric(vg[1])) {
+                            if(atoi(CSTR(vg[1])) > 1) return H4_CMD_PAYLOAD_FORMAT;
+                        } else return H4_CMD_NOT_NUMERIC;
+                    }
+                    _cb[vg[0]]=vg[1];
+                    return __uichgCore(vg[0],vg[1],u.c);
+                }
+            }
+            return H4_CMD_NAME_UNKNOWN;
+        default:
+            return H4_CMD_TOO_MANY_PARAMS;
+    }
+}
+/*
+
+        PUBLICS
+
+*/
 void H4P_WiFi::change(string ssid,string psk){ // add device / name?
     stop();
     _cb[ssidTag()]=ssid;
     _cb[pskTag()]=psk;
     HAL_WIFI_startSTA();
     h4reboot();
+}
+
+void H4P_WiFi::clear(){ 
+    WiFi.mode(WIFI_STA);
+    WiFi.begin("H4","H4"); // // === eraseConfig :) becos it wont allow "",""
+    show();
+	stop();
+    _wipe({deviceTag(),nameTag()});
 }
 
 void H4P_WiFi::signal(const char* pattern,uint32_t timebase){ h4fc.flashMorse(pattern,timebase,H4P_SIGNAL_LED,H4P_SIGNAL_SENSE); }

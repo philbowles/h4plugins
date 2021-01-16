@@ -27,12 +27,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_AsyncMQTT_HO
-#define H4P_AsyncMQTT_HO
+#pragma once
 
 #include<H4PCommon.h>
 #include<H4P_SerialCmd.h>
-#include<H4P_FlasherController.h>
 #include<H4P_WiFi.h>
 #include<PangolinMQTT.h>
 
@@ -44,18 +42,20 @@ struct H4P_LWT {
 };
 
 class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
-            bool            autorestart=true;
-            string          device;
-            string          prefix=string(h4Tag()).append("/");
-            struct H4P_LWT  _lwt;
-            unordered_set<string>  _reportList={"bin",boardTag(),ipTag(),h4pTag(),h4UITag(),pmvTag()};
-        VSCMD(_change);
+                bool            autorestart=true;
+                string          device;
+                string          prefix=string(h4Tag()).append("/");
+                struct H4P_LWT  _lwt;
+                unordered_set<string>  _reportList={"bin",boardTag(),ipTag(),h4pTag(),h4UITag(),pmvTag()};
+
+                VSCMD(_change);
+
                 void        _badSignal(){ h4wifi.signal(". .    ",H4P_SIGNAL_TIMEBASE/2); }
-                void        _greenLight() override {}; //do not autostart!
+                void        _greenLight() override; //do not autostart!
                 void        _hookIn() override;
                 void        _setup();
                 void        _start() override;
-                bool        _state() override { return PANGO::TCP; } // wrong!!!
+                bool        _state() override { return PANGO::TCP; }
                 void        _stop() override;
     public:
 
@@ -81,22 +81,14 @@ class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
         }
                 void        addReportingItem(const string& ri){ _reportList.insert(ri); }
                 void        change(const string& broker,uint16_t port,const string& user,const string& passwd);
-
                 void        publishDevice(const string& topic,const string& payload,uint8_t qos=0, bool retain=false){ xPublish(CSTR(string(prefix+topic)),payload,qos,retain); }
                 void        publishDevice(const string& topic,uint32_t payload,uint8_t qos=0, bool retain=false){ publishDevice(topic,stringFromInt(payload),qos,retain); }
                 void        report();
+                void        show() override;
                 void        subscribeDevice(string topic,H4_FN_MSG f,H4PC_CMD_ID root=H4PC_ROOT);
                 void        unsubscribeDevice(string topic);
     //          syscall only
                 void        _reply(string msg) override { publishDevice("reply",msg); }
-                void        show() override {
-                    reply("Server: %s, port:%s, %s",CSTR(_cb[brokerTag()]),CSTR(_cb[portTag()]),_state() ? "CNX":"DCX");
-                    string reporting;
-                    for(auto const r:_reportList) reporting+=r+",";
-                    reporting.pop_back();
-                    reply("Report: %s",CSTR(reporting));
-                }
 };
 
-    extern __attribute__((weak)) H4P_AsyncMQTT h4mqtt;
-#endif // H4P_AsyncMQTT_H
+extern __attribute__((weak)) H4P_AsyncMQTT h4mqtt;

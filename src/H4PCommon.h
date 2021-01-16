@@ -238,7 +238,7 @@ enum H4P_UI_ORDER:uint32_t {
     H4P_UIO_MQK,
     H4P_UIO_GO4IT,
     H4P_UIO_USER,
-    H4P_UIO_COND,
+    H4P_UIO_COND=900,
     H4P_UIO_ONOF,
     H4P_UIO_GPIO
 };
@@ -272,10 +272,10 @@ class H4Plugin {
         virtual void        _start() { _upHooks(); }
         virtual void        _stop() { _downHooks(); }
     public:
-        static  vector<H4Plugin*>   _plugins;
         static  vector<H4_FN_VOID>  _factoryChain;
                 H4_FN_VOID          _factoryHook=[]{};
                 H4_FN_VOID          _rebootHook=[this]{ stop(); };
+        static  vector<H4Plugin*>   _plugins;
                 string              _pName;
                 uint32_t            _subCmd;
 //       
@@ -319,7 +319,7 @@ class H4Plugin {
         static  void        setConfig(const string& c,const int v){ _cb[c]=stringFromInt(v); }
                 
                 template<typename... Args>
-                void        reply(const char* fmt, Args... args){ // find pub sub size
+                void        reply(const char* fmt, Args... args){
                     char* buff=static_cast<char*>(malloc(H4P_REPLY_BUFFER+1));
                     snprintf(buff,H4P_REPLY_BUFFER,fmt,args...);
                     string source=_cb[srcTag()];
@@ -329,8 +329,8 @@ class H4Plugin {
                     free(buff);
                 }
 //      syscall only
-        virtual void        _reply(string msg) { Serial.println(CSTR(msg)); }
                 void        _downHooks();
+        virtual void        _reply(string msg) { Serial.println(CSTR(msg)); }
                 void        _upHooks();
 
 //        static void         dumpCommands(H4_CMD_MAP cm=_commands){ for(auto const c:cm) Serial.printf("%16s o=%2d l=%2d\n",CSTR(c.first),c.second.owner,c.second.levID); }

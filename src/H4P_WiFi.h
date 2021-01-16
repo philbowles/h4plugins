@@ -49,10 +49,6 @@ SOFTWARE.
 #include<H4P_BinaryThing.h>
 #include<ESPAsyncWebServer.h>
 //
-#define H4P_ASWS_EVT_TIMEOUT    30000
-
-extern void onUiChange(const string& name,const string& value);
-
 enum H4P_UI_TYPE {
     H4P_UI_LABEL,
     H4P_UI_TEXT,
@@ -67,16 +63,15 @@ using H4P_FN_UINUM      = function<int(void)>;
 using H4P_FN_UIBOOL     = function<boolean(void)>;
 using H4P_FN_UICHANGE   = function<void(const string&)>;
 
-struct H4P_UI_ITEM {    
+struct H4P_UI_ITEM { // add title and/or props?
     string          id;
     H4P_UI_TYPE     type;
     string          value;
     H4P_FN_UITXT    f;
     H4P_FN_UICHANGE c;
 };
-
 using H4P_UI_LIST       = std::map<int,H4P_UI_ITEM>;
-//
+
 class H4P_WiFi: public AsyncWebServer, public H4Plugin{
 // ex asws
             H4P_BinaryThing*    _btp=nullptr;
@@ -116,7 +111,7 @@ class H4P_WiFi: public AsyncWebServer, public H4Plugin{
                 void            _stop() override;
                 void            _hookIn() override;
     public:
-                void            HAL_WIFI_startSTA(); // ESP32 FFS
+                void            HAL_WIFI_startSTA(); // Has to be static for bizarre start sequence on ESP32 FFS
 //          included here against better wishes due to compiler bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89605
 #if H4P_USE_WIFI_AP
                 void            _save(const string& s){ H4P_SerialCmd::write("/"+s,_cb[s]); }
@@ -156,7 +151,6 @@ class H4P_WiFi: public AsyncWebServer, public H4Plugin{
                 }
                 void            signal(const char* pattern,uint32_t timebase=H4P_SIGNAL_TIMEBASE);
                 void            signalOff();
-// ex asws
                 void            uiAddLabel(const string& name){ _uiAdd(_seq++,name,H4P_UI_LABEL,_cb[name]); }
                 void            uiAddLabel(const string& name,const string& v){ _uiAdd(_seq++,name,H4P_UI_LABEL,v); }
                 void            uiAddLabel(const string& name,const int v){ _uiAdd(_seq++,name,H4P_UI_LABEL,stringFromInt(v)); }
