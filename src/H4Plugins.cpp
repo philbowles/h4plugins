@@ -38,10 +38,7 @@ bool stringIsAlpha(const string& s){ return !(std::find_if(s.begin(), s.end(),[]
 void h4StartPlugins(){
     for(auto const& p:H4Plugin::_plugins) { p->_startup(); }
     for(auto const& p:H4Plugin::_plugins) { p->_hookIn(); }
-    for(auto const& p:H4Plugin::_plugins) {
-        H4Plugin::_factoryChain.push_back(p->_factoryHook);
-        h4.hookReboot(p->_rebootHook);
-    }
+    for(auto const& p:H4Plugin::_plugins) { H4Plugin::_factoryChain.push_back(p->_factoryHook); }
     for(auto const& p:H4Plugin::_plugins) { p->_greenLight(); }
     reverse(H4Plugin::_factoryChain.begin(),H4Plugin::_factoryChain.end());
     H4Plugin::_factoryChain.push_back(onFactoryReset);

@@ -35,6 +35,8 @@ SOFTWARE.
 
 // https://github.com/plerup/espsoftwareserial
 
+using namespace std::placeholders;
+
 class H4P_ExternalSqWave: public H4Plugin, public SoftwareSerial{
 //
             uint32_t        __set(vector<string> vs,uint32_t c,uint32_t lim);

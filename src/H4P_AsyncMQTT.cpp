@@ -156,7 +156,7 @@ void H4P_AsyncMQTT::change(const string& broker,uint16_t port,const string& user
     h4wifi._save(mqconfTag());
 #endif
     _setup();
-    start();
+    restart();
 }
 
 void H4P_AsyncMQTT::report(){

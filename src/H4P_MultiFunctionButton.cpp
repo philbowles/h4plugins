@@ -30,7 +30,7 @@ SOFTWARE.
 #include<H4P_FlasherController.h>
 #include<H4P_AsyncMQTT.h>
 
-void H4P_MultiFunctionButton::progress(H4GPIOPin* ptr){ // run this as each stage changes
+void H4P_MultiFunctionButton::_progress(H4GPIOPin* ptr){ // run this as each stage changes
     H4GM_PIN(Multistage); // Create the correct pointer type in 'pin'
     switch(pin->stage){
         case 1: // over 2 seconds, slow flash
@@ -52,5 +52,5 @@ void H4P_MultiFunctionButton::_hookIn(){
 }
 
 H4P_MultiFunctionButton::H4P_MultiFunctionButton(uint8_t pin,uint8_t mode,H4GM_SENSE b_sense,uint32_t dbTimeMs): H4Plugin("mfnb"){
-    h4gm.pinFactory<MultistagePin>(false,pin,mode,H4GM_PS_MULTISTAGE,b_sense,dbTimeMs,_sm,[this](H4GPIOPin* ptr){ progress(ptr); });
+    h4gm.pinFactory<MultistagePin>(false,pin,mode,H4GM_PS_MULTISTAGE,b_sense,dbTimeMs,_sm,[this](H4GPIOPin* ptr){ _progress(ptr); });
 }

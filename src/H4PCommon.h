@@ -44,10 +44,7 @@ SOFTWARE.
 #endif
 
 #include<unordered_set>
-#include<cstdarg>
 
-using namespace std::placeholders;
-//
 bool stringIsAlpha(const string& s); // move to util!!!
 //
 #ifndef ARDUINO_SONOFF_BASIC // or s20 / sv ect
@@ -274,7 +271,7 @@ class H4Plugin {
     public:
         static  vector<H4_FN_VOID>  _factoryChain;
                 H4_FN_VOID          _factoryHook=[]{};
-                H4_FN_VOID          _rebootHook=[this]{ stop(); };
+//                H4_FN_VOID          _rebootHook=[this]{ stop(); };
         static  vector<H4Plugin*>   _plugins;
                 string              _pName;
                 uint32_t            _subCmd;

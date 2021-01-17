@@ -194,22 +194,29 @@ void H4P_UPNPServer::_notify(const string& phase){ // h4Chunker it up
 }
 
 string H4P_UPNPServer::replaceParams(const string& s){ // oh for a working regex!
+//    Serial.printf("heap %u RP %s\n",ESP.getFreeHeap(),CSTR(s));
 	int i=0;
 	int j=0;
-	string rv(s);
-
-	while((i=rv.find("%",i))!=string::npos){
-        if(j){
-            string var=rv.substr(j+1,i-j-1);
-            if(_cb.count(var)) {
-                rv.replace(j,i-j+1,_cb[var]); // FIX!!
-                rv.shrink_to_fit();
+	string rv;
+//    Serial.printf("heap %u IPlen=%d\n",ESP.getFreeHeap(),s.size());
+    rv.reserve((s.size()*115)/100);
+//    Serial.printf("heap %u IPlen=%d capacity=%d\n",ESP.getFreeHeap(),s.size(),rv.capacity());
+	while(i < s.size()){
+        if(s[i]=='%'){
+            if(j){
+                string v=s.substr(j,i-j);
+//                Serial.printf("pair @ %d %d %s\n",i,j,CSTR(v));
+                if(_cb.count(v)) rv.append(_cb[v]);
+                else rv.append("%"+v+"%");
+                j=0;
             }
-            j=0;
-        } else j=i;    
-        ++i;
+            else j=i+1;
+        } else if(!j) rv.push_back(s[i]);
+        i++;
 	}
-	return rv.c_str();	
+    rv.shrink_to_fit();
+//    Serial.printf("heap %u OUT sz=%d\n%s\n",ESP.getFreeHeap(),rv.size(),CSTR(rv));
+	return rv.c_str();
 }
 
 void H4P_UPNPServer::setBothNames(const string& hostname,const string& friendly){ 

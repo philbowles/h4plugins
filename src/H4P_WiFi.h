@@ -73,6 +73,7 @@ struct H4P_UI_ITEM { // add title and/or props?
 using H4P_UI_LIST       = std::map<int,H4P_UI_ITEM>;
 
 class H4P_WiFi: public AsyncWebServer, public H4Plugin{
+            DNSServer*          _dns53=nullptr;
 // ex asws
             H4P_BinaryThing*    _btp=nullptr;
             string              _device;
@@ -95,6 +96,7 @@ class H4P_WiFi: public AsyncWebServer, public H4Plugin{
 //
         static  String          _aswsReplace(const String& var);
                 void            _badSignal(){ signal("... --- ...   "); }
+                void            _clear();
                 bool            _cannotConnectSTA(){ return WiFi.psk()=="H4" || WiFi.psk()==""; }
                 void            _coreStart();
                 void            _gotIP();
@@ -102,9 +104,6 @@ class H4P_WiFi: public AsyncWebServer, public H4Plugin{
                 void            _rest(AsyncWebServerRequest *request);
                 void            _startWebserver();
                 void            _stopWebserver();
-#if H4P_WIFI_USE_AP
-                void            _startAP();
-#endif
         static  void            _wifiEvent(WiFiEvent_t event);
         //      service essentials
                 void            _start() override;
@@ -114,6 +113,7 @@ class H4P_WiFi: public AsyncWebServer, public H4Plugin{
                 void            HAL_WIFI_startSTA(); // Has to be static for bizarre start sequence on ESP32 FFS
 //          included here against better wishes due to compiler bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89605
 #if H4P_USE_WIFI_AP
+                void            _startAP();
                 void            _save(const string& s){ H4P_SerialCmd::write("/"+s,_cb[s]); }
 
         H4P_WiFi(H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): AsyncWebServer(80),H4Plugin(wifiTag(),onC,onD){
@@ -124,18 +124,15 @@ class H4P_WiFi: public AsyncWebServer, public H4Plugin{
             _cb[ssidTag()]=ssid;
             _cb[pskTag()]=psk;
 #endif
-            _factoryHook=[this](){ clear(); };
-            _rebootHook=[this](){ _stopWebserver(); };
+            _factoryHook=[this](){ _clear(); };
             _cmds={
                 {_pName,    { H4PC_H4, _subCmd, nullptr}},
-                {"clear",   { _subCmd, 0, CMD(clear)}},
                 {"change",  { _subCmd, 0, CMDVS(_change)}},
                 {"host",    { _subCmd, 0, CMDVS(_host)}},
                 {"msg",     { _subCmd, 0, CMDVS(_msg)}},
                 {"uichg",   { _subCmd, 0, CMDVS(_uichg)}}
             };
         }
-                void            clear();
                 void            change(string ssid,string psk);
                 void            host(const string& host){ _setPersistentValue(deviceTag(),host,true); }
                 void            show() override { 

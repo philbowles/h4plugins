@@ -35,8 +35,9 @@ constexpr char* uuTag(){ return "Update URL"; }
 
 #if H4P_USE_WIFI_AP
 void H4P_WiFi::_startAP(){
-    static DNSServer* _dns53=nullptr;
+    signal(".  ",H4P_SIGNAL_TIMEBASE * 2); // really slow single blip
     string opts;
+    _dns53=new DNSServer;
 
     HAL_WIFI_disconnect();
 
@@ -74,6 +75,7 @@ void H4P_WiFi::_startAP(){
                 _save(deviceTag());
                 _save(nameTag());
                 change(_cb[ssidTag()],_cb[pskTag()]);
+//                h4reboot();
             });
     });
     WiFi.mode(WIFI_AP);
@@ -81,11 +83,9 @@ void H4P_WiFi::_startAP(){
 
     WiFi.softAP(CSTR(_cb[deviceTag()]));
     _cb[ipTag()]=CSTR(WiFi.softAPIP().toString());//.c_str();
-    _dns53=new DNSServer;
     _dns53->start(53, "*", WiFi.softAPIP());
-    h4.every(H4WF_AP_RATE,[](){ _dns53->processNextRequest(); },nullptr,H4P_TRID_WFAP);
+    h4.every(H4WF_AP_RATE,[this](){ _dns53->processNextRequest(); },nullptr,H4P_TRID_WFAP);
 
-    //h4wifi.start(); // DONT run uphooks!
     _startWebserver();
 }
 #endif

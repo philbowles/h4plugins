@@ -55,7 +55,7 @@ class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
                 void        _hookIn() override;
                 void        _setup();
                 void        _start() override;
-                bool        _state() override { return PANGO::TCP; }
+                bool        _state() override { return PangolinMQTT::_connected; }
                 void        _stop() override;
     public:
 

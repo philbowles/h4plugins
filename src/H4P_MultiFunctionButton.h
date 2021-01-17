@@ -42,8 +42,9 @@ class H4P_MultiFunctionButton: public H4Plugin{
                 {H4MF_FACTORY,[](H4GPIOPin*){ h4FactoryReset(); }}//,
             };
 
+            void            _greenLight() override {} // no autostart, dpends on wink
             void            _hookIn() override;
-            void            progress(H4GPIOPin* ptr);
+            void            _progress(H4GPIOPin* ptr);
     public:
         H4P_MultiFunctionButton(
             uint8_t pin,

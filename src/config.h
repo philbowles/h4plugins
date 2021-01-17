@@ -41,9 +41,9 @@ SOFTWARE.
         These affect the way wifi, mqtt and multfunction buttons do their signalling
         H4P_SIGNAL_TIMEBASE is the speed at which the signal pattern cycles - see the documentation for flashPattern API
 */
-#define H4P_SIGNAL_LED      LED_BUILTIN
-#define H4P_SIGNAL_SENSE    0
-#define H4P_SIGNAL_TIMEBASE 175
+#define H4P_SIGNAL_LED  LED_BUILTIN
+#define H4P_SIGNAL_SENSE          0
+#define H4P_SIGNAL_TIMEBASE     175
 /*
         DIAGNOSTICS
         comment out H4P_LOG_EVENTS to prevent any logging by EVENT( whatever ) messages
@@ -57,7 +57,7 @@ SOFTWARE.
 #define H4P_LOG_EVENTS
 
 // Make sure you read the documentation and have arrangements in place for using AP mode :)
-#define H4P_USE_WIFI_AP 0
+#define H4P_USE_WIFI_AP          1
 /*
             TWEAKABLES
 */

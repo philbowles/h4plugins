@@ -30,7 +30,7 @@ SOFTWARE.
 #include<H4P_Skeleton.h>
 
 H4P_Skeleton::H4P_Skeleton(const string& name,H4_FN_VOID onStart,H4_FN_VOID onStop): H4Plugin(name,onStart,onStop){
-    _rebootHook=[this](){ reply("FREE SOME RESOURCES\n"); };
+//    _rebootHook=[this](){ reply("FREE SOME RESOURCES\n"); };
     _factoryHook=[this](){ reply("CLEAN UP SOME SHIT\n"); };
     _cmds={
         {_pName,       { H4PC_H4, _subCmd, nullptr}}, // root for this plugin

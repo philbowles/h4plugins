@@ -1,9 +1,8 @@
 TODO:SOONER
-    signalling ap mode
     js - type = password if n includes "pass"
+    public h4 isalpa replace params file etc
 SHORTTERM
-    autoOff -> cb
-    getstartingheap
+    //getstartingheap
     H4_TIMER from at,daily
     adv docs + / example creating your own commands
     retval on ps inc/dec
@@ -18,6 +17,7 @@ MEDIUMTERM
     ESp32 tonecontroller
     templatise / macrofy dependent module detection (and std hookins for runnables?)
 LONGTERM
+    autoOff -> cb
     upnp analyser device
     dynamic add gpio / thing etc
     ESP32 bluetooth PD

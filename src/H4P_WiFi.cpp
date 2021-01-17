@@ -47,9 +47,14 @@ void __attribute__((weak)) onNoViewers(){}
 //
 string H4P_WiFi::HAL_WIFI_chipID(){ return stringFromInt(ESP.getChipId(),"%06X"); }
 
-void H4P_WiFi::HAL_WIFI_disconnect(){ WiFi.disconnect(false); }// prb 32 only: abandon curretn blank attempt or no scan possible
+void H4P_WiFi::HAL_WIFI_disconnect(){
+    //WiFi.printDiag(Serial);
+    //WiFi.disconnect(false); 
+    WiFi.mode(WIFI_OFF);
+    //WiFi.printDiag(Serial);
+}
 
-void H4P_WiFi::HAL_WIFI_setHost(const string& host){ WiFi.hostname(CSTR(host)); } // change ????
+void H4P_WiFi::HAL_WIFI_setHost(const string& host){ WiFi.hostname(CSTR(host)); }
 
 void H4P_WiFi::HAL_WIFI_startSTA(){
     WiFi.mode(WIFI_STA); // poss lose?
@@ -59,12 +64,28 @@ void H4P_WiFi::HAL_WIFI_startSTA(){
     WiFi.begin(CSTR(_cb[ssidTag()]),CSTR(_cb[pskTag()]));
 }
 
-void H4P_WiFi::_start(){     
+void H4P_WiFi::_start(){
     _badSignal();
     _coreStart();
 }
-
+/*#typedef enum WiFiEvent 
+{
+    WIFI_EVENT_STAMODE_CONNECTED = 0,
+    WIFI_EVENT_STAMODE_DISCONNECTED, 1 
+    WIFI_EVENT_STAMODE_AUTHMODE_CHANGE, 2
+    WIFI_EVENT_STAMODE_GOT_IP, 3
+    WIFI_EVENT_STAMODE_DHCP_TIMEOUT, 4
+    WIFI_EVENT_SOFTAPMODE_STACONNECTED, 5
+    WIFI_EVENT_SOFTAPMODE_STADISCONNECTED, 6
+    WIFI_EVENT_SOFTAPMODE_PROBEREQRECVED,7
+    WIFI_EVENT_MODE_CHANGE, 8
+    WIFI_EVENT_SOFTAPMODE_DISTRIBUTE_STA_IP,9
+    WIFI_EVENT_MAX,10
+    WIFI_EVENT_ANY = WIFI_EVENT_MAX,
+} WiFiEvent_t;
+*/
 void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
+    Serial.printf("[WiFi-event] event: %d\n", event);
     switch(event) {
         case WIFI_EVENT_STAMODE_DISCONNECTED:
 			h4.queueFunction([](){ h4wifi._lostIP(); });
@@ -83,7 +104,11 @@ string H4P_WiFi::HAL_WIFI_chipID(){
     uint64_t macAddressTrunc = macAddress << 40;
     return stringFromInt(macAddressTrunc >> 40,"%06X");
 }
-void H4P_WiFi::HAL_WIFI_disconnect(){ WiFi.disconnect(false,false); }// prb 32 only: abandon curretn blank attempt or no scan possible
+
+void H4P_WiFi::HAL_WIFI_disconnect(){ 
+//    WiFi.disconnect(false,false);
+    WiFi.mode(WIFI_OFF);
+}
 
 void H4P_WiFi::HAL_WIFI_setHost(const string& host){ WiFi.setHostname(CSTR(host)); }
 
@@ -99,7 +124,7 @@ void H4P_WiFi::_start(){
  };
 
 void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
-/*
+
     Serial.printf("[WiFi-event] event: %d\n", event);
 
     switch (event) {
@@ -115,6 +140,7 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
             break;
         case SYSTEM_EVENT_STA_STOP:
             Serial.println("WiFi clients stopped");
+			h4.queueFunction([](){ h4wifi._lostIP(); });
             break;
         case SYSTEM_EVENT_STA_CONNECTED:
             Serial.println("Connected to access point");
@@ -185,7 +211,7 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
         default: break;
     }
 }
-*/
+/*
     switch(event) {
         case SYSTEM_EVENT_WIFI_READY:
 			h4.queueFunction([](){ h4wifi._coreStart(); });
@@ -198,6 +224,7 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
 			break;
 	}
 }
+*/
 #endif
 /*
                                                                                                  C O M M O N   F U N C T I O N S
@@ -210,9 +237,15 @@ H4_CMD_ERROR H4P_WiFi::__uichgCore(const string& a,const string& b,H4P_FN_UICHAN
 }
 
 #if H4P_USE_WIFI_AP
-    void H4P_WiFi::_coreStart(){ if(_cannotConnectSTA()) _startAP(); }
+    void H4P_WiFi::_coreStart(){
+        WiFi.printDiag(Serial);
+        if(!_dns53){
+            if(_cannotConnectSTA()) _startAP();
+            else if(WiFi.getMode()==WIFI_OFF)  h4wifi.HAL_WIFI_startSTA();
+        } else Serial.printf("DON'T THINK TWICE!!!\n");
+    }
 #else
-    void H4P_WiFi::_coreStart(){ if(_cannotConnectSTA()) h4wifi.HAL_WIFI_startSTA(); }
+    void H4P_WiFi::_coreStart(){ WiFi.printDiag(Serial); if(_cannotConnectSTA() || WiFi.getMode()==WIFI_OFF) h4wifi.HAL_WIFI_startSTA(); }
 #endif
 
 String H4P_WiFi::_aswsReplace(const String& var){
@@ -226,6 +259,13 @@ bool H4P_WiFi::_getPersistentValue(string v,string prefix){
     string persistent=replaceAll(H4P_SerialCmd::read("/"+v),"\r\n","");
     _cb[v]=persistent.size() ? persistent:string(prefix)+_cb[chipTag()];
     return persistent.size();
+}
+
+void H4P_WiFi::_clear(){ 
+    WiFi.mode(WIFI_STA);
+    WiFi.begin("H4","H4"); // // === eraseConfig :) becos it wont allow "",""
+	stop();
+    _wipe({deviceTag(),nameTag()});
 }
 
 void H4P_WiFi::_gotIP(){
@@ -384,14 +424,14 @@ void H4P_WiFi::_startWebserver(){
 
 void H4P_WiFi::_stop(){
     h4.cancelSingleton(H4P_TRID_HOTA);
-    WiFi.mode(WIFI_OFF);
+    HAL_WIFI_disconnect();
 }
 
 void H4P_WiFi::_stopWebserver(){ 
-    _badSignal();
     end();
     _downHooks();
     _discoDone=true;
+    _badSignal();
 }
 
 void H4P_WiFi::_uiAdd(uint32_t seq,const string& i,H4P_UI_TYPE t,const string& v,H4P_FN_UITXT f,H4P_FN_UICHANGE c){
@@ -402,7 +442,6 @@ void H4P_WiFi::_uiAdd(uint32_t seq,const string& i,H4P_UI_TYPE t,const string& v
 }
 
 uint32_t H4P_WiFi::_uichg(vector<string> vs){
-    dumpvs(vs);
     string payload;
     string extra;
     vector<string> vg;
@@ -443,15 +482,8 @@ void H4P_WiFi::change(string ssid,string psk){ // add device / name?
     _cb[ssidTag()]=ssid;
     _cb[pskTag()]=psk;
     HAL_WIFI_startSTA();
-    h4reboot();
-}
-
-void H4P_WiFi::clear(){ 
-    WiFi.mode(WIFI_STA);
-    WiFi.begin("H4","H4"); // // === eraseConfig :) becos it wont allow "",""
-    show();
-	stop();
-    _wipe({deviceTag(),nameTag()});
+    if(_dns53) h4reboot();
+    else Serial.printf("Don're reboot frtom STA mode!!!\n");
 }
 
 void H4P_WiFi::signal(const char* pattern,uint32_t timebase){ h4fc.flashMorse(pattern,timebase,H4P_SIGNAL_LED,H4P_SIGNAL_SENSE); }
