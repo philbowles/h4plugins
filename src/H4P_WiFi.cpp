@@ -31,7 +31,6 @@ SOFTWARE.
 #include<H4P_SerialCmd.h>
 #include<H4P_FlasherController.h>
 #include<H4P_GPIOManager.h>
-#include<H4P_VerboseMessages.h>
 
 STAG(tcp)
 
@@ -47,12 +46,7 @@ void __attribute__((weak)) onNoViewers(){}
 //
 string H4P_WiFi::HAL_WIFI_chipID(){ return stringFromInt(ESP.getChipId(),"%06X"); }
 
-void H4P_WiFi::HAL_WIFI_disconnect(){
-    //WiFi.printDiag(Serial);
-    //WiFi.disconnect(false); 
-    WiFi.mode(WIFI_OFF);
-    //WiFi.printDiag(Serial);
-}
+void H4P_WiFi::HAL_WIFI_disconnect(){ WiFi.disconnect(false); }
 
 void H4P_WiFi::HAL_WIFI_setHost(const string& host){ WiFi.hostname(CSTR(host)); }
 
@@ -85,7 +79,6 @@ void H4P_WiFi::_start(){
 } WiFiEvent_t;
 */
 void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
-    Serial.printf("[WiFi-event] event: %d\n", event);
     switch(event) {
         case WIFI_EVENT_STAMODE_DISCONNECTED:
 			h4.queueFunction([](){ h4wifi._lostIP(); });
@@ -105,10 +98,7 @@ string H4P_WiFi::HAL_WIFI_chipID(){
     return stringFromInt(macAddressTrunc >> 40,"%06X");
 }
 
-void H4P_WiFi::HAL_WIFI_disconnect(){ 
-//    WiFi.disconnect(false,false);
-    WiFi.mode(WIFI_OFF);
-}
+void H4P_WiFi::HAL_WIFI_disconnect(){ WiFi.disconnect(false,false); }
 
 void H4P_WiFi::HAL_WIFI_setHost(const string& host){ WiFi.setHostname(CSTR(host)); }
 
@@ -124,9 +114,6 @@ void H4P_WiFi::_start(){
  };
 
 void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
-
-    Serial.printf("[WiFi-event] event: %d\n", event);
-
     switch (event) {
         case SYSTEM_EVENT_WIFI_READY: 
             Serial.println("WiFi interface ready");
@@ -242,7 +229,7 @@ H4_CMD_ERROR H4P_WiFi::__uichgCore(const string& a,const string& b,H4P_FN_UICHAN
         if(!_dns53){
             if(_cannotConnectSTA()) _startAP();
             else if(WiFi.getMode()==WIFI_OFF)  h4wifi.HAL_WIFI_startSTA();
-        } else Serial.printf("DON'T THINK TWICE!!!\n");
+        } //else Serial.printf("DON'T THINK TWICE!!!\n");
     }
 #else
     void H4P_WiFi::_coreStart(){ WiFi.printDiag(Serial); if(_cannotConnectSTA() || WiFi.getMode()==WIFI_OFF) h4wifi.HAL_WIFI_startSTA(); }
@@ -261,10 +248,13 @@ bool H4P_WiFi::_getPersistentValue(string v,string prefix){
     return persistent.size();
 }
 
-void H4P_WiFi::_clear(){ 
+void H4P_WiFi::_clear(){
+//    WiFi.printDiag(Serial);
+    _downHooks();
+    // turn off events?
+    WiFi.onEvent([](WiFiEvent_t event){});
     WiFi.mode(WIFI_STA);
     WiFi.begin("H4","H4"); // // === eraseConfig :) becos it wont allow "",""
-	stop();
     _wipe({deviceTag(),nameTag()});
 }
 
@@ -298,12 +288,27 @@ uint32_t H4P_WiFi::_gpio(vector<string> vs){
     return guard1(vs,[this](vector<string> vs){
         if(H4PAYLOAD=="all") uiAddGPIO();
         else {
-            if(!isNumeric(H4PAYLOAD)) return H4_CMD_NOT_NUMERIC;
+            if(!stringIsNumeric(H4PAYLOAD)) return H4_CMD_NOT_NUMERIC;
             uint8_t pin=H4PAYLOAD_INT;
             return uiAddGPIO(pin);
         }
         return H4_CMD_OK;
     });
+}
+
+void H4P_WiFi::_handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source) {
+    switch(type){
+        case H4P_EVENT_HEARTBEAT:
+            uiSync();
+            break;
+        case H4P_EVENT_FACTORY:
+            Serial.printf("%s H4P_EVENT_FACTORY src=%s msg=%s\n",CSTR(_pName),CSTR(source),CSTR(msg));
+             _clear();
+            break;
+        default:
+            Serial.printf("WTF? EVENT t=%d src=%s *%s*\n",type,CSTR(source),CSTR(msg));
+            break;
+    }
 }
 
 void H4P_WiFi::_hookIn(){
@@ -330,6 +335,7 @@ void H4P_WiFi::_hookIn(){
     _cb[h4UITag()]=_cb[h4UITag()]+"ap";
 #endif
     _uiAdd(H4P_UIO_H4UIV,h4UITag(),H4P_UI_LABEL);
+    H4PEventListener::_hookIn();
 }
 
 uint32_t H4P_WiFi::_host(vector<string> vs){
@@ -359,7 +365,7 @@ void H4P_WiFi::_rest(AsyncWebServerRequest *request){
 		string chop=replaceAll(CSTR(request->url()),"/rest/","");
         string msg="";
         uint32_t res=h4cmd._simulatePayload(CSTR(chop),wifiTag());
-        if(isLoaded(vmTag())) msg=h4vm.getErrorMessage(res);
+        msg=h4cmd._getErrorMessage(res);
         string j="{\"res\":"+stringFromInt(res)+",\"msg\":\""+msg+"\",\"lines\":[";
         string fl;
         if(!res){
@@ -377,10 +383,7 @@ void H4P_WiFi::_rest(AsyncWebServerRequest *request){
 	},request),nullptr,H4P_TRID_REST);
 }
 
-void H4P_WiFi::_sendSSE(const char* name,const char* msg){
-    static uint32_t _evtID=0;
-    if(_evts && _evts->count()) _evts->send(msg,name,_evtID++);
-}
+void H4P_WiFi::_sendSSE(const char* name,const char* msg){ if(_evts && _evts->count()) _evts->send(msg,name,_evtID++); }
 
 void H4P_WiFi::_setPersistentValue(string n,string v,bool reboot){
     if(_cb[n]!=v){
@@ -390,24 +393,33 @@ void H4P_WiFi::_setPersistentValue(string n,string v,bool reboot){
 }
 
 void H4P_WiFi::_startWebserver(){
+//    static unordered_set<AsyncEventSourceClient *client> clients;
 	reset();
     _evts=new AsyncEventSource("/evt");
     _evts->onConnect([this](AsyncEventSourceClient *client){
-        h4.queueFunction([this,client](){
-            H4EVENT("SSE Client %08x n=%d T/O=%d nC=%d nUI=%d",client,client->lastId(),H4P_ASWS_EVT_TIMEOUT,_evts->count(),_userItems.size());
-            if(_evts->count()==1) onViewers(); //if(_onC) _onC(); // first time only R WE SURE?
-            for(auto & i:_userItems) {
-                H4P_UI_ITEM u=i.second;
-                if(u.f) u.value=u.f(); // auto-sync delayed fields
-                _sendSSE("ui",CSTR(string(u.id+","+stringFromInt(u.type)+","+u.value+","+(u.c ? "1":"0" ))));
-            }
-            h4.repeatWhile([this]{ return _evts->count(); },
-                ((H4P_ASWS_EVT_TIMEOUT*3)/4),
-                [this]{ },
-                [this]{ onNoViewers(); },
-                H4P_TRID_SSET,true
-            );
-        });
+        Serial.printf("SSE Client %08x i=%d cLast=%d T/O=%d nC=%d\n",client,_evtID,client->lastId(),H4P_ASWS_EVT_TIMEOUT,_evts->count());
+        if(client->lastId() > _evtID){
+            client->close();
+            Serial.printf("STALE CLIENT %08X ignored nC=%d\n",client,_evts->count());
+        }
+        else {
+            h4.queueFunction([this,client](){
+//                clients.insert(client);
+                H4EVENT("Handle Client %08x i=%d cLast=%d T/O=%d nC=%d nUI=%d",client,_evtID,client->lastId(),H4P_ASWS_EVT_TIMEOUT,_evts->count(),_userItems.size());
+                if(_evts->count()==1) onViewers(); //if(_onC) _onC(); // first time only R WE SURE?
+                for(auto & i:_userItems) {
+                    H4P_UI_ITEM u=i.second;
+                    if(u.f) u.value=u.f(); // auto-sync delayed fields
+                    _sendSSE("ui",CSTR(string(u.id+","+stringFromInt(u.type)+","+u.value+","+(u.c ? "1":"0" ))));
+                }
+                h4.repeatWhile([this]{ return _evts->count(); },
+                    ((H4P_ASWS_EVT_TIMEOUT*3)/4),
+                    [this]{ },
+                    [this]{ onNoViewers(); },
+                    H4P_TRID_SSET,true
+                );
+            });
+        }
     });
     addHandler(_evts);
 
@@ -424,7 +436,7 @@ void H4P_WiFi::_startWebserver(){
 
 void H4P_WiFi::_stop(){
     h4.cancelSingleton(H4P_TRID_HOTA);
-    HAL_WIFI_disconnect();
+    WiFi.mode(WIFI_OFF);
 }
 
 void H4P_WiFi::_stopWebserver(){ 
@@ -459,7 +471,7 @@ uint32_t H4P_WiFi::_uichg(vector<string> vs){
                 H4P_UI_ITEM u=i.second;
                 if(u.id==vg[0]){
                     if(u.type==H4P_UI_BOOL){
-                        if(isNumeric(vg[1])) {
+                        if(stringIsNumeric(vg[1])) {
                             if(atoi(CSTR(vg[1])) > 1) return H4_CMD_PAYLOAD_FORMAT;
                         } else return H4_CMD_NOT_NUMERIC;
                     }

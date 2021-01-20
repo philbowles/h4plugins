@@ -32,18 +32,17 @@ SOFTWARE.
 
 #include<H4PCommon.h>
 
-class H4P_Heartbeat: public H4Plugin {
-        static  uint32_t    _uptime;
- 
-                H4_FN_VOID  _bf;
+using H4_FN_HEARTBEAT       = function<void(uint32_t)>;
 
-                void        _greenLight() override { _start(); }; // autostart
+class H4P_Heartbeat: public H4PEventListener { 
+                H4_FN_HEARTBEAT _f;
+        static  uint32_t        _uptime;
+
+                void        _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source) override;
                 void        _hookIn() override; // autostart
-                void        _start() override;
-                void        _stop() override ;
                 void        _run();
     public: 
-        H4P_Heartbeat(H4_FN_VOID beat=nullptr): _bf(beat),H4Plugin("beat"){}
+        H4P_Heartbeat(H4_FN_HEARTBEAT beat=nullptr): _f(beat), H4PEventListener("beat",H4P_EVENT_HEARTBEAT){}
 
         static string secsToTime(uint32_t sex);
 

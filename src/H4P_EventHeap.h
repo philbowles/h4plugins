@@ -27,35 +27,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_Skeleton_H
-#define H4P_Skeleton_H
+#pragma once
 
-#include<H4PCommon.h>
+#include <H4PCommon.h>
 
-STAG(skel);
-
-class H4P_Skeleton: public H4Plugin {
-        VSCMD(_bones);
-
-                void        _hookIn() override;
-                void        _greenLight() override;
-                void        _start() override {
-                    h4._hookLoop([this](){ _run(); },_subCmd);
-                    H4Plugin::_start();
-                }
-                void        _stop() override {
-                    h4._unHook(_subCmd);
-                    H4Plugin::_stop();
-                }
-                bool        _state() override;
-                void        _run(); // rare
+class H4P_EventHeap: public H4Plugin {
+        uint32_t _f;
+        void _start() override { h4.every(_f,[this](){ SYSEVENT(H4P_EVENT_HEAP,_pName,"%u",ESP.getFreeHeap()); },nullptr,H4P_TRID_HLOG,true); }
+        void _stop() override { h4.cancelSingleton(H4P_TRID_HLOG); }
     public:
-        H4P_Skeleton(const string& name,H4_FN_VOID onStart=nullptr,H4_FN_VOID onStop=nullptr);
-
-        void rattle();
-        
-        void start();
-        void stop();
+        H4P_EventHeap(uint32_t f=1000): _f(f),H4Plugin("hlog"){}
 };
-
-#endif // H4P_Skeleton_H

@@ -148,7 +148,7 @@ uint32_t H4P_ToneController::_siren(vector<string> vs){
     /*
     if(vs.size()<2) return H4_CMD_TOO_FEW_PARAMS;
     if(vs.size()>2) return H4_CMD_TOO_MANY_PARAMS;
-    if(!isNumeric(H4PAYLOAD)) return H4_CMD_NOT_NUMERIC;
+    if(!stringIsNumeric(H4PAYLOAD)) return H4_CMD_NOT_NUMERIC;
     if(H4PAYLOAD_INT > H4P_SIREN_MAX) return H4_CMD_OUT_OF_BOUNDS;
 */
     return H4_CMD_OK;

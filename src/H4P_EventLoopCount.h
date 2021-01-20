@@ -27,8 +27,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_LoopCount_HO
-#define H4P_LoopCount_HO
+#pragma once
 
 extern __attribute__((weak)) uint32_t h4Nloops=0;
 
@@ -45,20 +44,22 @@ extern __attribute__((weak)) uint32_t h4Nloops=0;
         but h4UserLoop will not get called!
 
 */
-class H4P_LoopCount: public H4Plugin {
-            uint32_t    _freq;
+#if H4_COUNT_LOOPS
+    #pragma message("COUNTING LOOPS")
+#endif
 
-            void        _start() override {
-                h4.every(_freq,[this]{
-                    H4EVENT("%u\n",h4Nloops);
-                    h4Nloops=0;
-                },nullptr,H4P_TRID_LOOP,true);
+class H4P_EventLoopCount: public H4PEventListener {
+
+            void _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source) override {
+                SYSEVENT(H4P_EVENT_LOOPS,_pName,"%u",h4Nloops);
+                h4Nloops=0;
+            };
+
+            void _hookIn() {
+                DEPEND(tick);
+                H4PEventListener::_hookIn();
             }
 
-            void        _stop() override { h4.cancelSingleton(H4P_TRID_LOOP); }
-
     public:
-        H4P_LoopCount(uint32_t freq=1000): _freq(freq), H4Plugin("loop"){ h4Nloops=0; }
+        H4P_EventLoopCount(): H4PEventListener("loop",H4P_EVENT_HEARTBEAT){ h4Nloops=0; }
 };
-
-#endif // H4P_LoopCount_H

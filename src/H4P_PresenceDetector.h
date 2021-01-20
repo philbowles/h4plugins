@@ -43,7 +43,7 @@ class H4PDetector: public H4Plugin{
                 if(b!=_here){
                     if(_f) _f(b);
                     _here=b;
-                    SYSEVENT(b ? H4P_LOG_PD_ENTER:H4P_LOG_PD_LEAVE ,"pd",_pName,"%s",b ? "IN":"OUT");
+                    SYSEVENT(b ? H4P_EVENT_PD_ENTER:H4P_EVENT_PD_LEAVE ,_pName,"%s",b ? "IN":"OUT");
                 }
             }
             void        _stop() override{

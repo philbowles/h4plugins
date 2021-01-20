@@ -72,11 +72,12 @@ struct H4P_UI_ITEM { // add title and/or props?
 };
 using H4P_UI_LIST       = std::map<int,H4P_UI_ITEM>;
 
-class H4P_WiFi: public AsyncWebServer, public H4Plugin{
+class H4P_WiFi: public AsyncWebServer, public H4PEventListener {
             DNSServer*          _dns53=nullptr;
-// ex asws
+//
             H4P_BinaryThing*    _btp=nullptr;
             string              _device;
+            uint32_t            _evtID=0;
             AsyncEventSource*   _evts;
             vector<string>      _lines={};
             H4P_UI_LIST         _userItems={};
@@ -100,6 +101,7 @@ class H4P_WiFi: public AsyncWebServer, public H4Plugin{
                 bool            _cannotConnectSTA(){ return WiFi.psk()=="H4" || WiFi.psk()==""; }
                 void            _coreStart();
                 void            _gotIP();
+                void            _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source) override;
                 void            _lostIP();
                 void            _rest(AsyncWebServerRequest *request);
                 void            _startWebserver();
@@ -116,15 +118,17 @@ class H4P_WiFi: public AsyncWebServer, public H4Plugin{
                 void            _startAP();
                 void            _save(const string& s){ H4P_SerialCmd::write("/"+s,_cb[s]); }
 
-        H4P_WiFi(H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): AsyncWebServer(80),H4Plugin(wifiTag(),onC,onD){
+        H4P_WiFi(H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): AsyncWebServer(80),H4PEventListener(wifiTag(),H4P_EVENT_HEARTBEAT | H4P_EVENT_FACTORY,onC,onD){
             _cb[ssidTag()]=uppercase(h4Tag());
             _cb[pskTag()]=uppercase(h4Tag());
 #else
-        H4P_WiFi(string ssid,string psk,string device="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): AsyncWebServer(80),_device(device),H4Plugin(wifiTag(),onC,onD){
+        H4P_WiFi(string ssid,string psk,string device="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): AsyncWebServer(80),
+            _device(device),
+            H4PEventListener(wifiTag(),H4P_EVENT_HEARTBEAT | H4P_EVENT_FACTORY,onC,onD)
+            {
             _cb[ssidTag()]=ssid;
             _cb[pskTag()]=psk;
 #endif
-            _factoryHook=[this](){ _clear(); };
             _cmds={
                 {_pName,    { H4PC_H4, _subCmd, nullptr}},
                 {"change",  { _subCmd, 0, CMDVS(_change)}},
@@ -139,6 +143,7 @@ class H4P_WiFi: public AsyncWebServer, public H4Plugin{
                     reply("Device %s Mode=%d Status: %d",CSTR(_cb[deviceTag()]),WiFi.getMode(),WiFi.status());
                     reply("SSID %s PSK=%s",CSTR(WiFi.SSID()),CSTR(WiFi.psk()));
                     reply("Signal Pin GPIO%d active=%d",H4P_SIGNAL_LED,H4P_SIGNAL_SENSE);
+                    H4PEventListener::show();
 /*
                     for(auto &i:_userItems) {
                         H4P_UI_ITEM u=i.second;

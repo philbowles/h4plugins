@@ -27,23 +27,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_MQTTHeapLogger_HO
-#define H4P_MQTTHeapLogger_HO
+#pragma once
 
 #include <H4PCommon.h>
-#include <H4P_AsyncMQTT.h>
 
-class H4P_MQTTHeapLogger: public H4P_MQTTLogger {
+class H4P_EventQ: public H4Plugin {
         uint32_t _f;
-        void _start() override { 
-            H4P_MQTTLogger::_start();
-            h4.every(_f,[this](){ SYSEVENT(H4P_LOG_MQTT_HEAP,_pName,mqttTag(),"%u",ESP.getFreeHeap()); },nullptr,H4P_TRID_HLOG,true);
-            }
-        void _stop() override { 
-            h4.cancelSingleton(H4P_TRID_HLOG);
-            H4P_MQTTLogger::_stop();
-        }
+        uint32_t _scale;
+
+        void _start() override { h4.every(_f,[this](){ SYSEVENT(H4P_EVENT_Q,_pName,"%u",_scale * h4.size()); },nullptr,H4P_TRID_QLOG,true); }
+        void _stop() override { h4.cancelSingleton(H4P_TRID_QLOG); }
     public:
-        H4P_MQTTHeapLogger(uint32_t f): _f(f),H4P_MQTTLogger("heap",H4P_LOG_MQTT_HEAP){}
+        H4P_EventQ(uint32_t f=1000,uint32_t scale=1000): _f(f),_scale(scale), H4Plugin("qlog"){}
 };
-#endif // H4P_MQTTLogger_H

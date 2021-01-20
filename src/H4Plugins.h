@@ -1,17 +1,20 @@
 #pragma once
 
 #include<config.h>
+
 #if H4P_USE_WIFI_AP
     #pragma message("Using Wifi AP - Make sure you have made arrangements!")
 #endif
-#include<H4P_VerboseMessages.h>
+
+
+// force start on line 11 for easy counting
 #include<H4P_Heartbeat.h>
 #include<H4P_SerialCmd.h>
 #include<H4P_SerialLogger.h>
 #include<H4P_ExternalSqWave.h>
 #include<H4P_TaskSniffer.h>
 #include<H4P_HeapWarn.h>
-#include<H4P_LoopCount.h>
+#include<H4P_EventLoopCount.h>
 #include<H4P_QueueWarn.h>
 #include<H4P_GPIOManager.h>
 #include<H4P_FlasherController.h>
@@ -19,20 +22,19 @@
 #include<H4P_WiFi.h>
 #include<H4P_PersistentStorage.h>
 #include<H4P_AsyncMQTT.h>
-#ifdef H4P_LOG_EVENTS
-    #include<H4P_LocalLogger.h>
-    #include<H4P_MQTTLogger.h>
-    #include<H4P_MQTTHeapLogger.h>
-    #include<H4P_MQTTQueueLogger.h>
-    #include<H4P_HttpMySQLLogger.h>
-#endif
+#include<H4P_MQTTLogger.h>
+#include<H4P_EventHeap.h>
+#include<H4P_EventListener.h>
+#include<H4P_EventQ.h>
+#include<H4P_EventTick.h>
+#include<H4P_LocalLogger.h>
+#include<H4P_HttpMySQLLogger.h>
 #include<H4P_RemoteUpdate.h>
 #include<H4P_udpLogger.h>
 #include<H4P_UPNPServer.h>
 #include<H4P_PresenceDetector.h>
 #include<H4P_Timekeeper.h>
 #include<H4P_Sunrise.h>
-
 #include<H4P_BinaryThing.h>
 #include<H4P_BinarySwitch.h>
 #include<H4P_MultiFunctionButton.h>

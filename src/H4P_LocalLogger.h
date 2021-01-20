@@ -27,26 +27,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_LocalLogger_HO
-#define H4P_LocalLogger_HO
+#pragma once
 
 #include <H4PCommon.h>
-#ifdef H4P_LOG_EVENTS
-
 #include <H4P_SerialCmd.h>
 
-class H4P_LocalLogger: public H4PLogService {
+class H4P_LocalLogger: public H4PEventListener {
         string      _fname;
         uint32_t    _limit;
 
-        virtual void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target);
+        virtual void        _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source);
     public:
-        H4P_LocalLogger(uint32_t limit=10000,uint32_t filter=H4P_LOG_ALL); // amount of free SPIFFS space to use
+        H4P_LocalLogger(uint32_t limit=10000,uint32_t filter=H4P_EVENT_ALL); // amount of free SPIFFS space to use
 
                 void        clear();
                 void        flush();
                 void        show() override;
 };
-#endif
-
-#endif // H4P_LocalLogger_H

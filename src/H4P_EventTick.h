@@ -27,21 +27,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_MQTTLogger_HO
-#define H4P_MQTTLogger_HO
+#pragma once
 
-#include <H4PCommon.h>
-#include <H4P_AsyncMQTT.h>
+#include<H4PCommon.h>
 
-class H4P_MQTTLogger: public H4PEventListener {
-        void _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source){ h4mqtt.publishDevice(_pName,msg); }
-    protected:
-        virtual void _hookIn() override {
-            DEPEND(mqtt);
-            H4PEventListener::_hookIn();
-        }
-        virtual void _greenLight() override {} // dont autostart
-    public:
-        H4P_MQTTLogger(const string& topic="mlog",uint32_t filter=H4P_EVENT_ALL): H4PEventListener(topic,filter){}
+class H4P_EventTick: public H4Plugin {
+            uint32_t    _uptime;
+
+                void        _hookIn() override { 
+                    h4._hookLoop([this](){ _run(); },_subCmd);
+                    H4Plugin::_hookIn();
+                }
+
+                void _run() {
+                    uint32_t now=millis();
+                    uint32_t nowsec=now/1000;
+                    if(!(now%1000) && nowsec!=_uptime) {
+                        _uptime=nowsec;
+                        SYSEVENT(H4P_EVENT_HEARTBEAT,_pName,"%u",_uptime);
+                    }
+                }
+    public: 
+        H4P_EventTick(H4_FN_VOID beat=nullptr): H4Plugin(tickTag()){}
+
+                void    show() override {
+                    H4Plugin::show();
+                    reply("Uptime %u",_uptime);
+                }
 };
-#endif // H4P_MQTTLogger_H

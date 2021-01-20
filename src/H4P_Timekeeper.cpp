@@ -91,7 +91,7 @@ uint32_t H4P_Timekeeper::__alarmCore (vector<string> vs,bool daily,H4BS_FN_SWITC
     int T=parseTime(vg[0]);
     if(T<0) return H4_CMD_PAYLOAD_FORMAT;
     string b=vg[1];
-    if(!isNumeric(b)) return H4_CMD_NOT_NUMERIC;
+    if(!stringIsNumeric(b)) return H4_CMD_NOT_NUMERIC;
     int onoff=atoi(CSTR(b));
     if(_mss00){ // onRTC
         H4EVENT("%s %s -> %s",daily ? "Daily":"S/Shot",CSTR(strTime(T)),onoff ? "ON":"OFF");

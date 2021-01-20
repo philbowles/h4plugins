@@ -31,16 +31,29 @@ SOFTWARE.
 
 #define SEPARATOR "\xff"
 
+void H4P_PersistentStorage::_handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source) {
+    switch(type){
+        case H4P_EVENT_FACTORY:
+            Serial.printf("%s H4P_EVENT_FACTORY src=%s msg=%s\n",CSTR(_pName),CSTR(source),CSTR(msg));
+            clear();
+            break;
+        default:
+            Serial.printf("WTF? EVENT t=%d src=%s *%s*\n",type,CSTR(source),CSTR(msg));
+            break;
+    }
+}
+
 void H4P_PersistentStorage::_hookIn() {
     vector<string> items=split(H4P_SerialCmd::read("/"+_pName),SEPARATOR);
     for(auto const& i:items){
         vector<string> nv=split(i,"=");
-        psRam[nv[0]]=nv[1];
+//        psRam[nv[0]]=nv[1];
+        psRam[nv[0]]=nv.size() > 1 ? nv[1]:""; // thanks hamzah :)
     }
-    _factoryHook=[this](){ clear(); };
+    H4PEventListener::_hookIn();
 }
 
-H4P_PersistentStorage::H4P_PersistentStorage(H4P_FN_PSCHANGE f): _f(f), H4Plugin("stor"){
+H4P_PersistentStorage::H4P_PersistentStorage(H4P_FN_PSCHANGE f): _f(f), H4PEventListener("stor",H4P_EVENT_FACTORY){
     _cmds={
         {_pName,    { H4PC_H4, _subCmd, nullptr}},
         {"clear",   { _subCmd, 0, CMD(clear)}},

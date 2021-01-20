@@ -30,22 +30,17 @@ SOFTWARE.
 #include<H4P_SerialCmd.h>
 
 void __attribute__((weak)) onFactoryReset(){}
-
-vector<H4_FN_VOID>  H4Plugin::_factoryChain;
-//
-bool stringIsAlpha(const string& s){ return !(std::find_if(s.begin(), s.end(),[](char c) { return !std::isalpha(c); }) != s.end()); }
 //
 void h4StartPlugins(){
+//    Serial.printf("CALIBRATION? cal=%u nL=%u peak=%u\n",H4_CALIBRATE,h4Nloops,h4Nloops * (1000 / H4_CALIBRATE));
     for(auto const& p:H4Plugin::_plugins) { p->_startup(); }
     for(auto const& p:H4Plugin::_plugins) { p->_hookIn(); }
-    for(auto const& p:H4Plugin::_plugins) { H4Plugin::_factoryChain.push_back(p->_factoryHook); }
     for(auto const& p:H4Plugin::_plugins) { p->_greenLight(); }
-    reverse(H4Plugin::_factoryChain.begin(),H4Plugin::_factoryChain.end());
-    H4Plugin::_factoryChain.push_back(onFactoryReset);
 }
 
-void h4FactoryReset(){
-    for(auto const &c:H4Plugin::_factoryChain) c();
+void h4FactoryReset(const string& src){
+    SYSEVENT(H4P_EVENT_FACTORY,src,stringFromInt(millis()));
+    onFactoryReset();
     h4rebootCore();
 }
 
@@ -53,7 +48,7 @@ vector<uint32_t> H4Plugin::expectInt(string pl,const char* delim){
     vector<uint32_t> results;
     vector<string> tmp=split(pl,delim);
     for(auto const& t:tmp){
-        if(!isNumeric(t)) return {};
+        if(!stringIsNumeric(t)) return {};
         results.push_back(STOI(t));
     }
     return results;
@@ -98,15 +93,15 @@ void H4Plugin::stop() {
 }
 
 void H4Plugin::_upHooks(){ 
-    SYSEVENT(H4P_LOG_SVC_UP,"svc",_pName,"UP");
+    SYSEVENT(H4P_EVENT_SVC_UP,_pName,"");
     for(auto const& c:_connected) c();
 }
 
 void H4Plugin::_downHooks(){
     for(auto const& c:_disconnected) c();
-    SYSEVENT(H4P_LOG_SVC_DOWN,"svc",_pName,"DN");
+    SYSEVENT(H4P_EVENT_SVC_DOWN,_pName,"");
 }
 //
 //      H4PlogService
 //
-void H4PLogService::_hookIn(){ h4cmd._hookLogChain(bind(&H4PLogService::_filterLog,this,_1,_2,_3,_4)); }
+void H4PEventListener::_hookIn(){ h4cmd._hookLogChain(bind(&H4PEventListener::_filterEvent,this,_1,_2,_3)); }

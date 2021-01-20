@@ -41,7 +41,7 @@ struct H4P_LWT {
     bool            retain;
 };
 
-class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
+class H4P_AsyncMQTT: public H4PEventListener, public PangolinMQTT{
                 bool            autorestart=true;
                 string          device;
                 string          prefix=string(h4Tag()).append("/");
@@ -52,27 +52,27 @@ class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
 
                 void        _badSignal(){ h4wifi.signal(". .    ",H4P_SIGNAL_TIMEBASE/2); }
                 void        _greenLight() override; //do not autostart!
+                void        _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source) override;
                 void        _hookIn() override;
                 void        _setup();
                 void        _start() override;
-                bool        _state() override { return PangolinMQTT::_connected; }
+                bool        _state() override { return connected(); }
                 void        _stop() override;
     public:
 
 #if H4P_USE_WIFI_AP
         H4P_AsyncMQTT(H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr,H4P_LWT lwt={"","",0,false}):
-            _lwt(lwt), H4Plugin(mqttTag(),onC,onD)
+            _lwt(lwt), H4PEventListener(mqttTag(),H4P_EVENT_FACTORY,onC,onD)
         {
 #else
         H4P_AsyncMQTT(string broker,uint16_t port, string user="",string pass="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr,H4P_LWT lwt={"","",0,false}):
-            _lwt(lwt), H4Plugin(mqttTag(),onC,onD)
+            _lwt(lwt), H4PEventListener(mqttTag(),H4P_EVENT_FACTORY,onC,onD)
         {
             _cb[brokerTag()]=broker;
             _cb[portTag()]=stringFromInt(port);
             _cb[mQuserTag()]=user,
             _cb[mQpassTag()]=pass;
 #endif
-            _factoryHook=[](){ h4wifi._wipe(mqconfTag()); };
             _cmds={ 
                 {_pName,    { H4PC_H4, _subCmd, nullptr }}, 
                 {"change",  { _subCmd, 0, CMDVS(_change) }},

@@ -124,6 +124,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     source.addEventListener('ui', function(e){ uiItem(e.data) });
     source.onmessage=function(e){ toaster(e.data) }
+    source.onerror=function(e){ document.querySelectorAll('div.uv').forEach(function(d){ d.style.background="#ff0000" })}
 
     toaster("Thank you for using H4/Plugins - please support me on Patreon, see link below");
         

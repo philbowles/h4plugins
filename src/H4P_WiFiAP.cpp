@@ -75,7 +75,6 @@ void H4P_WiFi::_startAP(){
                 _save(deviceTag());
                 _save(nameTag());
                 change(_cb[ssidTag()],_cb[pskTag()]);
-//                h4reboot();
             });
     });
     WiFi.mode(WIFI_AP);

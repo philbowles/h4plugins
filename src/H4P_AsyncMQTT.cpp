@@ -29,16 +29,28 @@ SOFTWARE.
 #include<H4P_AsyncMQTT.h>
 #include<H4P_WiFi.h>
 
-void __attribute__((weak)) onMQTTError(uint8_t e,int info){ SYSEVENT(H4P_LOG_MQTT_ERROR,mqttTag(),h4Tag(),"e=%d info=%d",e,info); }
+void __attribute__((weak)) onMQTTError(uint8_t e,int info){ SYSEVENT(H4P_EVENT_MQTT_ERROR,mqttTag(),"e=%d info=%d",e,info); }
 
 uint32_t H4P_AsyncMQTT::_change(vector<string> vs){
     return guard1(vs,[this](vector<string> vs){
         auto vg=split(H4PAYLOAD,",");
         if(vg.size()!=4) return H4_CMD_PAYLOAD_FORMAT;
-        if(!isNumeric(vg[1])) return H4_CMD_NOT_NUMERIC;
+        if(!stringIsNumeric(vg[1])) return H4_CMD_NOT_NUMERIC;
         change(vg[0],STOI(vg[1]),vg[2],vg[3]); // change this to a vs?
         return H4_CMD_OK;
     });
+}
+
+void H4P_AsyncMQTT::_handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source) {
+    switch(type){
+        case H4P_EVENT_FACTORY:
+            Serial.printf("%s H4P_EVENT_FACTORY src=%s msg=%s\n",CSTR(_pName),CSTR(source),CSTR(msg));
+            h4wifi._wipe(mqconfTag());
+            break;
+        default:
+            Serial.printf("WTF? EVENT t=%d src=%s *%s*\n",type,CSTR(source),CSTR(msg));
+            break;
+    }
 }
 
 void H4P_AsyncMQTT::_hookIn() { 
@@ -50,7 +62,6 @@ void H4P_AsyncMQTT::_hookIn() {
         _cb[portTag()]=mqconf[1];
         _cb[mQuserTag()]=mqconf.size() > 2 ? mqconf[2]:"";
         _cb[mQpassTag()]=mqconf.size() > 3 ? mqconf[3]:"";
-//        Serial.printf("Sanity %s:%s %s/%s\n",CSTR(_cb[brokerTag()]),CSTR(_cb[portTag()]),CSTR(_cb[mQuserTag()]),CSTR(_cb[mQpassTag()]));
     }
     _cb.erase(mqconfTag());
 #endif
@@ -92,7 +103,7 @@ void H4P_AsyncMQTT::_hookIn() {
     onDisconnect([this](int8_t reason){
         if(!_discoDone){
             h4.queueFunction([this,reason](){
-                _badSignal();//h4wifi.signal("..    ",H4P_SIGNAL_TIMEBASE/2);
+                _badSignal();
                 _discoDone=true;
                 _downHooks();
                 h4wifi.uiSync();
@@ -101,6 +112,7 @@ void H4P_AsyncMQTT::_hookIn() {
             });
         }
     });
+    H4PEventListener::_hookIn();
 }
 
 void H4P_AsyncMQTT::_greenLight(){
@@ -122,11 +134,7 @@ void H4P_AsyncMQTT::_greenLight(){
 void H4P_AsyncMQTT::_setup(){ // allow for TLS
     string broker=_cb[brokerTag()];
     uint16_t port=atoi(CSTR(_cb[portTag()]));
-    if(atoi(CSTR(broker))) {
-        vector<string> vs=split(broker,".");
-        setServer(IPAddress(PARAM_INT(0),PARAM_INT(1),PARAM_INT(2),PARAM_INT(3)),port);
-    } else setServer(CSTR(broker),port);
-        
+    setServer(CSTR(broker),port);
     if(_cb[mQuserTag()]!="") setCredentials(CSTR(_cb[mQuserTag()]),CSTR(_cb[mQpassTag()])); // optimise tag()
 }
 
@@ -155,7 +163,6 @@ void H4P_AsyncMQTT::change(const string& broker,uint16_t port,const string& user
     _cb[mqconfTag()]=_cb[brokerTag()]+","+_cb[portTag()]+","+_cb[mQuserTag()]+","+_cb[mQpassTag()];
     h4wifi._save(mqconfTag());
 #endif
-    _setup();
     restart();
 }
 
@@ -168,7 +175,7 @@ void H4P_AsyncMQTT::report(){
 }
 
 void H4P_AsyncMQTT::show(){
-    reply("Server: %s, port:%s, %s",CSTR(_cb[brokerTag()]),CSTR(_cb[portTag()]),_state() ? "CNX":"DCX");
+    reply("Server: %s, port:%s, %s",CSTR(_cb[brokerTag()]),CSTR(_cb[portTag()]),connected() ? "CNX":"DCX");
     string reporting;
     for(auto const r:_reportList) reporting+=r+",";
     reporting.pop_back();

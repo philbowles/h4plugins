@@ -30,6 +30,10 @@ SOFTWARE.
 #ifndef H4P_ExternalSqWave_HO
 #define H4P_ExternalSqWave_HO
 
+#define H4ESW_MAX_F         150000
+#define H4ESW_MAX_D            100
+#define H4ESW_TIMEOUT           50
+
 #include<H4PCommon.h>
 #include<SoftwareSerial.h>
 

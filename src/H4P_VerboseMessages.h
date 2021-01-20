@@ -27,14 +27,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_VerboseMessages_HO
-#define H4P_VerboseMessages_HO
+#pragma once
 
 #include<H4PCommon.h>
 
 extern const char* giveTaskName(uint32_t id);
 class H4P_VerboseMessages: public H4Plugin {
-        H4_INT_MAP  cmdErrors={
+    public:
+        H4_INT_MAP cmdErrors={
             {H4_CMD_OK,"OK"},
             {H4_CMD_UNKNOWN,"Unknown cmd"},
             {H4_CMD_TOO_FEW_PARAMS,"Too few parameters"},
@@ -45,19 +45,22 @@ class H4P_VerboseMessages: public H4Plugin {
             {H4_CMD_PAYLOAD_FORMAT,"Incorrect Payload Format"},
             {H4_CMD_NOT_NOW,"Can't do now"}
         };
-//
-        H4_INT_MAP  logTypes={
-            {H4P_LOG_H4,h4Tag()},
-            {H4P_LOG_SVC_UP,"SVC UP"},
-            {H4P_LOG_SVC_DOWN,"SVC DOWN"},
-            {H4P_LOG_CMD,"CMD"},
-            {H4P_LOG_USER,"USER"},
-            {H4P_LOG_MQTT_ERROR,"MQTT ERROR"},
-            {H4P_LOG_MQTT_HEAP,"MQTT HEAP"},
-            {H4P_LOG_MQTT_Q,"MQTT Q"},
-            {H4P_LOG_PD_ENTER,"PD ENTER"},
-            {H4P_LOG_PD_LEAVE,"PD LEAVE"},
-            {H4P_LOG_ERROR,"ERROR"}
+
+        H4_INT_MAP eventTypes={
+            {H4P_EVENT_HEARTBEAT,"PING"},
+            {H4P_EVENT_H4,uppercase(h4Tag())},
+            {H4P_EVENT_SVC_UP,"SVC UP"},
+            {H4P_EVENT_SVC_DOWN,"SVC DOWN"},
+            {H4P_EVENT_CMD,"CMD"},
+            {H4P_EVENT_USER,"USER"},
+            {H4P_EVENT_MQTT_ERROR,"MQTT ERROR"},
+            {H4P_EVENT_HEAP,"HEAP"},
+            {H4P_EVENT_Q,"Q"},
+            {H4P_EVENT_PD_ENTER,"PD ENTER"},
+            {H4P_EVENT_PD_LEAVE,"PD LEAVE"},
+            {H4P_EVENT_LOOPS,"LOOPS"},
+            {H4P_EVENT_FACTORY,"FRESET"},
+            {H4P_EVENT_ERROR,"ERROR"}
         };
 
         H4_INT_MAP taskTypes={
@@ -73,6 +76,7 @@ class H4P_VerboseMessages: public H4Plugin {
             {12,"rptw"}, // 12
             {13,"rpwe"}  // 13
         };
+
         H4_INT_MAP taskNames{
             {H4P_TRID_PATN,"PATN"},
             {H4P_TRID_PP1x,"PP1X"},
@@ -107,27 +111,20 @@ class H4P_VerboseMessages: public H4Plugin {
             {H4P_TRID_LOOP,"LOOP"},
             {H4P_TRID_SSET,"SSET"}
         };
-        virtual void        _greenLight(){ start(); }
-    public:
-        H4P_VerboseMessages(): H4Plugin(vmTag()) {}
-
-        string      getErrorMessage(uint32_t e){
+        H4P_VerboseMessages(): H4Plugin("vm") {}
+        string getErrorMessage(uint32_t e){
             return cmdErrors.count(e) ? cmdErrors[e]:string("No such error (")+stringFromInt(e)+")";
         }
 
-        string      getLogType(uint32_t e){
-            return logTypes.count(e) ? logTypes[e]:string("No such type (")+stringFromInt(e)+")";
+        string getEventName(uint32_t e){
+            return eventTypes.count(e) ? eventTypes[e]:string("No such type (")+stringFromInt(e)+")";
         }
 
-        string      getTaskType(uint32_t e){
+        string getTaskType(uint32_t e){
             return taskTypes.count(e) ? taskTypes[e]:stringFromInt(e,"?%02d?");
         }
-        
-        string      getTaskName(uint32_t e){
+
+        string getTaskName(uint32_t e){
             return uppercase(taskNames.count(e) ? taskNames[e]:giveTaskName(e));
         }
 };
-
-extern __attribute__((weak)) H4P_VerboseMessages h4vm;
-
-#endif // H4P_VerboseMessages_H

@@ -52,7 +52,7 @@ SOFTWARE.
 */
 
 using H4P_FN_HTTPFAIL = function<void(int)>;
-class H4P_HttpMySQLLogger: public H4PLogService, public asyncHTTPrequest {
+class H4P_HttpMySQLLogger: public H4PEventListener, public asyncHTTPrequest {
         string          ip;
         H4P_FN_HTTPFAIL _fail;
         bool            inflight=false;
@@ -70,29 +70,29 @@ class H4P_HttpMySQLLogger: public H4PLogService, public asyncHTTPrequest {
             }
         }
 
-        void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target){
+        void        _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source){
             static  uint32_t _logseq=0;
             if(!inflight){
                 open("POST",CSTR(ip));
                 inflight=true;
                 char buf[256];
-                sprintf(buf,"device=%s&msg=%s&type=%d&source=%s&target=%s&seq=%u",CSTR(_cb[deviceTag()]),CSTR(msg),(int) type,CSTR(source),CSTR(target),_logseq++);
+                sprintf(buf,"device=%s&msg=%s&type=%d&source=%s&seq=%u",CSTR(_cb[deviceTag()]),CSTR(msg),(int) type,CSTR(source),_logseq++);
                 setReqHeader("Content-Type","application/x-www-form-urlencoded");
                 send(buf);
-            } else h4.once(H4P_MYSQL_HOLDOFF,bind(&H4P_HttpMySQLLogger::_filterLog,this,msg,type,source,target),nullptr,H4P_TRID_MLRQ);
+            } else h4.once(H4P_MYSQL_HOLDOFF,bind(&H4P_HttpMySQLLogger::_filterEvent,this,msg,type,source),nullptr,H4P_TRID_MLRQ);
         }
 
         void _greenLight() override {} // prevetn autostart - wait until wifi up
 
         void _hookIn() override { // protect
             DEPEND(wifi);
-            H4PLogService::_hookIn();
+            H4PEventListener::_hookIn();
 //            setDebug(true);
             onReadyStateChange(bind(&H4P_HttpMySQLLogger::_requestCB,this,_1,_2,_3));
         }
     public:
-        H4P_HttpMySQLLogger(const string& ipaddress,H4P_FN_HTTPFAIL fnFail=nullptr,uint32_t filter=H4P_LOG_ALL): 
-            _fail(fnFail),ip(ipaddress),H4PLogService("mysql",filter){
+        H4P_HttpMySQLLogger(const string& ipaddress,H4P_FN_HTTPFAIL fnFail=nullptr,uint32_t filter=H4P_EVENT_ALL): 
+            _fail(fnFail),ip(ipaddress),H4PEventListener("mysql",filter){
         }
 };
 #endif // H4P_HttpMySQLLogger_H

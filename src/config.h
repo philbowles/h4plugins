@@ -57,15 +57,11 @@ SOFTWARE.
 #define H4P_LOG_EVENTS
 
 // Make sure you read the documentation and have arrangements in place for using AP mode :)
-#define H4P_USE_WIFI_AP          1
+#define H4P_USE_WIFI_AP          0
 /*
             TWEAKABLES
 */
 #define H4P_REPLY_BUFFER       512
-
-#define H4ESW_MAX_F         150000
-#define H4ESW_MAX_D            100
-#define H4ESW_TIMEOUT           50
 
 //#define H4FC_MORSE_SUPPORT
 
@@ -94,8 +90,6 @@ SOFTWARE.
 
 #define H4P_TIME_HOLDOFF      2000
 #define H4P_TIME_RESYNC    3600000
-
-//#define H4P_SAFE_MINIMUM     20000
 
 constexpr char* h4pTag(){ return "h4P"; }
 constexpr char* httpTag(){ return "http://"; }

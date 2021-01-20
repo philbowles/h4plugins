@@ -35,10 +35,10 @@ SOFTWARE.
 
 #ifdef ARDUINO_ARCH_ESP8266
     #include<ESP8266httpUpdate.h>
-class H4P_RemoteUpdate: public H4Plugin, public ESP8266HTTPUpdate {
+class H4P_RemoteUpdate: public H4PEventListener, public ESP8266HTTPUpdate {
 #else
     #include<HTTPUpdate.h>
-class H4P_RemoteUpdate: public H4Plugin, public HTTPUpdate {
+class H4P_RemoteUpdate: public H4PEventListener, public HTTPUpdate {
 #endif
                 WiFiClient  _c;
                 string      _url;
@@ -46,9 +46,23 @@ class H4P_RemoteUpdate: public H4Plugin, public HTTPUpdate {
                 void        _greenLight(){
                     if(h4wifi._getPersistentValue(rupdTag(),"")) _url=_cb[rupdTag()];
                     _cb[rupdTag()]=httpTag()+_url; 
-//                    Serial.printf("_greenLight %s\n",CSTR(_cb[rupdTag()]));
                 } // no autostart
-                void        _hookIn(){ DEPEND(wifi); }
+                void _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source) override {
+                    switch(type){
+                        case H4P_EVENT_FACTORY:
+                            Serial.printf("%s [%s] H4P_EVENT_FACTORY src=%s msg=%s\n",CSTR(_pName),rupdTag(),CSTR(source),CSTR(msg));
+                            h4wifi._wipe(rupdTag());
+                            break;
+                        default:
+                            Serial.printf("WTF? EVENT t=%d src=%s *%s*\n",type,CSTR(source),CSTR(msg));
+                            break;
+                    }
+                }
+
+                void        _hookIn(){ 
+                    DEPEND(wifi);
+                    H4PEventListener::_hookIn();
+                }
                 void        _updateFromUrl(bool fw,bool reboot){
                     string endpoint=_cb[rupdTag()]+"/"+_cb[deviceTag()];
                     t_httpUpdate_return rv=fw ? update(_c,CSTR(endpoint)):updateSpiffs(_c,CSTR(endpoint));
@@ -65,11 +79,10 @@ class H4P_RemoteUpdate: public H4Plugin, public HTTPUpdate {
                 }
     public:
  #if H4P_USE_WIFI_AP
-        H4P_RemoteUpdate(const char* bin): H4Plugin(rupdTag()){
+        H4P_RemoteUpdate(const char* bin): H4PEventListener(rupdTag(),H4P_EVENT_FACTORY){
 #else
-        H4P_RemoteUpdate(const string& url,const char* bin): _url(url), H4Plugin(rupdTag()){
+        H4P_RemoteUpdate(const string& url,const char* bin): _url(url), H4PEventListener(rupdTag(),H4P_EVENT_FACTORY){
 #endif
-            _factoryHook=[](){ h4wifi._wipe(rupdTag()); };
             _cb["bin"]=bin;
             _cmds={
                 {_pName,       { H4PC_H4,_subCmd  , nullptr}},

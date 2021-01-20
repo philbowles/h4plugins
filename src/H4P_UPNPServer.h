@@ -39,7 +39,7 @@ STAG(alive);
 using H4P_FN_TAGMATCH   =function<void(uint32_t mx,H4P_CONFIG_BLOCK,bool)>;
 using H4P_TAG_MAP       =unordered_map<string,pair<string,H4P_FN_TAGMATCH>>;
 
-class H4P_UPNPServer: public H4Plugin {
+class H4P_UPNPServer: public H4PEventListener {
         H4P_BinaryThing* _btp;
         AsyncUDP 	    _udp;
         IPAddress		_ubIP;
@@ -68,7 +68,7 @@ class H4P_UPNPServer: public H4Plugin {
                 void            __upnpSend(uint32_t mx,const string s,IPAddress ip,uint16_t port);
 
                 void            broadcast(uint32_t mx,const string s){ __upnpSend(mx,s,_ubIP,1900); }
-
+                void            _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source) override;
                 void            _handlePacket(string p,IPAddress ip,uint16_t port);
                 void            _listenUDP();
                 void            _notify(const string& s);
@@ -82,11 +82,10 @@ class H4P_UPNPServer: public H4Plugin {
         static  string          replaceParams(const string& s);
         static  string 	        replaceParamsFile(const string &f){ return replaceParams(CSTR(H4P_SerialCmd::read(f))); }
     public:                
-        H4P_UPNPServer(const string& name="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): _name(name), H4Plugin(upnpTag(),onC,onD){
+        H4P_UPNPServer(const string& name="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): _name(name), H4PEventListener(upnpTag(),H4P_EVENT_FACTORY,onC,onD){
             _pups.push_back(_urn+"device:controllee:1");
             _pups.push_back(_urn+"service:basicevent:1");
             _ubIP=IPAddress(239,255,255,250);
-            _factoryHook=[](){ h4wifi._wipe(nameTag()); };
             _cmds={ 
                 {_pName,    { H4PC_H4, _subCmd, nullptr}},
                 {"name",    {_subCmd, 0, CMDVS(_friendly)}},

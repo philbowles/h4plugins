@@ -30,6 +30,17 @@ SOFTWARE.
 #include<H4P_UPNPServer.h>
 
 //constexpr char* xh4dTag(){ return "X-H4-DEVICE"; }
+void H4P_UPNPServer::_handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source) {
+    switch(type){
+        case H4P_EVENT_FACTORY:
+            Serial.printf("%s [%s] H4P_EVENT_FACTORY src=%s msg=%s\n",CSTR(_pName),nameTag(),CSTR(source),CSTR(msg));
+            h4wifi._wipe(nameTag());
+            break;
+        default:
+            Serial.printf("WTF? EVENT t=%d src=%s *%s*\n",type,CSTR(source),CSTR(msg));
+            break;
+    }
+}
 
 void H4P_UPNPServer::_hookIn(){
     DEPEND(wifi);
@@ -44,6 +55,7 @@ void H4P_UPNPServer::_hookIn(){
         else _otherH4s.erase(blok[xh4dTag()]);
     });
 */
+    H4PEventListener::_hookIn();
 }
 
 uint32_t H4P_UPNPServer::_host2(vector<string> vs){ return guardString2(vs,[this](string a,string b){ setBothNames(a,b); return H4_CMD_OK; }); }

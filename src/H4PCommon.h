@@ -45,7 +45,7 @@ SOFTWARE.
 
 #include<unordered_set>
 
-bool stringIsAlpha(const string& s); // move to util!!!
+//bool stringIsAlpha(const string& s); // move to util!!!
 //
 #ifndef ARDUINO_SONOFF_BASIC // or s20 / sv ect
   #define RELAY_BUILTIN   12
@@ -78,19 +78,22 @@ enum H4_CMD_ERROR:uint32_t  {
     H4_CMD_NOT_NOW
 };
 
-enum H4P_LOG_TYPE {
-    H4P_LOG_H4=1,
-    H4P_LOG_SVC_UP=2,
-    H4P_LOG_SVC_DOWN=4,
-    H4P_LOG_CMD=8,
-    H4P_LOG_USER=16,
-    H4P_LOG_MQTT_HEAP=64,
-    H4P_LOG_MQTT_Q=128,
-    H4P_LOG_PD_ENTER=256,
-    H4P_LOG_PD_LEAVE=512,
-    H4P_LOG_MQTT_ERROR=1024,
-    H4P_LOG_ALL=0xffffffff,
-    H4P_LOG_ERROR=H4P_LOG_ALL
+enum H4P_EVENT_TYPE {
+    H4P_EVENT_H4=1,
+    H4P_EVENT_SVC_UP=2,
+    H4P_EVENT_SVC_DOWN=4,
+    H4P_EVENT_CMD=8,
+    H4P_EVENT_USER=16,
+    H4P_EVENT_HEAP=64,
+    H4P_EVENT_Q=128,
+    H4P_EVENT_PD_ENTER=256,
+    H4P_EVENT_PD_LEAVE=512,
+    H4P_EVENT_MQTT_ERROR=1024,
+    H4P_EVENT_LOOPS=2048,
+    H4P_EVENT_FACTORY=4096,
+    H4P_EVENT_HEARTBEAT=0x80000000,
+    H4P_EVENT_ALL=0x7fffffff,
+    H4P_EVENT_ERROR=H4P_EVENT_ALL
 };
 
 #define ON true
@@ -102,7 +105,6 @@ enum H4P_LOG_TYPE {
 
 constexpr const char* cmdhash(){ return "/h4/#"; }
 
-//STAG(asws);
 STAG(auto);
 STAG(board)
 STAG(broker);
@@ -130,9 +132,9 @@ STAG(src);
 STAG(ssid);
 STAG(state);
 STAG(time);
+STAG(tick);
 STAG(upnp);
 STAG(user);
-STAG(vm);
 STAG(wink);
 STAG(wifi);
 
@@ -149,12 +151,12 @@ STAG(wifi);
 #define QTHIS(f) h4.queueFunction([this]{ (f)(); })
 
 #ifdef H4P_LOG_EVENTS
-    #define SYSEVENT(e,s,t,x,...) { h4cmd.logEventType(e,s,t,x, ##__VA_ARGS__); }
-    #define H4EVENT(x,...) { h4cmd.logEventType(H4P_LOG_H4,_pName,h4Tag(),x, ##__VA_ARGS__); }
+    #define SYSEVENT(e,s,x,...) { h4cmd.emitEvent(e,s,x, ##__VA_ARGS__); }
+    #define H4EVENT(x,...) { h4cmd.emitEvent(H4P_EVENT_H4,_pName,x, ##__VA_ARGS__); }
     #define DEPENDFAIL(x) { Serial.printf("FATAL: %s needs %s\n",CSTR(_pName),x##Tag());return; }
-    #define h4UserEvent(x,...) { h4cmd.logEventType(H4P_LOG_USER,userTag(),h4Tag(),x, ##__VA_ARGS__); }
+    #define h4UserEvent(x,...) { h4cmd.emitEvent(H4P_EVENT_USER,userTag(),x, ##__VA_ARGS__); }
 #else
-    #define SYSEVENT(e,x,...)
+    #define SYSEVENT(e,s,x,...)
     #define H4EVENT(x,...)
     #define DEPENDFAIL(x)
     #define h4UserEvent(x,...)
@@ -269,9 +271,6 @@ class H4Plugin {
         virtual void        _start() { _upHooks(); }
         virtual void        _stop() { _downHooks(); }
     public:
-        static  vector<H4_FN_VOID>  _factoryChain;
-                H4_FN_VOID          _factoryHook=[]{};
-//                H4_FN_VOID          _rebootHook=[this]{ stop(); };
         static  vector<H4Plugin*>   _plugins;
                 string              _pName;
                 uint32_t            _subCmd;
@@ -333,15 +332,16 @@ class H4Plugin {
 //        static void         dumpCommands(H4_CMD_MAP cm=_commands){ for(auto const c:cm) Serial.printf("%16s o=%2d l=%2d\n",CSTR(c.first),c.second.owner,c.second.levID); }
 };
 
-class H4PLogService: public H4Plugin {
+class H4PEventListener: public H4Plugin {
                 uint32_t    _filter=0;
     protected:
-                void        _filterLog(const string &m,H4P_LOG_TYPE t,const string& s,const string& tg){ if(_up && (t & _filter)) _logEvent(m,t,s,tg); }
-        virtual void        _hookIn() override;
-        virtual void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target)=0;
+//                void        _filterEvent(const string &m,H4P_EVENT_TYPE t,const string& s){ if(_up && (t & _filter)) _handleEvent(m,t,s); }
+                void        _filterEvent(const string &m,H4P_EVENT_TYPE t,const string& s){ if(t & _filter) _handleEvent(m,t,s); }
+                void        _hookIn() override;
+        virtual void        _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source)=0;
     public:
-        H4PLogService(const string& lid,uint32_t filter=0xffffffff): _filter(filter), H4Plugin(lid){}
-        virtual void        show(){ reply("%s Filter 0x%08x\n",CSTR(_pName),_filter); }
+        H4PEventListener(const string& lid,uint32_t filter=H4P_EVENT_ALL,H4_FN_VOID svcUp=nullptr,H4_FN_VOID svcDown=nullptr): _filter(filter), H4Plugin(lid,svcUp,svcDown){}
+                void        show() override { reply("%s Filter 0x%08x",CSTR(_pName),_filter); }
 };
 
 #endif // H4P_HO

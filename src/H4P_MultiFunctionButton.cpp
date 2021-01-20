@@ -48,6 +48,7 @@ void H4P_MultiFunctionButton::_progress(H4GPIOPin* ptr){ // run this as each sta
 
 void H4P_MultiFunctionButton::_hookIn(){
     DEPEND(wink);
+    DEPEND(gpio);
     REQUIREBT;
 }
 

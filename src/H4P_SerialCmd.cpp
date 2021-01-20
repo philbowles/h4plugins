@@ -27,7 +27,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_SerialCmd.h>
-#include<H4P_VerboseMessages.h>
+
+extern void h4FactoryReset(const string& src);
 
 H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Plugin(scmdTag()){
     _cmds={
@@ -35,7 +36,7 @@ H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Plugin(scmdTag()){
         {"help",       { 0, 0, CMD(help) }},
         {"info",       { H4PC_SVC,  0, CMDVS(_svcInfo) }},
         {"reboot",     { H4PC_H4,   0, CMD(h4reboot) }},
-        {"factory",    { H4PC_H4,   0, CMD(h4FactoryReset) }},
+        {"factory",    { H4PC_H4,   0, ([this](vector<string>){ h4FactoryReset(_cb[srcTag()]); return H4_CMD_OK; }) }},
         {"dump",       { H4PC_H4,   0, CMDVS(_dump)}},
         {"svc",        { H4PC_H4,   H4PC_SVC, nullptr}},
         {"restart",    { H4PC_SVC,  0, CMDVS(_svcRestart) }},
@@ -80,20 +81,17 @@ uint32_t H4P_SerialCmd::_dispatch(vector<string> vs,uint32_t owner=0){
     } else return H4_CMD_UNKNOWN;
 }
 
-string H4P_SerialCmd::_errorString(uint32_t err){ return isLoaded(vmTag()) ? h4vm.getErrorMessage(err):"Error: "+stringFromInt(err); }
-
 uint32_t H4P_SerialCmd::_executeCmd(string topic, string pload){
 	vector<string> vs=split(CSTR(topic),"/");
     _cb[srcTag()]=vs[0];
-    _cb["target"]=vs[1];
 	vs.push_back(pload);
     vector<string> cmd(vs.begin()+2,vs.end());
     #ifdef H4P_LOG_EVENTS
-        _logEvent(join(cmd,"/"),H4P_LOG_CMD,vs[0],vs[1]);
+        _logger(join(cmd,"/"),H4P_EVENT_CMD,vs[0]);
     #endif	
     uint32_t rv=_dispatch(vector<string>(cmd)); // optimise?
     #ifdef H4P_LOG_EVENTS
-        if(rv) _logEvent(_errorString(rv),H4P_LOG_ERROR,vs[0],vs[1]);
+        if(rv) _logger(_getErrorMessage(rv),H4P_EVENT_ERROR,vs[0]);
     #endif
     return rv;
 }
@@ -109,10 +107,16 @@ void H4P_SerialCmd::_flattenCmds(function<void(string)> fn,string cmd,string pre
     }
 }
 
-void H4P_SerialCmd::_hookIn(){ HAL_FS.begin(); }
+void H4P_SerialCmd::_hookIn(){
+    _babel=reinterpret_cast<H4P_VerboseMessages*>(isLoaded("vm"));
+    HAL_FS.begin();
+}
 
-void H4P_SerialCmd::_logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target){
-    for(auto const& l:_logChain) l(msg,type,source,target); // if 0 serial print
+void H4P_SerialCmd::_logger(const string &msg,H4P_EVENT_TYPE type,const string& source){ 
+    for(auto const& l:_eventListeners) {
+//        Serial.printf("EMIT %s src=%s %s\n",CSTR(_getEventName(type)),CSTR(source),CSTR(msg));
+        l(msg,type,source);
+    }
 }
 
 void H4P_SerialCmd::_run(){
@@ -122,7 +126,7 @@ void H4P_SerialCmd::_run(){
         if (c == '\n') {
             h4.queueFunction(bind([this](string cmd){
                 uint32_t err=_simulatePayload(cmd);
-                if(err) reply("%s\n",CSTR(_errorString(err)));
+                if(err) reply("%s\n",CSTR(_getErrorMessage(err)));
             },cmd),nullptr,H4P_TRID_SCMD);
             cmd="";
         } else cmd+=c;
@@ -224,16 +228,15 @@ void H4P_SerialCmd::all(){
 }
 // ifdef log events?
 const char* __attribute__((weak)) giveTaskName(uint32_t id){ return "ANON"; }
-string H4P_SerialCmd::_dumpTask(task* t){
-    H4Plugin* p=isLoaded(vmTag()); // v inefficient, but, hey!
 
+string H4P_SerialCmd::_dumpTask(task* t){
     char buf[128];
     uint32_t type=t->uid/100;
     uint32_t id=t->uid%100;
     sprintf(buf,"%09lu %s/%s %s %9d %9d %9d",
         t->at,
-        p ? CSTR(h4vm.getTaskType(type)):CSTR(stringFromInt(type,"%04u")),
-        p ? CSTR(h4vm.getTaskName(id)):CSTR(stringFromInt(id,"%04u")),
+        CSTR(h4cmd._getTaskType(type)),
+        CSTR(h4cmd._getTaskName(id)),
         t->singleton ? "S":" ",
         t->rmin,
         t->rmax,

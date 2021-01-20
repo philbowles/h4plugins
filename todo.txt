@@ -1,6 +1,9 @@
 TODO:SOONER
+    rationalise compile out events
+    convert gpio to eventlistenr for stats clearing
+    find any other 1 sec timers!
     js - type = password if n includes "pass"
-    public h4 isalpa replace params file etc
+    js - arrowfunctions
 SHORTTERM
     //getstartingheap
     H4_TIMER from at,daily

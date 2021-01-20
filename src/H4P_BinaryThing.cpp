@@ -58,7 +58,7 @@ uint32_t H4P_BinaryThing::_slave(vector<string> vs){
     if(vs.size()<2) return H4_CMD_TOO_FEW_PARAMS;
     if(vs.size()>2) return H4_CMD_TOO_MANY_PARAMS;
     if(!stringIsAlpha(vs[0])) return H4_CMD_PAYLOAD_FORMAT;
-    if(!isNumeric(H4PAYLOAD)) return H4_CMD_NOT_NUMERIC;
+    if(!stringIsNumeric(H4PAYLOAD)) return H4_CMD_NOT_NUMERIC;
     if(H4PAYLOAD_INT > 1) return H4_CMD_OUT_OF_BOUNDS;
     if(H4PAYLOAD_INT) _slaves.insert(vs[0]);
     else _slaves.erase(vs[0]);
@@ -81,7 +81,7 @@ void H4P_BinaryThing::_turn(bool b,const string& src){
         _setState(b);
         if(_f) _f(_state);
         _publish(_state);
-        SYSEVENT(H4P_LOG_H4,src,onofTag(),"%s",(_state ? "ON":"OFF"));
+        SYSEVENT(H4P_EVENT_H4,src,"%s",(_state ? "ON":"OFF"));
     }
 }
 void H4P_BinaryThing::turn(bool b){ _turn(b,userTag()); }
@@ -100,7 +100,7 @@ void H4P_BinaryThing::turn(bool b){
 //      H4P_ConditionalThing
 //
 void H4P_ConditionalThing::_hookIn() {
-    h4wifi._uiAdd(H4P_UI_COND,conditionTag(),H4P_UI_BOOL,"",[this]{ return stringFromInt(_predicate(state())); });
+    h4wifi._uiAdd(H4P_UIO_COND,conditionTag(),H4P_UI_BOOL,"",[this]{ return stringFromInt(_predicate(state())); });
     H4P_BinaryThing::_hookIn();
 }
 

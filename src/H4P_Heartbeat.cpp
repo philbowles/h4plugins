@@ -31,30 +31,17 @@ SOFTWARE.
 
 uint32_t            H4P_Heartbeat::_uptime=0;
 
-void H4P_Heartbeat::_hookIn() { if(WiFi.getMode()!=WIFI_AP) h4wifi._uiAdd(H4P_UIO_UP,"uptime",H4P_UI_LABEL,"",upTime); }
+void H4P_Heartbeat::_handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source) {
+    _uptime=STOI(msg);
+    if(_f) _f(_uptime);
+};
 
-void H4P_Heartbeat::_start() {
-    if(WiFi.getMode()!=WIFI_AP) {
-        h4._hookLoop([this](){ _run(); },_subCmd);
-        H4Plugin::_start();
+void H4P_Heartbeat::_hookIn() {
+    DEPEND(tick);
+    if(isLoaded(wifiTag())){
+        if(WiFi.getMode()==WIFI_STA) h4wifi._uiAdd(H4P_UIO_UP,"uptime",H4P_UI_LABEL,"",upTime);
     }
-}
-
-void H4P_Heartbeat::_stop() {
-    if(WiFi.getMode()!=WIFI_AP) {
-        h4._unHook(_subCmd);
-        H4Plugin::_stop();
-    }
-}
-
-void H4P_Heartbeat::_run(){
-    uint32_t now=millis();
-    uint32_t nowsec=now/1000;
-    if(!(now%1000) && nowsec!=_uptime) {
-        if(_bf) _bf();
-        _uptime=nowsec;
-        h4wifi.uiSync();
-    }
+    H4PEventListener::_hookIn();
 }
 
 string H4P_Heartbeat::secsToTime(uint32_t sex){ 

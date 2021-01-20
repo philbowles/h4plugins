@@ -27,23 +27,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_SerialLogger_HO
-#define H4P_SerialLogger_HO
+#pragma once
 
 #include <H4PCommon.h>
-#include <H4P_VerboseMessages.h>
 #include <H4P_SerialCmd.h>
 
-class H4P_SerialLogger: public H4PLogService {
-        string _getType(uint32_t t){ return isLoaded(vmTag()) ? h4vm.getLogType(t):"TYPE="+stringFromInt((int) t); }
-        void   _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target){
-            Serial.print(CSTR(_getType(type)));
-            Serial.print(" "); Serial.print(CSTR(source));
-            Serial.print("->"); Serial.print(CSTR(target));
-            Serial.print(": ");Serial.println(CSTR(msg));
-        }
+class H4P_SerialLogger: public H4PEventListener {
+        void   _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source){ Serial.printf("%s:%s %s\n",CSTR(h4cmd._getEventName(type)),CSTR(uppercase(source)),CSTR(msg)); }
     public:
-        H4P_SerialLogger(uint32_t filter=H4P_LOG_ALL): H4PLogService("slog",filter){ _up=true; }
+        H4P_SerialLogger(uint32_t filter=H4P_EVENT_ALL): H4PEventListener("slog",filter){ _up=true; }
 };
-
-#endif // H4P_SerialLogger_H

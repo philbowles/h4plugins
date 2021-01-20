@@ -33,13 +33,14 @@ SOFTWARE.
 #include<H4P_GPIOManager.h>
 #include<H4P_BinaryThing.h>
 
-extern void h4FactoryReset();
+extern void h4FactoryReset(const string& src);
+
 class H4P_MultiFunctionButton: public H4Plugin{
             H4P_BinaryThing*    _btp;
             H4GM_STAGE_MAP _sm={
                 {0,[this](H4GPIOPin*){ _btp->toggle(); }},
                 {H4MF_REBOOT,[](H4GPIOPin*){ h4reboot(); }},
-                {H4MF_FACTORY,[](H4GPIOPin*){ h4FactoryReset(); }}//,
+                {H4MF_FACTORY,[this](H4GPIOPin*){ h4FactoryReset(_pName); }}//,
             };
 
             void            _greenLight() override {} // no autostart, dpends on wink
@@ -53,4 +54,4 @@ class H4P_MultiFunctionButton: public H4Plugin{
             uint32_t dbTimeMs);
 };
 
-extern __attribute__((weak)) H4P_MultiFunctionButton h4mfb;
+//extern __attribute__((weak)) H4P_MultiFunctionButton h4mfb;

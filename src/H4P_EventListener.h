@@ -27,24 +27,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_MQTTQueueLogger_HO
-#define H4P_MQTTQueueLogger_HO
+#pragma once
 
-#include <H4PCommon.h>
-#include <H4P_AsyncMQTT.h>
+#include<H4PCommon.h>
 
-class H4P_MQTTQueueLogger: public H4P_MQTTLogger {
-        uint32_t _f;
-        void _start() override { 
-            H4P_MQTTLogger::_start();
-            h4.every(_f,[this](){ SYSEVENT(H4P_LOG_MQTT_Q,_pName,mqttTag(),"%u",h4.size()); },nullptr,H4P_TRID_QLOG,true);
-        }
-        void _stop() override {
-            H4P_MQTTLogger::_stop();
-            h4.cancelSingleton(H4P_TRID_QLOG);
-        }
-        void _greenLight() override { h4cmd.removeCmd(msgTag(),_subCmd); } // msg is meaningless - we only "see" H4P_LOG_MQTT_Q events
-    public:
-        H4P_MQTTQueueLogger(uint32_t f): _f(f),H4P_MQTTLogger("qlog",H4P_LOG_MQTT_Q){}
+class H4P_EventListener: public H4PEventListener { 
+                H4P_FN_USEREVENT _f;
+
+                void        _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source) override { _f(msg); }
+    public: 
+        H4P_EventListener(const char* name,uint32_t filter,H4P_FN_USEREVENT f): _f(f), H4PEventListener(name,filter){}
 };
-#endif // H4P_MQTTLogger_H
