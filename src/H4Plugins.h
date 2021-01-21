@@ -14,7 +14,7 @@
 #include<H4P_ExternalSqWave.h>
 #include<H4P_TaskSniffer.h>
 #include<H4P_HeapWarn.h>
-#include<H4P_EventLoopCount.h>
+#include<H4P_EmitLoopCount.h>
 #include<H4P_QueueWarn.h>
 #include<H4P_GPIOManager.h>
 #include<H4P_FlasherController.h>
@@ -23,10 +23,10 @@
 #include<H4P_PersistentStorage.h>
 #include<H4P_AsyncMQTT.h>
 #include<H4P_MQTTLogger.h>
-#include<H4P_EventHeap.h>
+#include<H4P_EmitHeap.h>
 #include<H4P_EventListener.h>
-#include<H4P_EventQ.h>
-#include<H4P_EventTick.h>
+#include<H4P_EmitQ.h>
+#include<H4P_EmitTick.h>
 #include<H4P_LocalLogger.h>
 #include<H4P_HttpMySQLLogger.h>
 #include<H4P_RemoteUpdate.h>

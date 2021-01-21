@@ -1,15 +1,15 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,5,false) // Serial baud rate, Q size, SerialCmd autostop
+H4_USE_PLUGINS(115200,10,false) // Serial baud rate, Q size, SerialCmd autostop
 
-class myLogger: public H4PLogService {
-        void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target){
+class myLogger: public EventListener {
+        void        _logEvent(const string &msg,H4P_EVENT_TYPE type,const string& source){
             Serial.print("myLogger ");
             Serial.print(millis());
             Serial.print(" ");
             Serial.println(msg.c_str()); // or  Serial.println(CSTR(msg));
         }
     public:
-        myLogger(): H4PLogService("mylog"){}
+        myLogger(): EventListener("mylog"){}
 };
 
 
@@ -17,7 +17,7 @@ class myLogger: public H4PLogService {
 H4P_VerboseMessages h4vm;
 
 
-//H4P_SerialLogger h4sl;
+H4P_SerialLogger h4sl;
 myLogger lumberjack;
 
 void h4setup(){

@@ -27,8 +27,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_HO
-#define H4P_HO
+#pragma once
 
 #include<H4.h>
 #include<H4Utils.h>
@@ -44,8 +43,6 @@ SOFTWARE.
 #endif
 
 #include<unordered_set>
-
-//bool stringIsAlpha(const string& s); // move to util!!!
 //
 #ifndef ARDUINO_SONOFF_BASIC // or s20 / sv ect
   #define RELAY_BUILTIN   12
@@ -91,6 +88,7 @@ enum H4P_EVENT_TYPE {
     H4P_EVENT_MQTT_ERROR=1024,
     H4P_EVENT_LOOPS=2048,
     H4P_EVENT_FACTORY=4096,
+    H4P_EVENT_NOOP=8192, // use for testing
     H4P_EVENT_HEARTBEAT=0x80000000,
     H4P_EVENT_ALL=0x7fffffff,
     H4P_EVENT_ERROR=H4P_EVENT_ALL
@@ -150,16 +148,18 @@ STAG(wifi);
 #define VSCMD(x) uint32_t x(vector<string>)
 #define QTHIS(f) h4.queueFunction([this]{ (f)(); })
 
+#define SYSEVENT(e,s,x,...) { h4cmd.emitEvent(e,s,x, ##__VA_ARGS__); }
 #ifdef H4P_LOG_EVENTS
-    #define SYSEVENT(e,s,x,...) { h4cmd.emitEvent(e,s,x, ##__VA_ARGS__); }
     #define H4EVENT(x,...) { h4cmd.emitEvent(H4P_EVENT_H4,_pName,x, ##__VA_ARGS__); }
     #define DEPENDFAIL(x) { Serial.printf("FATAL: %s needs %s\n",CSTR(_pName),x##Tag());return; }
     #define h4UserEvent(x,...) { h4cmd.emitEvent(H4P_EVENT_USER,userTag(),x, ##__VA_ARGS__); }
+    #define h4SysEvent(e,x,...) { h4cmd.emitEvent(e,userTag(),x, ##__VA_ARGS__); }
 #else
-    #define SYSEVENT(e,s,x,...)
+//    #define SYSEVENT(e,s,x,...)
     #define H4EVENT(x,...)
     #define DEPENDFAIL(x)
     #define h4UserEvent(x,...)
+    #define h4SysEvent(e,x,...)
 #endif
 
 #define HOOK_IF_LOADED(x) { H4Plugin* p=isLoaded(x##Tag()); \
@@ -335,13 +335,14 @@ class H4Plugin {
 class H4PEventListener: public H4Plugin {
                 uint32_t    _filter=0;
     protected:
-//                void        _filterEvent(const string &m,H4P_EVENT_TYPE t,const string& s){ if(_up && (t & _filter)) _handleEvent(m,t,s); }
-                void        _filterEvent(const string &m,H4P_EVENT_TYPE t,const string& s){ if(t & _filter) _handleEvent(m,t,s); }
+                void        _filterEvent(const string &m,H4P_EVENT_TYPE t,const string& s){ 
+                    if(_up && (t & _filter)) _handleEvent(m,t,s);
+                    else Serial.printf("EL %s %s T%d from %s ignored %s\n",CSTR(_pName),_up ? "UP":"DOWN",t,CSTR(s),CSTR(m));
+                }
+//                void        _filterEvent(const string &m,H4P_EVENT_TYPE t,const string& s){ if(t & _filter) _handleEvent(m,t,s); }
                 void        _hookIn() override;
         virtual void        _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source)=0;
     public:
         H4PEventListener(const string& lid,uint32_t filter=H4P_EVENT_ALL,H4_FN_VOID svcUp=nullptr,H4_FN_VOID svcDown=nullptr): _filter(filter), H4Plugin(lid,svcUp,svcDown){}
                 void        show() override { reply("%s Filter 0x%08x",CSTR(_pName),_filter); }
 };
-
-#endif // H4P_HO

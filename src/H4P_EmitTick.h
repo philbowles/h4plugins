@@ -29,37 +29,29 @@ SOFTWARE.
 */
 #pragma once
 
-extern __attribute__((weak)) uint32_t h4Nloops=0;
-
 #include<H4PCommon.h>
-/*
-        This will only work if you edit inc/H4.h in the H4 library to include:
 
-        #define H4_COUNT_LOOPS true
+class H4P_EmitTick: public H4Plugin {
+            uint32_t    _uptime;
 
-        You will get a slightly better performance if you also include
+                void        _hookIn() override { 
+                    h4._hookLoop([this](){ _run(); },_subCmd);
+                    H4Plugin::_hookIn();
+                }
 
-        #define H4_NO_USERLOOP      // improves performance
+                void _run() {
+                    uint32_t now=millis();
+                    uint32_t nowsec=now/1000;
+                    if(!(now%1000) && nowsec!=_uptime) {
+                        _uptime=nowsec;
+                        SYSEVENT(H4P_EVENT_HEARTBEAT,_pName,"%u",_uptime);
+                    }
+                }
+    public: 
+        H4P_EmitTick(H4_FN_VOID beat=nullptr): H4Plugin(tickTag()){}
 
-        but h4UserLoop will not get called!
-
-*/
-#if H4_COUNT_LOOPS
-    #pragma message("COUNTING LOOPS")
-#endif
-
-class H4P_EventLoopCount: public H4PEventListener {
-
-            void _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source) override {
-                SYSEVENT(H4P_EVENT_LOOPS,_pName,"%u",h4Nloops);
-                h4Nloops=0;
-            };
-
-            void _hookIn() {
-                DEPEND(tick);
-                H4PEventListener::_hookIn();
-            }
-
-    public:
-        H4P_EventLoopCount(): H4PEventListener("loop",H4P_EVENT_HEARTBEAT){ h4Nloops=0; }
+                void    show() override {
+                    H4Plugin::show();
+                    reply("Uptime %u",_uptime);
+                }
 };

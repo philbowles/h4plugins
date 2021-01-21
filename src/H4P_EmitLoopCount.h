@@ -29,12 +29,37 @@ SOFTWARE.
 */
 #pragma once
 
-#include <H4PCommon.h>
+extern __attribute__((weak)) uint32_t h4Nloops=0;
 
-class H4P_EventHeap: public H4Plugin {
-        uint32_t _f;
-        void _start() override { h4.every(_f,[this](){ SYSEVENT(H4P_EVENT_HEAP,_pName,"%u",ESP.getFreeHeap()); },nullptr,H4P_TRID_HLOG,true); }
-        void _stop() override { h4.cancelSingleton(H4P_TRID_HLOG); }
+#include<H4PCommon.h>
+/*
+        This will only work if you edit inc/H4.h in the H4 library to include:
+
+        #define H4_COUNT_LOOPS true
+
+        You will get a slightly better performance if you also include
+
+        #define H4_NO_USERLOOP      // improves performance
+
+        but h4UserLoop will not get called!
+
+*/
+#if H4_COUNT_LOOPS
+    #pragma message("COUNTING LOOPS")
+#endif
+
+class H4P_EmitLoopCount: public H4PEventListener {
+
+            void _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source) override {
+                SYSEVENT(H4P_EVENT_LOOPS,_pName,"%u",h4Nloops);
+                h4Nloops=0;
+            };
+
+            void _hookIn() {
+                DEPEND(tick);
+                H4PEventListener::_hookIn();
+            }
+
     public:
-        H4P_EventHeap(uint32_t f=1000): _f(f),H4Plugin("hlog"){}
+        H4P_EmitLoopCount(): H4PEventListener("loop",H4P_EVENT_HEARTBEAT){ h4Nloops=0; }
 };

@@ -104,4 +104,4 @@ void H4Plugin::_downHooks(){
 //
 //      H4PlogService
 //
-void H4PEventListener::_hookIn(){ h4cmd._hookLogChain(bind(&H4PEventListener::_filterEvent,this,_1,_2,_3)); }
+void H4PEventListener::_hookIn(){ _up=true; h4cmd._hookLogChain(bind(&H4PEventListener::_filterEvent,this,_1,_2,_3)); }

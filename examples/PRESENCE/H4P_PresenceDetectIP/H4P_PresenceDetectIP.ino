@@ -1,5 +1,5 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,5,false) // Serial baud rate, Q size, SerialCmd autostop
+H4_USE_PLUGINS(115200,10,false) // Serial baud rate, Q size, SerialCmd autostop
 
 void onElvisDetect(bool b){
   Serial.printf("Elvis has %s the building\n",b ? "entered":"left");

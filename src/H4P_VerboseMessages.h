@@ -60,6 +60,7 @@ class H4P_VerboseMessages: public H4Plugin {
             {H4P_EVENT_PD_LEAVE,"PD LEAVE"},
             {H4P_EVENT_LOOPS,"LOOPS"},
             {H4P_EVENT_FACTORY,"FRESET"},
+            {H4P_EVENT_NOOP,"NO-OP"},
             {H4P_EVENT_ERROR,"ERROR"}
         };
 
@@ -117,7 +118,7 @@ class H4P_VerboseMessages: public H4Plugin {
         }
 
         string getEventName(uint32_t e){
-            return eventTypes.count(e) ? eventTypes[e]:string("No such type (")+stringFromInt(e)+")";
+            return eventTypes.count(e) ? eventTypes[e]:string("No such event (")+stringFromInt(e)+")";
         }
 
         string getTaskType(uint32_t e){

@@ -29,29 +29,12 @@ SOFTWARE.
 */
 #pragma once
 
-#include<H4PCommon.h>
+#include <H4PCommon.h>
 
-class H4P_EventTick: public H4Plugin {
-            uint32_t    _uptime;
-
-                void        _hookIn() override { 
-                    h4._hookLoop([this](){ _run(); },_subCmd);
-                    H4Plugin::_hookIn();
-                }
-
-                void _run() {
-                    uint32_t now=millis();
-                    uint32_t nowsec=now/1000;
-                    if(!(now%1000) && nowsec!=_uptime) {
-                        _uptime=nowsec;
-                        SYSEVENT(H4P_EVENT_HEARTBEAT,_pName,"%u",_uptime);
-                    }
-                }
-    public: 
-        H4P_EventTick(H4_FN_VOID beat=nullptr): H4Plugin(tickTag()){}
-
-                void    show() override {
-                    H4Plugin::show();
-                    reply("Uptime %u",_uptime);
-                }
+class H4P_EmitHeap: public H4Plugin {
+        uint32_t _f;
+        void _start() override { h4.every(_f,[this](){ SYSEVENT(H4P_EVENT_HEAP,_pName,"%u",ESP.getFreeHeap()); },nullptr,H4P_TRID_HLOG,true); }
+        void _stop() override { h4.cancelSingleton(H4P_TRID_HLOG); }
+    public:
+        H4P_EmitHeap(uint32_t f=1000): _f(f),H4Plugin("hlog"){}
 };

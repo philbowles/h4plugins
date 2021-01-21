@@ -31,12 +31,12 @@ SOFTWARE.
 
 #include <H4PCommon.h>
 
-class H4P_EventQ: public H4Plugin {
+class H4P_EmitQ: public H4Plugin {
         uint32_t _f;
         uint32_t _scale;
 
         void _start() override { h4.every(_f,[this](){ SYSEVENT(H4P_EVENT_Q,_pName,"%u",_scale * h4.size()); },nullptr,H4P_TRID_QLOG,true); }
         void _stop() override { h4.cancelSingleton(H4P_TRID_QLOG); }
     public:
-        H4P_EventQ(uint32_t f=1000,uint32_t scale=1000): _f(f),_scale(scale), H4Plugin("qlog"){}
+        H4P_EmitQ(uint32_t f=1000,uint32_t scale=1000): _f(f),_scale(scale), H4Plugin("qlog"){}
 };

@@ -24,14 +24,14 @@ Writing your own logger is seriously easy (see below)
 
 The important thing to note is that each logger is called in turn, thus you can log to several destinations at a time for a single message. The serial logger is a useful diagnostic aid, as it shows what is getting logged to other - less visible - destinations, e.g. remote servers.
 
-Also note that the main interface `h4cmd.logEventType(H4P_LOG_TYPE,const string& src,const string& tgt,const string& fmt,...)` (which operates like `printf` with variable number of parameters) will simply do nothing if no loggers are installed. This allows it to be left in the code and "switched on or off" by commenting out the loggers, which can be flipped back in at a stroke for testing.
+Also note that the main interface `h4cmd.logEventType(H4P_EVENT_TYPE,const string& src,const string& tgt,const string& fmt,...)` (which operates like `printf` with variable number of parameters) will simply do nothing if no loggers are installed. This allows it to be left in the code and "switched on or off" by commenting out the loggers, which can be flipped back in at a stroke for testing.
 
 Better still. there is a macro `h4UserEvent("printf-style %s",...)` which simply calls `h4cmd.logEventType` "under the hood" but can be "compiled out" by removing the `#define H4P_LOG_EVENTS` entry in `config.h`, which reduces the size of the binary. Unless you have good reason (which will be rare) then you should always use `h4UserEvent`.
 
 Finally, most loggers have  `filter` parameter which allows the logger to operate on only certain event types:
 
 ```cpp
-enum H4P_LOG_TYPE {
+enum H4P_EVENT_TYPE {
     H4P_LOG_H4=1,
     H4P_LOG_SVC_UP=2,
     H4P_LOG_SVC_DOWN=4,
@@ -296,15 +296,15 @@ The code would look like this:
 
 #include <H4PCommon.h>
 
-class myLogger: public H4PLogService {
-        void _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target,uint32_t error){
+class myLogger: public EventListener {
+        void _logEvent(const string &msg,H4P_EVENT_TYPE type,const string& source,const string& target,uint32_t error){
             Serial.print("myLogger ");
             Serial.print(millis());
             Serial.print(" ");
             Serial.println(msg.c_str()); // or  Serial.println(CSTR(msg));
         }
     public:
-        myLogger(): H4PLogService("mylog"){}
+        myLogger(): EventListener("mylog"){}
 };
 
 ```

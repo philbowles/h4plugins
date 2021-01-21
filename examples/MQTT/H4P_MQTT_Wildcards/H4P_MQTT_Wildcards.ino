@@ -1,5 +1,5 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,5,false) // Serial baud rate, Q size, SerialCmd autostop
+H4_USE_PLUGINS(115200,10,false) // Serial baud rate, Q size, SerialCmd autostop
 //
 //  Callback is given a vector of strings (vs), each contains one component of input topic
 //  NB last item is always payload, hence= vs.back()

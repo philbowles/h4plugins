@@ -13,7 +13,7 @@ and the appropriat "sense" settings of ACTIVE_HIGH/LOW for each
 
 */
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,5,false) // Serial baud rate, Q size, SerialCmd autostop
+H4_USE_PLUGINS(115200,10,false) // Serial baud rate, Q size, SerialCmd autostop
 
 #include <SPI.h>
 #include <Wire.h>

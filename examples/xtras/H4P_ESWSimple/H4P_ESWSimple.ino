@@ -1,5 +1,5 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,5,false) // Serial baud rate, Q size, SerialCmd autostop
+H4_USE_PLUGINS(115200,10,false) // Serial baud rate, Q size, SerialCmd autostop
 
 // Makes it easy to switch between Wemos D1 mini and Wemos LOLIN D32
 #ifdef ARDUINO_ARCH_ESP32

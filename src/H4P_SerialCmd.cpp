@@ -34,11 +34,11 @@ H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Plugin(scmdTag()){
     _cmds={
         {h4Tag(),      { 0, H4PC_H4, nullptr}},
         {"help",       { 0, 0, CMD(help) }},
-        {"info",       { H4PC_SVC,  0, CMDVS(_svcInfo) }},
         {"reboot",     { H4PC_H4,   0, CMD(h4reboot) }},
         {"factory",    { H4PC_H4,   0, ([this](vector<string>){ h4FactoryReset(_cb[srcTag()]); return H4_CMD_OK; }) }},
         {"dump",       { H4PC_H4,   0, CMDVS(_dump)}},
         {"svc",        { H4PC_H4,   H4PC_SVC, nullptr}},
+        {"info",       { H4PC_SVC,  0, CMDVS(_svcInfo) }},
         {"restart",    { H4PC_SVC,  0, CMDVS(_svcRestart) }},
         {"start",      { H4PC_SVC,  0, CMDVS(_svcStart) }},
         {"stop",       { H4PC_SVC,  0, CMDVS(_svcStop) }},
