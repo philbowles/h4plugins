@@ -36,6 +36,7 @@ SOFTWARE.
 void H4P_UPNPDetector::_hookIn() { 
     REQUIRE(onof);
     DEPEND(upnp);
+    H4Plugin::_hookIn();
 }
 
 void H4P_UPNPDetector::_start(){
@@ -46,8 +47,8 @@ void H4P_UPNPDetector::_start(){
     });
     _upHooks();
 }
-
-H4P_UPNPDetectorSource::H4P_UPNPDetectorSource(const string& pid,const string& id): H4P_UPNPDetector(pid,id){
+/*
+H4P_UPNPDetectorSource::H4P_UPNPDetectorSource(uint32_t pid,const string& id): H4P_UPNPDetector(pid,id){
     H4P_BinaryThing* _btp;
     REQUIREBT;
     if(_btp){
@@ -60,7 +61,7 @@ H4P_UPNPDetectorSource::H4P_UPNPDetectorSource(const string& pid,const string& i
         };
     }
 }
-
+*/
 #ifdef ARDUINO_ARCH_ESP8266
 extern "C" {
   #include <ping.h>
@@ -71,7 +72,10 @@ struct ping_option  H4P_IPDetector::pop;
 //
 //      IP
 //
-void H4P_IPDetector::_hookIn() { DEPEND(wifi); }
+void H4P_IPDetector::_hookIn() { 
+    DEPEND(wifi);
+    H4Plugin::_hookIn();
+}
 
 void H4P_IPDetector::_start(){
     _pinger=h4.everyRandom(H4P_PJ_LO,H4P_PJ_HI,[this](){
@@ -98,7 +102,8 @@ void H4P_IPDetector::_ping_recv_cb(void *arg, void *pdata){
         _inflight=false;
     },p,v));
 }
-H4P_IPDetectorSource::H4P_IPDetectorSource(const string& pid,const string& id): H4P_IPDetector(pid,id){
+/*
+H4P_IPDetectorSource::H4P_IPDetectorSource(uint32_t pid,const string& id): H4P_IPDetector(pid,id){
     H4P_BinaryThing* _btp;
     REQUIREBT;
     if(_btp){
@@ -111,15 +116,17 @@ H4P_IPDetectorSource::H4P_IPDetectorSource(const string& pid,const string& id): 
         };
     }
 }
-//#ifdef H4P_USE_OTA
+*/
 //
 //      MDNS
 //
+/*
 unordered_map<string,H4P_MDNSDetector*> H4P_MDNSDetector::localList;
 
 void H4P_MDNSDetector::_hookIn() { 
     REQUIRE(onof);
-    DEPEND(wifi);
+    depend<H4P_WiFi>(H4PID_WIFI);
+    H4Plugin::_hookIn();
 }
 
 void H4P_MDNSDetector::_start(){
@@ -127,10 +134,10 @@ void H4P_MDNSDetector::_start(){
     _upHooks();
 }
 
-H4P_MDNSDetector::H4P_MDNSDetector(const string& friendly,const string& service,const string& protocol,H4BS_FN_SWITCH f):
+H4P_MDNSDetector::H4P_MDNSDetector(const string& service,const string& protocol,H4BS_FN_SWITCH f):
     _service(service),
     _protocol(protocol),
-    H4PDetector(friendly,friendly,f){ 
+    H4PDetector(H4PID_PDMD,friendly,f){ 
         localList[friendly]=this;
 }
 
@@ -147,5 +154,6 @@ H4P_H4DetectorSource::H4P_H4DetectorSource(const string& id): H4P_H4Detector(id)
         };
     }
 }
+*/
 //#endif // OTA
 #endif // 8266

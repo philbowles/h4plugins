@@ -37,7 +37,7 @@ void __attribute__((weak)) onRTC(){}
 constexpr uint32_t secsInDay(){ return 86400; }
 constexpr uint32_t msInDay(){ return 1000*secsInDay(); }
 
-H4P_Timekeeper::H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzo,H4_FN_DST fDST): _fDST(fDST), H4Plugin(timeTag()){
+H4P_Timekeeper::H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzo,H4_FN_DST fDST): _fDST(fDST), H4Plugin(H4PID_TIME){
     _cmds={
         {_pName,   { H4PC_H4, _subCmd, nullptr}}, // root for this plugin
         {"change", { _subCmd,       0, CMDVS(_change)}},
@@ -114,13 +114,11 @@ uint32_t H4P_Timekeeper::_change(vector<string> vs){ return guardString2(vs,[thi
 uint32_t H4P_Timekeeper::_daily(vector<string> vs){ return __alarmCore(vs,true,[this](bool b){ _btp->turn(b); }); }
 
 void H4P_Timekeeper::_hookIn(){ 
-    DEPEND(wifi);
-    H4Plugin* p=isLoaded(onofTag());
-    if(p) {
-        _btp=reinterpret_cast<H4P_BinaryThing*>(p);
-        h4cmd.addCmd("at",_subCmd,0,CMDVS(_at));
-        h4cmd.addCmd("daily",_subCmd,0,CMDVS(_daily));
-    }
+    depend<H4P_WiFi>(H4PID_WIFI);
+    _btp=require<H4P_BinaryThing>(H4PID_ONOF);
+    h4cmd.addCmd("at",_subCmd,0,CMDVS(_at));
+    h4cmd.addCmd("daily",_subCmd,0,CMDVS(_daily));
+    H4Plugin::_hookIn();
 }
 
 void H4P_Timekeeper::_setupSNTP(const string& ntp1, const string& ntp2){

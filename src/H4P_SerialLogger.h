@@ -32,8 +32,8 @@ SOFTWARE.
 #include <H4PCommon.h>
 #include <H4P_SerialCmd.h>
 
-class H4P_SerialLogger: public H4PEventListener {
+class H4P_SerialLogger: public H4Plugin {
         void   _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source){ Serial.printf("%s:%s %s\n",CSTR(h4cmd._getEventName(type)),CSTR(uppercase(source)),CSTR(msg)); }
     public:
-        H4P_SerialLogger(uint32_t filter=H4P_EVENT_ALL): H4PEventListener("slog",filter){ _up=true; }
+        H4P_SerialLogger(uint32_t filter=H4P_EVENT_ALL): H4Plugin(H4PID_SLOG){ _eventFilter=filter; }
 };

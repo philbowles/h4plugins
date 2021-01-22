@@ -45,7 +45,7 @@ N/A
 
 N/A
 
-More information on [Event Emitters and Listeners](docs/../h4logs.md)
+More information on [Event Emitters and Listeners](docs/../events.md)
 
 ---
 
@@ -53,7 +53,7 @@ More information on [Event Emitters and Listeners](docs/../h4logs.md)
 
 N/A
 
-More information on [Event Emitters and Listeners](docs/../h4logs.md)
+More information on [Event Emitters and Listeners](docs/../events.md)
 
 ---
 

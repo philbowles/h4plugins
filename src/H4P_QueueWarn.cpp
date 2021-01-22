@@ -45,7 +45,7 @@ void H4P_QueueWarn::pcent(uint32_t pc){
 
 uint32_t H4P_QueueWarn::_qwPcent(vector<string> vs){ return guardInt1(vs,bind(&H4P_QueueWarn::pcent,this,_1)); }
 //
-H4P_QueueWarn::H4P_QueueWarn(function<void(bool)> _f,uint32_t _limit): H4Plugin("qwrn"){
+H4P_QueueWarn::H4P_QueueWarn(function<void(bool)> _f,uint32_t _limit): H4Plugin(H4PID_QWRN){
     _cmds={
         {_pName,     {H4PC_H4, _subCmd, nullptr}},
         {"pcent",  {_subCmd,   0, CMDVS(_qwPcent)}}

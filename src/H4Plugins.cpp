@@ -31,11 +31,83 @@ SOFTWARE.
 
 void __attribute__((weak)) onFactoryReset(){}
 //
+vector<string> h4pnames={
+    "VM",
+    "CMD",
+    "1SEC",
+    "ESQW",
+    "EVTQ",
+    "HEAP",
+    "EAR0",
+    "HWRN",
+    "LLOG",
+    "LOOP",
+    "ONOF",
+    "QWRN",
+    "SLOG",
+    "SNIF",
+    "STOR",
+    "TONE",
+    "GPIO",
+    "WINK",
+    "WIFI",
+    "BEAT",
+    "MQTT",
+    "MLG0",
+    "UPNP",
+    "MFNB",
+    "PDI0",
+    "PDM0",
+    "PDU0",
+    "RUPD",
+    "SQLL",
+    "SSET",
+    "TIME",
+    "UDPL",
+    "XXX0"
+};
+
+void H4Plugin::_applyEventFilter(const string &m,H4P_EVENT_TYPE t,const string& s){ 
+    if(t & _eventFilter) _handleEvent(m,t,s);
+}
+/*
+uint32_t H4Plugin::frig(){
+    auto i=find(h4pnames.begin(),h4pnames.end(),uppercase(_pName));
+    if(i!=h4pnames.end()){
+        uint32_t pos=distance(h4pnames.begin(),i);
+        if(!h4pmap[pos]) {
+            h4pmap[pos]=this;
+            return pos;
+        }
+        else Serial.printf("DOUBLE DIPPERS! %s\n",CSTR(_pName));
+    } else Serial.printf("WASSSSSSSSSAP!!!!!!!! %s\n",CSTR(_pName));
+    return 999;
+}
+*/
+H4Plugin* H4Plugin::isLoaded(const string& x){
+    for(auto const& p:h4pmap) if(p.second->_pName==x) return p.second;
+    return nullptr;
+}
+
+void H4Plugin::_dynamicLoad(H4Plugin* p){
+//    Serial.printf("_dynamicLoad %d %08x\n",p->_subCmd-H4PC_MAX,(void*) p);
+    p->_startup();
+    p->_hookIn();
+    h4cmd.emitEvent(H4P_EVENT_DLL,_pName,"%s",CSTR(p->_pName));
+}
+
 void h4StartPlugins(){
+    H4Plugin::_cb[srcTag()]=userTag();
+    H4Plugin::_cb[h4pTag()]=H4P_VERSION;
+    Serial.printf("H4P %s\n",CSTR(H4Plugin::_cb[h4pTag()]));
 //    Serial.printf("CALIBRATION? cal=%u nL=%u peak=%u\n",H4_CALIBRATE,h4Nloops,h4Nloops * (1000 / H4_CALIBRATE));
-    for(auto const& p:H4Plugin::_plugins) { p->_startup(); }
-    for(auto const& p:H4Plugin::_plugins) { p->_hookIn(); }
-    for(auto const& p:H4Plugin::_plugins) { p->_greenLight(); }
+//    for(auto const& p:h4pmap) { Serial.printf("map sez %08x %s in pos %d\n",(void*) p.second,(CSTR(h4pnames[p.first])),p.first); }
+    for(auto const& p:h4pmap) p.second->_startup();
+//    for(auto const& p:h4pmap) { Serial.printf("post startup sez %08x %s in pos %d\n",(void*) p.second,(CSTR(h4pnames[p.first])),p.first); }
+    for(auto const& p:h4pmap) p.second->_hookIn();
+//    for(auto const& p:h4pmap) { Serial.printf("post hookin sez %08x %s in pos %d\n",(void*) p.second,(CSTR(h4pnames[p.first])),p.first); }
+    for(auto const& p:h4pmap) p.second->_greenLight();
+//    for(auto const& p:h4pmap) { Serial.printf("post greenlight sez %08x %s in pos %d\n",(void*) p.second,(CSTR(h4pnames[p.first])),p.first); }
 }
 
 void h4FactoryReset(const string& src){
@@ -76,6 +148,7 @@ uint32_t H4Plugin::guardString2(vector<string> vs,function<H4_CMD_ERROR(string,s
 void H4Plugin::_startup(){
     _commands.insert(_cmds.begin(),_cmds.end());
     _cmds.clear();
+    h4cmd._hookLogChain(bind(&H4Plugin::_applyEventFilter,this,_1,_2,_3));
 }
 
 void H4Plugin::start() {
@@ -101,7 +174,5 @@ void H4Plugin::_downHooks(){
     for(auto const& c:_disconnected) c();
     SYSEVENT(H4P_EVENT_SVC_DOWN,_pName,"");
 }
-//
-//      H4PlogService
-//
-void H4PEventListener::_hookIn(){ _up=true; h4cmd._hookLogChain(bind(&H4PEventListener::_filterEvent,this,_1,_2,_3)); }
+
+//void H4PEventListener::_hookIn(){ h4cmd._hookLogChain(bind(&H4PEventListener::_filterEvent,this,_1,_2,_3)); }

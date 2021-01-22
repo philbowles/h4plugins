@@ -35,23 +35,24 @@ SOFTWARE.
 
 #ifdef ARDUINO_ARCH_ESP8266
     #include<ESP8266httpUpdate.h>
-class H4P_RemoteUpdate: public H4PEventListener, public ESP8266HTTPUpdate {
+class H4P_RemoteUpdate: public H4Plugin, public ESP8266HTTPUpdate {
 #else
     #include<HTTPUpdate.h>
-class H4P_RemoteUpdate: public H4PEventListener, public HTTPUpdate {
+class H4P_RemoteUpdate: public H4Plugin, public HTTPUpdate {
 #endif
+                H4P_WiFi*   _pWiFi;
                 WiFiClient  _c;
                 string      _url;
                 void        _entropise(H4_FN_VOID f){ h4.onceRandom(H4P_PJ_LO,H4P_PJ_HI * H4P_RUPD_STRETCH,f); }
                 void        _greenLight(){
-                    if(h4wifi._getPersistentValue(rupdTag(),"")) _url=_cb[rupdTag()];
+                    if(_pWiFi->_getPersistentValue(rupdTag(),"")) _url=_cb[rupdTag()];
                     _cb[rupdTag()]=httpTag()+_url; 
                 } // no autostart
                 void _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source) override {
                     switch(type){
                         case H4P_EVENT_FACTORY:
                             Serial.printf("%s [%s] H4P_EVENT_FACTORY src=%s msg=%s\n",CSTR(_pName),rupdTag(),CSTR(source),CSTR(msg));
-                            h4wifi._wipe(rupdTag());
+                            _pWiFi->_wipe(rupdTag());
                             break;
                         default:
                             Serial.printf("WTF? EVENT t=%d src=%s *%s*\n",type,CSTR(source),CSTR(msg));
@@ -60,8 +61,8 @@ class H4P_RemoteUpdate: public H4PEventListener, public HTTPUpdate {
                 }
 
                 void        _hookIn(){ 
-                    DEPEND(wifi);
-                    H4PEventListener::_hookIn();
+                    _pWiFi=depend<H4P_WiFi>(H4PID_WIFI);
+                    H4Plugin::_hookIn();
                 }
                 void        _updateFromUrl(bool fw,bool reboot){
                     string endpoint=_cb[rupdTag()]+"/"+_cb[deviceTag()];
@@ -79,10 +80,11 @@ class H4P_RemoteUpdate: public H4PEventListener, public HTTPUpdate {
                 }
     public:
  #if H4P_USE_WIFI_AP
-        H4P_RemoteUpdate(const char* bin): H4PEventListener(rupdTag(),H4P_EVENT_FACTORY){
+        H4P_RemoteUpdate(const char* bin): H4Plugin(H4PID_RUPD){
 #else
-        H4P_RemoteUpdate(const string& url,const char* bin): _url(url), H4PEventListener(rupdTag(),H4P_EVENT_FACTORY){
+        H4P_RemoteUpdate(const string& url,const char* bin): _url(url),  H4Plugin(H4PID_RUPD){
 #endif
+            _eventFilter=H4P_EVENT_FACTORY;
             _cb["bin"]=bin;
             _cmds={
                 {_pName,       { H4PC_H4,_subCmd  , nullptr}},

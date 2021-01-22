@@ -30,10 +30,11 @@ SOFTWARE.
 
 extern void h4FactoryReset(const string& src);
 
-H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Plugin(scmdTag()){
+H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Plugin(H4PID_CMD){
     _cmds={
         {h4Tag(),      { 0, H4PC_H4, nullptr}},
         {"help",       { 0, 0, CMD(help) }},
+        {"event",      { H4PC_H4,   0, CMDVS(_event) }}, // dangerous!!!
         {"reboot",     { H4PC_H4,   0, CMD(h4reboot) }},
         {"factory",    { H4PC_H4,   0, ([this](vector<string>){ h4FactoryReset(_cb[srcTag()]); return H4_CMD_OK; }) }},
         {"dump",       { H4PC_H4,   0, CMDVS(_dump)}},
@@ -91,7 +92,7 @@ uint32_t H4P_SerialCmd::_executeCmd(string topic, string pload){
     #endif	
     uint32_t rv=_dispatch(vector<string>(cmd)); // optimise?
     #ifdef H4P_LOG_EVENTS
-        if(rv) _logger(_getErrorMessage(rv),H4P_EVENT_ERROR,vs[0]);
+        if(rv) _logger(_getErrorMessage(rv),H4P_EVENT_CMDERROR,vs[0]);
     #endif
     return rv;
 }
@@ -112,12 +113,7 @@ void H4P_SerialCmd::_hookIn(){
     HAL_FS.begin();
 }
 
-void H4P_SerialCmd::_logger(const string &msg,H4P_EVENT_TYPE type,const string& source){ 
-    for(auto const& l:_eventListeners) {
-//        Serial.printf("EMIT %s src=%s %s\n",CSTR(_getEventName(type)),CSTR(source),CSTR(msg));
-        l(msg,type,source);
-    }
-}
+void H4P_SerialCmd::_logger(const string &msg,H4P_EVENT_TYPE type,const string& source){ for(auto const& l:_eventListeners) l(msg,type,source); }
 
 void H4P_SerialCmd::_run(){
     static string cmd="";
@@ -166,6 +162,16 @@ uint32_t H4P_SerialCmd::_svcControl(H4P_SVC_CONTROL svc,vector<string> vs){
             }
             return H4_CMD_NAME_UNKNOWN;
         })(H4PAYLOAD);
+    });
+}
+
+uint32_t H4P_SerialCmd::_event(vector<string> vs){ 
+    return guard1(vs,[this](vector<string> vs){
+        auto vg=split(H4PAYLOAD,",");
+        if(vg.size()!=2) return H4_CMD_PAYLOAD_FORMAT;
+        if(!stringIsNumeric(vg[0])) return H4_CMD_NOT_NUMERIC;
+        h4cmd.emitEvent(static_cast<H4P_EVENT_TYPE>(1 << STOI(vg[0])),_cb[srcTag()],"%s",CSTR(vg[1]));
+        return H4_CMD_OK;
     });
 }
 
@@ -252,7 +258,8 @@ void H4P_SerialCmd::showQ(){
 }
 
 void  H4P_SerialCmd::plugins(){
-    for(auto const& p:H4Plugin::_plugins){
+    for(auto const& pp:h4pmap){
+        auto p=pp.second;
         reply("h4/svc/info/%s %s ID=%d",CSTR(p->_pName),p->_state() ? "UP":"DN",p->_subCmd);
         p->show();
         reply("");

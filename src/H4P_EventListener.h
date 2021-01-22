@@ -31,10 +31,10 @@ SOFTWARE.
 
 #include<H4PCommon.h>
 
-class H4P_EventListener: public H4PEventListener { 
+class H4P_EventListener: public H4Plugin { 
                 H4P_FN_USEREVENT _f;
 
                 void        _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source) override { _f(msg); }
     public: 
-        H4P_EventListener(const char* name,uint32_t filter,H4P_FN_USEREVENT f): _f(f), H4PEventListener(name,filter){}
+        H4P_EventListener(uint32_t filter,H4P_FN_USEREVENT f): _f(f), H4Plugin(H4PID_HEAR){ _eventFilter=filter; }
 };

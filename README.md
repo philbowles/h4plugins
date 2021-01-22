@@ -165,25 +165,25 @@ Networking is not required, but if used the webserver will automatically add the
 
 ### Event Listeners
 
-* [**H4P_SerialLogger**](docs/h4logs.md): Event logging to serial monitor
+* [**H4P_SerialLogger**](docs/events.md): Event logging to serial monitor
 
-* [**H4P_LocalLogger**](docs/h4logs.md): Event logging to LittleFS file
+* [**H4P_LocalLogger**](docs/events.md): Event logging to LittleFS file
 
-* [**H4P_MQTTLogger**](docs/h4logs.md): Event logging to MQTT Server
+* [**H4P_MQTTLogger**](docs/events.md): Event logging to MQTT Server
 
 * [**H4P_HttpMySQLLogger**](docs/mysql.md): log to remote webserver to update MySQL log db - Includes [example Node.js server](examples/LOGGING/H4P_HttpMySQLLogger/mysqlrest/mysqllogger.code-workspace)
 
-* [**H4P_EventListener**](docs/h4logs.md): General-purpose listenr clls user-defined function on any event / combination of events
+* [**H4P_EventListener**](docs/events.md): General-purpose listenr clls user-defined function on any event / combination of events
 
 ### Event Emitters
 
 * [**H4P_EmitLoopCount**](docs/h4qw.md): Send loops/sec to the event queue for diagnosing bottlencks (requires changes to [H4 config](https://github.com/philbowles/H4/blob/src/config.h)
   
-* [**H4P_EmitQ**](docs/h4logs.md): Periodically Send H4 Q size to event queue to help profling / performance tuning
+* [**H4P_EmitQ**](docs/events.md): Periodically Send H4 Q size to event queue to help profling / performance tuning
 
-* [**H4P_EmitHeap**](docs/h4logs.md): Periodically Send `getFreeHeap()` value to event queue to help hunt memory leaks
+* [**H4P_EmitHeap**](docs/events.md): Periodically Send `getFreeHeap()` value to event queue to help hunt memory leaks
 
-* [**H4P_EmitTick**](docs/h4logs.md): Send synchronous 1x per second on-the-second heartbeat event.
+* [**H4P_EmitTick**](docs/events.md): Send synchronous 1x per second on-the-second heartbeat event.
 
 ## Specialist Device Drivers
 
@@ -290,7 +290,7 @@ After you have finished reading this file, the recommended path you should follo
 * [H4 and event-driven programming](https://github.com/philbowles/H4)
 * [Common Command and Control: H4P_SerialCmd](docs/ccc.md)
 * [Switches and Things](docs/things.md)
-* [Event Listeners, Event Emitters and logging](docs/h4logs.md)
+* [Event Listeners, Event Emitters and logging](docs/events.md)
 * [Plugins Master Index](docs/master.md)
 * [GPIO Handling](docs/h4gm.md)
 * [WiFi, MQTT and networking](docs/h4wifi.md)

@@ -55,7 +55,7 @@ class H4PDetector: public H4Plugin{
         string          _id;
         bool            _here=false;
 
-        H4PDetector(const string& pid,const string& id,H4BS_FN_SWITCH f): _id(id),_f(f),H4Plugin(pid){}
+        H4PDetector(uint32_t pid,const string& id,H4BS_FN_SWITCH f): _id(id),_f(f),H4Plugin(pid){}
                         
         bool        isPresent(){ return _here; }
         void show() override { reply("%s (%s) %s Present",CSTR(_pName),CSTR(_id),_here ? "":"NOT"); }
@@ -66,14 +66,14 @@ class H4P_UPNPDetector: public H4PDetector {
                 void        _hookIn() override;
                 void        _start() override;
     public:
-        H4P_UPNPDetector(const string& friendly,const string& usn,H4BS_FN_SWITCH f=nullptr): H4PDetector(friendly,usn,f){}
+        H4P_UPNPDetector(const string& usn,H4BS_FN_SWITCH f=nullptr): H4PDetector(H4PID_PDUP,usn,f){}
 };
-
+/*
 class H4P_UPNPDetectorSource: public H4P_UPNPDetector{
     public:
-        H4P_UPNPDetectorSource(const string& pid,const string& id);
+        H4P_UPNPDetectorSource(uint32_t pid,const string& id);
 };
-
+*/
 #ifdef ARDUINO_ARCH_ESP8266
 class H4P_IPDetector: public H4PDetector {
         static  bool _inflight;
@@ -86,13 +86,15 @@ class H4P_IPDetector: public H4PDetector {
                 void        _hookIn() override;
                 void        _start() override;
     public:
-        H4P_IPDetector(const string& friendly,const string& ip,H4BS_FN_SWITCH f=nullptr): H4PDetector(friendly,ip,f){}
+        H4P_IPDetector(uint32_t pid,const string& ip,H4BS_FN_SWITCH f=nullptr): H4PDetector(pid,ip,f){}
 };
+/*
 class H4P_IPDetectorSource: public H4P_IPDetector{
     public:
-        H4P_IPDetectorSource(const string& pid,const string& id);
+        H4P_IPDetectorSource(uint32_t pid,const string& id);
 };
-//#ifdef H4P_USE_OTA
+*/
+/*
 class H4P_MDNSDetector: public H4PDetector {
         string _service;
         string _protocol;
@@ -109,19 +111,19 @@ class H4P_MDNSDetector: public H4PDetector {
                 void        _hookIn() override;
                 void        _start() override;
     public:
-        H4P_MDNSDetector(const string& friendly,const string& service,const string& protocol,H4BS_FN_SWITCH f=nullptr);
+        H4P_MDNSDetector(uint32_t pid,const string& service,const string& protocol,H4BS_FN_SWITCH f=nullptr);
 };
-
+/*
 class H4P_H4Detector: public H4P_MDNSDetector {
     public:
-        H4P_H4Detector(const string& local,H4BS_FN_SWITCH f=nullptr): H4P_MDNSDetector(local,"arduino","tcp",f){}
+        H4P_H4Detector(uin32_t,H4BS_FN_SWITCH f=nullptr): H4P_MDNSDetector(local,"arduino","tcp",f){}
 };
 
 class H4P_H4DetectorSource: public H4P_H4Detector{
     public:
         H4P_H4DetectorSource(const string& local);
 };
-
+*/
 //#endif // OTA
 #endif // esp8266
 #endif // H4P_PresenceDetector_HO

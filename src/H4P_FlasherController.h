@@ -27,53 +27,50 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4FLASHER_HO
-#define H4FLASHER_HO
+#pragma once
 
 #include<H4PCommon.h>
 #include<H4P_GPIOManager.h>
 
 class H4Flasher{
-            uint8_t         _active=HIGH;
             H4_TASK_PTR     _timer=nullptr;
             H4_TASK_PTR	    _off=nullptr;
-
-                string 		ms;
-                uint32_t	a,t,p,d,v;
+            OutputPin*      _opp;
 
                 void 		_pulse(uint32_t width);	
-                void 		_toggle();
-
-                uint8_t 	_pin;
     public:  
-        H4Flasher(uint8_t pin,uint32_t period,uint8_t duty,uint8_t active);
-        H4Flasher(uint8_t pin,const char* pattern,uint32_t timebase,uint8_t active);
+        H4Flasher(OutputPin*  opp,uint32_t period,uint8_t duty);
+        H4Flasher(OutputPin*  opp,const char* pattern,uint32_t timebase);
 
-                void        autoOutput(); // hoist this
-                void        flashPattern(uint32_t timebase,const char* pattern);
+                void        flashPattern(const char* pattern,uint32_t timebase);
                 void        PWM(uint32_t period,uint8_t duty);
                 void        stop();
 };
 
+using H4FC_FN_F1        = function<void(H4Flasher*)>;
+using H4FC_FN_F2        = function<H4Flasher*(OutputPin*)>;
+
 class H4P_FlasherController: public H4Plugin {
+        H4P_GPIOManager*    _pGPIO;
+
         std::unordered_map<uint8_t,H4Flasher*> _flashMap;
-        void            _flash(uint32_t period,uint8_t duty,uint8_t pin,uint8_t active=HIGH);
+        
+        void            _dynaLoad(uint8_t pin,H4GM_SENSE active,H4FC_FN_F1 f1,H4FC_FN_F2 f2);
+        void            _flash(uint32_t period,uint8_t duty,uint8_t pin,H4GM_SENSE active=ACTIVE_HIGH);
+        void            _hookIn() override;
     public:
-        H4P_FlasherController(): H4Plugin(winkTag()){}
+        H4P_FlasherController(): H4Plugin(H4PID_WINK){}
              
-		void 			flashLED(uint32_t rate, uint8_t pin,uint8_t active=HIGH);
-		void 			flashMorse(const char *pattern, uint32_t timebase, uint8_t pin,uint8_t active=HIGH);	
+		void 			flashLED(uint32_t rate, uint8_t pin,H4GM_SENSE active=ACTIVE_HIGH);
+		void 			flashMorse(const char *pattern, uint32_t timebase, uint8_t pin,H4GM_SENSE active=ACTIVE_HIGH);	
 #ifdef H4FC_MORSE_SUPPORT
 		static std::unordered_map<char,string> _morse; // tidy
-		void 	        flashMorseText(const char * pattern,uint32_t timebase,uint8_t pin,uint8_t active=HIGH);
+		void 	        flashMorseText(const char * pattern,uint32_t timebase,uint8_t pin,H4GM_SENSE active=ACTIVE_HIGH);
 #endif
-		void 			flashPattern(const char * pattern,uint32_t timebase,uint8_t pin,uint8_t active=HIGH);
-		void 			flashPWM(uint32_t period,uint8_t duty,uint8_t pin,uint8_t active=HIGH);	
+		void 			flashPattern(const char * pattern,uint32_t timebase,uint8_t pin,H4GM_SENSE active=ACTIVE_HIGH);
+		void 			flashPWM(uint32_t period,uint8_t duty,uint8_t pin,H4GM_SENSE active=ACTIVE_HIGH);	
 		bool 			isFlashing(uint8_t pin);
-		void 			pulseLED(uint32_t period,uint8_t pin,uint8_t active=HIGH);
-        void            stopLED(uint8_t pin);				
+		void 			pulseLED(uint32_t period,uint8_t pin,H4GM_SENSE active=ACTIVE_HIGH);
+        void            stopLED(uint8_t pin);
 };
-
-extern __attribute__((weak)) H4P_FlasherController h4fc;
-
-#endif // H4FLASHER_Hs
+//extern __attribute__((weak)) H4P_FlasherController h4fc;

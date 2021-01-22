@@ -35,11 +35,11 @@ void H4P_MultiFunctionButton::_progress(H4GPIOPin* ptr){ // run this as each sta
     switch(pin->stage){
         case 1: // over 2 seconds, slow flash
             H4EVENT("STAGE 1 - will reboot");
-            h4fc.flashLED(H4MF_SLOW,H4P_SIGNAL_LED,H4P_SIGNAL_SENSE);
+            _pSignal->flashLED(H4MF_SLOW,H4P_SIGNAL_LED,H4P_SIGNAL_SENSE);
             break;
         case 2: // over 5 seconds, medium flash
             H4EVENT("STAGE 2 - will factory reset");
-            h4fc.flashLED(H4MF_MEDIUM,H4P_SIGNAL_LED,H4P_SIGNAL_SENSE);
+            _pSignal->flashLED(H4MF_MEDIUM,H4P_SIGNAL_LED,H4P_SIGNAL_SENSE);
             break;
         default: // do nothing if less than 2 seconds
             break;
@@ -47,11 +47,12 @@ void H4P_MultiFunctionButton::_progress(H4GPIOPin* ptr){ // run this as each sta
 }
 
 void H4P_MultiFunctionButton::_hookIn(){
-    DEPEND(wink);
-    DEPEND(gpio);
-    REQUIREBT;
+    _pSignal=require<H4P_FlasherController>(H4PID_WINK);
+    _btp=require<H4P_BinaryThing>(H4PID_ONOF);
+    _pGPIO=depend<H4P_GPIOManager>(H4PID_GPIO);
+    H4Plugin::_hookIn();
 }
 
-H4P_MultiFunctionButton::H4P_MultiFunctionButton(uint8_t pin,uint8_t mode,H4GM_SENSE b_sense,uint32_t dbTimeMs): H4Plugin("mfnb"){
-    h4gm.pinFactory<MultistagePin>(false,pin,mode,H4GM_PS_MULTISTAGE,b_sense,dbTimeMs,_sm,[this](H4GPIOPin* ptr){ _progress(ptr); });
+H4P_MultiFunctionButton::H4P_MultiFunctionButton(uint8_t pin,uint8_t mode,H4GM_SENSE b_sense,uint32_t dbTimeMs): H4Plugin(H4PID_MFNB){
+    _pGPIO->pinFactory<MultistagePin>(false,pin,mode,H4GM_PS_MULTISTAGE,b_sense,dbTimeMs,_sm,[this](H4GPIOPin* ptr){ _progress(ptr); });
 }

@@ -32,7 +32,7 @@ SOFTWARE.
 
 #include<H4PCommon.h>
 
-class H4P_PersistentStorage: public H4PEventListener {
+class H4P_PersistentStorage: public H4Plugin {
         H4P_CONFIG_BLOCK    psRam={};
         H4P_FN_PSCHANGE     _f=nullptr;
 

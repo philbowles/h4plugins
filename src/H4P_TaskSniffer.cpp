@@ -86,17 +86,17 @@ void H4P_TaskSniffer::show(){
 //
 //      public 
 //
-H4P_TaskSniffer::H4P_TaskSniffer(): H4Plugin(snifTag()){ 
+H4P_TaskSniffer::H4P_TaskSniffer(): H4Plugin(H4PID_SNIF){ 
     for(uint32_t i=0;i<100;i++) hitList.insert(i);
     _common();
 }
 
-H4P_TaskSniffer::H4P_TaskSniffer(uint32_t i): H4Plugin(snifTag()){ 
+H4P_TaskSniffer::H4P_TaskSniffer(uint32_t i): H4Plugin(H4PID_SNIF){ 
     include(i);
     _common();
 }
 
-H4P_TaskSniffer::H4P_TaskSniffer(initializer_list<uint32_t> i): H4Plugin(snifTag()){ 
+H4P_TaskSniffer::H4P_TaskSniffer(initializer_list<uint32_t> i): H4Plugin(H4PID_SNIF){ 
     include(i);
     _common();
 }

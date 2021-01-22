@@ -17,7 +17,7 @@
 ---
 # What does it do?
 
-The H4P_HttpMySQLLogger fits into the H4Pluins Logging strategy and you *must* read that [documentation](h4logs.md) first if you have not already done so!
+The H4P_HttpMySQLLogger fits into the H4Pluins Logging strategy and you *must* read that [documentation](events.md) first if you have not already done so!
 
 It simply send each matching event to an Http server. An example [server](../examples/LOGGING/H4P_HttpMySQLLogger/mysqlrest/README.MD) is provide using nodejs and express.
 
@@ -37,7 +37,7 @@ The logging interface sends the following data items to the server in a POST mes
 
 * Target: 
 
-These fields are described in the [general logging documenatation](h4logs.md)
+These fields are described in the [general logging documenatation](events.md)
 
 ---
 

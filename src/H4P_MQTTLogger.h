@@ -27,21 +27,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_MQTTLogger_HO
-#define H4P_MQTTLogger_HO
+#pragma once
 
 #include <H4PCommon.h>
 #include <H4P_AsyncMQTT.h>
 
-class H4P_MQTTLogger: public H4PEventListener {
-        void _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source){ h4mqtt.publishDevice(_pName,msg); }
+class H4P_MQTTLogger: public H4Plugin {
+        H4P_AsyncMQTT*  _pMQTT;
+        string          _topic;
+        void _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source){ _pMQTT->publishDevice(_topic,msg); }
     protected:
         virtual void _hookIn() override {
-            DEPEND(mqtt);
-            H4PEventListener::_hookIn();
+            _pMQTT=depend<H4P_AsyncMQTT>(H4PID_MQTT);
+            H4Plugin::_hookIn();
         }
         virtual void _greenLight() override {} // dont autostart
     public:
-        H4P_MQTTLogger(const string& topic="mlog",uint32_t filter=H4P_EVENT_ALL): H4PEventListener(topic,filter){}
+        H4P_MQTTLogger(const string& topic,uint32_t filter=H4P_EVENT_ALL): _topic(topic),H4Plugin(H4PID_MLOG){
+            _eventFilter=filter;
+        }
 };
-#endif // H4P_MQTTLogger_H

@@ -27,8 +27,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_LocalLogger.h>
+#include <H4P_SerialCmd.h>
 
-H4P_LocalLogger::H4P_LocalLogger(uint32_t limit,uint32_t filter): H4PEventListener(logTag(),filter), _limit(limit) {
+H4P_LocalLogger::H4P_LocalLogger(uint32_t limit,uint32_t filter):  _limit(limit), H4Plugin(H4PID_LLOG) {
+    _eventFilter=filter | H4P_EVENT_FACTORY;
     _fname=string(logTag())+".csv";
     _cmds={
         {_pName,   {H4PC_H4, _subCmd, nullptr}},
@@ -38,19 +40,26 @@ H4P_LocalLogger::H4P_LocalLogger(uint32_t limit,uint32_t filter): H4PEventListen
     };
 }
 
-void H4P_LocalLogger::clear(){ HAL_FS.remove(CSTR(string("/").append(logTag()))); }
+void H4P_LocalLogger::clear(){ HAL_FS.remove(CSTR(string("/"+_fname))); }
 
 void H4P_LocalLogger::flush(){
     show();
     clear();
 }
 
-void H4P_LocalLogger::show(){ h4cmd._dump(vector<string>{_fname}); }
+void H4P_LocalLogger::show(){
+    uint32_t fsz=HAL_FS.open(CSTR(string("/"+_fname)),"r").size();
+    reply("File /%s size=%u (%u %%full) limit=%u",CSTR(_fname),fsz,(fsz*100)/_limit,_limit);
+    h4cmd._dump(vector<string>{_fname});
+}
 //
 //      our raison d'etre
 //
 void H4P_LocalLogger::_handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source){
-    vector<string> msgparts={stringFromInt(millis()),stringFromInt(type),source,msg};
-    uint32_t size=h4cmd.write("/"+_fname,join(msgparts,",")+"\n","a");
-    if(size > _limit) flush();
+    if(type==H4P_EVENT_FACTORY) clear();
+    else {
+        vector<string> msgparts={stringFromInt(millis()),h4cmd._getEventName(type),source,msg};
+        uint32_t size=h4cmd.write("/"+_fname,join(msgparts,",")+"\n","a");
+        if(size > _limit) flush();
+    }
 }

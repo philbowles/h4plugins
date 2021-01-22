@@ -47,12 +47,12 @@ class H4P_BinaryThing: public H4Plugin{
                     void     _publish(bool b);
                     void     _setSlaves(bool b);
             virtual void     _setState(bool b);
-                    uint32_t _slave(vector<string> vs); //vscmd
+                    uint32_t _slave(vector<string> vs);
                     void     _start() override;
                     uint32_t _switch(vector<string> vs){ return guardInt1(vs,bind(&H4P_BinaryThing::turn,this,_1)); }
     public:
             bool            _state=false;
-        H4P_BinaryThing(H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): _f(f),_state(initial),_timeout(timer), H4Plugin(onofTag()) {
+        H4P_BinaryThing(H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): _f(f),_state(initial),_timeout(timer), H4Plugin(H4PID_ONOF) {
             autoOff(timer);
             _cmds={
                 {autoTag(),{H4PC_H4, 0, CMDVS(_autoOff)}},

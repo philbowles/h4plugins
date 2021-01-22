@@ -1,28 +1,23 @@
 #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,10,false) // Serial baud rate, Q size, SerialCmd autostop
 
-class myLogger: public EventListener {
-        void        _logEvent(const string &msg,H4P_EVENT_TYPE type,const string& source){
-            Serial.print("myLogger ");
-            Serial.print(millis());
-            Serial.print(" ");
-            Serial.println(msg.c_str()); // or  Serial.println(CSTR(msg));
+H4P_VerboseMessages h4vm;
+H4P_SerialLogger h4sl; // defaults to H4P_EVENT_ALL
+
+class myLogger: public H4Plugin {
+        void _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source){
+          uint32_t msgvalue=atoi(msg.c_str());
+          if(msgvalue%2) Serial.printf("That's odd! Type=%s from %s msg=%s\n",h4vm.getEventName(type).c_str(),source.c_str(),msg.c_str());
         }
     public:
-        myLogger(): EventListener("mylog"){}
+        myLogger(uint32_t filter=H4P_EVENT_ALL): H4Plugin(H4PID_UNKNOWN){ _eventFilter=filter; }
 };
 
-
-
-H4P_VerboseMessages h4vm;
-
-
-H4P_SerialLogger h4sl;
-myLogger lumberjack;
+myLogger lumberjack(H4P_EVENT_USER);
 
 void h4setup(){
   static uint32_t pingCount=0;
-  h4UserEvent("test1 %d\n",666);
-  h4UserEvent("Ztest2");
-  h4.every(1000,[](){ h4UserEvent("ping %d",pingCount++); });
+  h4.once(3000,[](){ h4UserEvent("669"); });
+  h4.every(1000,[](){ h4UserEvent("%d",pingCount++); }); // sends H4P_EVENT_USER, so will get picked up
+  h4.every(5000,[](){ h4SysEvent(H4P_EVENT_NOOP,"ignore me"); }); // ignored by YOU, caught by H4P_SerialLogger
 }

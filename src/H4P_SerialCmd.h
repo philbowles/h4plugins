@@ -49,6 +49,7 @@ class H4P_SerialCmd: public H4Plugin {
         H4P_VerboseMessages* _babel=nullptr;
         vector<H4P_FN_EVENT> _eventListeners;
         
+        VSCMD(_event);
         VSCMD(_svcRestart);
         VSCMD(_svcInfo);
         VSCMD(_svcStart);
@@ -62,7 +63,6 @@ class H4P_SerialCmd: public H4Plugin {
         void            _hookIn() override;
         void            _run();        
         void            _start() override {
-            reply("H4P %s\n",CSTR(_cb[h4pTag()]));
             h4._hookLoop([this](){ _run(); },_subCmd);
             H4Plugin::_start();
         }
@@ -81,7 +81,7 @@ class H4P_SerialCmd: public H4Plugin {
                 void            config(){ for(auto const& c:_cb) reply("%s=%s",CSTR(c.first),CSTR(c.second)); }        
                 void            heap(){ reply("Heap=%u",ESP.getFreeHeap()); }        
                 void            help();
-                uint32_t        invokeCmd(string,string="",const char* src=userTag());			
+                uint32_t        invokeCmd(string,string="",const char* src=userTag()); // force taek from _cb inside fn?
                 uint32_t        invokeCmd(string,uint32_t,const char* src=userTag()); 
                 void            plugins();
         static  string          read(const string& fn);
@@ -105,7 +105,7 @@ class H4P_SerialCmd: public H4Plugin {
                 void            _hookLogChain(H4P_FN_EVENT f){ _eventListeners.push_back(f); }
                 void            _logger(const string &msg,H4P_EVENT_TYPE type,const string& source);
                 uint32_t        _executeCmd(string topic, string pload);
-                uint32_t        _simulatePayload(string flat,const char* src=scmdTag());
+                uint32_t        _simulatePayload(string flat,const char* src=cmdTag());
 };
 
 extern __attribute__((weak)) H4P_SerialCmd h4cmd;

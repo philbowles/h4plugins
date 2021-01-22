@@ -27,8 +27,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4GPIOmanager_HO
-#define H4GPIOmanager_HO
+#pragma once
 
 #include<H4PCommon.h>
 #include<H4P_BinaryThing.h>
@@ -414,10 +413,11 @@ class H4P_GPIOManager: public H4Plugin{//
         void                _start() override;
         void                _stop() override {
             h4._unHook(_subCmd);
-            h4.cancelSingleton(H4P_TRID_GPIO);
             H4Plugin::_stop();
         }
         void                _run();
+        void                _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source) override;
+        void                _hookIn() override;
     public:
         template<typename T, typename... Args>
         T* pinFactory(bool onof,uint8_t _p,Args... args) {
@@ -428,6 +428,7 @@ class H4P_GPIOManager: public H4Plugin{//
 
                 H4GPIOPin*      isManaged(uint8_t p){ return pins.count(p) ? pins[p]:nullptr; }
         static  H4GM_PINMAP     pins;
+
         H4P_GPIOManager();
         //              returns 32 not 8 as it can also analogRead and state will hold analog value as well as digital 1/0
                 uint32_t        logicalRead(uint8_t p);
@@ -472,5 +473,3 @@ class H4P_GPIOManager: public H4Plugin{//
 };
 
 extern __attribute__((weak)) H4P_GPIOManager h4gm;
-
-#endif // inc guard

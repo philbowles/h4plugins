@@ -27,8 +27,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_UPNPServer_HO
-#define H4P_UPNPServer_HO
+#pragma once
 
 #include<H4PCommon.h>
 #include<H4P_WiFi.h>
@@ -39,8 +38,9 @@ STAG(alive);
 using H4P_FN_TAGMATCH   =function<void(uint32_t mx,H4P_CONFIG_BLOCK,bool)>;
 using H4P_TAG_MAP       =unordered_map<string,pair<string,H4P_FN_TAGMATCH>>;
 
-class H4P_UPNPServer: public H4PEventListener {
+class H4P_UPNPServer: public H4Plugin {
         H4P_BinaryThing* _btp;
+        H4P_WiFi*       _pWiFi;
         AsyncUDP 	    _udp;
         IPAddress		_ubIP;
         H4P_TAG_MAP     _detect;
@@ -82,7 +82,8 @@ class H4P_UPNPServer: public H4PEventListener {
         static  string          replaceParams(const string& s);
         static  string 	        replaceParamsFile(const string &f){ return replaceParams(CSTR(H4P_SerialCmd::read(f))); }
     public:                
-        H4P_UPNPServer(const string& name="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): _name(name), H4PEventListener(upnpTag(),H4P_EVENT_FACTORY,onC,onD){
+        H4P_UPNPServer(const string& name="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): _name(name), H4Plugin(H4PID_UPNP,onC,onD){
+            _eventFilter=H4P_EVENT_FACTORY;
             _pups.push_back(_urn+"device:controllee:1");
             _pups.push_back(_urn+"service:basicevent:1");
             _ubIP=IPAddress(239,255,255,250);
@@ -104,6 +105,5 @@ class H4P_UPNPServer: public H4PEventListener {
              void           _listenTag(const string& tag,const string& value,H4P_FN_TAGMATCH f){ _detect[tag]=make_pair(value,f); }
              void           _listenUSN(const string& usn,H4P_FN_TAGMATCH f){ _listenTag("USN",usn,f); }
 };
-    extern __attribute__((weak)) H4P_UPNPServer h4upnp;
 
-#endif // H4P_UPNPServer_H
+extern __attribute__((weak)) H4P_UPNPServer h4upnp;

@@ -27,8 +27,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_ToneController_H
-#define H4P_ToneController_H
+#pragma once
 
 #include<H4PCommon.h>
 #include<map>
@@ -90,5 +89,3 @@ extern __attribute__((weak)) H4P_ToneController h4tc;
 #define H4P_sirenHiLo(p,d) h4tc.siren(H4P_SIREN_HILO,p,d)
 #define H4P_sirenScreech(p,d) h4tc.siren(H4P_SIREN_SCREECH,p,d)
 #define H4P_sirenWoopWoop(p,d) h4tc.siren(H4P_SIREN_WOOPWOOP,p,d)
-
-#endif // H4P_ToneController_H

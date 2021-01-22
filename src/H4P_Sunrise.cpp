@@ -28,8 +28,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_Sunrise.h>
-//#include<H4P_WiFiSelect.h>
-
 #include<H4P_SerialCmd.h>
 #include <WiFiClientSecure.h>
 
@@ -66,8 +64,8 @@ SOFTWARE.
 
 
 void H4P_Sunrise::_hookIn(){ 
-    REQUIRE(wifi);
-    DEPEND(time);
+    _pTime=depend<H4P_Timekeeper>(H4PID_TIME);
+    H4Plugin::_hookIn();
 }
 
 void H4P_Sunrise::_parse(const string& s){
@@ -113,7 +111,7 @@ void H4P_Sunrise::_start(){
                     _parse(chop2[0]);
                     _parse(chop2[1]);
                     H4EVENT("s/r=%s s/s=%s",CSTR(_cb["sunrise"]),CSTR(_cb["sunset"]));
-                    h4tk.daily("01:00",ON,[this](bool b){
+                    _pTime->daily("01:00",ON,[this](bool b){
                         _cb.erase("sunrise");
                         _start();
                     });

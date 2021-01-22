@@ -48,6 +48,7 @@ SOFTWARE.
 // ex asws
 #include<H4P_BinaryThing.h>
 #include<ESPAsyncWebServer.h>
+#include<H4P_FlasherController.h>
 //
 enum H4P_UI_TYPE {
     H4P_UI_LABEL,
@@ -72,7 +73,10 @@ struct H4P_UI_ITEM { // add title and/or props?
 };
 using H4P_UI_LIST       = std::map<int,H4P_UI_ITEM>;
 
-class H4P_WiFi: public AsyncWebServer, public H4PEventListener {
+class H4P_WiFi: public AsyncWebServer, public H4Plugin {
+            H4P_FlasherController* _pSignal;
+            H4P_GPIOManager*       _pGPIO;
+
             DNSServer*          _dns53=nullptr;
 //
             H4P_BinaryThing*    _btp=nullptr;
@@ -113,19 +117,22 @@ class H4P_WiFi: public AsyncWebServer, public H4PEventListener {
                 void            _hookIn() override;
     public:
                 void            HAL_WIFI_startSTA(); // Has to be static for bizarre start sequence on ESP32 FFS
+        H4P_WiFi(): AsyncWebServer(80),H4Plugin(H4PID_WIFI){ Serial.printf("mandy deft shud neer appen wifin"); }
 //          included here against better wishes due to compiler bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89605
 #if H4P_USE_WIFI_AP
                 void            _startAP();
                 void            _save(const string& s){ H4P_SerialCmd::write("/"+s,_cb[s]); }
 
-        H4P_WiFi(H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): AsyncWebServer(80),H4PEventListener(wifiTag(),H4P_EVENT_HEARTBEAT | H4P_EVENT_FACTORY,onC,onD){
+        H4P_WiFi(H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): AsyncWebServer(80),H4Plugin(H4PID_WIFI,onC,onD){
+            _eventFilter=H4P_EVENT_HEARTBEAT | H4P_EVENT_FACTORY;
             _cb[ssidTag()]=uppercase(h4Tag());
             _cb[pskTag()]=uppercase(h4Tag());
 #else
         H4P_WiFi(string ssid,string psk,string device="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): AsyncWebServer(80),
             _device(device),
-            H4PEventListener(wifiTag(),H4P_EVENT_HEARTBEAT | H4P_EVENT_FACTORY,onC,onD)
+            H4Plugin(H4PID_WIFI,onC,onD)
             {
+            _eventFilter=H4P_EVENT_HEARTBEAT | H4P_EVENT_FACTORY;
             _cb[ssidTag()]=ssid;
             _cb[pskTag()]=psk;
 #endif
@@ -140,10 +147,9 @@ class H4P_WiFi: public AsyncWebServer, public H4PEventListener {
                 void            change(string ssid,string psk);
                 void            host(const string& host){ _setPersistentValue(deviceTag(),host,true); }
                 void            show() override { 
-                    reply("Device %s Mode=%d Status: %d",CSTR(_cb[deviceTag()]),WiFi.getMode(),WiFi.status());
+                    reply("Device %s Mode=%d Status: %d IP=%s",CSTR(_cb[deviceTag()]),WiFi.getMode(),WiFi.status(),WiFi.localIP().toString().c_str());
                     reply("SSID %s PSK=%s",CSTR(WiFi.SSID()),CSTR(WiFi.psk()));
                     reply("Signal Pin GPIO%d active=%d",H4P_SIGNAL_LED,H4P_SIGNAL_SENSE);
-                    H4PEventListener::show();
 /*
                     for(auto &i:_userItems) {
                         H4P_UI_ITEM u=i.second;

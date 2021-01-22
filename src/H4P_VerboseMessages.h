@@ -47,21 +47,23 @@ class H4P_VerboseMessages: public H4Plugin {
         };
 
         H4_INT_MAP eventTypes={
-            {H4P_EVENT_HEARTBEAT,"PING"},
+            {H4P_EVENT_NOOP,"NO-OP"},
             {H4P_EVENT_H4,uppercase(h4Tag())},
-            {H4P_EVENT_SVC_UP,"SVC UP"},
-            {H4P_EVENT_SVC_DOWN,"SVC DOWN"},
+            {H4P_EVENT_SVC_UP,"SVCUP"},
+            {H4P_EVENT_SVC_DOWN,"SVCDOWN"},
             {H4P_EVENT_CMD,"CMD"},
             {H4P_EVENT_USER,"USER"},
-            {H4P_EVENT_MQTT_ERROR,"MQTT ERROR"},
             {H4P_EVENT_HEAP,"HEAP"},
             {H4P_EVENT_Q,"Q"},
-            {H4P_EVENT_PD_ENTER,"PD ENTER"},
-            {H4P_EVENT_PD_LEAVE,"PD LEAVE"},
             {H4P_EVENT_LOOPS,"LOOPS"},
-            {H4P_EVENT_FACTORY,"FRESET"},
-            {H4P_EVENT_NOOP,"NO-OP"},
-            {H4P_EVENT_ERROR,"ERROR"}
+            {H4P_EVENT_PD_ENTER,"PDENTER"},
+            {H4P_EVENT_PD_LEAVE,"PDLEAVE"},
+            {H4P_EVENT_MQTT_ERROR,"MQTTERROR"},
+            {H4P_EVENT_REBOOT,"REBOOT"},
+            {H4P_EVENT_FACTORY,"FACTORY"},
+            {H4P_EVENT_CMDERROR,"CMDERROR"},
+            {H4P_EVENT_DLL,"DYNLOAD"},
+            {H4P_EVENT_HEARTBEAT,"PING"}
         };
 
         H4_INT_MAP taskTypes={
@@ -82,7 +84,7 @@ class H4P_VerboseMessages: public H4Plugin {
             {H4P_TRID_PATN,"PATN"},
             {H4P_TRID_PP1x,"PP1X"},
             {H4P_TRID_PWM1,"PWM1"},
-            {H4P_TRID_GPIO,gpioTag()},
+//            {H4P_TRID_GPIO,gpioTag()},
             {H4P_TRID_DBNC,"DBNC"},
             {H4P_TRID_RPTP,"RPTP"},
             {H4P_TRID_POLL,"POLL"},
@@ -99,7 +101,7 @@ class H4P_VerboseMessages: public H4Plugin {
             {H4P_TRID_UDPS,"UDPS"},
             {H4P_TRID_UDPU,"UDPU"},
             {H4P_TRID_NTFY,"UNFY"},
-            {H4P_TRID_SCMD,scmdTag()},
+            {H4P_TRID_SCMD,cmdTag()},
             {H4P_TRID_HLOG,"HLOG"},
             {H4P_TRID_QLOG,"QLOG"},
             {H4P_TRID_MLRQ,"MLRQ"},
@@ -112,7 +114,7 @@ class H4P_VerboseMessages: public H4Plugin {
             {H4P_TRID_LOOP,"LOOP"},
             {H4P_TRID_SSET,"SSET"}
         };
-        H4P_VerboseMessages(): H4Plugin("vm") {}
+        H4P_VerboseMessages(): H4Plugin(H4PID_VM) {}
         string getErrorMessage(uint32_t e){
             return cmdErrors.count(e) ? cmdErrors[e]:string("No such error (")+stringFromInt(e)+")";
         }

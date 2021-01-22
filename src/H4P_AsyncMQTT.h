@@ -41,7 +41,8 @@ struct H4P_LWT {
     bool            retain;
 };
 
-class H4P_AsyncMQTT: public H4PEventListener, public PangolinMQTT{
+class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
+                H4P_WiFi*       _pWiFi;
                 bool            autorestart=true;
                 string          device;
                 string          prefix=string(h4Tag()).append("/");
@@ -59,21 +60,23 @@ class H4P_AsyncMQTT: public H4PEventListener, public PangolinMQTT{
                 bool        _state() override { return connected(); }
                 void        _stop() override;
     public:
-
+        H4P_AsyncMQTT():H4Plugin(H4PID_MQTT){}
 #if H4P_USE_WIFI_AP
         H4P_AsyncMQTT(H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr,H4P_LWT lwt={"","",0,false}):
-            _lwt(lwt), H4PEventListener(mqttTag(),H4P_EVENT_FACTORY,onC,onD)
+            _lwt(lwt), H4Plugin(H4PID_MQTT,onC,onD)
         {
 #else
         H4P_AsyncMQTT(string broker,uint16_t port, string user="",string pass="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr,H4P_LWT lwt={"","",0,false}):
-            _lwt(lwt), H4PEventListener(mqttTag(),H4P_EVENT_FACTORY,onC,onD)
+            _lwt(lwt), H4Plugin(H4PID_MQTT,onC,onD)
         {
+            _eventFilter=H4P_EVENT_FACTORY;
+            _cb[pmvTag()]=PANGO_VERSION;
             _cb[brokerTag()]=broker;
             _cb[portTag()]=stringFromInt(port);
             _cb[mQuserTag()]=user,
             _cb[mQpassTag()]=pass;
 #endif
-            _cmds={ 
+            _cmds={
                 {_pName,    { H4PC_H4, _subCmd, nullptr }}, 
                 {"change",  { _subCmd, 0, CMDVS(_change) }},
                 {"report",  { _subCmd, 0, CMD(report) }}

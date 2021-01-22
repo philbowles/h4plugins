@@ -27,7 +27,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_GPIOManager.h>
-#include <numeric>
+#include<H4P_EmitTick.h>
+//#include <numeric>
 
 H4GPIOPin::H4GPIOPin(
     uint8_t _p,
@@ -99,23 +100,30 @@ void H4GPIOPin::run(){
 //
 //      H4P_GPIOManager
 //
+void H4P_GPIOManager::_handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source){
+    //Serial.printf("DEFAULT EVENT HANDLER %s: rcvd T%d from %s '%s'\n",CSTR(_pName),type,CSTR(source),CSTR(msg));
+    for(auto p:pins){
+        H4GPIOPin* ptr=p.second;         
+        if(!((ptr->cps) < ptr->cMax)) ptr->_syncState();
+        ptr->rate=(ptr->cps);
+        ptr->Rpeak=std::max(ptr->Rpeak,ptr->rate);
+        ptr->cps=0;
+    }
+};
+
+void H4P_GPIOManager::_hookIn(){
+    require<H4P_EmitTick>(H4PID_1SEC);
+    H4Plugin::_hookIn();
+}
+
 void H4P_GPIOManager::_start(){
     h4._hookLoop([this](){ _run(); },_subCmd);
-    h4.every(1000,[this](){
-        for(auto p:pins){
-            H4GPIOPin* ptr=p.second;         
-            if(!((ptr->cps) < ptr->cMax)) ptr->_syncState();
-            ptr->rate=(ptr->cps);
-            ptr->Rpeak=std::max(ptr->Rpeak,ptr->rate);
-            ptr->cps=0;
-        }
-    },nullptr,H4P_TRID_GPIO,true);
     H4Plugin::_start();
 }
 
 void  H4P_GPIOManager::_run(){ for(auto const& p:pins) (p.second)->run(); }
 
-H4P_GPIOManager::H4P_GPIOManager(): H4Plugin(gpioTag()){}
+H4P_GPIOManager::H4P_GPIOManager(): H4Plugin(H4PID_GPIO){ _eventFilter=H4P_EVENT_HEARTBEAT; }
 //
 //      (oblique) strategies
 //

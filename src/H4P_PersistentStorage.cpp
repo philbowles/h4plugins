@@ -50,10 +50,11 @@ void H4P_PersistentStorage::_hookIn() {
 //        psRam[nv[0]]=nv[1];
         psRam[nv[0]]=nv.size() > 1 ? nv[1]:""; // thanks hamzah :)
     }
-    H4PEventListener::_hookIn();
+    H4Plugin::_hookIn();
 }
 
-H4P_PersistentStorage::H4P_PersistentStorage(H4P_FN_PSCHANGE f): _f(f), H4PEventListener("stor",H4P_EVENT_FACTORY){
+H4P_PersistentStorage::H4P_PersistentStorage(H4P_FN_PSCHANGE f): _f(f), H4Plugin(H4PID_STOR){
+    _eventFilter=H4P_EVENT_FACTORY;
     _cmds={
         {_pName,    { H4PC_H4, _subCmd, nullptr}},
         {"clear",   { _subCmd, 0, CMD(clear)}},

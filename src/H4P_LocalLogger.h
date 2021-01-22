@@ -30,9 +30,8 @@ SOFTWARE.
 #pragma once
 
 #include <H4PCommon.h>
-#include <H4P_SerialCmd.h>
 
-class H4P_LocalLogger: public H4PEventListener {
+class H4P_LocalLogger: public H4Plugin {
         string      _fname;
         uint32_t    _limit;
 

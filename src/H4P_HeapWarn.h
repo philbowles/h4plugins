@@ -27,8 +27,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_HeapWarn_HO
-#define H4P_HeapWarn_HO
+#pragma once
 
 #include<H4PCommon.h>
 
@@ -56,5 +55,3 @@ class H4P_HeapWarn: public H4Plugin {
         void        show() override;
         void        pcent(uint32_t pc);
 };
-
-#endif // H4P_HeapWarn_Hs

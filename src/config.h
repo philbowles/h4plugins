@@ -42,7 +42,7 @@ SOFTWARE.
         H4P_SIGNAL_TIMEBASE is the speed at which the signal pattern cycles - see the documentation for flashPattern API
 */
 #define H4P_SIGNAL_LED  LED_BUILTIN
-#define H4P_SIGNAL_SENSE          0
+#define H4P_SIGNAL_SENSE ACTIVE_LOW
 #define H4P_SIGNAL_TIMEBASE     175
 /*
         DIAGNOSTICS

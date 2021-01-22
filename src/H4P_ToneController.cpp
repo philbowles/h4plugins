@@ -119,7 +119,7 @@ unordered_map<uint32_t,pair<uint32_t,string>> H4P_ToneController::sirens={
     {H4P_SIREN_WOOPWOOP,{450,"AN3d AN3d AN3d AN3d CN4d CN4d EN4d AN4d BN5d GN5d C#6d R  M "}}
 };
 
-H4P_ToneController::H4P_ToneController(uint32_t tempo): H4Plugin("tone"){
+H4P_ToneController::H4P_ToneController(uint32_t tempo): H4Plugin(H4PID_TONE){
     for(auto const &n:notes) xpose.push_back(n.second); // build ordered table of f
     sort(xpose.begin(),xpose.end());
     for(auto &n:notes) {

@@ -45,7 +45,7 @@ void H4P_AsyncMQTT::_handleEvent(const string &msg,H4P_EVENT_TYPE type,const str
     switch(type){
         case H4P_EVENT_FACTORY:
             Serial.printf("%s H4P_EVENT_FACTORY src=%s msg=%s\n",CSTR(_pName),CSTR(source),CSTR(msg));
-            h4wifi._wipe(mqconfTag());
+            _pWiFi->_wipe(mqconfTag());
             break;
         default:
             Serial.printf("WTF? EVENT t=%d src=%s *%s*\n",type,CSTR(source),CSTR(msg));
@@ -54,9 +54,9 @@ void H4P_AsyncMQTT::_handleEvent(const string &msg,H4P_EVENT_TYPE type,const str
 }
 
 void H4P_AsyncMQTT::_hookIn() { 
-    DEPEND(wifi);
+    _pWiFi=depend<H4P_WiFi>(H4PID_WIFI);
 #if H4P_USE_WIFI_AP
-    if(h4wifi._getPersistentValue(mqconfTag(),"")){
+    if(_pWiFi->_getPersistentValue(mqconfTag(),"")){
         vector<string> mqconf=split(_cb[mqconfTag()],",");
         _cb[brokerTag()]=mqconf[0];
         _cb[portTag()]=mqconf[1];
@@ -86,7 +86,7 @@ void H4P_AsyncMQTT::_hookIn() {
 
     onConnect([this](bool b){
         h4.queueFunction([this](){
-            h4wifi.signalOff();
+            _pWiFi->signalOff();
             h4.cancelSingleton(H4P_TRID_MQRC);
             _discoDone=false;
             subscribe(CSTR(string("all").append(cmdhash())),0);
@@ -95,7 +95,7 @@ void H4P_AsyncMQTT::_hookIn() {
             subscribe(CSTR(string(_cb[boardTag()]+cmdhash())),0);
             report();
             _upHooks();
-            h4wifi.uiSync();
+            _pWiFi->uiSync();
             H4EVENT("MQTT CNX");
         });
     });
@@ -106,27 +106,27 @@ void H4P_AsyncMQTT::_hookIn() {
                 _badSignal();
                 _discoDone=true;
                 _downHooks();
-                h4wifi.uiSync();
+                _pWiFi->uiSync();
                 H4EVENT("MQTT DCX %d",reason);
                 if(autorestart && WiFi.status()==WL_CONNECTED) h4.every(H4MQ_RETRY,[this](){ connect(); },nullptr,H4P_TRID_MQRC,true);
             });
         }
     });
-    H4PEventListener::_hookIn();
+    H4Plugin::_hookIn();
 }
 
 void H4P_AsyncMQTT::_greenLight(){
     if(WiFi.getMode()==WIFI_STA){
-        h4wifi._uiAdd(H4P_UIO_PMV,"Pangolin",H4P_UI_LABEL,_cb[pmvTag()]);
-        h4wifi._uiAdd(H4P_UIO_MQB,brokerTag(),H4P_UI_LABEL,"",[]{ return _cb[brokerTag()]; }); // cos we don't know it yet
-        h4wifi._uiAdd(H4P_UIO_MQP,portTag(),H4P_UI_LABEL,"",[]{ return _cb[portTag()]; }); // cos we don't know it yet
-        h4wifi._uiAdd(H4P_UIO_MQTT,uppercase(mqttTag()),H4P_UI_BOOL,"",
+        _pWiFi->_uiAdd(H4P_UIO_PMV,"Pangolin",H4P_UI_LABEL,_cb[pmvTag()]);
+        _pWiFi->_uiAdd(H4P_UIO_MQB,brokerTag(),H4P_UI_LABEL,"",[]{ return _cb[brokerTag()]; }); // cos we don't know it yet
+        _pWiFi->_uiAdd(H4P_UIO_MQP,portTag(),H4P_UI_LABEL,"",[]{ return _cb[portTag()]; }); // cos we don't know it yet
+        _pWiFi->_uiAdd(H4P_UIO_MQTT,uppercase(mqttTag()),H4P_UI_BOOL,"",
         [this]{ return stringFromInt(_state()); },
         [this](const string& b){ 
             if(b=="1") _start();
             else _stop();
             H4EVENT("MQTT %s by user",b=="1" ? "Started":"Stopped");
-            h4wifi.uiMessage("MQTT %s by user",b=="1" ? "Started":"Stopped");
+            _pWiFi->uiMessage("MQTT %s by user",b=="1" ? "Started":"Stopped");
         });
     }
 }
@@ -161,7 +161,7 @@ void H4P_AsyncMQTT::change(const string& broker,uint16_t port,const string& user
     _cb[mQpassTag()]=passwd;
 #if H4P_USE_WIFI_AP
     _cb[mqconfTag()]=_cb[brokerTag()]+","+_cb[portTag()]+","+_cb[mQuserTag()]+","+_cb[mQpassTag()];
-    h4wifi._save(mqconfTag());
+    _pWiFi->_save(mqconfTag());
 #endif
     restart();
 }

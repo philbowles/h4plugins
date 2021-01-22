@@ -29,7 +29,6 @@ SOFTWARE.
 #include<H4PCommon.h>
 #include<H4P_WiFi.h>
 #include<H4P_SerialCmd.h>
-#include<H4P_FlasherController.h>
 #include<H4P_GPIOManager.h>
 
 STAG(tcp)
@@ -79,6 +78,7 @@ void H4P_WiFi::_start(){
 } WiFiEvent_t;
 */
 void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
+    Serial.printf("WIFI EVENT %u\n",event);
     switch(event) {
         case WIFI_EVENT_STAMODE_DISCONNECTED:
 			h4.queueFunction([](){ h4wifi._lostIP(); });
@@ -223,17 +223,17 @@ H4_CMD_ERROR H4P_WiFi::__uichgCore(const string& a,const string& b,H4P_FN_UICHAN
     return H4_CMD_OK;
 }
 
+void H4P_WiFi::_coreStart(){
+//    WiFi.printDiag(Serial); 
 #if H4P_USE_WIFI_AP
-    void H4P_WiFi::_coreStart(){
-        WiFi.printDiag(Serial);
-        if(!_dns53){
-            if(_cannotConnectSTA()) _startAP();
-            else if(WiFi.getMode()==WIFI_OFF)  h4wifi.HAL_WIFI_startSTA();
-        } //else Serial.printf("DON'T THINK TWICE!!!\n");
-    }
+    if(!_dns53){
+        if(_cannotConnectSTA()) _startAP();
+        else if(WiFi.getMode()==WIFI_OFF)  h4wifi.HAL_WIFI_startSTA();
+    } //else Serial.printf("DON'T THINK TWICE!!!\n");
 #else
-    void H4P_WiFi::_coreStart(){ WiFi.printDiag(Serial); if(_cannotConnectSTA() || WiFi.getMode()==WIFI_OFF) h4wifi.HAL_WIFI_startSTA(); }
+    if(_cannotConnectSTA() || WiFi.getMode()==WIFI_OFF) h4wifi.HAL_WIFI_startSTA();
 #endif
+}
 
 String H4P_WiFi::_aswsReplace(const String& var){
     string v=CSTR(var);
@@ -312,7 +312,9 @@ void H4P_WiFi::_handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& 
 }
 
 void H4P_WiFi::_hookIn(){
-    DEPEND(wink);
+    _pSignal=require<H4P_FlasherController>(H4PID_WINK);
+    _pGPIO=require<H4P_GPIOManager>(H4PID_GPIO);
+    _btp=require<H4P_BinaryThing>(H4PID_ONOF);
     _cb[chipTag()]=HAL_WIFI_chipID();
     _cb[boardTag()]=replaceAll(H4_BOARD,"ESP8266_","");
     if(!_getPersistentValue(deviceTag(),"H4-")) if(_device!="") _cb[deviceTag()]=_device;
@@ -321,9 +323,7 @@ void H4P_WiFi::_hookIn(){
     WiFi.persistent(true);
     WiFi.onEvent(_wifiEvent);
 
-    H4Plugin* p=isLoaded(onofTag());
-    if(p) _btp=reinterpret_cast<H4P_BinaryThing*>(p);
-    if(isLoaded(gpioTag())) h4cmd.addCmd("gpio",_subCmd,0,CMDVS(_gpio));
+    if(_pGPIO) h4cmd.addCmd(gpioTag(),_subCmd,0,CMDVS(_gpio));
 
     _uiAdd(H4P_UIO_BOARD,boardTag(),H4P_UI_LABEL);
     _uiAdd(H4P_UIO_CHIP,chipTag(),H4P_UI_LABEL);
@@ -335,7 +335,7 @@ void H4P_WiFi::_hookIn(){
     _cb[h4UITag()]=_cb[h4UITag()]+"ap";
 #endif
     _uiAdd(H4P_UIO_H4UIV,h4UITag(),H4P_UI_LABEL);
-    H4PEventListener::_hookIn();
+    H4Plugin::_hookIn(); // check this :)
 }
 
 uint32_t H4P_WiFi::_host(vector<string> vs){
@@ -497,10 +497,10 @@ void H4P_WiFi::change(string ssid,string psk){ // add device / name?
     if(_dns53) h4reboot();
     else Serial.printf("Don're reboot frtom STA mode!!!\n");
 }
+// 
+void H4P_WiFi::signal(const char* pattern,uint32_t timebase){_pSignal->flashMorse(pattern,timebase,H4P_SIGNAL_LED,H4P_SIGNAL_SENSE); }
 
-void H4P_WiFi::signal(const char* pattern,uint32_t timebase){ h4fc.flashMorse(pattern,timebase,H4P_SIGNAL_LED,H4P_SIGNAL_SENSE); }
-
-void H4P_WiFi::signalOff(){ h4fc.stopLED(H4P_SIGNAL_LED); }
+void H4P_WiFi::signalOff(){ _pSignal->stopLED(H4P_SIGNAL_LED); }
 
 void H4P_WiFi::uiAddDropdown(const string& name,H4P_CONFIG_BLOCK options,H4P_FN_UICHANGE onChange){
     string opts="";
@@ -509,10 +509,10 @@ void H4P_WiFi::uiAddDropdown(const string& name,H4P_CONFIG_BLOCK options,H4P_FN_
     _uiAdd(_seq++,name,H4P_UI_DROPDOWN,opts,nullptr,onChange); // optimise
 }
 
-void H4P_WiFi::uiAddGPIO(){ if(isLoaded(gpioTag())) for(auto const& p:H4P_GPIOManager::pins) uiAddGPIO(p.first); }
+void H4P_WiFi::uiAddGPIO(){ if(_pGPIO) for(auto const& p:H4P_GPIOManager::pins) uiAddGPIO(p.first); }
 
 H4_CMD_ERROR H4P_WiFi::uiAddGPIO(uint8_t pin){
-    if(isLoaded(gpioTag())){
+    if(_pGPIO){
         H4GPIOPin*  p;
         if(p=h4gm.isManaged(pin)) {
             char buf[32];

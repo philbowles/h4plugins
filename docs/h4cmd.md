@@ -2,7 +2,7 @@
 
 # H4P_SerialCmd
 
-## Shortname "scmd"
+## Shortname "cmd"
 
 Provides common command / control functions to all other plugins and allows control of device from serial console.
 
@@ -24,6 +24,7 @@ Provides common command / control functions to all other plugins and allows cont
 # Usage
 
 None: Included automatically by the mandatory opening sequence.
+Global instance: h4cmd, prefix all API calls with `h4cmd.`
 
 ---
 
@@ -53,7 +54,7 @@ None, but when preceded by [H4P_VerboseMessages](h4vm.md), numeric codes / error
 
 * H4P_EVENT_FACTORY
 
-More information on [Event Emitters and Listeners](docs/../h4logs.md)
+More information on [Event Emitters and Listeners](docs/../events.md)
 
 ---
 
@@ -61,7 +62,7 @@ More information on [Event Emitters and Listeners](docs/../h4logs.md)
 
 N/A
 
-More information on [Event Emitters and Listeners](docs/../h4logs.md)
+More information on [Event Emitters and Listeners](docs/../events.md)
 
 ---
 
@@ -75,7 +76,7 @@ More information on [Event Emitters and Listeners](docs/../h4logs.md)
 ---
 # Service Commands
 
-SerialCmd can be safely stopped - it will continue to provide command functionality to other plugins that depend upon it. e.g. [(http "REST")](h4wifi.md) and [**H4P_AsyncMQTT**](h4mqtt.md) but it will no longer accept serial commands on its own behalf. Thus it can only be stopped *once* from the serial console*. Unloading `scmd` will show a huge performance improvement (+50% ish), so it is worth considering once testing is complete, especially for devices that will be deployed remotely and will never be able to recive serial commands. (see autoStop parameter above)
+SerialCmd can be safely stopped - it will continue to provide command functionality to other plugins that depend upon it. e.g. [(http "REST")](h4wifi.md) and [**H4P_AsyncMQTT**](h4mqtt.md) but it will no longer accept serial commands on its own behalf. Thus it can only be stopped *once* from the serial console*. Unloading `cmd` will show a huge performance improvement (+50% ish), so it is worth considering once testing is complete, especially for devices that will be deployed remotely and will never be able to recive serial commands. (see autoStop parameter above)
 
 (* It can be restarted remotely, e.g. via MQTT or http/REST)
 
@@ -183,7 +184,7 @@ H4_INT_MAP eventTypes={
     {H4P_EVENT_PD_LEAVE,"PD LEAVE"},
     {H4P_EVENT_LOOPS,"LOOPS"},
     {H4P_EVENT_FACTORY,"FRESET"},
-    {H4P_EVENT_ERROR,"ERROR"}
+    {H4P_EVENT_CMDERROR,"ERROR"}
 };
 ```
 
@@ -191,7 +192,7 @@ H4_INT_MAP eventTypes={
 
 ### NB
 
-Many of these events are reserved by the system and this is rarely directly called by the user. There are predefined macros such as `H4EVENT`, `SYSEVENT` and `h4UserEvent` which are preferred and detailed fully in [Event Listeners, Event Emitters and logging](docs/h4logs.md)
+Many of these events are reserved by the system and this is rarely directly called by the user. There are predefined macros such as `H4EVENT`, `SYSEVENT` and `h4UserEvent` which are preferred and detailed fully in [Event Listeners, Event Emitters and logging](docs/events.md)
 
 ---
 

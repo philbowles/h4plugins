@@ -31,12 +31,15 @@ SOFTWARE.
 
 #include<H4PCommon.h>
 #include<H4P_GPIOManager.h>
+#include<H4P_FlasherController.h>
 #include<H4P_BinaryThing.h>
 
 extern void h4FactoryReset(const string& src);
 
 class H4P_MultiFunctionButton: public H4Plugin{
-            H4P_BinaryThing*    _btp;
+            H4P_FlasherController*  _pSignal;
+            H4P_GPIOManager*        _pGPIO;
+            H4P_BinaryThing*        _btp;
             H4GM_STAGE_MAP _sm={
                 {0,[this](H4GPIOPin*){ _btp->toggle(); }},
                 {H4MF_REBOOT,[](H4GPIOPin*){ h4reboot(); }},
@@ -53,5 +56,3 @@ class H4P_MultiFunctionButton: public H4Plugin{
             H4GM_SENSE b_sense,
             uint32_t dbTimeMs);
 };
-
-//extern __attribute__((weak)) H4P_MultiFunctionButton h4mfb;

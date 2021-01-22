@@ -48,7 +48,7 @@ class H4P_EmitTick: public H4Plugin {
                     }
                 }
     public: 
-        H4P_EmitTick(H4_FN_VOID beat=nullptr): H4Plugin(tickTag()){}
+        H4P_EmitTick(H4_FN_VOID beat=nullptr): H4Plugin(H4PID_1SEC){}
 
                 void    show() override {
                     H4Plugin::show();

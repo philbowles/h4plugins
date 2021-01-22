@@ -48,7 +48,7 @@ extern __attribute__((weak)) uint32_t h4Nloops=0;
     #pragma message("COUNTING LOOPS")
 #endif
 
-class H4P_EmitLoopCount: public H4PEventListener {
+class H4P_EmitLoopCount: public H4Plugin {
 
             void _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source) override {
                 SYSEVENT(H4P_EVENT_LOOPS,_pName,"%u",h4Nloops);
@@ -57,9 +57,12 @@ class H4P_EmitLoopCount: public H4PEventListener {
 
             void _hookIn() {
                 DEPEND(tick);
-                H4PEventListener::_hookIn();
+                H4Plugin::_hookIn();
             }
 
     public:
-        H4P_EmitLoopCount(): H4PEventListener("loop",H4P_EVENT_HEARTBEAT){ h4Nloops=0; }
+        H4P_EmitLoopCount(): H4Plugin(H4PID_LOOP){ 
+            _eventFilter=H4P_EVENT_HEARTBEAT;
+            h4Nloops=0;
+        }
 };

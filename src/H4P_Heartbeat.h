@@ -27,14 +27,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_Heartbeat_H
-#define H4P_Heartbeat_H
+#pragma once
 
 #include<H4PCommon.h>
 
 using H4_FN_HEARTBEAT       = function<void(uint32_t)>;
 
-class H4P_Heartbeat: public H4PEventListener { 
+class H4P_Heartbeat: public H4Plugin { 
                 H4_FN_HEARTBEAT _f;
         static  uint32_t        _uptime;
 
@@ -42,7 +41,7 @@ class H4P_Heartbeat: public H4PEventListener {
                 void        _hookIn() override; // autostart
                 void        _run();
     public: 
-        H4P_Heartbeat(H4_FN_HEARTBEAT beat=nullptr): _f(beat), H4PEventListener("beat",H4P_EVENT_HEARTBEAT){}
+        H4P_Heartbeat(H4_FN_HEARTBEAT beat=nullptr): _f(beat), H4Plugin(H4PID_BEAT){ _eventFilter=H4P_EVENT_HEARTBEAT; }
 
         static string secsToTime(uint32_t sex);
 
@@ -52,5 +51,3 @@ class H4P_Heartbeat: public H4PEventListener {
 
         static string upTime(){ return secsToTime(_uptime); }
 };
-
-#endif // H4P_Heartbeat_H

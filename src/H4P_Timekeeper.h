@@ -28,11 +28,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_Timekeeper_H
-#define H4P_Timekeeper_H
+#pragma once
 
 #include<H4PCommon.h>
-//#include<H4P_WiFiSelect.h>
 #ifdef ARDUINO_ARCH_ESP8266
     #include "sntp.h"
 #else
@@ -40,6 +38,7 @@ SOFTWARE.
     #include <time.h>
 #endif
 
+#include<H4P_WiFi.h>
 #include<H4P_BinaryThing.h>
 
 using H4P_DURATION = pair<string,string>;
@@ -75,6 +74,7 @@ class H4P_Timekeeper: public H4Plugin {
                 void        _start() override;
                 void        _stop() override;
     public:
+        H4P_Timekeeper(): H4Plugin(H4PID_TIME){} // required for dependencies
         H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzOffset=0,H4_FN_DST fDST=nullptr);
 ///
 // _tzo = Time Zone Offset in +/- minutes from UTC, not hours.
@@ -106,5 +106,3 @@ class H4P_Timekeeper: public H4Plugin {
 };
 
 extern __attribute__((weak)) H4P_Timekeeper h4tk;
-
-#endif // H4P_Timekeeper_H

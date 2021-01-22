@@ -27,8 +27,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_TaskSniffer_HO
-#define H4P_TaskSniffer_HO
+#pragma once
 
 #include<H4PCommon.h>
 
@@ -60,6 +59,4 @@ class H4P_TaskSniffer: public H4Plugin{
                 void        show() override;
 };
 
-extern __attribute__((weak)) H4P_TaskSniffer h4ts;
-
-#endif // H4P_TaskSniffer_HO
+//extern __attribute__((weak)) H4P_TaskSniffer h4ts;

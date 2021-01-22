@@ -41,7 +41,7 @@ void H4P_Heartbeat::_hookIn() {
     if(isLoaded(wifiTag())){
         if(WiFi.getMode()==WIFI_STA) h4wifi._uiAdd(H4P_UIO_UP,"uptime",H4P_UI_LABEL,"",upTime);
     }
-    H4PEventListener::_hookIn();
+    H4Plugin::_hookIn();
 }
 
 string H4P_Heartbeat::secsToTime(uint32_t sex){ 

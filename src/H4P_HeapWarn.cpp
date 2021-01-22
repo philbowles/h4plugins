@@ -29,7 +29,7 @@ SOFTWARE.
 #include<H4P_HeapWarn.h>
 #include<H4P_SerialCmd.h>
 
-H4P_HeapWarn::H4P_HeapWarn(function<void(bool)> f,uint32_t pc): _f(f),H4Plugin("hwrn"){
+H4P_HeapWarn::H4P_HeapWarn(function<void(bool)> f,uint32_t pc): _f(f),H4Plugin(H4PID_HWRN){
     _cmds={
         {_pName,   {H4PC_H4, _subCmd, nullptr}},
         {"pcent",  {_subCmd,   0, CMDVS(_hwPcent)}}
