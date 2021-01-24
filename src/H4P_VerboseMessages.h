@@ -48,7 +48,7 @@ class H4P_VerboseMessages: public H4Plugin {
 
         H4_INT_MAP eventTypes={
             {H4P_EVENT_NOOP,"NO-OP"},
-            {H4P_EVENT_H4,uppercase(h4Tag())},
+            {H4P_EVENT_MSG,"MSG"},
             {H4P_EVENT_SVC_UP,"SVCUP"},
             {H4P_EVENT_SVC_DOWN,"SVCDOWN"},
             {H4P_EVENT_CMD,"CMD"},
@@ -61,7 +61,7 @@ class H4P_VerboseMessages: public H4Plugin {
             {H4P_EVENT_MQTT_ERROR,"MQTTERROR"},
             {H4P_EVENT_REBOOT,"REBOOT"},
             {H4P_EVENT_FACTORY,"FACTORY"},
-            {H4P_EVENT_CMDERROR,"CMDERROR"},
+            {H4P_EVENT_CMDREPLY,"CMDREPLY"},
             {H4P_EVENT_DLL,"DYNLOAD"},
             {H4P_EVENT_HEARTBEAT,"PING"}
         };
@@ -84,20 +84,17 @@ class H4P_VerboseMessages: public H4Plugin {
             {H4P_TRID_PATN,"PATN"},
             {H4P_TRID_PP1x,"PP1X"},
             {H4P_TRID_PWM1,"PWM1"},
-//            {H4P_TRID_GPIO,gpioTag()},
             {H4P_TRID_DBNC,"DBNC"},
             {H4P_TRID_RPTP,"RPTP"},
             {H4P_TRID_POLL,"POLL"},
             {H4P_TRID_MULT,"MULT"},
             {H4P_TRID_TRIG,"TRIG"},
-            {H4P_TRID_SQWV,"SQWV"},
             {H4P_TRID_HOTA,"HOTA"},
             {H4P_TRID_WFAP,"WFAP"},
             {H4P_TRID_MQMS,"MQMS"},
             {H4P_TRID_MQRC,"MQRC"},
             {H4P_TRID_REST,"REST"},
             {H4P_TRID_SOAP,"SOAP"},
-            {H4P_TRID_UDPM,"UDPM"},
             {H4P_TRID_UDPS,"UDPS"},
             {H4P_TRID_UDPU,"UDPU"},
             {H4P_TRID_NTFY,"UNFY"},
@@ -107,11 +104,10 @@ class H4P_VerboseMessages: public H4Plugin {
             {H4P_TRID_MLRQ,"MLRQ"},
             {H4P_TRID_BTTO,"BTTO"},
             {H4P_TRID_IPPD,"IPPD"},
-            {H4P_TRID_TIME,timeTag()},
+            {H4P_TRID_TIME,"TIME"},
             {H4P_TRID_SYNC,"SYNC"},
             {H4P_TRID_DALY,"DALY"},
             {H4P_TRID_SHOT,"AT_T"},
-            {H4P_TRID_LOOP,"LOOP"},
             {H4P_TRID_SSET,"SSET"}
         };
         H4P_VerboseMessages(): H4Plugin(H4PID_VM) {}
@@ -119,7 +115,7 @@ class H4P_VerboseMessages: public H4Plugin {
             return cmdErrors.count(e) ? cmdErrors[e]:string("No such error (")+stringFromInt(e)+")";
         }
 
-        string getEventName(uint32_t e){
+        string getEventName(H4P_EVENT_TYPE e){
             return eventTypes.count(e) ? eventTypes[e]:string("No such event (")+stringFromInt(e)+")";
         }
 

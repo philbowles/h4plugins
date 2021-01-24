@@ -29,26 +29,14 @@ SOFTWARE.
 
 #include<H4P_UPNPServer.h>
 
-//constexpr char* xh4dTag(){ return "X-H4-DEVICE"; }
-void H4P_UPNPServer::_handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source) {
-    switch(type){
-        case H4P_EVENT_FACTORY:
-            Serial.printf("%s [%s] H4P_EVENT_FACTORY src=%s msg=%s\n",CSTR(_pName),nameTag(),CSTR(source),CSTR(msg));
-            _pWiFi->_wipe(nameTag());
-            break;
-        default:
-            Serial.printf("WTF? EVENT t=%d src=%s *%s*\n",type,CSTR(source),CSTR(msg));
-            break;
-    }
-}
+void H4P_UPNPServer::_handleEvent(H4PID pid,H4P_EVENT_TYPE type,const string &msg){ _pWiFi->_wipe(nameTag()); }
 
 void H4P_UPNPServer::_hookIn(){
-    _pWiFi=depend<H4P_WiFi>(H4PID_WIFI);
-    //REQUIREBT;
-    _btp=depend<H4P_BinaryThing>(H4PID_ONOF);
+    _pWiFi=depend<H4P_WiFi>(this,H4PID_WIFI);
+    _btp=depend<H4P_BinaryThing>(this,H4PID_ONOF);
     string dn=uppercase(h4Tag())+" "+deviceTag()+" ";
     if(!_pWiFi->_getPersistentValue(nameTag(),dn)) if(_name!="") _cb[nameTag()]=_name;
-    H4EVENT("UPNP name %s",CSTR(_cb[nameTag()]));
+    PLOG("UPNP name %s",CSTR(_cb[nameTag()]));
     _pWiFi->_uiAdd(H4P_UIO_NAME,"name",H4P_UI_LABEL,"",[]{ return _cb[nameTag()]; }); // cos we don't know it yet
 /*    // sniff neighbours
     _listenTag("NT",_pups.back(),[this](uint32_t mx,H4P_CONFIG_BLOCK blok,bool dora){ 
@@ -59,12 +47,12 @@ void H4P_UPNPServer::_hookIn(){
     H4Plugin::_hookIn();
 }
 
-uint32_t H4P_UPNPServer::_host2(vector<string> vs){ return guardString2(vs,[this](string a,string b){ setBothNames(a,b); return H4_CMD_OK; }); }
+uint32_t H4P_UPNPServer::_host2(vector<string> vs){ return _guardString2(vs,[this](string a,string b){ setBothNames(a,b); return H4_CMD_OK; }); }
 
 void  H4P_UPNPServer::friendlyName(const string& name){ _pWiFi->_setPersistentValue(nameTag(),name,true); }
 
 uint32_t H4P_UPNPServer::_friendly(vector<string> vs){
-    return guard1(vs,[this](vector<string> vs){
+    return _guard1(vs,[this](vector<string> vs){
         _pWiFi->_setPersistentValue(nameTag(),H4PAYLOAD,true);
         return H4_CMD_OK;
     });
@@ -181,7 +169,7 @@ void H4P_UPNPServer::_upnp(AsyncWebServerRequest *request){ // redo
         string soap=stringFromBuff((const byte*) request->_tempObject,strlen((const char*) request->_tempObject));
         _cb["gs"]=(soap.find("Get")==string::npos) ? "Set":"Get";
         uint32_t _set=soap.find(">1<")==string::npos ? 0:1;
-#ifdef H4P_LOG_EVENTS
+#if H4P_LOG_EVENTS
         if(_cb["gs"]=="Set") _btp->_turn(_set,_pName);
 #else
         if(_cb["gs"]=="Set") _btp->turn(_set);

@@ -30,6 +30,7 @@ SOFTWARE.
 #pragma once
 
 #include<H4PCommon.h>
+
 #ifdef ARDUINO_ARCH_ESP8266
     #include<ESP8266WiFi.h>
     #include<ESP8266mDNS.h>
@@ -45,7 +46,6 @@ SOFTWARE.
 #include<DNSServer.h>
 #include<ArduinoOTA.h>
 #include<H4P_SerialCmd.h>
-// ex asws
 #include<H4P_BinaryThing.h>
 #include<ESPAsyncWebServer.h>
 #include<H4P_FlasherController.h>
@@ -73,7 +73,7 @@ struct H4P_UI_ITEM { // add title and/or props?
 };
 using H4P_UI_LIST       = std::map<int,H4P_UI_ITEM>;
 
-class H4P_WiFi: public AsyncWebServer, public H4Plugin {
+class H4P_WiFi: public H4Plugin, public AsyncWebServer {
             H4P_FlasherController* _pSignal;
             H4P_GPIOManager*       _pGPIO;
 
@@ -105,7 +105,7 @@ class H4P_WiFi: public AsyncWebServer, public H4Plugin {
                 bool            _cannotConnectSTA(){ return WiFi.psk()=="H4" || WiFi.psk()==""; }
                 void            _coreStart();
                 void            _gotIP();
-                void            _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source) override;
+                void            _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) override;
                 void            _lostIP();
                 void            _rest(AsyncWebServerRequest *request);
                 void            _startWebserver();
@@ -114,49 +114,40 @@ class H4P_WiFi: public AsyncWebServer, public H4Plugin {
         //      service essentials
                 void            _start() override;
                 void            _stop() override;
-                void            _hookIn() override;
     public:
                 void            HAL_WIFI_startSTA(); // Has to be static for bizarre start sequence on ESP32 FFS
-        H4P_WiFi(): AsyncWebServer(80),H4Plugin(H4PID_WIFI){ Serial.printf("mandy deft shud neer appen wifin"); }
+        explicit H4P_WiFi(): H4Plugin(H4PID_WIFI),AsyncWebServer(H4P_WEBSERVER_PORT){}
 //          included here against better wishes due to compiler bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89605
 #if H4P_USE_WIFI_AP
                 void            _startAP();
                 void            _save(const string& s){ H4P_SerialCmd::write("/"+s,_cb[s]); }
+                H4P_AsyncMQTT*  _pMQTT;
 
-        H4P_WiFi(H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): AsyncWebServer(80),H4Plugin(H4PID_WIFI,onC,onD){
-            _eventFilter=H4P_EVENT_HEARTBEAT | H4P_EVENT_FACTORY;
+        H4P_WiFi(H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): 
+            H4Plugin(H4PID_WIFI,H4P_EVENT_HEARTBEAT | H4P_EVENT_FACTORY,onC,onD),
+            AsyncWebServer(H4P_WEBSERVER_PORT){
             _cb[ssidTag()]=uppercase(h4Tag());
             _cb[pskTag()]=uppercase(h4Tag());
 #else
-        H4P_WiFi(string ssid,string psk,string device="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): AsyncWebServer(80),
+        H4P_WiFi(string ssid,string psk,string device="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr):
             _device(device),
-            H4Plugin(H4PID_WIFI,onC,onD)
+            H4Plugin(H4PID_WIFI,H4P_EVENT_HEARTBEAT | H4P_EVENT_FACTORY,onC,onD),
+            AsyncWebServer(H4P_WEBSERVER_PORT)
             {
-            _eventFilter=H4P_EVENT_HEARTBEAT | H4P_EVENT_FACTORY;
             _cb[ssidTag()]=ssid;
             _cb[pskTag()]=psk;
 #endif
-            _cmds={
-                {_pName,    { H4PC_H4, _subCmd, nullptr}},
-                {"change",  { _subCmd, 0, CMDVS(_change)}},
-                {"host",    { _subCmd, 0, CMDVS(_host)}},
-                {"msg",     { _subCmd, 0, CMDVS(_msg)}},
-                {"uichg",   { _subCmd, 0, CMDVS(_uichg)}}
-            };
+            _addLocals({
+                {_pName,    { H4PC_H4, _pid, nullptr}},
+                {"change",  { _pid, 0, CMDVS(_change)}},
+                {"host",    { _pid, 0, CMDVS(_host)}},
+                {"msg",     { _pid, 0, CMDVS(_msg)}},
+                {"uichg",   { _pid, 0, CMDVS(_uichg)}}
+            });
         }
                 void            change(string ssid,string psk);
                 void            host(const string& host){ _setPersistentValue(deviceTag(),host,true); }
-                void            show() override { 
-                    reply("Device %s Mode=%d Status: %d IP=%s",CSTR(_cb[deviceTag()]),WiFi.getMode(),WiFi.status(),WiFi.localIP().toString().c_str());
-                    reply("SSID %s PSK=%s",CSTR(WiFi.SSID()),CSTR(WiFi.psk()));
-                    reply("Signal Pin GPIO%d active=%d",H4P_SIGNAL_LED,H4P_SIGNAL_SENSE);
-/*
-                    for(auto &i:_userItems) {
-                        H4P_UI_ITEM u=i.second;
-                        reply("id=%03d item=%16s type=%d f=%08x c=%08x value=%s ",i.first,CSTR(u.id),u.type,u.f ? &u.f:0,u.c ? &u.c:0,CSTR(u.value));
-                    }
-*/
-                }
+                void            show() override;
                 void            signal(const char* pattern,uint32_t timebase=H4P_SIGNAL_TIMEBASE);
                 void            signalOff();
                 void            uiAddLabel(const string& name){ _uiAdd(_seq++,name,H4P_UI_LABEL,_cb[name]); }
@@ -185,6 +176,7 @@ class H4P_WiFi: public AsyncWebServer, public H4Plugin {
                 }
 //          syscall only        
                 bool            _getPersistentValue(string v,string prefix);
+                void            _hookIn() override;
                 void            _reply(string msg) override { _lines.push_back(msg); }
                 void            _sendSSE(const char* name,const char* msg);
                 void            _setPersistentValue(string n,string v,bool reboot);
@@ -193,4 +185,4 @@ class H4P_WiFi: public AsyncWebServer, public H4Plugin {
                 void            _wipe(initializer_list<char*> l){ for(auto const& t:l) _wipe(t); }
 };
 
-extern __attribute__((weak)) H4P_WiFi h4wifi;
+//extern __attribute__((weak)) H4P_WiFi h4wifi;

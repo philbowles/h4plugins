@@ -27,10 +27,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_PersistentStorage_HO
-#define H4P_PersistentStorage_HO
+#pragma once
 
 #include<H4PCommon.h>
+#include<H4P_UPNPServer.h>
 
 class H4P_PersistentStorage: public H4Plugin {
         H4P_CONFIG_BLOCK    psRam={};
@@ -39,7 +39,7 @@ class H4P_PersistentStorage: public H4Plugin {
         VSCMD(_get);
         VSCMD(_set);
         
-        void         _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source) override;
+        void         _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) override;
         void         _hookIn() override;
         void         _showItem(const string& n){ reply("%s=%s",CSTR(n),CSTR(psRam[n])); }
     public:
@@ -59,4 +59,3 @@ class H4P_PersistentStorage: public H4Plugin {
 };
 
 extern __attribute__((weak)) H4P_PersistentStorage h4ps;
-#endif // H4P_PersistentStorage_H

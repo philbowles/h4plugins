@@ -68,7 +68,6 @@ class H4P_Timekeeper: public H4Plugin {
                 void        __HALsetTimezone(int);
                 uint32_t    _at(vector<string> vs);
                 uint32_t    _daily(vector<string> vs);
-                void        _hookIn() override;
                 void        _greenLight() override {}; // no autostart
                 void        _setupSNTP(const string& ntp1, const string& ntp2);
                 void        _start() override;
@@ -103,6 +102,8 @@ class H4P_Timekeeper: public H4Plugin {
                 void        sync();
                 void        tz(int tzOffset);
                 string 		upTime();
+// syscall only
+        void            _hookIn() override;
 };
 
 extern __attribute__((weak)) H4P_Timekeeper h4tk;

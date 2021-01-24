@@ -128,7 +128,7 @@ H4P_ToneController::H4P_ToneController(uint32_t tempo): H4Plugin(H4PID_TONE){
     }
     metronome(tempo);
 
-    _cmds={ {_pName,    { H4PC_H4, 0, CMDVS(_siren) }} };
+    _addLocals({ {_pName,    { H4PC_H4, 0, CMDVS(_siren) }} });
 }
 
 void H4P_ToneController::_repeat(const string& siren,uint8_t pin,uint32_t speed,uint32_t duration){

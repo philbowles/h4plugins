@@ -48,12 +48,12 @@ H4GPIOPin::H4GPIOPin(
 //
 void H4GPIOPin::_pinFactoryCommon(bool onof){ // optimise for no logging
     if(onof){
-        H4P_BinaryThing* btp=reinterpret_cast<H4P_BinaryThing*>(H4Plugin::isLoaded(onofTag()));
+        auto btp=h4pisloaded<H4P_BinaryThing>(H4PID_ONOF);
         if(btp){
             onEvent=[this,btp](H4GPIOPin* pp){ 
                 if(pp->style==H4GM_PS_LATCHING) {
                     if(pp->nEvents) btp->toggle(); // POTENTIAL BUG! if btp already commanded on, 1st time wont toggle
-    #ifdef H4P_LOG_EVENTS
+    #if H4P_LOG_EVENTS
                 } else btp->_turn(pp->logicalRead(),gpioTag()+string("("+stringFromInt(pin)+"/"+stringFromInt(style)+")"));
     #else
                 } else btp->turn(pp->logicalRead());
@@ -68,7 +68,7 @@ void H4GPIOPin::_pinFactoryCommon(bool onof){ // optimise for no logging
     begin();
 }
 
-#ifdef H4P_LOG_EVENTS
+#if H4P_LOG_EVENTS
 string H4GPIOPin::dump(){
     char buf[128];
     sprintf(buf,"%2d %2d %2d %2d %6d %6d %6d %6d %6d %6d %6d %6d",pin,gpioType,style,sense,Tevt,state,delta,rate,Rpeak,cps,cMax,(int) nEvents);
@@ -100,8 +100,7 @@ void H4GPIOPin::run(){
 //
 //      H4P_GPIOManager
 //
-void H4P_GPIOManager::_handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source){
-    //Serial.printf("DEFAULT EVENT HANDLER %s: rcvd T%d from %s '%s'\n",CSTR(_pName),type,CSTR(source),CSTR(msg));
+void H4P_GPIOManager::_handleEvent(H4PID pid,H4P_EVENT_TYPE type,const string &msg){
     for(auto p:pins){
         H4GPIOPin* ptr=p.second;         
         if(!((ptr->cps) < ptr->cMax)) ptr->_syncState();
@@ -117,13 +116,13 @@ void H4P_GPIOManager::_hookIn(){
 }
 
 void H4P_GPIOManager::_start(){
-    h4._hookLoop([this](){ _run(); },_subCmd);
+    h4._hookLoop([this](){ _run(); },_pid);
     H4Plugin::_start();
 }
 
 void  H4P_GPIOManager::_run(){ for(auto const& p:pins) (p.second)->run(); }
 
-H4P_GPIOManager::H4P_GPIOManager(): H4Plugin(H4PID_GPIO){ _eventFilter=H4P_EVENT_HEARTBEAT; }
+H4P_GPIOManager::H4P_GPIOManager(): H4Plugin(H4PID_GPIO,H4P_EVENT_HEARTBEAT){ }
 //
 //      (oblique) strategies
 //

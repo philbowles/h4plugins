@@ -27,21 +27,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_BinaryThing_HO
-#define H4P_BinaryThing_HO
+#pragma once
 
 #include<H4PCommon.h>
-#include<H4P_SerialCmd.h>
+//#include<H4P_SerialCmd.h>
+//#include<H4P_WiFi.h>
+//#include<H4P_AsyncMQTT.h>
+
+using namespace std::placeholders;
+
+class H4P_WiFi;
+class H4P_AsyncMQTT;
 
 STAG(condition);
 
 class H4P_BinaryThing: public H4Plugin{
+            H4P_WiFi*               _pWiFi;
+            H4P_AsyncMQTT*          _pMQTT;
             uint32_t                _timeout;
             unordered_set<string>   _slaves;
     protected:
             H4BS_FN_SWITCH  _f;
 
-                    uint32_t _autoOff(vector<string> vs){ return guardInt1(vs,bind(&H4P_BinaryThing::autoOff,this,_1)); }
+                    uint32_t _autoOff(vector<string> vs){ return _guardInt1(vs,bind(&H4P_BinaryThing::autoOff,this,_1)); }
 
             virtual void     _greenLight() override ;
                     void     _publish(bool b);
@@ -49,19 +57,19 @@ class H4P_BinaryThing: public H4Plugin{
             virtual void     _setState(bool b);
                     uint32_t _slave(vector<string> vs);
                     void     _start() override;
-                    uint32_t _switch(vector<string> vs){ return guardInt1(vs,bind(&H4P_BinaryThing::turn,this,_1)); }
+                    uint32_t _switch(vector<string> vs){ return _guardInt1(vs,bind(&H4P_BinaryThing::turn,this,_1)); }
     public:
             bool            _state=false;
         H4P_BinaryThing(H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): _f(f),_state(initial),_timeout(timer), H4Plugin(H4PID_ONOF) {
             autoOff(timer);
-            _cmds={
+            _addLocals({
                 {autoTag(),{H4PC_H4, 0, CMDVS(_autoOff)}},
                 {"on",     {H4PC_H4, 0, CMD(turnOn)}},
                 {"off",    {H4PC_H4, 0, CMD(turnOff)}},
                 {"state",  {H4PC_H4, 0, CMD(show)}},
                 {"switch", {H4PC_H4, 0, CMDVS(_switch)}},
                 {"toggle", {H4PC_H4, 0, CMD(toggle)}}
-            };
+            });
         }
 
         virtual void show() override { 
@@ -80,7 +88,7 @@ class H4P_BinaryThing: public H4Plugin{
                     void     turnOn(){ turn(true); }
                     void     toggle(){ turn(!_state); }
                     void     turn(bool b);
-#ifdef H4P_LOG_EVENTS
+#if H4P_LOG_EVENTS
                     void    _turn(bool b,const string& src);
 #endif
 };
@@ -101,5 +109,3 @@ class H4P_ConditionalThing: public H4P_BinaryThing{
 
         void syncCondition();
 };
-
-#endif // H4P_BinaryThing_H

@@ -51,36 +51,34 @@ class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
 
                 VSCMD(_change);
 
-                void        _badSignal(){ h4wifi.signal(". .    ",H4P_SIGNAL_TIMEBASE/2); }
+                void        _badSignal(){ h4pisloaded<H4P_WiFi>(H4PID_WIFI)->signal(". .    ",H4P_SIGNAL_TIMEBASE/2); }
                 void        _greenLight() override; //do not autostart!
-                void        _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source) override;
-                void        _hookIn() override;
+        virtual void        _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) override;
                 void        _setup();
                 void        _start() override;
                 bool        _state() override { return connected(); }
                 void        _stop() override;
     public:
-        H4P_AsyncMQTT():H4Plugin(H4PID_MQTT){}
+        explicit H4P_AsyncMQTT():H4Plugin(H4PID_MQTT,H4P_EVENT_FACTORY){}
 #if H4P_USE_WIFI_AP
         H4P_AsyncMQTT(H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr,H4P_LWT lwt={"","",0,false}):
-            _lwt(lwt), H4Plugin(H4PID_MQTT,onC,onD)
+            _lwt(lwt), H4Plugin(H4PID_MQTT,H4P_EVENT_FACTORY,onC,onD)
         {
 #else
         H4P_AsyncMQTT(string broker,uint16_t port, string user="",string pass="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr,H4P_LWT lwt={"","",0,false}):
-            _lwt(lwt), H4Plugin(H4PID_MQTT,onC,onD)
+            _lwt(lwt), H4Plugin(H4PID_MQTT,H4P_EVENT_FACTORY,onC,onD)
         {
-            _eventFilter=H4P_EVENT_FACTORY;
             _cb[pmvTag()]=PANGO_VERSION;
             _cb[brokerTag()]=broker;
             _cb[portTag()]=stringFromInt(port);
             _cb[mQuserTag()]=user,
             _cb[mQpassTag()]=pass;
 #endif
-            _cmds={
-                {_pName,    { H4PC_H4, _subCmd, nullptr }}, 
-                {"change",  { _subCmd, 0, CMDVS(_change) }},
-                {"report",  { _subCmd, 0, CMD(report) }}
-            };
+            _addLocals({
+                {_pName,    { H4PC_H4, _pid, nullptr }}, 
+                {"change",  { _pid, 0, CMDVS(_change) }},
+                {"report",  { _pid, 0, CMD(report) }}
+            });
         }
                 void        addReportingItem(const string& ri){ _reportList.insert(ri); }
                 void        change(const string& broker,uint16_t port,const string& user,const string& passwd);
@@ -91,6 +89,7 @@ class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
                 void        subscribeDevice(string topic,H4_FN_MSG f,H4PC_CMD_ID root=H4PC_ROOT);
                 void        unsubscribeDevice(string topic);
     //          syscall only
+                void        _hookIn() override;
                 void        _reply(string msg) override { publishDevice("reply",msg); }
 };
 

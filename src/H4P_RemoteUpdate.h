@@ -48,20 +48,9 @@ class H4P_RemoteUpdate: public H4Plugin, public HTTPUpdate {
                     if(_pWiFi->_getPersistentValue(rupdTag(),"")) _url=_cb[rupdTag()];
                     _cb[rupdTag()]=httpTag()+_url; 
                 } // no autostart
-                void _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source) override {
-                    switch(type){
-                        case H4P_EVENT_FACTORY:
-                            Serial.printf("%s [%s] H4P_EVENT_FACTORY src=%s msg=%s\n",CSTR(_pName),rupdTag(),CSTR(source),CSTR(msg));
-                            _pWiFi->_wipe(rupdTag());
-                            break;
-                        default:
-                            Serial.printf("WTF? EVENT t=%d src=%s *%s*\n",type,CSTR(source),CSTR(msg));
-                            break;
-                    }
-                }
-
+                void        _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) override { _pWiFi->_wipe(rupdTag()); }
                 void        _hookIn(){ 
-                    _pWiFi=depend<H4P_WiFi>(H4PID_WIFI);
+                    _pWiFi=depend<H4P_WiFi>(this,H4PID_WIFI);
                     H4Plugin::_hookIn();
                 }
                 void        _updateFromUrl(bool fw,bool reboot){
@@ -72,26 +61,25 @@ class H4P_RemoteUpdate: public H4Plugin, public HTTPUpdate {
                             if(reboot) h4reboot();
                             break;
                         case HTTP_UPDATE_NO_UPDATES:
-                            H4EVENT("Already up to date");
+                            PLOG("Already up to date");
                             break;
                         default:
-                            H4EVENT("FAIL %d: %s", getLastError(), getLastErrorString().c_str());
+                            PLOG("FAIL %d: %s", getLastError(), getLastErrorString().c_str());
                     }
                 }
     public:
  #if H4P_USE_WIFI_AP
         H4P_RemoteUpdate(const char* bin): H4Plugin(H4PID_RUPD){
 #else
-        H4P_RemoteUpdate(const string& url,const char* bin): _url(url),  H4Plugin(H4PID_RUPD){
+        H4P_RemoteUpdate(const string& url,const char* bin): _url(url),  H4Plugin(H4PID_RUPD,H4P_EVENT_FACTORY){
 #endif
-            _eventFilter=H4P_EVENT_FACTORY;
             _cb["bin"]=bin;
-            _cmds={
-                {_pName,       { H4PC_H4,_subCmd  , nullptr}},
-                {"both",       { _subCmd, 0, CMD(both)}},
-                {"fs",         { _subCmd, 0, CMD(fs)}},
-                {"fw",         { _subCmd, 0, CMD(fw)}}
-            }; 
+            _addLocals({
+                {_pName,       { H4PC_H4,_pid  , nullptr}},
+                {"both",       { _pid, 0, CMD(both)}},
+                {"fs",         { _pid, 0, CMD(fs)}},
+                {"fw",         { _pid, 0, CMD(fw)}}
+            });
         }
 
         void both(){

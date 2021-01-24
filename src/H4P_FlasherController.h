@@ -57,7 +57,6 @@ class H4P_FlasherController: public H4Plugin {
         
         void            _dynaLoad(uint8_t pin,H4GM_SENSE active,H4FC_FN_F1 f1,H4FC_FN_F2 f2);
         void            _flash(uint32_t period,uint8_t duty,uint8_t pin,H4GM_SENSE active=ACTIVE_HIGH);
-        void            _hookIn() override;
     public:
         H4P_FlasherController(): H4Plugin(H4PID_WINK){}
              
@@ -72,5 +71,7 @@ class H4P_FlasherController: public H4Plugin {
 		bool 			isFlashing(uint8_t pin);
 		void 			pulseLED(uint32_t period,uint8_t pin,H4GM_SENSE active=ACTIVE_HIGH);
         void            stopLED(uint8_t pin);
+// syscall only
+        void            _hookIn() override;
 };
 //extern __attribute__((weak)) H4P_FlasherController h4fc;

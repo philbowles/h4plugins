@@ -30,8 +30,8 @@ SOFTWARE.
 
 extern void h4FactoryReset(const string& src);
 
-H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Plugin(H4PID_CMD){
-    _cmds={
+H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Plugin(H4PID_CMD,H4P_EVENT_MSG){
+    _addLocals({
         {h4Tag(),      { 0, H4PC_H4, nullptr}},
         {"help",       { 0, 0, CMD(help) }},
         {"event",      { H4PC_H4,   0, CMDVS(_event) }}, // dangerous!!!
@@ -50,7 +50,7 @@ H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Plugin(H4PID_CMD){
         {"plugins",    { H4PC_SHOW, 0, CMD(plugins) }},
         {"heap",       { H4PC_SHOW, 0, CMD(heap) }},
         {"fs",         { H4PC_SHOW, 0, CMD(showFS)}}
-    }; 
+            });
     if(autoStop) QTHIS(stop);
 }
 
@@ -87,13 +87,14 @@ uint32_t H4P_SerialCmd::_executeCmd(string topic, string pload){
     _cb[srcTag()]=vs[0];
 	vs.push_back(pload);
     vector<string> cmd(vs.begin()+2,vs.end());
-    #ifdef H4P_LOG_EVENTS
-        _logger(join(cmd,"/"),H4P_EVENT_CMD,vs[0]);
+    #if H4P_LOG_EVENTS
+       PEVENT(H4P_EVENT_CMD,"%s %s",CSTR(vs[0]),CSTR(join(cmd,"/")));
     #endif	
     uint32_t rv=_dispatch(vector<string>(cmd)); // optimise?
-    #ifdef H4P_LOG_EVENTS
-        if(rv) _logger(_getErrorMessage(rv),H4P_EVENT_CMDERROR,vs[0]);
-    #endif
+    #if H4P_LOG_EVENTS
+//        if(rv) _logger(_getErrorMessage(rv),,vs[0]);
+        PEVENT(H4P_EVENT_CMDREPLY,"%s",CSTR(h4pgetErrorMessage(rv)));
+   #endif
     return rv;
 }
 
@@ -109,11 +110,9 @@ void H4P_SerialCmd::_flattenCmds(function<void(string)> fn,string cmd,string pre
 }
 
 void H4P_SerialCmd::_hookIn(){
-    _babel=reinterpret_cast<H4P_VerboseMessages*>(isLoaded("vm"));
     HAL_FS.begin();
+    H4Plugin::_hookIn();
 }
-
-void H4P_SerialCmd::_logger(const string &msg,H4P_EVENT_TYPE type,const string& source){ for(auto const& l:_eventListeners) l(msg,type,source); }
 
 void H4P_SerialCmd::_run(){
     static string cmd="";
@@ -122,7 +121,7 @@ void H4P_SerialCmd::_run(){
         if (c == '\n') {
             h4.queueFunction(bind([this](string cmd){
                 uint32_t err=_simulatePayload(cmd);
-                if(err) reply("%s\n",CSTR(_getErrorMessage(err)));
+                if(err) reply("%s\n",CSTR(h4pgetErrorMessage(err)));
             },cmd),nullptr,H4P_TRID_SCMD);
             cmd="";
         } else cmd+=c;
@@ -140,9 +139,9 @@ uint32_t H4P_SerialCmd::_simulatePayload(string flat,const char* src){ // refac
 }
 //
 uint32_t H4P_SerialCmd::_svcControl(H4P_SVC_CONTROL svc,vector<string> vs){
-    return guard1(vs,[this,svc](vector<string> vs){
+    return _guard1(vs,[this,svc](vector<string> vs){
         return ([this,svc](string s){
-            H4Plugin* p=isLoaded(s);
+            auto p=h4pptrfromtxt(s);
             if(p) {
                 switch(svc){
                     case H4PSVC_START:
@@ -166,11 +165,11 @@ uint32_t H4P_SerialCmd::_svcControl(H4P_SVC_CONTROL svc,vector<string> vs){
 }
 
 uint32_t H4P_SerialCmd::_event(vector<string> vs){ 
-    return guard1(vs,[this](vector<string> vs){
+    return _guard1(vs,[this](vector<string> vs){
         auto vg=split(H4PAYLOAD,",");
         if(vg.size()!=2) return H4_CMD_PAYLOAD_FORMAT;
         if(!stringIsNumeric(vg[0])) return H4_CMD_NOT_NUMERIC;
-        h4cmd.emitEvent(static_cast<H4P_EVENT_TYPE>(1 << STOI(vg[0])),_cb[srcTag()],"%s",CSTR(vg[1]));
+        PEVENT(static_cast<H4P_EVENT_TYPE>(1 << STOI(vg[0])),"%s",CSTR(vg[1]));
         return H4_CMD_OK;
     });
 }
@@ -198,7 +197,7 @@ uint32_t H4P_SerialCmd::invokeCmd(string topic,uint32_t payload,const char* src)
     return invokeCmd(topic,stringFromInt(payload),src);
 }
 
-void H4P_SerialCmd::removeCmd(const string& s,uint32_t _subCmd){ if(__exactMatch(s,_subCmd)!=_commands.end()) _commands.erase(s); }
+void H4P_SerialCmd::removeCmd(const string& s,uint32_t _pid){ if(__exactMatch(s,_pid)!=_commands.end()) _commands.erase(s); }
 
 string H4P_SerialCmd::read(const string& fn){
 	string rv="";
@@ -241,8 +240,8 @@ string H4P_SerialCmd::_dumpTask(task* t){
     uint32_t id=t->uid%100;
     sprintf(buf,"%09lu %s/%s %s %9d %9d %9d",
         t->at,
-        CSTR(h4cmd._getTaskType(type)),
-        CSTR(h4cmd._getTaskName(id)),
+        CSTR(h4pgetTaskType(type)),
+        CSTR(h4pgetTaskName(id)),
         t->singleton ? "S":" ",
         t->rmin,
         t->rmax,
@@ -260,14 +259,14 @@ void H4P_SerialCmd::showQ(){
 void  H4P_SerialCmd::plugins(){
     for(auto const& pp:h4pmap){
         auto p=pp.second;
-        reply("h4/svc/info/%s %s ID=%d",CSTR(p->_pName),p->_state() ? "UP":"DN",p->_subCmd);
+        reply("h4/svc/info/%s %s ID=%d",CSTR(p->_pName),p->_state() ? "UP":"DN",p->_pid);
         p->show();
         reply("");
     }
 }
 
 uint32_t H4P_SerialCmd::_dump(vector<string> vs){
-    return guard1(vs,[this](vector<string> vs){
+    return _guard1(vs,[this](vector<string> vs){
         return ([this](string h){ 
             reply("DUMP FILE %s",CSTR(h));
             reply("%s",CSTR(read("/"+h)));

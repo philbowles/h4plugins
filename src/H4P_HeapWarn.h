@@ -42,11 +42,11 @@ class H4P_HeapWarn: public H4Plugin {
             void        _run();
             uint32_t    _setLimit(uint32_t v);
             void        _start() override {
-                h4._hookLoop([this](){ _run(); },_subCmd);
+                h4._hookLoop([this](){ _run(); },_pid);
                 H4Plugin::_start();
             }
             void        _stop() override {
-                h4._unHook(_subCmd);
+                h4._unHook(_pid);
                 H4Plugin::_stop();
             }
     public:

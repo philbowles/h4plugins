@@ -68,29 +68,28 @@ class H4P_HttpMySQLLogger: public H4Plugin, public asyncHTTPrequest {
             }
         }
 
-        void        _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source){
+        void        _handleEvent(H4PID pid,H4P_EVENT_TYPE type,const string &msg){
             static  uint32_t _logseq=0;
             if(!inflight){
                 open("POST",CSTR(ip));
                 inflight=true;
                 char buf[256];
-                sprintf(buf,"device=%s&msg=%s&type=%d&source=%s&seq=%u",CSTR(_cb[deviceTag()]),CSTR(msg),(int) type,CSTR(source),_logseq++);
+                sprintf(buf,"device=%s&msg=%s&type=%d&source=%d&seq=%u",CSTR(_cb[deviceTag()]),CSTR(msg),type,pid,_logseq++);
                 setReqHeader("Content-Type","application/x-www-form-urlencoded");
                 send(buf);
-            } else h4.once(H4P_MYSQL_HOLDOFF,bind(&H4P_HttpMySQLLogger::_applyEventFilter,this,msg,type,source),nullptr,H4P_TRID_MLRQ);
+            } else h4.once(H4P_MYSQL_HOLDOFF,bind(&H4P_HttpMySQLLogger::_handleEvent,this,pid,type,msg),nullptr,H4P_TRID_MLRQ);
         }
 
         void _greenLight() override {} // prevetn autostart - wait until wifi up
 
+    public:
+        H4P_HttpMySQLLogger(const string& ipaddress,H4P_FN_HTTPFAIL fnFail=nullptr,uint32_t filter=H4P_EVENT_ALL): 
+            _fail(fnFail),ip(ipaddress),H4Plugin(H4PID_SQLL,filter){}
+            
         void _hookIn() override { // protect
-            depend<H4P_WiFi>(H4PID_WIFI);
+            depend<H4P_WiFi>(this,H4PID_WIFI);
 //            setDebug(true);
             onReadyStateChange(bind(&H4P_HttpMySQLLogger::_requestCB,this,_1,_2,_3));
             H4Plugin::_hookIn();
-        }
-    public:
-        H4P_HttpMySQLLogger(const string& ipaddress,H4P_FN_HTTPFAIL fnFail=nullptr,uint32_t filter=H4P_EVENT_ALL): 
-            _fail(fnFail),ip(ipaddress),H4Plugin(H4PID_SQLL){
-                H4Plugin::_eventFilter=filter;
         }
 };

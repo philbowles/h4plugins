@@ -38,12 +38,12 @@ constexpr uint32_t secsInDay(){ return 86400; }
 constexpr uint32_t msInDay(){ return 1000*secsInDay(); }
 
 H4P_Timekeeper::H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzo,H4_FN_DST fDST): _fDST(fDST), H4Plugin(H4PID_TIME){
-    _cmds={
-        {_pName,   { H4PC_H4, _subCmd, nullptr}}, // root for this plugin
-        {"change", { _subCmd,       0, CMDVS(_change)}},
-        {"sync",   { _subCmd,       0, CMD(sync)}},
-        {"tz",     { _subCmd,       0, CMDVS(_tz)}}
-    };
+    _addLocals({
+        {_pName,   { H4PC_H4, _pid, nullptr}}, // root for this plugin
+        {"change", { _pid,       0, CMDVS(_change)}},
+        {"sync",   { _pid,       0, CMD(sync)}},
+        {"tz",     { _pid,       0, CMDVS(_tz)}}
+            });
     sntp_setoperatingmode(SNTP_OPMODE_POLL);
     _setupSNTP(ntp1,ntp2);
     __HALsetTimezone(0);
@@ -94,30 +94,30 @@ uint32_t H4P_Timekeeper::__alarmCore (vector<string> vs,bool daily,H4BS_FN_SWITC
     if(!stringIsNumeric(b)) return H4_CMD_NOT_NUMERIC;
     int onoff=atoi(CSTR(b));
     if(_mss00){ // onRTC
-        H4EVENT("%s %s -> %s",daily ? "Daily":"S/Shot",CSTR(strTime(T)),onoff ? "ON":"OFF");
+        PLOG("%s %s -> %s",daily ? "Daily":"S/Shot",CSTR(strTime(T)),onoff ? "ON":"OFF");
         int msDue=T-msSinceMidnight();
         if(msDue < 0) msDue+=msInDay();
         uint32_t u=daily ? H4P_TRID_DALY:H4P_TRID_SHOT;
         h4.add([this,f,onoff]{
             if(_mss00) f(onoff);
-            //else H4EVENT("RTC ignored"); // don't fire if NTP not sync'ed 
+            //else PLOG("RTC ignored"); // don't fire if NTP not sync'ed 
         },msDue,daily ? msDue:0,H4Countdown(1),nullptr,TAG(daily ? 7:3));
         return H4_CMD_OK;
-    } //else H4EVENT("Alarm ignored"); // don't set if NTP not sync'ed
+    } //else PLOG("Alarm ignored"); // don't set if NTP not sync'ed
     return H4_CMD_NOT_NOW; 
 }
 
 uint32_t H4P_Timekeeper::_at(vector<string> vs){ return __alarmCore(vs,false,[this](bool b){ _btp->turn(b); }); }
 
-uint32_t H4P_Timekeeper::_change(vector<string> vs){ return guardString2(vs,[this](string a,string b){ change(a,b); return H4_CMD_OK; }); }
+uint32_t H4P_Timekeeper::_change(vector<string> vs){ return _guardString2(vs,[this](string a,string b){ change(a,b); return H4_CMD_OK; }); }
 
 uint32_t H4P_Timekeeper::_daily(vector<string> vs){ return __alarmCore(vs,true,[this](bool b){ _btp->turn(b); }); }
 
 void H4P_Timekeeper::_hookIn(){ 
-    depend<H4P_WiFi>(H4PID_WIFI);
+    depend<H4P_WiFi>(this,H4PID_WIFI);
     _btp=require<H4P_BinaryThing>(H4PID_ONOF);
-    h4cmd.addCmd("at",_subCmd,0,CMDVS(_at));
-    h4cmd.addCmd("daily",_subCmd,0,CMDVS(_daily));
+    h4cmd.addCmd("at",_pid,0,CMDVS(_at));
+    h4cmd.addCmd("daily",_pid,0,CMDVS(_daily));
     H4Plugin::_hookIn();
 }
 
@@ -137,7 +137,7 @@ void H4P_Timekeeper::_start(){
             [this]{ sync(); },
             [this]{
                 static bool gotRTC=false; 
-                H4EVENT("NTP SYNC _mss00=%u %s",_mss00,CSTR(clockTime()));
+                PLOG("NTP SYNC _mss00=%u %s",_mss00,CSTR(clockTime()));
                 if(!gotRTC) {
                     _upHooks();
                     onRTC();
@@ -158,7 +158,7 @@ void H4P_Timekeeper::_stop(){
 }
 
 uint32_t H4P_Timekeeper::_tz(vector<string> vs){
-    return guardInt1(vs,[this](int v){
+    return _guardInt1(vs,[this](int v){
         tz(v); 
         return H4_CMD_OK;
     });

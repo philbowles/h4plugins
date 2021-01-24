@@ -32,6 +32,7 @@ SOFTWARE.
 extern __attribute__((weak)) uint32_t h4Nloops=0;
 
 #include<H4PCommon.h>
+#include<H4P_EmitTick.h>
 /*
         This will only work if you edit inc/H4.h in the H4 library to include:
 
@@ -44,25 +45,22 @@ extern __attribute__((weak)) uint32_t h4Nloops=0;
         but h4UserLoop will not get called!
 
 */
+/*
 #if H4_COUNT_LOOPS
     #pragma message("COUNTING LOOPS")
 #endif
-
+*/
 class H4P_EmitLoopCount: public H4Plugin {
-
-            void _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source) override {
-                SYSEVENT(H4P_EVENT_LOOPS,_pName,"%u",h4Nloops);
+            void _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) override {
+                PEVENT(H4P_EVENT_LOOPS,"%u",h4Nloops);
                 h4Nloops=0;
             };
 
             void _hookIn() {
-                DEPEND(tick);
+                depend<H4P_EmitTick>(this,H4PID_1SEC);
                 H4Plugin::_hookIn();
             }
 
     public:
-        H4P_EmitLoopCount(): H4Plugin(H4PID_LOOP){ 
-            _eventFilter=H4P_EVENT_HEARTBEAT;
-            h4Nloops=0;
-        }
+        H4P_EmitLoopCount(): H4Plugin(H4PID_LOOP,H4P_EVENT_HEARTBEAT){ h4Nloops=0; }
 };

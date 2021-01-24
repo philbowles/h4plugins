@@ -30,11 +30,14 @@ SOFTWARE.
 #include<H4P_WiFi.h>
 #include<H4P_SerialCmd.h>
 #include<H4P_AsyncMQTT.h>
+#include<H4P_RemoteUpdate.h>
+#include<H4P_UPNPServer.h>
 
 constexpr char* uuTag(){ return "Update URL"; }
 
 #if H4P_USE_WIFI_AP
 void H4P_WiFi::_startAP(){
+
     signal(".  ",H4P_SIGNAL_TIMEBASE * 2); // really slow single blip
     string opts;
     _dns53=new DNSServer;
@@ -52,24 +55,24 @@ void H4P_WiFi::_startAP(){
     }
     WiFi.scanDelete();
 
-    h4wifi._uiAdd(H4P_UIO_SSID,ssidTag(),H4P_UI_DROPDOWN,opts);
-    h4wifi._uiAdd(H4P_UIO_PSK,pskTag(),H4P_UI_INPUT);
-    h4wifi._uiAdd(H4P_UIO_DEVICE,deviceTag(),H4P_UI_INPUT,_cb[deviceTag()]);
+    _uiAdd(H4P_UIO_SSID,ssidTag(),H4P_UI_DROPDOWN,opts);
+    _uiAdd(H4P_UIO_PSK,pskTag(),H4P_UI_INPUT);
+    _uiAdd(H4P_UIO_DEVICE,deviceTag(),H4P_UI_INPUT,_cb[deviceTag()]);
 
-    if(isLoaded(upnpTag())) h4wifi._uiAdd(H4P_UIO_NAME,nameTag(),H4P_UI_INPUT);
-    if(isLoaded(rupdTag())) h4wifi._uiAdd(H4P_UIO_RUPD,uuTag(),H4P_UI_INPUT);
-    if(isLoaded(mqttTag())){
-        h4wifi._uiAdd(H4P_UIO_MQB,brokerTag(),H4P_UI_INPUT);
-        h4wifi._uiAdd(H4P_UIO_MQP,portTag(),H4P_UI_INPUT);
-        h4wifi._uiAdd(H4P_UIO_MQU,mQuserTag(),H4P_UI_INPUT);
-        h4wifi._uiAdd(H4P_UIO_MQK,mQpassTag(),H4P_UI_INPUT);
+    if(h4pisloaded<H4P_UPNPServer>(H4PID_UPNP)) _uiAdd(H4P_UIO_NAME,nameTag(),H4P_UI_INPUT);
+    if(h4pisloaded<H4P_RemoteUpdate>(H4PID_RUPD)) _uiAdd(H4P_UIO_RUPD,uuTag(),H4P_UI_INPUT);
+    if(_pMQTT){
+        _uiAdd(H4P_UIO_MQB,brokerTag(),H4P_UI_INPUT);
+        _uiAdd(H4P_UIO_MQP,portTag(),H4P_UI_INPUT);
+        _uiAdd(H4P_UIO_MQU,mQuserTag(),H4P_UI_INPUT);
+        _uiAdd(H4P_UIO_MQK,mQpassTag(),H4P_UI_INPUT);
     }
 
-    h4wifi._uiAdd(H4P_UIO_GO4IT,"GO!",H4P_UI_BOOL,"",
+    _uiAdd(H4P_UIO_GO4IT,"GO!",H4P_UI_BOOL,"",
         nullptr,
         [this](const string& b){
             h4.queueFunction([this](){
-                if(isLoaded(mqttTag()))h4mqtt.change(_cb[brokerTag()],STOI(_cb[portTag()]),_cb[mQuserTag()],_cb[mQpassTag()]);
+                if(_pMQTT) _pMQTT->change(_cb[brokerTag()],STOI(_cb[portTag()]),_cb[mQuserTag()],_cb[mQpassTag()]);
                 _cb[rupdTag()]=_cb[uuTag()];
                 _save(rupdTag());
                 _save(deviceTag());
@@ -78,7 +81,7 @@ void H4P_WiFi::_startAP(){
             });
     });
     WiFi.mode(WIFI_AP);
-    H4EVENT("ENTER AP MODE %s MAC=%s",CSTR(_cb[deviceTag()]),CSTR(WiFi.softAPmacAddress()));
+    PLOG("ENTER AP MODE %s MAC=%s",CSTR(_cb[deviceTag()]),CSTR(WiFi.softAPmacAddress()));
 
     WiFi.softAP(CSTR(_cb[deviceTag()]));
     _cb[ipTag()]=CSTR(WiFi.softAPIP().toString());//.c_str();

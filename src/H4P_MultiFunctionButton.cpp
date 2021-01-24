@@ -34,11 +34,11 @@ void H4P_MultiFunctionButton::_progress(H4GPIOPin* ptr){ // run this as each sta
     H4GM_PIN(Multistage); // Create the correct pointer type in 'pin'
     switch(pin->stage){
         case 1: // over 2 seconds, slow flash
-            H4EVENT("STAGE 1 - will reboot");
+            PLOG("STAGE 1 - will reboot");
             _pSignal->flashLED(H4MF_SLOW,H4P_SIGNAL_LED,H4P_SIGNAL_SENSE);
             break;
         case 2: // over 5 seconds, medium flash
-            H4EVENT("STAGE 2 - will factory reset");
+            PLOG("STAGE 2 - will factory reset");
             _pSignal->flashLED(H4MF_MEDIUM,H4P_SIGNAL_LED,H4P_SIGNAL_SENSE);
             break;
         default: // do nothing if less than 2 seconds
@@ -49,7 +49,7 @@ void H4P_MultiFunctionButton::_progress(H4GPIOPin* ptr){ // run this as each sta
 void H4P_MultiFunctionButton::_hookIn(){
     _pSignal=require<H4P_FlasherController>(H4PID_WINK);
     _btp=require<H4P_BinaryThing>(H4PID_ONOF);
-    _pGPIO=depend<H4P_GPIOManager>(H4PID_GPIO);
+    _pGPIO=depend<H4P_GPIOManager>(this,H4PID_GPIO);
     H4Plugin::_hookIn();
 }
 

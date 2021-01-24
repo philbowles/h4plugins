@@ -30,6 +30,18 @@ SOFTWARE.
 
 #define H4P_VERSION "1.0.0"
 /*
+        DIAGNOSTICS
+        comment out H4P_LOG_EVENTS to prevent any logging by EVENT( whatever ) messages
+        Increases performance, reduces binary size, increases free heap, but ...
+        
+        **********************************************************************
+        YOU MUST H4P_LOG_EVENTS DEFINED AND INCLUDE ALL SERIAL MONITOR OUTPUT
+        WHEN SUBMITTING BUG REPORTS
+        ***********************************************************************
+*/
+#define H4P_LOG_EVENTS      1
+#define H4P_WEBSERVER_PORT 80
+/*
         HARDWARE ASSUMPTIONS
 
         Most boards have a builtin LED where they have this will be defined by LED_BUILTIN
@@ -41,20 +53,15 @@ SOFTWARE.
         These affect the way wifi, mqtt and multfunction buttons do their signalling
         H4P_SIGNAL_TIMEBASE is the speed at which the signal pattern cycles - see the documentation for flashPattern API
 */
+enum H4GM_SENSE:uint8_t {
+    ACTIVE_LOW,
+    ACTIVE_HIGH
+};
+
 #define H4P_SIGNAL_LED  LED_BUILTIN
 #define H4P_SIGNAL_SENSE ACTIVE_LOW
 #define H4P_SIGNAL_TIMEBASE     175
-/*
-        DIAGNOSTICS
-        comment out H4P_LOG_EVENTS to prevent any logging by EVENT( whatever ) messages
-        Increases perfirmance, reduces binary size, increases free heap, but ...
-        
-        **********************************************************************
-        YOU MUST H4P_LOG_EVENTS DEFINED AND INCLUDE ALL SERIAL MONITOR OUTPUT
-        WHEN SUBMITTING BUG REPORTS
-        ***********************************************************************
-*/
-#define H4P_LOG_EVENTS
+
 
 // Make sure you read the documentation and have arrangements in place for using AP mode :)
 #define H4P_USE_WIFI_AP          0
@@ -65,7 +72,7 @@ SOFTWARE.
 
 //#define H4FC_MORSE_SUPPORT
 
-#define H4MQ_RETRY            10000
+#define H4MQ_RETRY           10000
 
 #define H4P_UDP_JITTER         250
 #define H4P_UDP_REFRESH     300000

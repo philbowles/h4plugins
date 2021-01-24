@@ -33,7 +33,8 @@ SOFTWARE.
 #include<H4P_WiFi.h>
 #include<H4PCommon.h>
 #include<H4P_SerialCmd.h>
-
+#include<H4P_UPNPServer.h>
+        
 class H4PDetector: public H4Plugin{
     protected:
         H4_TIMER        _pinger;
@@ -43,7 +44,7 @@ class H4PDetector: public H4Plugin{
                 if(b!=_here){
                     if(_f) _f(b);
                     _here=b;
-                    SYSEVENT(b ? H4P_EVENT_PD_ENTER:H4P_EVENT_PD_LEAVE ,_pName,"%s",b ? "IN":"OUT");
+                    PEVENT(b ? H4P_EVENT_PD_ENTER:H4P_EVENT_PD_LEAVE,"%s",b ? "IN":"OUT");
                 }
             }
             void        _stop() override{
@@ -55,7 +56,7 @@ class H4PDetector: public H4Plugin{
         string          _id;
         bool            _here=false;
 
-        H4PDetector(uint32_t pid,const string& id,H4BS_FN_SWITCH f): _id(id),_f(f),H4Plugin(pid){}
+        H4PDetector(H4PID pid,const string& id,H4BS_FN_SWITCH f): _id(id),_f(f),H4Plugin(pid){}
                         
         bool        isPresent(){ return _here; }
         void show() override { reply("%s (%s) %s Present",CSTR(_pName),CSTR(_id),_here ? "":"NOT"); }
@@ -86,7 +87,7 @@ class H4P_IPDetector: public H4PDetector {
                 void        _hookIn() override;
                 void        _start() override;
     public:
-        H4P_IPDetector(uint32_t pid,const string& ip,H4BS_FN_SWITCH f=nullptr): H4PDetector(pid,ip,f){}
+        H4P_IPDetector(H4PID pid,const string& ip,H4BS_FN_SWITCH f=nullptr): H4PDetector(pid,ip,f){}
 };
 /*
 class H4P_IPDetectorSource: public H4P_IPDetector{

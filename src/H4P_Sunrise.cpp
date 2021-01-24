@@ -64,7 +64,7 @@ SOFTWARE.
 
 
 void H4P_Sunrise::_hookIn(){ 
-    _pTime=depend<H4P_Timekeeper>(H4PID_TIME);
+    _pTime=depend<H4P_Timekeeper>(this,H4PID_TIME);
     H4Plugin::_hookIn();
 }
 
@@ -110,14 +110,14 @@ void H4P_Sunrise::_start(){
                     vector<string> chop2=split(chop,","); // "sunrise":"5:11:52 AM" 
                     _parse(chop2[0]);
                     _parse(chop2[1]);
-                    H4EVENT("s/r=%s s/s=%s",CSTR(_cb["sunrise"]),CSTR(_cb["sunset"]));
+                    PLOG("s/r=%s s/s=%s",CSTR(_cb["sunrise"]),CSTR(_cb["sunset"]));
                     _pTime->daily("01:00",ON,[this](bool b){
                         _cb.erase("sunrise");
                         _start();
                     });
                 }
-            } else H4EVENT("sset FAIL %d",httpCode);
+            } else PLOG("sset FAIL %d",httpCode);
         https.end();
         }
-    } //else H4EVENT("ALREADY GOT SS %s",CSTR(_cb["sunrise"]));
+    } //else PLOG("ALREADY GOT SS %s",CSTR(_cb["sunrise"]));
 }

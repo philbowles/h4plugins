@@ -34,8 +34,8 @@ SOFTWARE.
 //      UPNP
 //
 void H4P_UPNPDetector::_hookIn() { 
-    REQUIRE(onof);
-    DEPEND(upnp);
+    require<H4P_BinaryThing>(H4PID_ONOF);
+    depend<H4P_UPNPServer>(this,H4PID_UPNP);
     H4Plugin::_hookIn();
 }
 
@@ -53,7 +53,7 @@ H4P_UPNPDetectorSource::H4P_UPNPDetectorSource(uint32_t pid,const string& id): H
     REQUIREBT;
     if(_btp){
         _f=[this,_btp](bool b){ 
-#ifdef H4P_LOG_EVENTS
+#if H4P_LOG_EVENTS
         _btp->_turn(b,_pName+string("("+_id+")"));
 #else
         _btp->turn(b);
@@ -73,7 +73,7 @@ struct ping_option  H4P_IPDetector::pop;
 //      IP
 //
 void H4P_IPDetector::_hookIn() { 
-    DEPEND(wifi);
+    depend<H4P_WiFi>(this,H4PID_WIFI);
     H4Plugin::_hookIn();
 }
 
@@ -108,7 +108,7 @@ H4P_IPDetectorSource::H4P_IPDetectorSource(uint32_t pid,const string& id): H4P_I
     REQUIREBT;
     if(_btp){
         _f=[this,_btp](bool b){ 
-#ifdef H4P_LOG_EVENTS
+#if H4P_LOG_EVENTS
         _btp->_turn(b,_pName+string("("+_id+")"));
 #else
         _btp->turn(b);
@@ -125,7 +125,7 @@ unordered_map<string,H4P_MDNSDetector*> H4P_MDNSDetector::localList;
 
 void H4P_MDNSDetector::_hookIn() { 
     REQUIRE(onof);
-    depend<H4P_WiFi>(H4PID_WIFI);
+    depend<H4P_WiFi>(this,H4PID_WIFI);
     H4Plugin::_hookIn();
 }
 
@@ -146,7 +146,7 @@ H4P_H4DetectorSource::H4P_H4DetectorSource(const string& id): H4P_H4Detector(id)
     REQUIREBT;
     if(_btp){
         _f=[this,_btp](bool b){ 
-#ifdef H4P_LOG_EVENTS
+#if H4P_LOG_EVENTS
         _btp->_turn(b,_pName+string("("+_id+")"));
 #else
         _btp->turn(b);

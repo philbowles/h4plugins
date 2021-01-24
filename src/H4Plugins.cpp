@@ -28,10 +28,12 @@ SOFTWARE.
 */
 #include<H4PCommon.h>
 #include<H4P_SerialCmd.h>
-
-void __attribute__((weak)) onFactoryReset(){}
 //
 vector<string> h4pnames={
+    "SYS", // ROOT
+    "R1", // H4
+    "R2", // SHOW
+    "SVC", // SVC
     "VM",
     "CMD",
     "1SEC",
@@ -48,13 +50,13 @@ vector<string> h4pnames={
     "SNIF",
     "STOR",
     "TONE",
-    "GPIO",
+    "GPIO", //
     "WINK",
-    "WIFI",
+    "WIFI", //
     "BEAT",
-    "MQTT",
+    "MQTT", //
     "MLG0",
-    "UPNP",
+    "UPNP", //
     "MFNB",
     "PDI0",
     "PDM0",
@@ -66,57 +68,14 @@ vector<string> h4pnames={
     "UDPL",
     "XXX0"
 };
-
-void H4Plugin::_applyEventFilter(const string &m,H4P_EVENT_TYPE t,const string& s){ 
-    if(t & _eventFilter) _handleEvent(m,t,s);
-}
-/*
-uint32_t H4Plugin::frig(){
-    auto i=find(h4pnames.begin(),h4pnames.end(),uppercase(_pName));
-    if(i!=h4pnames.end()){
-        uint32_t pos=distance(h4pnames.begin(),i);
-        if(!h4pmap[pos]) {
-            h4pmap[pos]=this;
-            return pos;
-        }
-        else Serial.printf("DOUBLE DIPPERS! %s\n",CSTR(_pName));
-    } else Serial.printf("WASSSSSSSSSAP!!!!!!!! %s\n",CSTR(_pName));
-    return 999;
-}
-*/
-H4Plugin* H4Plugin::isLoaded(const string& x){
-    for(auto const& p:h4pmap) if(p.second->_pName==x) return p.second;
-    return nullptr;
+void H4Plugin::_envoi(const string& s){
+    string source=_cb[srcTag()];
+    auto pp=h4pptrfromtxt(source);
+    if(pp) pp->_reply(CSTR(s)); // send reply back to originating source
+    else Serial.printf("SRC %s %s\n",CSTR(source),CSTR(s));
 }
 
-void H4Plugin::_dynamicLoad(H4Plugin* p){
-//    Serial.printf("_dynamicLoad %d %08x\n",p->_subCmd-H4PC_MAX,(void*) p);
-    p->_startup();
-    p->_hookIn();
-    h4cmd.emitEvent(H4P_EVENT_DLL,_pName,"%s",CSTR(p->_pName));
-}
-
-void h4StartPlugins(){
-    H4Plugin::_cb[srcTag()]=userTag();
-    H4Plugin::_cb[h4pTag()]=H4P_VERSION;
-    Serial.printf("H4P %s\n",CSTR(H4Plugin::_cb[h4pTag()]));
-//    Serial.printf("CALIBRATION? cal=%u nL=%u peak=%u\n",H4_CALIBRATE,h4Nloops,h4Nloops * (1000 / H4_CALIBRATE));
-//    for(auto const& p:h4pmap) { Serial.printf("map sez %08x %s in pos %d\n",(void*) p.second,(CSTR(h4pnames[p.first])),p.first); }
-    for(auto const& p:h4pmap) p.second->_startup();
-//    for(auto const& p:h4pmap) { Serial.printf("post startup sez %08x %s in pos %d\n",(void*) p.second,(CSTR(h4pnames[p.first])),p.first); }
-    for(auto const& p:h4pmap) p.second->_hookIn();
-//    for(auto const& p:h4pmap) { Serial.printf("post hookin sez %08x %s in pos %d\n",(void*) p.second,(CSTR(h4pnames[p.first])),p.first); }
-    for(auto const& p:h4pmap) p.second->_greenLight();
-//    for(auto const& p:h4pmap) { Serial.printf("post greenlight sez %08x %s in pos %d\n",(void*) p.second,(CSTR(h4pnames[p.first])),p.first); }
-}
-
-void h4FactoryReset(const string& src){
-    SYSEVENT(H4P_EVENT_FACTORY,src,stringFromInt(millis()));
-    onFactoryReset();
-    h4rebootCore();
-}
-
-vector<uint32_t> H4Plugin::expectInt(string pl,const char* delim){
+vector<uint32_t> H4Plugin::_expectInt(string pl,const char* delim){
     vector<uint32_t> results;
     vector<string> tmp=split(pl,delim);
     for(auto const& t:tmp){
@@ -126,16 +85,16 @@ vector<uint32_t> H4Plugin::expectInt(string pl,const char* delim){
     return results;
 }
 
-uint32_t H4Plugin::guardInt1(vector<string> vs,function<void(uint32_t)> f){
-    return guard1(vs,[f,this](vector<string> vs){
-        auto vi=expectInt(H4PAYLOAD);
+uint32_t H4Plugin::_guardInt1(vector<string> vs,function<void(uint32_t)> f){
+    return _guard1(vs,[f,this](vector<string> vs){
+        auto vi=_expectInt(H4PAYLOAD);
         if(vi.size()==1) return ([f](uint32_t v){ f(v); return H4_CMD_OK; })(vi[0]);
         return H4_CMD_NOT_NUMERIC;
     });
 }        
 
-uint32_t H4Plugin::guardString2(vector<string> vs,function<H4_CMD_ERROR(string,string)> f){
-    return guard1(vs,[f,this](vector<string> vs){
+uint32_t H4Plugin::_guardString2(vector<string> vs,function<H4_CMD_ERROR(string,string)> f){
+    return _guard1(vs,[f,this](vector<string> vs){
         auto vg=split(H4PAYLOAD,",");
         if(vg.size()<3){ 
             if(vg.size()>1) return ([f](string s1,string s2){ return f(s1,s2); })(vg[0],vg[1]);
@@ -143,12 +102,6 @@ uint32_t H4Plugin::guardString2(vector<string> vs,function<H4_CMD_ERROR(string,s
         }
         return H4_CMD_TOO_MANY_PARAMS;
     });
-}
-
-void H4Plugin::_startup(){
-    _commands.insert(_cmds.begin(),_cmds.end());
-    _cmds.clear();
-    h4cmd._hookLogChain(bind(&H4Plugin::_applyEventFilter,this,_1,_2,_3));
 }
 
 void H4Plugin::start() {
@@ -166,13 +119,11 @@ void H4Plugin::stop() {
 }
 
 void H4Plugin::_upHooks(){ 
-    SYSEVENT(H4P_EVENT_SVC_UP,_pName,"");
+    SEVENT(H4P_EVENT_SVC_UP,_pName,"");
     for(auto const& c:_connected) c();
 }
 
 void H4Plugin::_downHooks(){
     for(auto const& c:_disconnected) c();
-    SYSEVENT(H4P_EVENT_SVC_DOWN,_pName,"");
+    SEVENT(H4P_EVENT_SVC_DOWN,_pName,"");
 }
-
-//void H4PEventListener::_hookIn(){ h4cmd._hookLogChain(bind(&H4PEventListener::_filterEvent,this,_1,_2,_3)); }

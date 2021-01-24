@@ -28,19 +28,20 @@ SOFTWARE.
 */
 #include<H4P_Heartbeat.h>
 #include<H4P_WiFi.h>
+#include<H4P_EmitTick.h>
 
 uint32_t            H4P_Heartbeat::_uptime=0;
 
-void H4P_Heartbeat::_handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source) {
+void H4P_Heartbeat::_handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) {
     _uptime=STOI(msg);
     if(_f) _f(_uptime);
+    if(_pWiFi) _pWiFi->uiSync();
 };
 
 void H4P_Heartbeat::_hookIn() {
-    DEPEND(tick);
-    if(isLoaded(wifiTag())){
-        if(WiFi.getMode()==WIFI_STA) h4wifi._uiAdd(H4P_UIO_UP,"uptime",H4P_UI_LABEL,"",upTime);
-    }
+    depend<H4P_EmitTick>(this,H4PID_1SEC);
+    _pWiFi=h4pisloaded<H4P_WiFi>(H4PID_WIFI);
+    if(_pWiFi) _pWiFi->_uiAdd(H4P_UIO_UP,"Uptime",H4P_UI_LABEL,"",upTime); // cos we don't know it yet
     H4Plugin::_hookIn();
 }
 

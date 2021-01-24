@@ -43,13 +43,13 @@ void H4P_QueueWarn::pcent(uint32_t pc){
     show();
 }
 
-uint32_t H4P_QueueWarn::_qwPcent(vector<string> vs){ return guardInt1(vs,bind(&H4P_QueueWarn::pcent,this,_1)); }
+uint32_t H4P_QueueWarn::_qwPcent(vector<string> vs){ return _guardInt1(vs,bind(&H4P_QueueWarn::pcent,this,_1)); }
 //
 H4P_QueueWarn::H4P_QueueWarn(function<void(bool)> _f,uint32_t _limit): H4Plugin(H4PID_QWRN){
-    _cmds={
-        {_pName,     {H4PC_H4, _subCmd, nullptr}},
-        {"pcent",  {_subCmd,   0, CMDVS(_qwPcent)}}
-    };
+    _addLocals({
+        {_pName,     {H4PC_H4, _pid, nullptr}},
+        {"pcent",  {_pid,   0, CMDVS(_qwPcent)}}
+            });
     f=_f;  
     limit=__setLimit(_limit);
 }
@@ -60,7 +60,7 @@ void H4P_QueueWarn::_run(){ // optimise a la throttle
     if(qsize > maxq) maxq=qsize;
     bool state=qsize > limit;
     if(state ^ warned){
-        H4EVENT("Queue Warn %d %d",state,qsize);
+        PLOG("Queue Warn %d %d",state,qsize);
         f(state);
     }
     warned=state;

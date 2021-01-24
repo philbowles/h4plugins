@@ -27,23 +27,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_BinaryThing.h>
+#include<H4P_WiFi.h>
 #include<H4P_AsyncMQTT.h>
 
 void H4P_BinaryThing::_greenLight() {
-    if(isLoaded(wifiTag())){
+    _pWiFi=h4pisloaded<H4P_WiFi>(H4PID_WIFI);
+    _pMQTT=h4pisloaded<H4P_AsyncMQTT>(H4PID_MQTT);
+    if(_pWiFi){
         if(WiFi.getMode()==WIFI_STA) {
-            h4wifi._uiAdd(H4P_UIO_ONOF,onofTag(),H4P_UI_ONOF,"",[this]{ return stringFromInt(state()); });
-            if(isLoaded(mqttTag())) h4mqtt.hookConnect([this](){ h4mqtt.subscribeDevice("slave/#",CMDVS(_slave),H4PC_H4); });
+            _pWiFi->_uiAdd(H4P_UIO_ONOF,onofTag(),H4P_UI_ONOF,"",[this]{ return stringFromInt(state()); });
+            if(_pMQTT) _pMQTT->hookConnect([this](){ _pMQTT->subscribeDevice("slave/#",CMDVS(_slave),H4PC_H4); });
         }
     }
 }
 
-void H4P_BinaryThing::_publish(bool b){ if(isLoaded(mqttTag())) h4mqtt.publishDevice(stateTag(),b); }
+void H4P_BinaryThing::_publish(bool b){ if(_pMQTT) _pMQTT->publishDevice(stateTag(),b); }
 
 void H4P_BinaryThing::_setSlaves(bool b){
     for(auto s:_slaves){
         string t=s+"/h4/switch";
-        h4mqtt.xPublish(CSTR(t),stringFromInt(b));
+        _pMQTT->xPublish(CSTR(t),stringFromInt(b));
     }
 }
 
@@ -51,7 +54,7 @@ void H4P_BinaryThing::_setState(bool b) {
     _state=b;
     _cb[stateTag()]=stringFromInt(b);
     _setSlaves(b);
-    if(isLoaded(wifiTag())) h4wifi.uiSync();
+    if(_pWiFi) _pWiFi->uiSync();
 }
 
 uint32_t H4P_BinaryThing::_slave(vector<string> vs){
@@ -62,7 +65,7 @@ uint32_t H4P_BinaryThing::_slave(vector<string> vs){
     if(H4PAYLOAD_INT > 1) return H4_CMD_OUT_OF_BOUNDS;
     if(H4PAYLOAD_INT) _slaves.insert(vs[0]);
     else _slaves.erase(vs[0]);
-    H4EVENT("%s slave %s",H4PAYLOAD_INT ? "Added":"Removed",CSTR(vs[0]));
+    PLOG("%s slave %s",H4PAYLOAD_INT ? "Added":"Removed",CSTR(vs[0]));
     show();
     return H4_CMD_OK;
 }
@@ -73,7 +76,7 @@ void H4P_BinaryThing::_start() {
     turn(_state);
 }
 
-#ifdef H4P_LOG_EVENTS
+#if H4P_LOG_EVENTS
 void H4P_BinaryThing::_turn(bool b,const string& src){
     h4.cancelSingleton(H4P_TRID_BTTO);
     if(b && _timeout) h4.once(_timeout,[this](){ _turn(OFF,"btto"); },nullptr,H4P_TRID_BTTO,true);
@@ -81,7 +84,7 @@ void H4P_BinaryThing::_turn(bool b,const string& src){
         _setState(b);
         if(_f) _f(_state);
         _publish(_state);
-        SYSEVENT(H4P_EVENT_H4,src,"%s",(_state ? "ON":"OFF"));
+//        PLOG(H4P_EVENT_MSG,src,"%s",(_state ? "ON":"OFF"));
     }
 }
 void H4P_BinaryThing::turn(bool b){ _turn(b,userTag()); }
@@ -100,15 +103,15 @@ void H4P_BinaryThing::turn(bool b){
 //      H4P_ConditionalThing
 //
 void H4P_ConditionalThing::_hookIn() {
-    h4wifi._uiAdd(H4P_UIO_COND,conditionTag(),H4P_UI_BOOL,"",[this]{ return stringFromInt(_predicate(state())); });
+    _pWiFi->_uiAdd(H4P_UIO_COND,conditionTag(),H4P_UI_BOOL,"",[this]{ return stringFromInt(_predicate(state())); });
     H4P_BinaryThing::_hookIn();
 }
 
 void H4P_ConditionalThing:: _setState(bool b) { 
     if(_predicate(b)) H4P_BinaryThing::_setState(b);
-    else h4wifi.uiMessage("Unable: condition disarmed");
+    else _pWiFi->uiMessage("Unable: condition disarmed");
 }
 
-void H4P_ConditionalThing::syncCondition() { h4wifi._sendSSE(conditionTag(),CSTR(stringFromInt(_predicate(state())))); }
+void H4P_ConditionalThing::syncCondition() { _pWiFi->_sendSSE(conditionTag(),CSTR(stringFromInt(_predicate(state())))); }
 
 #endif

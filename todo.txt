@@ -1,7 +1,5 @@
 TODO:SOONER
     rationalise compile out events
-    convert gpio to eventlistenr for stats clearing
-    find any other 1 sec timers!
     js - type = password if n includes "pass"
     js - arrowfunctions
 SHORTTERM

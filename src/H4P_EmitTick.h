@@ -30,21 +30,17 @@ SOFTWARE.
 #pragma once
 
 #include<H4PCommon.h>
+#include<H4P_SerialCmd.h>
 
 class H4P_EmitTick: public H4Plugin {
             uint32_t    _uptime;
 
-                void        _hookIn() override { 
-                    h4._hookLoop([this](){ _run(); },_subCmd);
-                    H4Plugin::_hookIn();
-                }
-
-                void _run() {
+                void    _run() {
                     uint32_t now=millis();
                     uint32_t nowsec=now/1000;
                     if(!(now%1000) && nowsec!=_uptime) {
                         _uptime=nowsec;
-                        SYSEVENT(H4P_EVENT_HEARTBEAT,_pName,"%u",_uptime);
+                        PEVENT(H4P_EVENT_HEARTBEAT,"%u",_uptime);
                     }
                 }
     public: 
@@ -53,5 +49,9 @@ class H4P_EmitTick: public H4Plugin {
                 void    show() override {
                     H4Plugin::show();
                     reply("Uptime %u",_uptime);
+                }
+                void    _hookIn() override { 
+                    h4._hookLoop([this](){ _run(); },_pid);
+                    H4Plugin::_hookIn();
                 }
 };

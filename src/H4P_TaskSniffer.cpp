@@ -30,8 +30,8 @@ SOFTWARE.
 #include<H4P_SerialCmd.h>
 
 uint32_t H4P_TaskSniffer::__incexc(vector<string> vs,function<void(vector<uint32_t>)> f){
-    return guard1(vs,[f,this](vector<string> vs){
-        auto vi=expectInt(H4PAYLOAD);
+    return _guard1(vs,[f,this](vector<string> vs){
+        auto vi=_expectInt(H4PAYLOAD);
         if(vi.size()) return ([f,this](vector<uint32_t> vu){ 
             f(vu);
             show(); 
@@ -39,7 +39,7 @@ uint32_t H4P_TaskSniffer::__incexc(vector<string> vs,function<void(vector<uint32
         })(vi);
         else {
             if((H4PAYLOAD).find_first_of("-")!=string::npos){
-                vector<uint32_t> range=expectInt(H4PAYLOAD,"-");
+                vector<uint32_t> range=_expectInt(H4PAYLOAD,"-");
                 if(range.size()==2 && range[0]<range[1]){
                     range[1]=std::min(range[1],(uint32_t) 99);
                     vector<uint32_t> expanded;
@@ -54,18 +54,18 @@ uint32_t H4P_TaskSniffer::__incexc(vector<string> vs,function<void(vector<uint32
 }
 
 void H4P_TaskSniffer::_common(){
-    _cmds={
-        {_pName,      {H4PC_H4, _subCmd, nullptr}},
-        {"include", {_subCmd, 0, CMDVS(_tsInclude)}},
-        {"exclude", {_subCmd, 0, CMDVS(_tsExclude)}}
-    };
+    _addLocals({
+        {_pName,      {H4PC_H4, _pid, nullptr}},
+        {"include", {_pid, 0, CMDVS(_tsInclude)}},
+        {"exclude", {_pid, 0, CMDVS(_tsExclude)}}
+            });
     h4._hookEvent(bind(&H4P_TaskSniffer::_taskDump,this,_1,_2));    
 }
 
 void H4P_TaskSniffer::_taskDump(H4_TASK_PTR t,const char c){
     if(hitList.count((t->uid)%100)) {
         reply("%d:%u:%c: ",h4.size(),micros(),c);
-#ifdef H4P_LOG_EVENTS        
+#if H4P_LOG_EVENTS        
         reply(CSTR(H4P_SerialCmd::_dumpTask(t)));
 #endif
     }

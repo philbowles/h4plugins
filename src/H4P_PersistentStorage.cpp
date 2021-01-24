@@ -31,36 +31,31 @@ SOFTWARE.
 
 #define SEPARATOR "\xff"
 
-void H4P_PersistentStorage::_handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source) {
-    switch(type){
-        case H4P_EVENT_FACTORY:
-            Serial.printf("%s H4P_EVENT_FACTORY src=%s msg=%s\n",CSTR(_pName),CSTR(source),CSTR(msg));
+void H4P_PersistentStorage::_handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) {
+//    switch(t){
+//        case H4P_EVENT_FACTORY:
+            Serial.printf("%s H4P_EVENT_FACTORY src=%d msg=%s\n",CSTR(_pName),pid,CSTR(msg));
             clear();
-            break;
-        default:
-            Serial.printf("WTF? EVENT t=%d src=%s *%s*\n",type,CSTR(source),CSTR(msg));
-            break;
-    }
+//            break;
+//    }
 }
 
 void H4P_PersistentStorage::_hookIn() {
     vector<string> items=split(H4P_SerialCmd::read("/"+_pName),SEPARATOR);
     for(auto const& i:items){
         vector<string> nv=split(i,"=");
-//        psRam[nv[0]]=nv[1];
         psRam[nv[0]]=nv.size() > 1 ? nv[1]:""; // thanks hamzah :)
     }
     H4Plugin::_hookIn();
 }
 
-H4P_PersistentStorage::H4P_PersistentStorage(H4P_FN_PSCHANGE f): _f(f), H4Plugin(H4PID_STOR){
-    _eventFilter=H4P_EVENT_FACTORY;
-    _cmds={
-        {_pName,    { H4PC_H4, _subCmd, nullptr}},
-        {"clear",   { _subCmd, 0, CMD(clear)}},
-        {"get",     { _subCmd, 0, CMDVS(_get)}},
-        {"set",     { _subCmd, 0, CMDVS(_set)}}
-    };
+H4P_PersistentStorage::H4P_PersistentStorage(H4P_FN_PSCHANGE f): _f(f), H4Plugin(H4PID_STOR,H4P_EVENT_FACTORY){
+    _addLocals({
+        {_pName,    { H4PC_H4, _pid, nullptr}},
+        {"clear",   { _pid, 0, CMD(clear)}},
+        {"get",     { _pid, 0, CMDVS(_get)}},
+        {"set",     { _pid, 0, CMDVS(_set)}}
+            });
 }
 
 void  H4P_PersistentStorage::setstring(const string& name,const string& value){
@@ -71,13 +66,13 @@ void  H4P_PersistentStorage::setstring(const string& name,const string& value){
         for(auto const& p:psRam) items+=p.first+"="+p.second+SEPARATOR;
         items.pop_back();
         H4P_SerialCmd::write("/"+_pName,items);
-        H4EVENT("PS item %s now=%s",CSTR(name),CSTR(value));
+        PLOG("PS item %s now=%s",CSTR(name),CSTR(value));
         if(_f) _f(name,value);
     }
 }
 
 uint32_t H4P_PersistentStorage::_get(vector<string> vs){
-    return H4Plugin::guard1(vs,[this](vector<string> vs){
+    return H4Plugin::_guard1(vs,[this](vector<string> vs){
         if(psRam.count(H4PAYLOAD)) {
             _showItem(H4PAYLOAD);
             return H4_CMD_OK;
@@ -86,7 +81,7 @@ uint32_t H4P_PersistentStorage::_get(vector<string> vs){
 }
 
 uint32_t H4P_PersistentStorage::_set(vector<string> vs){
-    return guardString2(vs,[this](string a,string b){ 
+    return _guardString2(vs,[this](string a,string b){ 
         setstring(a,b);
         _showItem(a); //
         return H4_CMD_OK;

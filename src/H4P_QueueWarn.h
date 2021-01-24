@@ -43,11 +43,11 @@ class H4P_QueueWarn: public H4Plugin {
 
         void            _run();
         void            _start() override {
-            h4._hookLoop([this](){ _run(); },_subCmd);
+            h4._hookLoop([this](){ _run(); },_pid);
             H4Plugin::_start();
         }
         void            _stop() override {
-            h4._unHook(_subCmd);
+            h4._unHook(_pid);
             H4Plugin::_stop();
         }
     public:

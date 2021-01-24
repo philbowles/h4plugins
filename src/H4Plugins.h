@@ -44,6 +44,8 @@
     H4 h4(s,q); \
     std::map<uint32_t,H4Plugin*> h4pmap; \
     H4_CMD_MAP          H4Plugin::_commands; \
-    H4P_SerialCmd       h4cmd(b); \
-    H4GM_PINMAP         H4P_GPIOManager::pins; 
-    H4P_CONFIG_BLOCK    H4Plugin::_cb{};
+    H4P_SerialCmd       h4cmd(b);
+
+H4P_EVENT_HANDLERS  h4pevt;
+H4GM_PINMAP         H4P_GPIOManager::pins; 
+H4P_CONFIG_BLOCK    H4Plugin::_cb{};

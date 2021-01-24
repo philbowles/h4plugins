@@ -33,7 +33,7 @@ SOFTWARE.
 
 class H4P_EmitHeap: public H4Plugin {
         uint32_t _f;
-        void _start() override { h4.every(_f,[this](){ SYSEVENT(H4P_EVENT_HEAP,_pName,"%u",ESP.getFreeHeap()); },nullptr,H4P_TRID_HLOG,true); }
+        void _start() override { h4.every(_f,[this](){ PEVENT(H4P_EVENT_HEAP,"%u",ESP.getFreeHeap()); },nullptr,H4P_TRID_HLOG,true); }
         void _stop() override { h4.cancelSingleton(H4P_TRID_HLOG); }
     public:
         H4P_EmitHeap(uint32_t f=1000): _f(f),H4Plugin(H4PID_HEAP){}

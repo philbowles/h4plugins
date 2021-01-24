@@ -27,26 +27,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_BinarySwitch_HO
-#define H4P_BinarySwitch_HO
+#pragma once
 
 #include<H4P_GPIOManager.h>
 #include<H4P_BinaryThing.h>
+
+class H4P_WiFi;
 class H4P_BinarySwitch: public H4P_BinaryThing{
-//
+            uint8_t         _pin;
+            H4GM_SENSE      _sense;
+            uint32_t        _initial;
     protected:
         OutputPin*          _pp;
         virtual void        _setState(bool b) override { 
             H4P_BinaryThing::_setState(b);
             _pp->logicalWrite(_state);
         }
+        void                _hookIn() override;
     public:
-        H4P_BinarySwitch(uint8_t pin,H4GM_SENSE sense, uint32_t initial,H4BS_FN_SWITCH f=nullptr,uint32_t timer=0): H4P_BinaryThing(f,initial,timer){
-            _pp=h4gm.Output(pin,sense,initial,[](H4GPIOPin* ptr){});
-        }
+        H4P_BinarySwitch(uint8_t pin,H4GM_SENSE sense, uint32_t initial,H4BS_FN_SWITCH f=nullptr,uint32_t timer=0):
+            _pin(pin),
+            _sense(sense),
+            _initial(initial),
+            H4P_BinaryThing(f,initial,timer){}
 };
 
 class H4P_ConditionalSwitch: public H4P_BinarySwitch{
+        H4P_WiFi*           _pWiFi;
         H4_FN_CPRED _predicate;
     protected:
         virtual void        _setState(bool b) override;
@@ -61,5 +68,3 @@ class H4P_ConditionalSwitch: public H4P_BinarySwitch{
             H4P_BinarySwitch::show();
         }
 };
-
-#endif // H4P_BinarySwitch_H

@@ -29,15 +29,14 @@ SOFTWARE.
 #include<H4P_LocalLogger.h>
 #include <H4P_SerialCmd.h>
 
-H4P_LocalLogger::H4P_LocalLogger(uint32_t limit,uint32_t filter):  _limit(limit), H4Plugin(H4PID_LLOG) {
-    _eventFilter=filter | H4P_EVENT_FACTORY;
-    _fname=string(logTag())+".csv";
-    _cmds={
-        {_pName,   {H4PC_H4, _subCmd, nullptr}},
-        {msgTag(), {_subCmd, 0, CMDNULL}},
-        {"clear",  {_subCmd, 0, CMD(clear)}},
-        {"flush",  {_subCmd, 0, CMD(flush)}}
-    };
+H4P_LocalLogger::H4P_LocalLogger(uint32_t limit,uint32_t filter):  _limit(limit), H4Plugin(H4PID_LLOG,filter | H4P_EVENT_FACTORY) {
+    _fname="log.csv";
+    _addLocals({
+        {_pName,   {H4PC_H4, _pid, nullptr}},
+        {"msg",    {_pid, 0, CMDNULL}},
+        {"clear",  {_pid, 0, CMD(clear)}},
+        {"flush",  {_pid, 0, CMD(flush)}}
+            });
 }
 
 void H4P_LocalLogger::clear(){ HAL_FS.remove(CSTR(string("/"+_fname))); }
@@ -58,7 +57,7 @@ void H4P_LocalLogger::show(){
 void H4P_LocalLogger::_handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source){
     if(type==H4P_EVENT_FACTORY) clear();
     else {
-        vector<string> msgparts={stringFromInt(millis()),h4cmd._getEventName(type),source,msg};
+        vector<string> msgparts={stringFromInt(millis()),h4pgetEventName(type),source,msg};
         uint32_t size=h4cmd.write("/"+_fname,join(msgparts,",")+"\n","a");
         if(size > _limit) flush();
     }
