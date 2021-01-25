@@ -58,4 +58,4 @@ class H4P_PersistentStorage: public H4Plugin {
         void          show() override { for(auto const& p:psRam) _showItem(p.first); }
 };
 
-extern __attribute__((weak)) H4P_PersistentStorage h4ps;
+//extern __attribute__((weak)) H4P_PersistentStorage h4ps;

@@ -32,8 +32,11 @@ extern void h4FactoryReset(const string& src);
 
 H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Plugin(H4PID_CMD,H4P_EVENT_MSG){
     _addLocals({
-        {h4Tag(),      { 0, H4PC_H4, nullptr}},
-        {"help",       { 0, 0, CMD(help) }},
+        {h4Tag(),      { 0,         H4PC_H4, nullptr}},
+        {"help",       { 0,         0, CMD(help) }},
+#if SANITY
+        {"sanity",     { 0,         0, CMD(h4psanitycheck) }},
+#endif
         {"event",      { H4PC_H4,   0, CMDVS(_event) }}, // dangerous!!!
         {"reboot",     { H4PC_H4,   0, CMD(h4reboot) }},
         {"factory",    { H4PC_H4,   0, ([this](vector<string>){ h4FactoryReset(_cb[srcTag()]); return H4_CMD_OK; }) }},
@@ -76,7 +79,7 @@ uint32_t H4P_SerialCmd::_dispatch(vector<string> vs,uint32_t owner=0){
         string cmd=vs[0];
         i=__exactMatch(cmd,owner);
         if(i!=_commands.end()){
-            if(i->second.fn) return (bind(i->second.fn,CHOP_FRONT(vs)))();
+            if(i->second.fn) return [=](){ return i->second.fn(CHOP_FRONT(vs)); }();
             else return _dispatch(CHOP_FRONT(vs),i->second.levID);
         } else return H4_CMD_UNKNOWN;
     } else return H4_CMD_UNKNOWN;
@@ -88,13 +91,12 @@ uint32_t H4P_SerialCmd::_executeCmd(string topic, string pload){
 	vs.push_back(pload);
     vector<string> cmd(vs.begin()+2,vs.end());
     #if H4P_LOG_EVENTS
-       PEVENT(H4P_EVENT_CMD,"%s %s",CSTR(vs[0]),CSTR(join(cmd,"/")));
+        PEVENT(H4P_EVENT_CMD,"%s %s",CSTR(vs[0]),CSTR(join(cmd,"/")));
     #endif	
     uint32_t rv=_dispatch(vector<string>(cmd)); // optimise?
     #if H4P_LOG_EVENTS
-//        if(rv) _logger(_getErrorMessage(rv),,vs[0]);
         PEVENT(H4P_EVENT_CMDREPLY,"%s",CSTR(h4pgetErrorMessage(rv)));
-   #endif
+    #endif
     return rv;
 }
 
@@ -119,10 +121,10 @@ void H4P_SerialCmd::_run(){
 	static int	c;
     if((c=Serial.read()) != -1){
         if (c == '\n') {
-            h4.queueFunction(bind([this](string cmd){
+            h4.queueFunction([this,cmd](){
                 uint32_t err=_simulatePayload(cmd);
                 if(err) reply("%s\n",CSTR(h4pgetErrorMessage(err)));
-            },cmd),nullptr,H4P_TRID_SCMD);
+            },nullptr,H4P_TRID_SCMD);
             cmd="";
         } else cmd+=c;
     }
@@ -134,7 +136,7 @@ uint32_t H4P_SerialCmd::_simulatePayload(string flat,const char* src){ // refac
 		string pload=CSTR(H4PAYLOAD);
 		vs.pop_back();
 		string topic=join(vs,"/");
-		return invokeCmd(topic,pload,src);			
+		return invokeCmd(topic,pload,src); // _invoke
 	} else return H4_CMD_TOO_FEW_PARAMS;
 }
 //

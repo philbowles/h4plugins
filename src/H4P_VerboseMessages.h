@@ -62,7 +62,9 @@ class H4P_VerboseMessages: public H4Plugin {
             {H4P_EVENT_REBOOT,"REBOOT"},
             {H4P_EVENT_FACTORY,"FACTORY"},
             {H4P_EVENT_CMDREPLY,"CMDREPLY"},
-            {H4P_EVENT_DLL,"DYNLOAD"},
+            {H4P_EVENT_DLL,"DLL"},
+            {H4P_EVENT_ON,"ON"},
+            {H4P_EVENT_OFF,"OFF"},
             {H4P_EVENT_HEARTBEAT,"PING"}
         };
 
@@ -124,6 +126,6 @@ class H4P_VerboseMessages: public H4Plugin {
         }
 
         string getTaskName(uint32_t e){
-            return uppercase(taskNames.count(e) ? taskNames[e]:giveTaskName(e));
+            return taskNames.count(e) ? taskNames[e]:giveTaskName(e);
         }
 };

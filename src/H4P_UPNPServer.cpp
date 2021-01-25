@@ -32,9 +32,9 @@ SOFTWARE.
 void H4P_UPNPServer::_handleEvent(H4PID pid,H4P_EVENT_TYPE type,const string &msg){ _pWiFi->_wipe(nameTag()); }
 
 void H4P_UPNPServer::_hookIn(){
-    _pWiFi=depend<H4P_WiFi>(this,H4PID_WIFI);
-    _btp=depend<H4P_BinaryThing>(this,H4PID_ONOF);
-    string dn=uppercase(h4Tag())+" "+deviceTag()+" ";
+    _pWiFi=h4pdepend<H4P_WiFi>(this,H4PID_WIFI);
+    _btp=h4pdepend<H4P_BinaryThing>(this,H4PID_ONOF);
+    string dn=string(h4Tag())+" "+deviceTag()+" ";
     if(!_pWiFi->_getPersistentValue(nameTag(),dn)) if(_name!="") _cb[nameTag()]=_name;
     PLOG("UPNP name %s",CSTR(_cb[nameTag()]));
     _pWiFi->_uiAdd(H4P_UIO_NAME,"name",H4P_UI_LABEL,"",[]{ return _cb[nameTag()]; }); // cos we don't know it yet
@@ -59,9 +59,9 @@ uint32_t H4P_UPNPServer::_friendly(vector<string> vs){
 }
 
 void H4P_UPNPServer::__upnpSend(uint32_t mx,const string s,IPAddress ip,uint16_t port){
-	h4.nTimesRandom(H4P_UDP_REPEAT,0,mx,bind([this](IPAddress ip,uint16_t port,string s) {
+	h4.nTimesRandom(H4P_UDP_REPEAT,0,mx,[=,this]() {
 		_udp.writeTo((uint8_t *)CSTR(s), s.size(), ip, port);
-	},ip,port,s),nullptr,H4P_TRID_UDPS); // name this!!
+	},nullptr,H4P_TRID_UDPS); // name this!!
 }
 
 void H4P_UPNPServer::_handlePacket(string p,IPAddress ip,uint16_t port){
@@ -84,7 +84,7 @@ void H4P_UPNPServer::_handlePacket(string p,IPAddress ip,uint16_t port){
             }
         } else Serial.printf("TiNY BLOCK Nh=%d\n",hdrs.size()); 
 
-        if(_detect.size()) Serial.printf("DETECT CORRUPTION 2 sz=%d\n",_detect.size());
+//        if(_detect.size()) Serial.printf("DETECT CORRUPTION 2 sz=%d\n",_detect.size());
         uint32_t mx=1000 * atoi(CSTR(replaceAll(uhdrs["CACHE-CONTROL"],"max-age=","")));
         if (p[0] == 'M') { //-SEARCH
             string ST = uhdrs["ST"];
@@ -94,13 +94,15 @@ void H4P_UPNPServer::_handlePacket(string p,IPAddress ip,uint16_t port){
             }
         }
         else {
-            if(_detect.size()) Serial.printf("DETECT CORRUPTION 3 sz=%d\n",_detect.size());
+//            if(_detect.size()) Serial.printf("DETECT CORRUPTION 3 sz=%d\n",_detect.size());
             if (p[0] == 'N') { //OTIFY
                 for(auto const& d:_detect){
-                    Serial.printf(" WILL NEVER SEE!!! %s sz=%d [DET sz=%d]\n",CSTR(p),p.size(),_detect.size());
-                    for (auto const &h :uhdrs) Serial.printf("UH: %s=%s\n",CSTR(h.first),CSTR(h.second));
+//                    for (auto const &h :uhdrs) Serial.printf("UH: %s=%s\n",CSTR(h.first),CSTR(h.second));
                     string tag=d.first;
-                    if(uhdrs.count(tag) && uhdrs[tag].find(d.second.first)!=string::npos) d.second.second(mx,uhdrs,uhdrs["NTS"].find(aliveTag())!=string::npos);
+                    if(uhdrs.count(tag) && uhdrs[tag].find(d.second.first)!=string::npos){
+                        Serial.printf("DETECT! %s sz=%d [DET sz=%d]\n",CSTR(p),p.size(),_detect.size());
+                        d.second.second(mx,uhdrs,uhdrs["NTS"].find(aliveTag())!=string::npos);
+                    }
                 }
             }
         }
@@ -165,7 +167,7 @@ void H4P_UPNPServer::_start(){
 }
 
 void H4P_UPNPServer::_upnp(AsyncWebServerRequest *request){ // redo
-  h4.queueFunction(bind([this](AsyncWebServerRequest *request) {
+  h4.queueFunction([=,this]() {
         string soap=stringFromBuff((const byte*) request->_tempObject,strlen((const char*) request->_tempObject));
         _cb["gs"]=(soap.find("Get")==string::npos) ? "Set":"Get";
         uint32_t _set=soap.find(">1<")==string::npos ? 0:1;
@@ -176,7 +178,7 @@ void H4P_UPNPServer::_upnp(AsyncWebServerRequest *request){ // redo
 #endif
 //        _cb[stateTag()]=stringFromInt(_btp->state());
         request->send(200, "text/xml", CSTR(replaceParams(_soap))); // refac
-    },request),nullptr, H4P_TRID_SOAP);
+    },nullptr, H4P_TRID_SOAP);
 }
 
 void H4P_UPNPServer::_stop(){
@@ -190,7 +192,7 @@ void H4P_UPNPServer::_notify(const string& phase){ // h4Chunker it up
     h4Chunker<vector<string>>(_pups,[this,phase](vector<string>::const_iterator i){ 
         string NT=(*i).size() ? (*i):__makeUSN("");
         string nfy="NOTIFY * HTTP/1.1\r\nHOST:"+string(_ubIP.toString().c_str())+":1900\r\nNTS:ssdp:"+phase+"\r\nNT:"+NT+"\r\n"+__upnpCommon((*i));
-        broadcast(H4P_UDP_JITTER,CSTR(nfy));
+        _broadcast(H4P_UDP_JITTER,CSTR(nfy));
     });
 }
 

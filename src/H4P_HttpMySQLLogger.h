@@ -77,7 +77,7 @@ class H4P_HttpMySQLLogger: public H4Plugin, public asyncHTTPrequest {
                 sprintf(buf,"device=%s&msg=%s&type=%d&source=%d&seq=%u",CSTR(_cb[deviceTag()]),CSTR(msg),type,pid,_logseq++);
                 setReqHeader("Content-Type","application/x-www-form-urlencoded");
                 send(buf);
-            } else h4.once(H4P_MYSQL_HOLDOFF,bind(&H4P_HttpMySQLLogger::_handleEvent,this,pid,type,msg),nullptr,H4P_TRID_MLRQ);
+            } else h4.once(H4P_MYSQL_HOLDOFF,[=,this](){ _handleEvent(pid,type,msg); },nullptr,H4P_TRID_MLRQ);
         }
 
         void _greenLight() override {} // prevetn autostart - wait until wifi up
@@ -87,9 +87,9 @@ class H4P_HttpMySQLLogger: public H4Plugin, public asyncHTTPrequest {
             _fail(fnFail),ip(ipaddress),H4Plugin(H4PID_SQLL,filter){}
             
         void _hookIn() override { // protect
-            depend<H4P_WiFi>(this,H4PID_WIFI);
+            h4pdepend<H4P_WiFi>(this,H4PID_WIFI);
 //            setDebug(true);
-            onReadyStateChange(bind(&H4P_HttpMySQLLogger::_requestCB,this,_1,_2,_3));
+            onReadyStateChange( [this](void* && a,asyncHTTPrequest* && b,int  && c){ _requestCB(a,b,c); });
             H4Plugin::_hookIn();
         }
 };

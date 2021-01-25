@@ -57,7 +57,7 @@ class H4P_EmitLoopCount: public H4Plugin {
             };
 
             void _hookIn() {
-                depend<H4P_EmitTick>(this,H4PID_1SEC);
+                h4pdepend<H4P_EmitTick>(this,H4PID_1SEC);
                 H4Plugin::_hookIn();
             }
 

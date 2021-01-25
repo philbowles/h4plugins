@@ -1,9 +1,9 @@
 TODO:SOONER
+pd lockut upnp. add uh[] infor to msg
+
+unbind my heart
+    realign KW
 check optional depend / reuire etc
-kill ucase/lcase specifics
-    rationalise compile out events ***************** 
-    js - type = password if n includes "pass"
-    js - arrowfunctions
 SHORTTERM
     //getstartingheap
     H4_TIMER from at,daily
@@ -12,6 +12,8 @@ SHORTTERM
     ps discard(x)
     jitter on loggers freq
 MEDIUMTERM
+    js - type = password if n includes "pass"
+    js - arrowfunctions
     total event / reaction cmd model - major update
     passthru ap config params in ctor
 #    upnp grid :)

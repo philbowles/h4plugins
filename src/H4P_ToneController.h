@@ -82,7 +82,7 @@ class H4P_Voice {
         void         rest(const char duration){ play(string("R  ").append(1,duration).append(1,' ')); }
 };
 
-extern __attribute__((weak)) H4P_ToneController h4tc;
+//extern __attribute__((weak)) H4P_ToneController h4tc;
 
 #define H4P_sirenBuzz(p,d) h4tc.siren(H4P_SIREN_BUZZ,p,d)
 #define H4P_sirenChirp(p,d) h4tc.siren(H4P_SIREN_CHIRP,p,d)

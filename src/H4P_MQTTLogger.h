@@ -38,7 +38,7 @@ class H4P_MQTTLogger: public H4Plugin {
         void _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source){ _pMQTT->publishDevice(_topic,msg); }
     protected:
         virtual void _hookIn() override {
-            _pMQTT=depend<H4P_AsyncMQTT>(this,H4PID_MQTT);
+            _pMQTT=h4pdepend<H4P_AsyncMQTT>(this,H4PID_MQTT);
             H4Plugin::_hookIn();
         }
         virtual void _greenLight() override {} // dont autostart

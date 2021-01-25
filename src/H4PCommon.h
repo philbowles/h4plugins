@@ -103,7 +103,6 @@ enum H4PID {
     H4PID_LOOP, // 10
     H4PID_ONOF,
     H4PID_QWRN,
-    H4PID_SLOG, // 13
     H4PID_SNIF,
     H4PID_STOR, // 15
     H4PID_TONE,
@@ -143,11 +142,11 @@ enum H4P_EVENT_TYPE:uint32_t {
     H4P_EVENT_FACTORY   = 1 << 12,
     H4P_EVENT_CMDREPLY  = 1 << 13,
     H4P_EVENT_DLL       = 1 << 14,
+    H4P_EVENT_ON        = 1 << 15,
+    H4P_EVENT_OFF       = 1 << 16,
     H4P_EVENT_HEARTBEAT=0x80000000,
     H4P_EVENT_ALL=0x7fffffff
 };
-
-#define H4P_EVENT_BUFFER        256 // hoist
 
 using H4P_FN_EVENTHANDLER = function<void(H4PID pid,H4P_EVENT_TYPE t,const string& msg)>;
 using H4P_EVENT_LISTENER  = pair<H4PID,H4P_FN_EVENTHANDLER>;
@@ -174,7 +173,9 @@ string h4pgetTaskName    (uint32_t e);
 //
 void h4FactoryReset(const string& src=userTag());
 
-void h4pevtdump();
+#if SANITY
+void h4psanitycheck();
+#endif
 
 using 	H4_FN_MSG 		=function<uint32_t(vector<string>)>;
 using   H4BS_FN_SWITCH  =function<void(bool)>;
@@ -306,8 +307,8 @@ class H4Plugin {
                 bool                _up=false;
                 
                 void                _envoi(const string& s);
-    protected:
                 uint32_t            _eventFilter=H4P_EVENT_NOOP;
+    protected:
         static  H4_CMD_MAP          _commands;
                 bool                _discoDone=false;
 
@@ -321,15 +322,7 @@ class H4Plugin {
         virtual void                _restart(){ stop();start(); }
         virtual void                _start() { _upHooks(); }
         virtual void                _stop() { _downHooks(); }
-                string              _uniquify(const string& name,uint32_t uqf=0){
-                    string tmp=name+(uqf ? stringFromInt(uqf):"");
-                    Serial.printf("testing %s\n",CSTR(tmp));
-                    if(h4pptrfromtxt(tmp)) return _uniquify(name,uqf+1);
-                    else {
-                        Serial.printf("returning %s\n",CSTR(tmp));
-                        return tmp;
-                    }
-                }
+                string              _uniquify(const string& name,uint32_t uqf=0);
     public:
         static  H4P_CONFIG_BLOCK    _cb;
                 H4PID               _pid;
@@ -338,16 +331,13 @@ class H4Plugin {
 //      statics
 //
         H4Plugin(const string name,uint32_t filter=H4P_EVENT_NOOP,H4_FN_VOID svcUp=nullptr,H4_FN_VOID svcDown=nullptr): _eventFilter(filter){
-            string uniquename=_uniquify(uppercase(name),0);
+            string uniquename=_uniquify(name,1);
             H4PID pid=static_cast<H4PID>(h4pnames.size());
             h4pnames.push_back(uniquename);
-            Serial.printf("%s synth _pid=%d\n",CSTR(uniquename),pid);
             _init(pid,svcUp,svcDown);
         }
 
-        H4Plugin(H4PID pid,uint32_t filter=H4P_EVENT_NOOP,H4_FN_VOID svcUp=nullptr,H4_FN_VOID svcDown=nullptr): _eventFilter(filter){
-            _init(pid,svcUp,svcDown);
-        }
+        H4Plugin(H4PID pid,uint32_t filter=H4P_EVENT_NOOP,H4_FN_VOID svcUp=nullptr,H4_FN_VOID svcDown=nullptr): _eventFilter(filter){ _init(pid,svcUp,svcDown); }
 //
         static  string      getConfig(const string& c){ return _cb[c]; }
         static  int         getConfigInt(const string& c){ return STOI(_cb[c]); }
@@ -382,20 +372,14 @@ class H4Plugin {
 };
 
 template<typename T>
-T* h4pisloaded(H4PID p){
-    Serial.printf("Is %d %s Loaded? 0x%08x\n",p,CSTR(h4pnames[p]),h4pmap.count(p) ? (void*) h4pmap[p]:nullptr);
-    return h4pmap.count(p) ? reinterpret_cast<T*>(h4pmap[p]):nullptr; 
-}
+T* h4pisloaded(H4PID p){ return h4pmap.count(p) ? reinterpret_cast<T*>(h4pmap[p]):nullptr; }
 
 void h4pdll(H4Plugin* dll);
 
 template<typename T,typename... Args>
-T* require(H4PID p,Args... args){
+T* h4prequire(H4PID p,Args... args){
     T* test=h4pisloaded<T>(p);
-    if(test) {
-        Serial.printf("pid=%d 0x%08x already loaded\n",p,(void*) test);
-        return test;
-    }
+    if(test) return test;
     auto dll=new T(args...);
     h4pdll(dll);
     return dll;
@@ -404,9 +388,9 @@ T* require(H4PID p,Args... args){
 void h4pupcall(H4Plugin* me,H4Plugin* ptr);
 
 template<typename T,typename... Args>
-T* depend(H4Plugin* me,H4PID p,Args... args){
+T* h4pdepend(H4Plugin* me,H4PID p,Args... args){
     SEVENT(H4P_EVENT_DLL,"%s->%s",CSTR(me->_pName),CSTR(h4pnames[p]));
-    T* ptr=require<T>(p,args...);
+    T* ptr=h4prequire<T>(p,args...);
     h4pupcall(me,ptr);
     return ptr;
 }

@@ -67,7 +67,7 @@ class H4P_UPNPServer: public H4Plugin {
                 string          __upnpCommon(const string& usn);
                 void            __upnpSend(uint32_t mx,const string s,IPAddress ip,uint16_t port);
 
-                void            broadcast(uint32_t mx,const string s){ __upnpSend(mx,s,_ubIP,1900); }
+                void            _broadcast(uint32_t mx,const string s){ __upnpSend(mx,s,_ubIP,1900); }
                 void            _handleEvent(H4PID pid,H4P_EVENT_TYPE type,const string &msg) override;
                 void            _handlePacket(string p,IPAddress ip,uint16_t port);
                 void            _listenUDP();
@@ -100,10 +100,11 @@ class H4P_UPNPServer: public H4Plugin {
     //                 for(auto const& o:_otherH4s) reply(CSTR(o));
                 }
 //          _syscall only
-             void           _listenTag(const string& tag,const string& value,H4P_FN_TAGMATCH f){ _detect[tag]=make_pair(value,f); }
-             void           _listenUSN(const string& usn,H4P_FN_TAGMATCH f){ _listenTag("USN",usn,f); }
-// syscall only
+             void           _listenTag(const string& tag,const string& value,H4P_FN_TAGMATCH f){
+                 PLOG("listen TAG %s=%s\n",CSTR(tag),CSTR(value));
+                 _detect[tag]=make_pair(value,f);
+            }
              void            _hookIn() override;
 };
 
-extern __attribute__((weak)) H4P_UPNPServer h4upnp;
+//extern __attribute__((weak)) H4P_UPNPServer h4upnp;

@@ -30,11 +30,6 @@ SOFTWARE.
 #pragma once
 
 #include<H4PCommon.h>
-//#include<H4P_SerialCmd.h>
-//#include<H4P_WiFi.h>
-//#include<H4P_AsyncMQTT.h>
-
-using namespace std::placeholders;
 
 class H4P_WiFi;
 class H4P_AsyncMQTT;
@@ -42,14 +37,14 @@ class H4P_AsyncMQTT;
 STAG(condition);
 
 class H4P_BinaryThing: public H4Plugin{
-            H4P_WiFi*               _pWiFi;
-            H4P_AsyncMQTT*          _pMQTT;
             uint32_t                _timeout;
             unordered_set<string>   _slaves;
     protected:
+            H4P_WiFi*               _pWiFi;
+            H4P_AsyncMQTT*          _pMQTT;
             H4BS_FN_SWITCH  _f;
 
-                    uint32_t _autoOff(vector<string> vs){ return _guardInt1(vs,bind(&H4P_BinaryThing::autoOff,this,_1)); }
+                    uint32_t _autoOff(vector<string> vs){ return _guardInt1(vs,[this](uint32_t t){ autoOff(t); }); }
 
             virtual void     _greenLight() override ;
                     void     _publish(bool b);
@@ -57,7 +52,7 @@ class H4P_BinaryThing: public H4Plugin{
             virtual void     _setState(bool b);
                     uint32_t _slave(vector<string> vs);
                     void     _start() override;
-                    uint32_t _switch(vector<string> vs){ return _guardInt1(vs,bind(&H4P_BinaryThing::turn,this,_1)); }
+                    uint32_t _switch(vector<string> vs){ return _guardInt1(vs,[this](bool b){ turn(b); }); }
     public:
             bool            _state=false;
         H4P_BinaryThing(H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): _f(f),_state(initial),_timeout(timer), H4Plugin(H4PID_ONOF) {
@@ -74,7 +69,7 @@ class H4P_BinaryThing: public H4Plugin{
 
         virtual void show() override { 
                 reply("State:%d, auto:%d",_state,_timeout);
-                for(auto s :_slaves) reply("slave: %s",CSTR(s));
+                for(auto s:_slaves) reply("slave: %s",CSTR(s));
             }
 
                     uint32_t getAutoOff(){ return _timeout; }
@@ -82,7 +77,10 @@ class H4P_BinaryThing: public H4Plugin{
                         _timeout=T;
                         _cb[autoTag()]=stringFromInt(T);
                     }
-                    void     slave(const string& otherh4){ _slaves.insert(otherh4); }
+                    void     slave(const string& otherh4,bool inout=true){ 
+                        if(inout) _slaves.insert(otherh4);
+                        else _slaves.erase(otherh4);
+                        }
                     bool     state() { return _state; }
                     void     turnOff(){ turn(false); }
                     void     turnOn(){ turn(true); }

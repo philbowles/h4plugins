@@ -32,8 +32,6 @@ SOFTWARE.
 #include<H4PCommon.h>
 #include<H4P_VerboseMessages.h>
 
-using  namespace std::placeholders;
-
 enum H4P_SVC_CONTROL {
     H4PSVC_RESTART,
     H4PSVC_STATE,
@@ -44,9 +42,7 @@ enum H4P_SVC_CONTROL {
 using H4P_FN_EVENT      = function<void(const string &msg,H4P_EVENT_TYPE type,const string& source)>;
 using H4P_FN_USEREVENT  = function<void(const string &msg)>;
 
-class H4P_SerialCmd: public H4Plugin {
-//        H4P_VerboseMessages* _babel=nullptr;
-        
+class H4P_SerialCmd: public H4Plugin {        
         VSCMD(_event);
         VSCMD(_svcRestart);
         VSCMD(_svcInfo);
@@ -80,12 +76,11 @@ class H4P_SerialCmd: public H4Plugin {
                 void            config(){ for(auto const& c:_cb) reply("%s=%s",CSTR(c.first),CSTR(c.second)); }        
                 void            heap(){ reply("Heap=%u",ESP.getFreeHeap()); }        
                 void            help();
-                uint32_t        invokeCmd(string,string="",const char* src=userTag()); // force taek from _cb inside fn?
+                uint32_t        invokeCmd(string,string="",const char* src=userTag());
                 uint32_t        invokeCmd(string,uint32_t,const char* src=userTag()); 
                 void            plugins();
         static  string          read(const string& fn);
                 void            removeCmd(const string& name,uint32_t _pid=0);
-                void            show() override { h4pevtdump(); }
                 void            showFS();
                 void            showQ();
         static  uint32_t        write(const string& fn,const string& data,const char* mode="w");
@@ -93,5 +88,4 @@ class H4P_SerialCmd: public H4Plugin {
                 uint32_t        _executeCmd(string topic, string pload);
                 uint32_t        _simulatePayload(string flat,const char* src=cmdTag());
 };
-
 extern __attribute__((weak)) H4P_SerialCmd h4cmd;

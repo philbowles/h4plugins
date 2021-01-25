@@ -88,7 +88,7 @@ void H4P_FlasherController::_flash(uint32_t period,uint8_t duty,uint8_t pin,H4GM
 }
 
 void H4P_FlasherController::_hookIn() {
-    _pGPIO=require<H4P_GPIOManager>(H4PID_GPIO);
+    _pGPIO=h4prequire<H4P_GPIOManager>(H4PID_GPIO);
     H4Plugin::_hookIn();
 }
 
@@ -153,7 +153,7 @@ void H4Flasher::PWM(uint32_t period,uint8_t duty){
 		stop();
 		uint32_t width=(duty*period)/100;
 		_pulse(width); 
-		_timer=h4.every(period,bind([this](int width){ _pulse(width); },width),nullptr,H4P_TRID_PWM1);
+		_timer=h4.every(period,[this,width](){ _pulse(width); },nullptr,H4P_TRID_PWM1);
 	} else _pulse(period);
 }
 

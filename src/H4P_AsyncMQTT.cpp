@@ -44,7 +44,7 @@ uint32_t H4P_AsyncMQTT::_change(vector<string> vs){
 void H4P_AsyncMQTT::_handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg){ _pWiFi->_wipe(mqconfTag()); }
 
 void H4P_AsyncMQTT::_hookIn() { 
-    _pWiFi=depend<H4P_WiFi>(this,H4PID_WIFI);
+    _pWiFi=h4pdepend<H4P_WiFi>(this,H4PID_WIFI);
 #if H4P_USE_WIFI_AP
     if(_pWiFi->_getPersistentValue(mqconfTag(),"")){
         vector<string> mqconf=split(_cb[mqconfTag()],",");
@@ -67,11 +67,9 @@ void H4P_AsyncMQTT::_hookIn() {
     prefix+=device+"/";
 
     onMessage([this](const char* topic, const uint8_t* payload, size_t length, uint8_t qos, bool retain,bool dup){
-        h4.queueFunction(
-            bind([](string topic, string pload){ 
-                h4cmd._executeCmd(CSTR(string(mqttTag()).append("/").append(topic)),pload); 
-            },string(topic),stringFromBuff((uint8_t*) payload,length)),
-        nullptr,H4P_TRID_MQMS);
+        string top(topic);
+        string pload=stringFromBuff((uint8_t*) payload,length);
+        h4.queueFunction([top,pload](){ h4cmd._executeCmd(CSTR(string(mqttTag()).append("/").append(top)),pload); },nullptr,H4P_TRID_MQMS);
     });
 
     onConnect([this](bool b){

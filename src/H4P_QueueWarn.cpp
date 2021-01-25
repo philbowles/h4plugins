@@ -43,7 +43,7 @@ void H4P_QueueWarn::pcent(uint32_t pc){
     show();
 }
 
-uint32_t H4P_QueueWarn::_qwPcent(vector<string> vs){ return _guardInt1(vs,bind(&H4P_QueueWarn::pcent,this,_1)); }
+uint32_t H4P_QueueWarn::_qwPcent(vector<string> vs){ return _guardInt1(vs,[this](uint32_t && i){ pcent(i); }); }
 //
 H4P_QueueWarn::H4P_QueueWarn(function<void(bool)> _f,uint32_t _limit): H4Plugin(H4PID_QWRN){
     _addLocals({

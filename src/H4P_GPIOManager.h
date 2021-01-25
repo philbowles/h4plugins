@@ -473,4 +473,4 @@ class H4P_GPIOManager: public H4Plugin{//
         void                _hookIn() override;
 };
 
-extern __attribute__((weak)) H4P_GPIOManager h4gm;
+//extern __attribute__((weak)) H4P_GPIOManager h4gm;

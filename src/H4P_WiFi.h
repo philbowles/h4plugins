@@ -126,8 +126,8 @@ class H4P_WiFi: public H4Plugin, public AsyncWebServer {
         H4P_WiFi(H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): 
             H4Plugin(H4PID_WIFI,H4P_EVENT_HEARTBEAT | H4P_EVENT_FACTORY,onC,onD),
             AsyncWebServer(H4P_WEBSERVER_PORT){
-            _cb[ssidTag()]=uppercase(h4Tag());
-            _cb[pskTag()]=uppercase(h4Tag());
+            _cb[ssidTag()]=h4Tag();
+            _cb[pskTag()]=h4Tag();
 #else
         H4P_WiFi(string ssid,string psk,string device="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr):
             _device(device),

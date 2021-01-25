@@ -30,41 +30,40 @@ SOFTWARE.
 #include<H4P_SerialCmd.h>
 //
 vector<string> h4pnames={
-    "SYS", // ROOT
-    "R1", // H4
+    "sys", // ROOT
+    "H4P", // H4
     "R2", // SHOW
-    "SVC", // SVC
-    "VM",
-    "CMD",
-    "1SEC",
-    "ESQW",
-    "EVTQ",
-    "HEAP",
-    "EAR0",
-    "HWRN",
-    "LLOG",
-    "LOOP",
-    "ONOF",
-    "QWRN",
-    "SLOG",
-    "SNIF",
-    "STOR",
-    "TONE",
-    "GPIO", //
-    "WINK",
-    "WIFI", //
-    "BEAT",
-    "MQTT", //
-    "MLG0",
-    "UPNP", //
-    "MFNB",
-    "PDI0",
-    "PDM0",
-    "PDU0",
-    "RUPD",
-    "SQLL",
-    "SSET",
-    "TIME"
+    "QVC", // SVC
+    "vm",
+    "cmd",
+    "1sec",
+    "esqw",
+    "evtq",
+    "heap",
+    "ears",
+    "hwrn",
+    "llog",
+    "loop",
+    "onof",
+    "qwrn",
+    "snif",
+    "stor",
+    "tone",
+    "gpio", //
+    "wink",
+    "wifi", //
+    "beat",
+     mqttTag(), //
+    "mlog",
+    "upnp", //
+    "mfnb",
+    "pdip",
+    "pdmd",
+    "pdup",
+    "rupd",
+    "sqll",
+    "sset",
+    "time"
 //"UDPL"
 };
 
@@ -77,7 +76,7 @@ void H4Plugin::_envoi(const string& s){
     string source=_cb[srcTag()];
     auto pp=h4pptrfromtxt(source);
     if(pp) pp->_reply(CSTR(s)); // send reply back to originating source
-    else Serial.printf("SRC %s %s\n",CSTR(source),CSTR(s));
+    else Serial.printf("SRC *%s* %s\n",CSTR(source),CSTR(s));
 }
 
 vector<uint32_t> H4Plugin::_expectInt(string pl,const char* delim){
@@ -145,4 +144,9 @@ void H4Plugin::_upHooks(){
 void H4Plugin::_downHooks(){
     for(auto const& c:_disconnected) c();
     SEVENT(H4P_EVENT_SVC_DOWN,_pName,"");
+}
+
+string H4Plugin::_uniquify(const string& name,uint32_t uqf){
+    string tmp=name+(uqf ? stringFromInt(uqf):"");
+    return h4pptrfromtxt(tmp) ? _uniquify(name,uqf+1):tmp;
 }

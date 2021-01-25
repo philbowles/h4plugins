@@ -92,5 +92,3 @@ class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
                 void        _hookIn() override;
                 void        _reply(string msg) override { publishDevice("reply",msg); }
 };
-
-extern __attribute__((weak)) H4P_AsyncMQTT h4mqtt;

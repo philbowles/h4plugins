@@ -36,7 +36,7 @@ void H4P_BinaryThing::_greenLight() {
     if(_pWiFi){
         if(WiFi.getMode()==WIFI_STA) {
             _pWiFi->_uiAdd(H4P_UIO_ONOF,onofTag(),H4P_UI_ONOF,"",[this]{ return stringFromInt(state()); });
-            if(_pMQTT) _pMQTT->hookConnect([this](){ _pMQTT->subscribeDevice("slave/#",CMDVS(_slave),H4PC_H4); });
+            if(_pMQTT) _pMQTT->hookConnect([this](){ _pMQTT->subscribeDevice("slave/#",CMDVS(_slave),H4PC_H4); }); // addcmd slave
         }
     }
 }
@@ -46,7 +46,7 @@ void H4P_BinaryThing::_publish(bool b){ if(_pMQTT) _pMQTT->publishDevice(stateTa
 void H4P_BinaryThing::_setSlaves(bool b){
     for(auto s:_slaves){
         string t=s+"/h4/switch";
-        _pMQTT->xPublish(CSTR(t),stringFromInt(b));
+        if(_pMQTT) _pMQTT->xPublish(CSTR(t),stringFromInt(b));
     }
 }
 
@@ -63,8 +63,7 @@ uint32_t H4P_BinaryThing::_slave(vector<string> vs){
     if(!stringIsAlpha(vs[0])) return H4_CMD_PAYLOAD_FORMAT;
     if(!stringIsNumeric(H4PAYLOAD)) return H4_CMD_NOT_NUMERIC;
     if(H4PAYLOAD_INT > 1) return H4_CMD_OUT_OF_BOUNDS;
-    if(H4PAYLOAD_INT) _slaves.insert(vs[0]);
-    else _slaves.erase(vs[0]);
+    slave(vs[0],H4PAYLOAD_INT);
     PLOG("%s slave %s",H4PAYLOAD_INT ? "Added":"Removed",CSTR(vs[0]));
     show();
     return H4_CMD_OK;
@@ -84,9 +83,11 @@ void H4P_BinaryThing::_turn(bool b,const string& src){
         _setState(b);
         if(_f) _f(_state);
         _publish(_state);
-//        PLOG(H4P_EVENT_MSG,src,"%s",(_state ? "ON":"OFF"));
+//        PLOG("%s %s",CSTR(src),(_state ? "ON":"OFF")); // specialise
+        PEVENT(_state ? H4P_EVENT_ON:H4P_EVENT_OFF,"%s",CSTR(src)); // specialise
     }
 }
+
 void H4P_BinaryThing::turn(bool b){ _turn(b,userTag()); }
 // syscall only
 #else

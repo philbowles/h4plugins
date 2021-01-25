@@ -40,7 +40,7 @@ SOFTWARE.
         ***********************************************************************
 */
 #define H4P_LOG_EVENTS      1
-#define H4P_WEBSERVER_PORT 80
+#define SANITY              1
 /*
         HARDWARE ASSUMPTIONS
 
@@ -63,12 +63,14 @@ enum H4GM_SENSE:uint8_t {
 #define H4P_SIGNAL_TIMEBASE     175
 
 
+#define H4P_WEBSERVER_PORT      80
 // Make sure you read the documentation and have arrangements in place for using AP mode :)
 #define H4P_USE_WIFI_AP          0
 /*
             TWEAKABLES
 */
-#define H4P_REPLY_BUFFER       512
+#define H4P_REPLY_BUFFER       256
+#define H4P_EVENT_BUFFER       256
 
 //#define H4FC_MORSE_SUPPORT
 

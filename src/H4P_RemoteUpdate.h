@@ -50,7 +50,7 @@ class H4P_RemoteUpdate: public H4Plugin, public HTTPUpdate {
                 } // no autostart
                 void        _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) override { _pWiFi->_wipe(rupdTag()); }
                 void        _hookIn(){ 
-                    _pWiFi=depend<H4P_WiFi>(this,H4PID_WIFI);
+                    _pWiFi=h4pdepend<H4P_WiFi>(this,H4PID_WIFI);
                     H4Plugin::_hookIn();
                 }
                 void        _updateFromUrl(bool fw,bool reboot){

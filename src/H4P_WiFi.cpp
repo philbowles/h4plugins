@@ -309,9 +309,8 @@ void H4P_WiFi::_handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) {
 }
 
 void H4P_WiFi::_hookIn(){
-    _pSignal=require<H4P_FlasherController>(H4PID_WINK);
-    _pGPIO=require<H4P_GPIOManager>(H4PID_GPIO);
-//    _btp=require<H4P_BinaryThing>(H4PID_ONOF);
+    _pSignal=h4prequire<H4P_FlasherController>(H4PID_WINK);
+    _pGPIO=h4prequire<H4P_GPIOManager>(H4PID_GPIO);
     _btp=h4pisloaded<H4P_BinaryThing>(H4PID_ONOF);
     _cb[chipTag()]=HAL_WIFI_chipID();
     _cb[boardTag()]=replaceAll(H4_BOARD,"ESP8266_","");
@@ -358,7 +357,7 @@ uint32_t H4P_WiFi::_msg(vector<string> vs){
 }
 
 void H4P_WiFi::_rest(AsyncWebServerRequest *request){
-	h4.queueFunction(bind([this](AsyncWebServerRequest *request){
+	h4.queueFunction([=,this](){
         PLOG("_rest %s",request->client()->remoteIP().toString().c_str());
 		string chop=replaceAll(CSTR(request->url()),"/rest/","");
         string msg="";
@@ -378,7 +377,7 @@ void H4P_WiFi::_rest(AsyncWebServerRequest *request){
         response->addHeader("Access-Control-Allow-Origin","*");
         request->send(response);
         _lines.clear();
-	},request),nullptr,H4P_TRID_REST);
+	},nullptr,H4P_TRID_REST);
 }
 
 void H4P_WiFi::_sendSSE(const char* name,const char* msg){ if(_evts && _evts->count()) _evts->send(msg,name,_evtID++); }
@@ -394,7 +393,7 @@ void H4P_WiFi::_startWebserver(){
 	reset();
     _evts=new AsyncEventSource("/evt");
     _evts->onConnect([this](AsyncEventSourceClient *client){
-        Serial.printf("SSE Client %08x i=%d cLast=%d T/O=%d nC=%d\n",client,_evtID,client->lastId(),H4P_ASWS_EVT_TIMEOUT,_evts->count());
+        PLOG("SSE Client %08x i=%d cLast=%d T/O=%d nC=%d",client,_evtID,client->lastId(),H4P_ASWS_EVT_TIMEOUT,_evts->count());
         if(client->lastId() > _evtID){
             client->close();
         }
@@ -515,7 +514,7 @@ void H4P_WiFi::uiAddGPIO(){ if(_pGPIO) for(auto const& p:H4P_GPIOManager::pins) 
 H4_CMD_ERROR H4P_WiFi::uiAddGPIO(uint8_t pin){
     if(_pGPIO){
         H4GPIOPin*  p;
-        if(p=h4gm.isManaged(pin)) {
+        if(p=_pGPIO->isManaged(pin)) {
             char buf[32];
             snprintf(buf,31,"GP%02d(Type%02d)",pin,p->style);
             string name(buf);

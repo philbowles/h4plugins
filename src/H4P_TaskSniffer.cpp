@@ -59,7 +59,7 @@ void H4P_TaskSniffer::_common(){
         {"include", {_pid, 0, CMDVS(_tsInclude)}},
         {"exclude", {_pid, 0, CMDVS(_tsExclude)}}
             });
-    h4._hookEvent(bind(&H4P_TaskSniffer::_taskDump,this,_1,_2));    
+    h4._hookEvent([this](H4_TASK_PTR && a, const char && b){ _taskDump(a,b); });
 }
 
 void H4P_TaskSniffer::_taskDump(H4_TASK_PTR t,const char c){

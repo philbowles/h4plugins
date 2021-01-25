@@ -64,7 +64,7 @@ SOFTWARE.
 
 
 void H4P_Sunrise::_hookIn(){ 
-    _pTime=depend<H4P_Timekeeper>(this,H4PID_TIME);
+    _pTime=h4pdepend<H4P_Timekeeper>(this,H4PID_TIME);
     H4Plugin::_hookIn();
 }
 
