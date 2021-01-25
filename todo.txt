@@ -1,5 +1,7 @@
 TODO:SOONER
-    rationalise compile out events
+check optional depend / reuire etc
+kill ucase/lcase specifics
+    rationalise compile out events ***************** 
     js - type = password if n includes "pass"
     js - arrowfunctions
 SHORTTERM
@@ -10,13 +12,13 @@ SHORTTERM
     ps discard(x)
     jitter on loggers freq
 MEDIUMTERM
+    total event / reaction cmd model - major update
     passthru ap config params in ctor
 #    upnp grid :)
     dynamic cmds flash / siren etc
     remote client get
     ESp32 MDNS detector
     ESp32 tonecontroller
-    templatise / macrofy dependent module detection (and std hookins for runnables?)
 LONGTERM
     autoOff -> cb
     upnp analyser device

@@ -311,7 +311,8 @@ void H4P_WiFi::_handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) {
 void H4P_WiFi::_hookIn(){
     _pSignal=require<H4P_FlasherController>(H4PID_WINK);
     _pGPIO=require<H4P_GPIOManager>(H4PID_GPIO);
-    _btp=require<H4P_BinaryThing>(H4PID_ONOF);
+//    _btp=require<H4P_BinaryThing>(H4PID_ONOF);
+    _btp=h4pisloaded<H4P_BinaryThing>(H4PID_ONOF);
     _cb[chipTag()]=HAL_WIFI_chipID();
     _cb[boardTag()]=replaceAll(H4_BOARD,"ESP8266_","");
     if(!_getPersistentValue(deviceTag(),"H4-")) if(_device!="") _cb[deviceTag()]=_device;

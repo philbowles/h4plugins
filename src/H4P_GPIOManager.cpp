@@ -28,7 +28,6 @@ SOFTWARE.
 */
 #include<H4P_GPIOManager.h>
 #include<H4P_EmitTick.h>
-//#include <numeric>
 
 H4GPIOPin::H4GPIOPin(
     uint8_t _p,
@@ -294,14 +293,6 @@ void EncoderAutoPin::setValue(int v){
 //
 //      H4P_GPIOManager
 //
-/* do we need this ?
-OutputPin* H4P_GPIOManager::isOutput(uint8_t p){
-    H4GPIOPin* output;
-    if((output=isManaged(p)) && output->style==H4GM_PS_OUTPUT) return reinterpret_cast<OutputPin*>(output);
-    return nullptr;
-}
-*/
-
 uint32_t H4P_GPIOManager::logicalRead(uint8_t p){ if(pins.count(p)) return pins[p]->logicalRead(); }
 
 void H4P_GPIOManager::logicalWrite(uint8_t p,uint8_t l) { 

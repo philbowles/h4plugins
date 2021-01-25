@@ -62,6 +62,7 @@ void h4pupcall(H4Plugin* me,H4Plugin* ptr){
     ptr->hookConnect([me](){ me->start(); });
     ptr->hookDisconnect([me](){ me->stop(); });
 }
+
 void h4pdll(H4Plugin* dll){
     SEVENT(H4P_EVENT_DLL,"%s",CSTR(dll->_pName));
     dll->_hookIn();
@@ -87,15 +88,26 @@ void h4StartPlugins(){
     H4Plugin::_cb[srcTag()]="SYS";
     H4Plugin::_cb[h4pTag()]=H4P_VERSION;
     Serial.printf("H4P %s\n",CSTR(H4Plugin::_cb[h4pTag()]));
-    for(auto const& p:h4pmap) Serial.printf("INIT %d %s\n",p.first,CSTR(p.second->_pName));
-//    for(auto const& p:h4pmap) p.second->_startup();
+//    for(auto const& p:h4pmap) Serial.printf("INIT %d %s\n",p.first,CSTR(p.second->_pName));
     for(auto const& p:h4pmap) p.second->_hookIn();
     for(auto const& p:h4pmap) p.second->_greenLight();
 }
 /*
 TESTERS / DIAG
 */
+#include<map>
 void h4pevtdump(){
+    Serial.printf("SANITY CHECKS\n");
+    std::map<uint32_t,string> names;
+    int i=0;
+    for(auto n:h4pnames){
+        Serial.printf("name %02d %4s ptr=0x%08x\n",i,CSTR(n),h4pmap.count(i) ? (void*) h4pmap[i]:0 );
+        names[i]=n;
+        i++;
+    }
+    i=0;
+    for(auto n:h4pmap) Serial.printf("i=%02d idx=%02d ptr=0x%08x name=%s\n",i++,n.first,(void*) n.second,CSTR(names[n.first]));
+
     Serial.printf("EVENTS LISTENED\n");
     unordered_set<uint32_t> listeners;
     unordered_map<uint32_t,vector<H4P_EVENT_TYPE>> earmap;

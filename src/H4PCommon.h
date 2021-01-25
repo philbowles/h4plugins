@@ -298,39 +298,38 @@ extern vector<string> h4pnames;
     #define PEVENT(t,f,...)
     #define PLOG(f,...)
 #endif
+H4Plugin* h4pptrfromtxt(const string& s);
 
 class H4Plugin {
                 vector<H4_FN_VOID>  _connected;
                 vector<H4_FN_VOID>  _disconnected;
-
                 bool                _up=false;
                 
                 void                _envoi(const string& s);
     protected:
-                void                _addLocals(H4_CMD_MAP local){
-                    _commands.insert(local.begin(),local.end());
-                   local.clear();
-                }
-
                 uint32_t            _eventFilter=H4P_EVENT_NOOP;
         static  H4_CMD_MAP          _commands;
                 bool                _discoDone=false;
 
+                void                _addLocals(H4_CMD_MAP local);
                 vector<uint32_t>    _expectInt(string pl,const char* delim=",");  
                 uint32_t            _guardInt1(vector<string> vs,function<void(uint32_t)> f);
                 uint32_t            _guardString2(vector<string> vs,function<H4_CMD_ERROR(string,string)> f);
-                uint32_t            _guard1(vector<string> vs,H4_FN_MSG f){
-                    if(!vs.size()) return H4_CMD_TOO_FEW_PARAMS;
-                    return vs.size()>1 ? H4_CMD_TOO_MANY_PARAMS:f(vs);
-                }
-        virtual void                _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg){
-//                    Serial.printf("%s _handleEvent: From: %s TYPE %s '%s'\n",CSTR(_pName),CSTR(h4pnames[pid]),CSTR(h4pgetEventName(t)),CSTR(msg));
-                }                
-
+                uint32_t            _guard1(vector<string> vs,H4_FN_MSG f);
+        virtual void                _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg){}
+                void                _init(H4PID pid,H4_FN_VOID svcUp=nullptr,H4_FN_VOID svcDown=nullptr);
         virtual void                _restart(){ stop();start(); }
         virtual void                _start() { _upHooks(); }
         virtual void                _stop() { _downHooks(); }
-
+                string              _uniquify(const string& name,uint32_t uqf=0){
+                    string tmp=name+(uqf ? stringFromInt(uqf):"");
+                    Serial.printf("testing %s\n",CSTR(tmp));
+                    if(h4pptrfromtxt(tmp)) return _uniquify(name,uqf+1);
+                    else {
+                        Serial.printf("returning %s\n",CSTR(tmp));
+                        return tmp;
+                    }
+                }
     public:
         static  H4P_CONFIG_BLOCK    _cb;
                 H4PID               _pid;
@@ -338,13 +337,16 @@ class H4Plugin {
 //
 //      statics
 //
+        H4Plugin(const string name,uint32_t filter=H4P_EVENT_NOOP,H4_FN_VOID svcUp=nullptr,H4_FN_VOID svcDown=nullptr): _eventFilter(filter){
+            string uniquename=_uniquify(uppercase(name),0);
+            H4PID pid=static_cast<H4PID>(h4pnames.size());
+            h4pnames.push_back(uniquename);
+            Serial.printf("%s synth _pid=%d\n",CSTR(uniquename),pid);
+            _init(pid,svcUp,svcDown);
+        }
+
         H4Plugin(H4PID pid,uint32_t filter=H4P_EVENT_NOOP,H4_FN_VOID svcUp=nullptr,H4_FN_VOID svcDown=nullptr): _eventFilter(filter){
-            _pid=pid;
-            h4pmap[pid]=this;
-            _pName=lowercase(h4pnames[pid]);
-            h4pregisterhandler(pid,_eventFilter,[this](H4PID i,H4P_EVENT_TYPE t,const string& m){ _handleEvent(i,t,m); });
-            if(svcUp) hookConnect(svcUp);
-            if(svcDown) hookDisconnect(svcDown);
+            _init(pid,svcUp,svcDown);
         }
 //
         static  string      getConfig(const string& c){ return _cb[c]; }
@@ -378,23 +380,24 @@ class H4Plugin {
 
 //        static void         dumpCommands(H4_CMD_MAP cm=_commands){ for(auto const c:cm) Serial.printf("%16s o=%2d l=%2d\n",CSTR(c.first),c.second.owner,c.second.levID); }
 };
-H4Plugin* h4pptrfromtxt(const string& s);
 
 template<typename T>
-T* h4pisloaded(H4PID p){ return h4pmap.count(p) ? reinterpret_cast<T*>(h4pmap[p]):nullptr; }
+T* h4pisloaded(H4PID p){
+    Serial.printf("Is %d %s Loaded? 0x%08x\n",p,CSTR(h4pnames[p]),h4pmap.count(p) ? (void*) h4pmap[p]:nullptr);
+    return h4pmap.count(p) ? reinterpret_cast<T*>(h4pmap[p]):nullptr; 
+}
 
 void h4pdll(H4Plugin* dll);
-//    SEVENT(H4P_EVENT_DLL,"%s",CSTR(dll->_pName));
-//    dll->_hookIn();
 
 template<typename T,typename... Args>
 T* require(H4PID p,Args... args){
     T* test=h4pisloaded<T>(p);
-    if(test) return test;
+    if(test) {
+        Serial.printf("pid=%d 0x%08x already loaded\n",p,(void*) test);
+        return test;
+    }
     auto dll=new T(args...);
     h4pdll(dll);
-//    SEVENT(H4P_EVENT_DLL,"%s",CSTR(dll->_pName));
-//    dll->_hookIn();
     return dll;
 }
 
@@ -402,6 +405,7 @@ void h4pupcall(H4Plugin* me,H4Plugin* ptr);
 
 template<typename T,typename... Args>
 T* depend(H4Plugin* me,H4PID p,Args... args){
+    SEVENT(H4P_EVENT_DLL,"%s->%s",CSTR(me->_pName),CSTR(h4pnames[p]));
     T* ptr=require<T>(p,args...);
     h4pupcall(me,ptr);
     return ptr;

@@ -64,10 +64,15 @@ vector<string> h4pnames={
     "RUPD",
     "SQLL",
     "SSET",
-    "TIME",
-    "UDPL",
-    "XXX0"
+    "TIME"
+//"UDPL"
 };
+
+void H4Plugin::_addLocals(H4_CMD_MAP local){
+    _commands.insert(local.begin(),local.end());
+    local.clear();
+}
+
 void H4Plugin::_envoi(const string& s){
     string source=_cb[srcTag()];
     auto pp=h4pptrfromtxt(source);
@@ -85,13 +90,18 @@ vector<uint32_t> H4Plugin::_expectInt(string pl,const char* delim){
     return results;
 }
 
+uint32_t H4Plugin::_guard1(vector<string> vs,H4_FN_MSG f){
+    if(!vs.size()) return H4_CMD_TOO_FEW_PARAMS;
+    return vs.size()>1 ? H4_CMD_TOO_MANY_PARAMS:f(vs);
+}
+
 uint32_t H4Plugin::_guardInt1(vector<string> vs,function<void(uint32_t)> f){
     return _guard1(vs,[f,this](vector<string> vs){
         auto vi=_expectInt(H4PAYLOAD);
         if(vi.size()==1) return ([f](uint32_t v){ f(v); return H4_CMD_OK; })(vi[0]);
         return H4_CMD_NOT_NUMERIC;
     });
-}        
+}
 
 uint32_t H4Plugin::_guardString2(vector<string> vs,function<H4_CMD_ERROR(string,string)> f){
     return _guard1(vs,[f,this](vector<string> vs){
@@ -102,6 +112,15 @@ uint32_t H4Plugin::_guardString2(vector<string> vs,function<H4_CMD_ERROR(string,
         }
         return H4_CMD_TOO_MANY_PARAMS;
     });
+}
+
+void H4Plugin::_init(H4PID pid,H4_FN_VOID svcUp,H4_FN_VOID svcDown){
+    _pid=pid;
+    h4pmap[pid]=this;
+    _pName=lowercase(h4pnames[pid]);
+    h4pregisterhandler(pid,_eventFilter,[this](H4PID i,H4P_EVENT_TYPE t,const string& m){ _handleEvent(i,t,m); });
+    if(svcUp) hookConnect(svcUp);
+    if(svcDown) hookDisconnect(svcDown);
 }
 
 void H4Plugin::start() {
