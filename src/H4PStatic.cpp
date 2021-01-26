@@ -31,7 +31,7 @@ SOFTWARE.
 
 void __attribute__((weak)) onFactoryReset(){}
 void __attribute__((weak)) onReboot(){}
-//void __attribute__((weak)) h4pGlobalEventHandler(H4PID pid,H4P_EVENT_TYPE t,const string& msg){}
+void __attribute__((weak)) h4pGlobalEventHandler(H4PID pid,H4P_EVENT_TYPE t,const string& msg){}
 //
 //   Events Listeners Emitters
 //
@@ -47,7 +47,7 @@ void h4pregisterhandler(H4PID pid,uint32_t t,H4P_FN_EVENTHANDLER f){
 
 void h4pemit(H4PID pid,H4P_EVENT_TYPE t,const char* msg){
     if(h4pevt.count(t)) for(auto const& e:h4pevt[t]) e.second(pid,t,msg);
-//    h4pGlobalEventHandler(pid,t,msg);
+    h4pGlobalEventHandler(pid,t,msg);
 }
 //
 //      Plugin names etc

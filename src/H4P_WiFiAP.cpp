@@ -33,7 +33,7 @@ SOFTWARE.
 #include<H4P_RemoteUpdate.h>
 #include<H4P_UPNPServer.h>
 
-constexpr char* uuTag(){ return "Update URL"; }
+constexpr const char* uuTag(){ return "Update URL"; }
 
 #if H4P_USE_WIFI_AP
 void H4P_WiFi::_startAP(){

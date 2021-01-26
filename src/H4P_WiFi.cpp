@@ -357,7 +357,7 @@ uint32_t H4P_WiFi::_msg(vector<string> vs){
 }
 
 void H4P_WiFi::_rest(AsyncWebServerRequest *request){
-	h4.queueFunction([=,this](){
+	h4.queueFunction([=](){
         PLOG("_rest %s",request->client()->remoteIP().toString().c_str());
 		string chop=replaceAll(CSTR(request->url()),"/rest/","");
         string msg="";

@@ -114,7 +114,7 @@ class H4P_MDNSDetector: public H4PDetector {
     public:
         H4P_MDNSDetector(const string& friendly,const string& service,const string& protocol,H4BS_FN_SWITCH f=nullptr);
 };
-
+/*
 class H4P_H4Detector: public H4P_UPNPDetector {
     public:
         H4P_H4Detector(const string& device,H4BS_FN_SWITCH f=nullptr): H4P_UPNPDetector(device,"X-H4-DEVICE",device,f){}
@@ -124,5 +124,5 @@ class H4P_H4DetectorSource: public H4P_H4Detector{
     public:
         H4P_H4DetectorSource(const string& local);
 };
-
+*/
 #endif // esp8266

@@ -100,5 +100,5 @@ enum H4GM_SENSE:uint8_t {
 #define H4P_TIME_HOLDOFF      2000
 #define H4P_TIME_RESYNC    3600000
 
-constexpr char* h4pTag(){ return "h4P"; }
-constexpr char* httpTag(){ return "http://"; }
+constexpr const char* h4pTag(){ return "h4P"; }
+constexpr const char* httpTag(){ return "http://"; }

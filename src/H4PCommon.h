@@ -53,7 +53,7 @@ SOFTWARE.
 //
 // literal string RAM savers
 //
-#define STAG(x) constexpr char* x##Tag(){ return #x; }
+#define STAG(x) constexpr const char* x##Tag(){ return #x; }
 
 constexpr const char* cmdhash(){ return "/h4/#"; }
 
@@ -144,6 +144,8 @@ enum H4P_EVENT_TYPE:uint32_t {
     H4P_EVENT_DLL       = 1 << 14,
     H4P_EVENT_ON        = 1 << 15,
     H4P_EVENT_OFF       = 1 << 16,
+    H4P_EVENT_H4_ENTER  = 1 << 17,
+    H4P_EVENT_H4_LEAVE  = 1 << 18,
     H4P_EVENT_HEARTBEAT=0x80000000,
     H4P_EVENT_ALL=0x7fffffff
 };

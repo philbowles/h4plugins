@@ -1,10 +1,9 @@
 TODO:SOONER
 pd lockut upnp. add uh[] infor to msg
-
-unbind my heart
     realign KW
 check optional depend / reuire etc
 SHORTTERM
+    upndp out gangmaster in
     //getstartingheap
     H4_TIMER from at,daily
     adv docs + / example creating your own commands

@@ -77,7 +77,7 @@ class H4P_HttpMySQLLogger: public H4Plugin, public asyncHTTPrequest {
                 sprintf(buf,"device=%s&msg=%s&type=%d&source=%d&seq=%u",CSTR(_cb[deviceTag()]),CSTR(msg),type,pid,_logseq++);
                 setReqHeader("Content-Type","application/x-www-form-urlencoded");
                 send(buf);
-            } else h4.once(H4P_MYSQL_HOLDOFF,[=,this](){ _handleEvent(pid,type,msg); },nullptr,H4P_TRID_MLRQ);
+            } else h4.once(H4P_MYSQL_HOLDOFF,[=](){ _handleEvent(pid,type,msg); },nullptr,H4P_TRID_MLRQ);
         }
 
         void _greenLight() override {} // prevetn autostart - wait until wifi up

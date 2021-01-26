@@ -131,7 +131,7 @@ H4P_MDNSDetector::H4P_MDNSDetector(const string& friendly,const string& service,
     H4PDetector(friendly,friendly,f){ 
         localList[friendly]=this;
 }
-
+/*
 H4P_H4DetectorSource::H4P_H4DetectorSource(const string& id): H4P_H4Detector(id){
     H4P_BinaryThing* _btp=h4prequire<H4P_BinaryThing>(H4PID_ONOF);
     if(_btp){
@@ -144,4 +144,5 @@ H4P_H4DetectorSource::H4P_H4DetectorSource(const string& id): H4P_H4Detector(id)
         };
     }
 }
+*/
 #endif // 8266

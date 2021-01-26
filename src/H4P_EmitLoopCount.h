@@ -29,7 +29,7 @@ SOFTWARE.
 */
 #pragma once
 
-extern __attribute__((weak)) uint32_t h4Nloops=0;
+extern __attribute__((weak)) uint32_t h4Nloops;
 
 #include<H4PCommon.h>
 #include<H4P_EmitTick.h>
