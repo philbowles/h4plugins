@@ -1,13 +1,6 @@
+FREEZE THE GODDAMN CODE AND STOP TWEAKING!!!!!
+FULL 32/ap reversion Tester
 TODO:SOONER
-heartbeat not owrking oth:
-
-H4P_WiFi whiffy("XXXXXXXX","XXXXXXXX","statix");
-H4P_AsyncMQTT cutie("192.168.1.20",1883);
-H4P_BinarySwitch h4onof(RELAY_BUILTIN,ACTIVE_HIGH,OFF);
-H4P_UPNPServer alexa("Statics Tester");
-H4P_Gangmaster capone;
-H4P_Heartbeat h4hb;
-
     file statics into ...
     realign KW
     check optional depend / reuire etc
