@@ -104,7 +104,6 @@ void H4P_AsyncMQTT::_hookIn() {
             });
         }
     });
-    H4Plugin::_hookIn();
 }
 
 void H4P_AsyncMQTT::_greenLight(){

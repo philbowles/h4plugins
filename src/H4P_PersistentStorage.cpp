@@ -46,7 +46,6 @@ void H4P_PersistentStorage::_hookIn() {
         vector<string> nv=split(i,"=");
         psRam[nv[0]]=nv.size() > 1 ? nv[1]:""; // thanks hamzah :)
     }
-    H4Plugin::_hookIn();
 }
 
 H4P_PersistentStorage::H4P_PersistentStorage(H4P_FN_PSCHANGE f): _f(f), H4Plugin(H4PID_STOR,H4P_EVENT_FACTORY){

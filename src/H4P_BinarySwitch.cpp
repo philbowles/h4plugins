@@ -32,7 +32,6 @@ SOFTWARE.
 void H4P_BinarySwitch::_hookIn() {
     auto _pGPIO=h4prequire<H4P_GPIOManager>(this,H4PID_GPIO);
     _pp=_pGPIO->Output(_pin,_sense,_initial,[](H4GPIOPin* ptr){});
-    H4Plugin::_hookIn();
 }
 
 void H4P_ConditionalSwitch::syncCondition(){ if(_pWiFi) _pWiFi->_sendSSE(conditionTag(),CSTR(stringFromInt(_predicate(state())))); }

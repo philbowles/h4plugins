@@ -111,10 +111,7 @@ void H4P_SerialCmd::_flattenCmds(function<void(string)> fn,string cmd,string pre
     }
 }
 
-void H4P_SerialCmd::_hookIn(){
-    HAL_FS.begin();
-    H4Plugin::_hookIn();
-}
+void H4P_SerialCmd::_hookIn(){ HAL_FS.begin(); }
 
 void H4P_SerialCmd::_run(){
     static string cmd="";

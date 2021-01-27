@@ -89,10 +89,7 @@ void H4P_FlasherController::_flash(uint32_t period,uint8_t duty,uint8_t pin,H4GM
 	}
 }
 
-void H4P_FlasherController::_hookIn() {
-    _pGPIO=h4prequire<H4P_GPIOManager>(this,H4PID_GPIO);
-    H4Plugin::_hookIn();
-}
+void H4P_FlasherController::_hookIn() { _pGPIO=h4prequire<H4P_GPIOManager>(this,H4PID_GPIO); }
 
 void H4P_FlasherController::flashPattern(const char* _pattern,uint32_t _timebase,uint8_t pin,H4GM_SENSE active){
     // cancel any existing!!!

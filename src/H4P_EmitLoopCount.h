@@ -56,10 +56,7 @@ class H4P_EmitLoopCount: public H4Plugin {
                 h4Nloops=0;
             };
 
-            void _hookIn() {
-                h4pdepend<H4P_EmitTick>(this,H4PID_1SEC);
-                H4Plugin::_hookIn();
-            }
+            void _hookIn() { h4pdepend<H4P_EmitTick>(this,H4PID_1SEC); }
 
     public:
         H4P_EmitLoopCount(): H4Plugin(H4PID_LOOP,H4P_EVENT_HEARTBEAT){ h4Nloops=0; }

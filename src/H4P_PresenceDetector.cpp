@@ -32,11 +32,7 @@ SOFTWARE.
 //
 //      UPNP
 //
-void H4P_UPNPDetector::_hookIn() {
-    // send bcast rootdevice
-    _pUPNP=h4pdepend<H4P_UPNPServer>(this,H4PID_UPNP);
-    H4Plugin::_hookIn();
-}
+void H4P_UPNPDetector::_hookIn() { _pUPNP=h4pdepend<H4P_UPNPServer>(this,H4PID_UPNP); }
 
 void H4P_UPNPDetector::_start(){
     _pUPNP->_listenTag(_tag,_id,[this](uint32_t mx,H4P_CONFIG_BLOCK uh,bool direction){

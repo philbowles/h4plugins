@@ -49,10 +49,7 @@ class H4P_RemoteUpdate: public H4Plugin, public HTTPUpdate {
                     _cb[rupdTag()]=httpTag()+_url; 
                 } // no autostart
                 void        _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) override { _pWiFi->_wipe(rupdTag()); }
-                void        _hookIn(){ 
-                    _pWiFi=h4pdepend<H4P_WiFi>(this,H4PID_WIFI);
-                    H4Plugin::_hookIn();
-                }
+                void        _hookIn(){ _pWiFi=h4pdepend<H4P_WiFi>(this,H4PID_WIFI); }
                 void        _updateFromUrl(bool fw,bool reboot){
                     string endpoint=_cb[rupdTag()]+"/"+_cb[deviceTag()];
                     t_httpUpdate_return rv=fw ? update(_c,CSTR(endpoint)):updateSpiffs(_c,CSTR(endpoint));

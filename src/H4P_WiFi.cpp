@@ -333,7 +333,6 @@ void H4P_WiFi::_hookIn(){
     _cb[h4UITag()]=_cb[h4UITag()]+"ap";
 #endif
     _uiAdd(H4P_UIO_H4UIV,h4UITag(),H4P_UI_LABEL);
-    H4Plugin::_hookIn(); // check this :)
 }
 
 uint32_t H4P_WiFi::_host(vector<string> vs){

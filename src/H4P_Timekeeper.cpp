@@ -118,7 +118,6 @@ void H4P_Timekeeper::_hookIn(){
     _btp=h4prequire<H4P_BinaryThing>(this,H4PID_ONOF);
     h4cmd.addCmd("at",_pid,0,CMDVS(_at));
     h4cmd.addCmd("daily",_pid,0,CMDVS(_daily));
-    H4Plugin::_hookIn();
 }
 
 void H4P_Timekeeper::_setupSNTP(const string& ntp1, const string& ntp2){

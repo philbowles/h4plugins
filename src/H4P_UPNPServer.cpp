@@ -33,11 +33,7 @@ Received 26/01/2021 at 14:39:05 (519)
 
 */
 
-void H4P_UPNPServer::_handleEvent(H4PID pid,H4P_EVENT_TYPE type,const string &msg){ 
-    _pWiFi->_wipe(nameTag());
-//    _notify("byebye");
-//    delay(1000); // naughty but nice :) 
-}
+void H4P_UPNPServer::_handleEvent(H4PID pid,H4P_EVENT_TYPE type,const string &msg){  _pWiFi->_wipe(nameTag()); }
 
 void H4P_UPNPServer::_hookIn(){
     _btp=h4prequire<H4P_BinaryThing>(this,H4PID_ONOF);
@@ -46,7 +42,6 @@ void H4P_UPNPServer::_hookIn(){
     if(!_pWiFi->_getPersistentValue(nameTag(),dn)) if(_name!="") _cb[nameTag()]=_name;
     PLOG("UPNP name %s",CSTR(_cb[nameTag()]));
     _pWiFi->_uiAdd(H4P_UIO_NAME,"name",H4P_UI_LABEL,"",[]{ return _cb[nameTag()]; }); // cos we don't know it yet
-    H4Plugin::_hookIn();
 }
 
 uint32_t H4P_UPNPServer::_host2(vector<string> vs){ return _guardString2(vs,[this](string a,string b){ setBothNames(a,b); return H4_CMD_OK; }); }
@@ -100,10 +95,12 @@ void H4P_UPNPServer::_handlePacket(string p,IPAddress ip,uint16_t port){
                 }
             }
             break;
+/*
         default:
             PLOG("unknown SSDP msg %c\n",p[0]);
             break;
     }
+*/
 //    }
 }
 

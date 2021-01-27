@@ -55,7 +55,7 @@ class H4P_UPNPServer: public H4Plugin {
 
             vector<string>      _pups={
                     "",
-                    "upnp:rootdevice"
+                    rootTag()
                 };
 
                 string          _name;

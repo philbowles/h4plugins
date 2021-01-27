@@ -66,17 +66,18 @@ class H4P_Gangmaster: public H4Plugin {
             }
         }
             void _greenLight() override {}
+            
             void _hookIn() override {
                 _pUPNP=h4pdepend<H4P_UPNPServer>(this,H4PID_UPNP);
                 _pUPNP->_listenTag("X-H4-DEVICE","*",[this](uint32_t && mx,H4P_CONFIG_BLOCK && uh,bool && direction){
             //        for(auto const& u:uh) Serial.printf("U WOT ? %s=%s\n",CSTR(u.first),CSTR(u.second));
-                    if(uh["USN"].find("upnp:rootdevice")!=string::npos) {
+                    if(uh["USN"].find(rootTag())!=string::npos) {
                         if(direction) PEVENT(H4P_EVENT_H4_ENTER,"%s,%s,%s,%d",CSTR(uh["X-H4-DEVICE"]),CSTR(uh["X-H4-CHIP"]),CSTR(uh["LOCATION"]),mx); // stag it
                         else PEVENT(H4P_EVENT_H4_LEAVE,"%s",CSTR(uh["X-H4-DEVICE"])); // stag it
                     }
                 });
-                H4Plugin::_hookIn();
             }
+
             void _start() override {
                 _pUPNP->broadcast(50,h4cmd.read("/srch.txt"));
                 Serial.printf("T=%u BROADCAST\n%s\n",millis(),CSTR(h4cmd.read("/srch.txt")));

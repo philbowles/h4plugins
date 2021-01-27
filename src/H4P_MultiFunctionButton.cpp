@@ -50,7 +50,6 @@ void H4P_MultiFunctionButton::_hookIn(){
     _pSignal=h4prequire<H4P_FlasherController>(this,H4PID_WINK);
     _btp=h4prequire<H4P_BinaryThing>(this,H4PID_ONOF);
     _pGPIO=h4pdepend<H4P_GPIOManager>(this,H4PID_GPIO);
-    H4Plugin::_hookIn();
 }
 
 H4P_MultiFunctionButton::H4P_MultiFunctionButton(uint8_t pin,uint8_t mode,H4GM_SENSE b_sense,uint32_t dbTimeMs): H4Plugin(H4PID_MFNB){

@@ -67,7 +67,7 @@ void h4pupcall(H4Plugin* me,H4Plugin* ptr){
 //      Verbosity
 //
 string h4pgetErrorMessage(uint32_t e){ auto vm=h4pisloaded<H4P_VerboseMessages>(H4PID_VM); return vm ? vm->getErrorMessage(e):string("Error "+stringFromInt(e)); }
-string h4pgetEventName   (H4P_EVENT_TYPE e){ auto vm=h4pisloaded<H4P_VerboseMessages>(H4PID_VM); return vm ? vm->getEventName(e):string("No "+stringFromInt(e)); }
+string h4pgetEventName   (H4P_EVENT_TYPE e){ auto vm=h4pisloaded<H4P_VerboseMessages>(H4PID_VM); return vm ? vm->getEventName(e):string("E"+stringFromInt(e,"0x%08x")); }
 string h4pgetTaskType    (uint32_t e){ auto vm=h4pisloaded<H4P_VerboseMessages>(H4PID_VM); return vm ? vm->getTaskType(e):string(stringFromInt(e,"%04d")); }
 string h4pgetTaskName    (uint32_t e){ auto vm=h4pisloaded<H4P_VerboseMessages>(H4PID_VM); return vm ? vm->getTaskName(e):string(stringFromInt(e,"%04d")); }
 //

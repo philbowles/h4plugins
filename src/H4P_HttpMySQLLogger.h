@@ -90,6 +90,5 @@ class H4P_HttpMySQLLogger: public H4Plugin, public asyncHTTPrequest {
             h4pdepend<H4P_WiFi>(this,H4PID_WIFI);
 //            setDebug(true);
             onReadyStateChange( [this](void* && a,asyncHTTPrequest* && b,int  && c){ _requestCB(a,b,c); });
-            H4Plugin::_hookIn();
         }
 };

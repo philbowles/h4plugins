@@ -63,10 +63,7 @@ SOFTWARE.
 #endif
 
 
-void H4P_Sunrise::_hookIn(){ 
-    _pTime=h4pdepend<H4P_Timekeeper>(this,H4PID_TIME);
-    H4Plugin::_hookIn();
-}
+void H4P_Sunrise::_hookIn(){ _pTime=h4pdepend<H4P_Timekeeper>(this,H4PID_TIME); }
 
 void H4P_Sunrise::_parse(const string& s){
     vector<string> parts=split(replaceAll(s,"\"",""),":");

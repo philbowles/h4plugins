@@ -102,3 +102,4 @@ enum H4GM_SENSE:uint8_t {
 
 constexpr const char* h4pTag(){ return "h4P"; }
 constexpr const char* httpTag(){ return "http://"; }
+constexpr const char* rootTag(){ return "upnp:rootdevice"; }
