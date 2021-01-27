@@ -40,6 +40,7 @@ void h4pregisterhandler(H4PID pid,uint32_t t,H4P_FN_EVENTHANDLER f){
         uint32_t inst=1 << i;
         if(t & inst) {
             string e=h4pgetEventName(static_cast<H4P_EVENT_TYPE>(inst));
+            Serial.printf("WTFuckeroo %s t=0x%08x\n",CSTR(e),t);
             if(e.find("No ")==string::npos) h4pevt[inst].push_back(make_pair(pid,f));
         }
     }
@@ -61,11 +62,7 @@ void h4pupcall(H4Plugin* me,H4Plugin* ptr){
     ptr->hookConnect([me](){ me->start(); });
     ptr->hookDisconnect([me](){ me->stop(); });
 }
-
-void h4pdll(H4Plugin* dll){
-    SEVENT(H4P_EVENT_DLL,"%s",CSTR(dll->_pName));
-    dll->_hookIn();
-}
+//
 //
 //      Verbosity
 //
@@ -86,8 +83,33 @@ void h4StartPlugins(){
     H4Plugin::_cb[srcTag()]="SYS";
     H4Plugin::_cb[h4pTag()]=H4P_VERSION;
     Serial.printf("H4P %s\n",CSTR(H4Plugin::_cb[h4pTag()]));
-    for(auto const& p:h4pmap) p.second->_hookIn();
+    for(auto const& p:h4pmap) Serial.printf("%s,",CSTR(p.second->_pName));
+    Serial.println();
+    for(auto const& p:h4pmap) { Serial.printf("%s hookin\n",CSTR(p.second->_pName)); p.second->_hookIn(); }
     for(auto const& p:h4pmap) p.second->_greenLight();
+}
+//
+// General Purpose
+//
+string h4preplaceparams(const string& s){ // oh for a working regex!
+	int i=0;
+	int j=0;
+	string rv;
+    rv.reserve((s.size()*115)/100);
+	while(i < s.size()){
+        if(s[i]=='%'){
+            if(j){
+                string v=s.substr(j,i-j);
+                if(H4Plugin::_cb.count(v)) rv.append(H4Plugin::_cb[v]);
+                else rv.append("%"+v+"%");
+                j=0;
+            }
+            else j=i+1;
+        } else if(!j) rv.push_back(s[i]);
+        i++;
+	}
+    rv.shrink_to_fit();
+	return rv.c_str();
 }
 /*
 TESTERS / DIAG

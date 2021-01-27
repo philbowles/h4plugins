@@ -101,7 +101,6 @@ enum H4PID {
     H4PID_HWRN,
     H4PID_LLOG,
     H4PID_LOOP, // 10
-    H4PID_ONOF,
     H4PID_QWRN,
     H4PID_SNIF,
     H4PID_STOR, // 15
@@ -111,8 +110,10 @@ enum H4PID {
     H4PID_WIFI, // 19
     H4PID_BEAT, // 20
     H4PID_MQTT, // 21
+    H4PID_ONOF,
     H4PID_MLOG,
     H4PID_UPNP,
+    H4PID_GANG,
     H4PID_MFNB,
     H4PID_PDIP, // 25
     H4PID_PDMD,
@@ -174,6 +175,7 @@ string h4pgetTaskType    (uint32_t e);
 string h4pgetTaskName    (uint32_t e);
 //
 void h4FactoryReset(const string& src=userTag());
+string h4preplaceparams(const string& s);
 
 #if SANITY
 void h4psanitycheck();
@@ -376,14 +378,16 @@ class H4Plugin {
 template<typename T>
 T* h4pisloaded(H4PID p){ return h4pmap.count(p) ? reinterpret_cast<T*>(h4pmap[p]):nullptr; }
 
-void h4pdll(H4Plugin* dll);
+//void h4pdll(H4Plugin* dll);
 
 template<typename T,typename... Args>
-T* h4prequire(H4PID p,Args... args){
+T* h4prequire(H4Plugin* me,H4PID p,Args... args){
     T* test=h4pisloaded<T>(p);
     if(test) return test;
     auto dll=new T(args...);
-    h4pdll(dll);
+    SEVENT(H4P_EVENT_DLL,"%s cascade load %s",CSTR(me->_pName),CSTR(h4pnames[p]));
+//    h4pdll(dll);
+    dll->_hookIn();
     return dll;
 }
 
@@ -391,8 +395,8 @@ void h4pupcall(H4Plugin* me,H4Plugin* ptr);
 
 template<typename T,typename... Args>
 T* h4pdepend(H4Plugin* me,H4PID p,Args... args){
-    SEVENT(H4P_EVENT_DLL,"%s->%s",CSTR(me->_pName),CSTR(h4pnames[p]));
-    T* ptr=h4prequire<T>(p,args...);
+    SLOG("%s depends on %s",CSTR(me->_pName),CSTR(h4pnames[p]));
+    T* ptr=h4prequire<T>(me,p,args...);
     h4pupcall(me,ptr);
     return ptr;
 }

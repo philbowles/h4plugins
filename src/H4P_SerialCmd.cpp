@@ -121,11 +121,11 @@ void H4P_SerialCmd::_run(){
 	static int	c;
     if((c=Serial.read()) != -1){
         if (c == '\n') {
-            h4.queueFunction([this,cmd](){
+            h4.queueFunction([=](){
                 uint32_t err=_simulatePayload(cmd);
                 if(err) reply("%s\n",CSTR(h4pgetErrorMessage(err)));
+                cmd="";
             },nullptr,H4P_TRID_SCMD);
-            cmd="";
         } else cmd+=c;
     }
 }

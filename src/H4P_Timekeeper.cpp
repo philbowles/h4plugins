@@ -115,7 +115,7 @@ uint32_t H4P_Timekeeper::_daily(vector<string> vs){ return __alarmCore(vs,true,[
 
 void H4P_Timekeeper::_hookIn(){ 
     h4pdepend<H4P_WiFi>(this,H4PID_WIFI);
-    _btp=h4prequire<H4P_BinaryThing>(H4PID_ONOF);
+    _btp=h4prequire<H4P_BinaryThing>(this,H4PID_ONOF);
     h4cmd.addCmd("at",_pid,0,CMDVS(_at));
     h4cmd.addCmd("daily",_pid,0,CMDVS(_daily));
     H4Plugin::_hookIn();

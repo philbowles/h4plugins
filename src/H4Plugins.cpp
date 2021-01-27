@@ -30,7 +30,7 @@ SOFTWARE.
 #include<H4P_SerialCmd.h>
 //
 vector<string> h4pnames={
-    "sys", // ROOT
+    h4Tag(), // ROOT
     "H4P", // H4
     "R2", // SHOW
     "QVC", // SVC
@@ -44,23 +44,24 @@ vector<string> h4pnames={
     "hwrn",
     "llog",
     "loop",
-    "onof",
     "qwrn",
     "snif",
     "stor",
     "tone",
-    "gpio", //
+    gpioTag(), //
     "wink",
-    "wifi", //
+    wifiTag(), //
     "beat",
-     mqttTag(), //
+    mqttTag(), //
+    onofTag(),
     "mlog",
-    "upnp", //
+    upnpTag(), //
+    "gang", //
     "mfnb",
     "pdip",
     "pdmd",
     "pdup",
-    "rupd",
+    rupdTag(),
     "sqll",
     "sset",
     "time"

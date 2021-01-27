@@ -100,7 +100,7 @@ class H4P_WiFi: public H4Plugin, public AsyncWebServer {
                 void            HAL_WIFI_setHost(const string& host);
 //
         static  String          _aswsReplace(const String& var);
-                void            _badSignal(){ signal("... --- ...   "); }
+                void            _badSignal(){ PLOG("SOS"); signal("... --- ...   "); }
                 void            _clear();
                 bool            _cannotConnectSTA(){ return WiFi.psk()=="H4" || WiFi.psk()==""; }
                 void            _coreStart();

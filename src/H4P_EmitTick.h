@@ -50,8 +50,5 @@ class H4P_EmitTick: public H4Plugin {
                     H4Plugin::show();
                     reply("Uptime %u",_uptime);
                 }
-                void    _hookIn() override { 
-                    h4._hookLoop([this](){ _run(); },_pid);
-                    H4Plugin::_hookIn();
-                }
+                void    _hookIn() override { h4._hookLoop([this](){ _run(); },_pid); }
 };

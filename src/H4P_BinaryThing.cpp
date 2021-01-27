@@ -30,7 +30,7 @@ SOFTWARE.
 #include<H4P_WiFi.h>
 #include<H4P_AsyncMQTT.h>
 
-void H4P_BinaryThing::_greenLight() {
+void H4P_BinaryThing::_greenLight() { // hookin ?
     _pWiFi=h4pisloaded<H4P_WiFi>(H4PID_WIFI);
     _pMQTT=h4pisloaded<H4P_AsyncMQTT>(H4PID_MQTT);
     if(_pWiFi){
@@ -73,6 +73,7 @@ void H4P_BinaryThing::_start() {
     H4Plugin::_start();
     if(_f) _f(_state);
     turn(_state);
+    _upHooks();
 }
 
 #if H4P_LOG_EVENTS

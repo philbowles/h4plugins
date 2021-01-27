@@ -33,6 +33,7 @@ SOFTWARE.
 #include<H4P_GPIOManager.h>
 
 class H4Flasher{
+	        string          _dots;
             H4_TASK_PTR     _timer=nullptr;
             H4_TASK_PTR	    _off=nullptr;
             OutputPin*      _opp;
@@ -73,5 +74,10 @@ class H4P_FlasherController: public H4Plugin {
         void            stopLED(uint8_t pin);
 // syscall only
         void            _hookIn() override;
+/*
+        void show() override{
+            PLOG("Flashers:");
+            for(auto const& f:_flashMap) Serial.printf("h4fc: pin %d 0x%08x\n",f.first,(void*) f.second);
+        }
+*/
 };
-//extern __attribute__((weak)) H4P_FlasherController h4fc;

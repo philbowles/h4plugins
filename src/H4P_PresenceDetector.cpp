@@ -48,7 +48,7 @@ void H4P_UPNPDetector::_start(){
 }
 
 H4P_UPNPDetectorSource::H4P_UPNPDetectorSource(const string& pid,const string& tag,const string& id): H4P_UPNPDetector(pid,tag,id){
-    H4P_BinaryThing* _btp=h4prequire<H4P_BinaryThing>(H4PID_ONOF);
+    H4P_BinaryThing* _btp=h4prequire<H4P_BinaryThing>(this,H4PID_ONOF);
     if(_btp){
         _f=[this,_btp](bool b){ 
 #ifdef H4P_EVENT_EVENTS
@@ -99,7 +99,7 @@ void H4P_IPDetector::_ping_recv_cb(void *arg, void *pdata){
 }
 
 H4P_IPDetectorSource::H4P_IPDetectorSource(const string& pid,const string& id): H4P_IPDetector(pid,id){
-    H4P_BinaryThing* _btp=h4prequire<H4P_BinaryThing>(H4PID_ONOF);
+    H4P_BinaryThing* _btp=h4prequire<H4P_BinaryThing>(this,H4PID_ONOF);
     if(_btp){
         _f=[this,_btp](bool b){ 
 #ifdef H4P_EVENT_EVENTS
@@ -116,7 +116,7 @@ H4P_IPDetectorSource::H4P_IPDetectorSource(const string& pid,const string& id): 
 unordered_map<string,H4P_MDNSDetector*> H4P_MDNSDetector::localList;
 
 void H4P_MDNSDetector::_hookIn() { 
-    h4prequire<H4P_BinaryThing>(H4PID_ONOF);
+    h4prequire<H4P_BinaryThing>(this,H4PID_ONOF);
     h4pdepend<H4P_WiFi>(this,H4PID_WIFI);
 }
 
@@ -133,7 +133,7 @@ H4P_MDNSDetector::H4P_MDNSDetector(const string& friendly,const string& service,
 }
 /*
 H4P_H4DetectorSource::H4P_H4DetectorSource(const string& id): H4P_H4Detector(id){
-    H4P_BinaryThing* _btp=h4prequire<H4P_BinaryThing>(H4PID_ONOF);
+    H4P_BinaryThing* _btp=h4prequire<H4P_BinaryThing>(this,H4PID_ONOF);
     if(_btp){
         _f=[this,_btp](bool b){ 
 #ifdef H4P_EVENT_EVENTS

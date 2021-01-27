@@ -79,23 +79,27 @@ void H4P_FlasherController::_dynaLoad(uint8_t pin,H4GM_SENSE active,H4FC_FN_F1 f
 }
 
 void H4P_FlasherController::_flash(uint32_t period,uint8_t duty,uint8_t pin,H4GM_SENSE active){
+    // cancel any existing!!!
+    stopLED(pin);
 	if(duty < 100){ // sanity
         _dynaLoad(pin,active,
             [period,duty](H4Flasher* fp){ fp->PWM(period,duty); },
-            [period,duty](OutputPin* opp){ return new H4Flasher(opp,period,duty); }
+            [period,duty,this](OutputPin* opp){ return new H4Flasher(opp,period,duty); }
         );
 	}
 }
 
 void H4P_FlasherController::_hookIn() {
-    _pGPIO=h4prequire<H4P_GPIOManager>(H4PID_GPIO);
+    _pGPIO=h4prequire<H4P_GPIOManager>(this,H4PID_GPIO);
     H4Plugin::_hookIn();
 }
 
 void H4P_FlasherController::flashPattern(const char* _pattern,uint32_t _timebase,uint8_t pin,H4GM_SENSE active){
+    // cancel any existing!!!
+    stopLED(pin);
     _dynaLoad(pin,active,
         [_pattern,_timebase](H4Flasher* fp){ fp->flashPattern(_pattern, _timebase); },
-        [_pattern,_timebase](OutputPin* opp){ return new H4Flasher(opp,_pattern,_timebase); }
+        [_pattern,_timebase,this](OutputPin* opp){ return new H4Flasher(opp,_pattern,_timebase); }
     );
 }
 
@@ -131,8 +135,9 @@ void H4P_FlasherController::pulseLED(uint32_t period,uint8_t pin,H4GM_SENSE acti
 
 void H4P_FlasherController::stopLED(uint8_t pin){
 	if(_flashMap.count(pin)) {
-		_flashMap[pin]->stop();
-		delete _flashMap[pin];
+        auto fp=_flashMap[pin];
+		fp->stop();
+		delete fp;
 		_flashMap.erase(pin);
 	}
 }    
@@ -159,18 +164,13 @@ void H4Flasher::PWM(uint32_t period,uint8_t duty){
 
 void H4Flasher::flashPattern(const char* pattern,uint32_t timebase){
 	stop();
-	static string ms=pattern;//t=timebase;
-	_timer=h4.every(timebase,[this]( ){
-		static char prev='0';
-		char c=ms.front();
-		if(c!=prev) {
-		  _opp->toggle();
-		  prev=c;
-		}
-		rotate(ms.begin(),++ms.begin(),ms.end());
+    _dots=pattern;
+	_timer=h4.every(timebase,[this](){
+        _opp->logicalWrite(_dots.front() - 0x30);
+		rotate(_dots.begin(),++_dots.begin(),_dots.end());
 	},nullptr,H4P_TRID_PATN);
 }
-			
+
 void H4Flasher::stop(){
 	h4.cancel({_timer,_off});
 	_opp->logicalWrite(OFF); // OFF

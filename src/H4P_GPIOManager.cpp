@@ -110,7 +110,7 @@ void H4P_GPIOManager::_handleEvent(H4PID pid,H4P_EVENT_TYPE type,const string &m
 };
 
 void H4P_GPIOManager::_hookIn(){
-    h4prequire<H4P_EmitTick>(H4PID_1SEC);
+    h4prequire<H4P_EmitTick>(this,H4PID_1SEC);
     H4Plugin::_hookIn();
 }
 

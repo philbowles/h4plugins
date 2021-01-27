@@ -29,7 +29,7 @@ SOFTWARE.
 #include<H4P_AsyncMQTT.h>
 #include<H4P_WiFi.h>
 
-void __attribute__((weak)) onMQTTError(uint8_t e,int info){ SEVENT(H4P_EVENT_MQTT_ERROR,"e=%d info=%d",e,info); }
+void __attribute__((weak)) onMQTTError(uint8_t e,int info){ SLOG("DEFAULT OE CALL e=%d info=%d",e,info); }
 
 uint32_t H4P_AsyncMQTT::_change(vector<string> vs){
     return _guard1(vs,[this](vector<string> vs){
@@ -55,7 +55,11 @@ void H4P_AsyncMQTT::_hookIn() {
     }
     _cb.erase(mqconfTag());
 #endif
-    onError(onMQTTError);
+    onError([=](uint8_t && e,int && info){
+        PEVENT(H4P_EVENT_MQTT_ERROR,"e=%d info=%d",e,info);
+        onMQTTError(e,info);
+        }
+    );
 
     device=_cb[deviceTag()];
     setClientId(CSTR(device));
@@ -84,7 +88,7 @@ void H4P_AsyncMQTT::_hookIn() {
             report();
             _upHooks();
             _pWiFi->uiSync();
-            PLOG("MQTT CNX");
+            PLOG("MQTT CNX %s:%s",CSTR(_cb[brokerTag()]),CSTR(_cb[portTag()]));
         });
     });
 

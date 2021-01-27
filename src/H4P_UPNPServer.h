@@ -67,7 +67,6 @@ class H4P_UPNPServer: public H4Plugin {
                 string          __upnpCommon(const string& usn);
                 void            __upnpSend(uint32_t mx,const string s,IPAddress ip,uint16_t port);
 
-                void            _broadcast(uint32_t mx,const string s){ __upnpSend(mx,s,_ubIP,1900); }
                 void            _handleEvent(H4PID pid,H4P_EVENT_TYPE type,const string &msg) override;
                 void            _handlePacket(string p,IPAddress ip,uint16_t port);
                 void            _listenUDP();
@@ -78,8 +77,7 @@ class H4P_UPNPServer: public H4Plugin {
                 void            _stop() override;
                 void            _greenLight() override {}; // dont autostart!
 
-        static  string          replaceParams(const string& s);
-        static  string 	        replaceParamsFile(const string &f){ return replaceParams(CSTR(H4P_SerialCmd::read(f))); }
+        static  string 	        replaceParamsFile(const string &f){ return h4preplaceparams(CSTR(H4P_SerialCmd::read(f))); }
     public:                
         H4P_UPNPServer(const string& name="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): _name(name), H4Plugin(H4PID_UPNP,H4P_EVENT_FACTORY,onC,onD){
             _pups.push_back(_urn+"device:controllee:1");
@@ -92,6 +90,7 @@ class H4P_UPNPServer: public H4Plugin {
             });
         }
 
+                void           broadcast(uint32_t mx,const string s){ __upnpSend(mx,s,_ubIP,1900); }
                 void           friendlyName(const string& name);
                 void           setBothNames(const string& host,const string& friendly);
                 void           show() override { 
@@ -101,7 +100,7 @@ class H4P_UPNPServer: public H4Plugin {
                 }
 //          _syscall only
              void           _listenTag(const string& tag,const string& value,H4P_FN_TAGMATCH f){
-                 PLOG("listen TAG %s=%s\n",CSTR(tag),CSTR(value));
+                 PLOG("listen TAG %s=%s",CSTR(tag),CSTR(value));
                  _detect[tag]=make_pair(value,f);
             }
              void            _hookIn() override;

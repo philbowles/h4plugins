@@ -79,6 +79,7 @@ void H4P_WiFi::_start(){
 */
 
 void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
+    SLOG("WIFI EVENT %d",event);
     switch(event) {
         case WIFI_EVENT_STAMODE_DISCONNECTED:
 			h4.queueFunction([](){ h4pisloaded<H4P_WiFi>(H4PID_WIFI)->_lostIP(); });
@@ -309,8 +310,8 @@ void H4P_WiFi::_handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) {
 }
 
 void H4P_WiFi::_hookIn(){
-    _pSignal=h4prequire<H4P_FlasherController>(H4PID_WINK);
-    _pGPIO=h4prequire<H4P_GPIOManager>(H4PID_GPIO);
+    _pSignal=h4prequire<H4P_FlasherController>(this,H4PID_WINK);
+    _pGPIO=h4prequire<H4P_GPIOManager>(this,H4PID_GPIO);
     _btp=h4pisloaded<H4P_BinaryThing>(H4PID_ONOF);
     _cb[chipTag()]=HAL_WIFI_chipID();
     _cb[boardTag()]=replaceAll(H4_BOARD,"ESP8266_","");
@@ -489,7 +490,7 @@ void H4P_WiFi::change(string ssid,string psk){ // add device / name?
     _cb[pskTag()]=psk;
     HAL_WIFI_startSTA();
     if(_dns53) h4reboot();
-    else Serial.printf("Don're reboot frtom STA mode!!!\n");
+//    else Serial.printf("Don're reboot frtom STA mode!!!\n");
 }
 
 void H4P_WiFi::show() { 
@@ -500,7 +501,7 @@ void H4P_WiFi::show() {
 
 void H4P_WiFi::signal(const char* pattern,uint32_t timebase){_pSignal->flashMorse(pattern,timebase,H4P_SIGNAL_LED,H4P_SIGNAL_SENSE); }
 
-void H4P_WiFi::signalOff(){ _pSignal->stopLED(H4P_SIGNAL_LED); }
+void H4P_WiFi::signalOff(){ PLOG("STOPSIGNAL"); _pSignal->stopLED(H4P_SIGNAL_LED); }
 
 void H4P_WiFi::uiAddDropdown(const string& name,H4P_CONFIG_BLOCK options,H4P_FN_UICHANGE onChange){
     string opts="";

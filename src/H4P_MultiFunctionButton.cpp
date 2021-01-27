@@ -47,8 +47,8 @@ void H4P_MultiFunctionButton::_progress(H4GPIOPin* ptr){ // run this as each sta
 }
 
 void H4P_MultiFunctionButton::_hookIn(){
-    _pSignal=h4prequire<H4P_FlasherController>(H4PID_WINK);
-    _btp=h4prequire<H4P_BinaryThing>(H4PID_ONOF);
+    _pSignal=h4prequire<H4P_FlasherController>(this,H4PID_WINK);
+    _btp=h4prequire<H4P_BinaryThing>(this,H4PID_ONOF);
     _pGPIO=h4pdepend<H4P_GPIOManager>(this,H4PID_GPIO);
     H4Plugin::_hookIn();
 }
