@@ -28,7 +28,7 @@ SOFTWARE.
 */
 #pragma once
 
-#define H4P_VERSION "1.0.0"
+#define H4P_VERSION "1.0.1"
 /*
         DIAGNOSTICS
         comment out H4P_LOG_EVENTS to prevent any logging by EVENT( whatever ) messages
