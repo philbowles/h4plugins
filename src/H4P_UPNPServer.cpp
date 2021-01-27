@@ -62,7 +62,6 @@ void H4P_UPNPServer::__upnpSend(uint32_t mx,const string s,IPAddress ip,uint16_t
 }
 
 void H4P_UPNPServer::_handlePacket(string p,IPAddress ip,uint16_t port){
-//    if(p.size() > 50){ // do we need this???
     H4P_CONFIG_BLOCK uhdrs;
     vector<string> hdrs = split(p, "\r\n");
     while (hdrs.back() == "") hdrs.pop_back();
@@ -99,9 +98,8 @@ void H4P_UPNPServer::_handlePacket(string p,IPAddress ip,uint16_t port){
         default:
             PLOG("unknown SSDP msg %c\n",p[0]);
             break;
-    }
 */
-//    }
+    }
 }
 
 void H4P_UPNPServer::_listenUDP(){ 
