@@ -1,0 +1,143 @@
+body {
+font-family: Arial, Helvetica, sans-serif;
+margin: auto;
+}
+form {
+margin-top: 10px;
+margin-bottom: 8px;
+width: inherit;
+}
+select{ 
+    width: 173px;
+}
+#main{
+display: grid;
+grid-template-columns: 25px 300px 25px;
+justify-content: center;
+grid-gap: 5px;
+}
+#cchang{ 
+    grid-column: 2;
+    width: 295px;
+ }
+#cc{ 
+        background-color: #006468;
+    padding: 4px;
+    border-radius: 5px;
+}
+#run{display: inline-flex; }
+#exec{
+    border-radius: 10px;
+    border-style: solid;   
+}
+#cmd{ 
+    width:220px;
+    background-color: aliceblue;
+    margin-left: 2px;
+    border-radius: 10px;
+    border-style: none;   
+    height: 19px;
+    padding-left: 8px;
+}
+#qh{
+    background-color:#17a1a5;
+    color: white;
+    width: 20px;
+    text-align: center;
+    vertical-align: sub;
+    border-radius: 20px;
+    margin-left: 4px;
+    padding-top: 2px;
+    cursor: pointer;
+}
+#reply{
+    margin-top: 5px;
+    background-color: black;
+    resize: none;
+    color:white;
+    width: 289px;
+    height:160px;
+    cursor: pointer;
+}
+#header {
+    grid-row-start: 1;
+    grid-column: 2;
+    margin: auto;
+}
+#footer {
+    font-size: x-small;
+    text-align: center;
+    grid-column: 2;
+    width: 300px;
+}
+#ap{
+    grid-column: 2;
+    width: 280px;
+    display: none;
+    }
+.fline {
+    display: inline-flex;
+    width: -webkit-fill-available;
+}
+#msg{ 
+    color: red;
+    grid-column: 2;
+ }
+#uhang{ 
+    grid-column: 2;
+    display: grid;
+    grid-template-columns: 40% 60%;
+    grid-gap: 5px;
+ }
+ #onof{
+    grid-column: 2;
+    cursor: pointer;
+    display: none;
+    margin: auto;
+}
+#frnd{
+    display: none;
+}
+.line {
+    display: inline-flex;
+    text-align: left;
+    grid-column: 2;
+}
+
+.btn{
+    display: grid;
+    justify-items: center;
+    margin-top: 6px;
+} 
+.title { width: 40%; }
+.data{ 
+    width: 60%;
+    text-align: right;
+}
+.uv{ 
+    text-align: right;
+    margin-right: 6px;
+}
+.ld {
+    margin-left: 162px;
+    margin-top: 5px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.led-red {
+    background-color: #F00;
+    box-shadow: #000 0 -1px 6px 1px, inset #600 0 -1px 8px, #F00 0 3px 11px;
+}
+
+.led-green {
+    background-color: #80FF00;
+    box-shadow: #000 0 -1px 6px 1px, inset #460 0 -1px 8px, #80FF00 0 3px 11px;
+}
+.tuia{
+    color: darkorange;
+}
+.uia{
+    cursor: pointer;
+}

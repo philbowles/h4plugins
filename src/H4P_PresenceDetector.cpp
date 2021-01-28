@@ -32,6 +32,7 @@ SOFTWARE.
 //
 //      UPNP
 //
+/*
 void H4P_UPNPDetector::_hookIn() { _pUPNP=h4pdepend<H4P_UPNPServer>(this,H4PID_UPNP); }
 
 void H4P_UPNPDetector::_start(){
@@ -55,7 +56,7 @@ H4P_UPNPDetectorSource::H4P_UPNPDetectorSource(const string& pid,const string& t
         };
     }
 }
-
+*/
 #ifdef ARDUINO_ARCH_ESP8266
 extern "C" {
   #include <ping.h>

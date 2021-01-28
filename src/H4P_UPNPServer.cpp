@@ -75,7 +75,7 @@ void H4P_UPNPServer::_handlePacket(string p,IPAddress ip,uint16_t port){
         }
     } //else Serial.printf("TiNY BLOCK Nh=%d\n",hdrs.size()); 
     uint32_t mx=1000 * atoi(CSTR(replaceAll(uhdrs["CACHE-CONTROL"],"max-age=","")));
-    bool schroedingerscat=true;
+//    bool schroedingerscat=true;
     string ST = uhdrs["ST"];
     switch(p[0]){
         case 'M':
@@ -84,6 +84,7 @@ void H4P_UPNPServer::_handlePacket(string p,IPAddress ip,uint16_t port){
                 __upnpSend(mx, "HTTP/1.1 200 OK\r\nST:" + ST +"\r\n" +__upnpCommon(tail), ip,port);
             }
             break;
+/*
         case 'N':
             schroedingerscat=uhdrs["NTS"].find(aliveTag())!=string::npos;
         case 'H': // cat always alive :)
@@ -94,7 +95,7 @@ void H4P_UPNPServer::_handlePacket(string p,IPAddress ip,uint16_t port){
                 }
             }
             break;
-/*
+
         default:
             PLOG("unknown SSDP msg %c\n",p[0]);
             break;
@@ -105,7 +106,7 @@ void H4P_UPNPServer::_handlePacket(string p,IPAddress ip,uint16_t port){
 void H4P_UPNPServer::_listenUDP(){ 
     if(!_udp.listenMulticast(_ubIP, 1900)) return; // some kinda error?
     _udp.onPacket([this](AsyncUDPPacket packet){
-//        Serial.printf("pkt sz=%d from %s:%d type %c\n",packet.length(),packet.remoteIP().toString().c_str(),packet.remotePort(),packet.data()[0]);
+        Serial.printf("pkt sz=%d from %s:%d type %c\n",packet.length(),packet.remoteIP().toString().c_str(),packet.remotePort(),packet.data()[0]);
         string pkt=stringFromBuff(packet.data(),packet.length());
         IPAddress ip=packet.remoteIP();
         uint16_t port=packet.remotePort();

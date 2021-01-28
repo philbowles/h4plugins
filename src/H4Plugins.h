@@ -29,7 +29,7 @@
 #include<H4P_LocalLogger.h>
 #include<H4P_HttpMySQLLogger.h>
 #include<H4P_RemoteUpdate.h>
-#include<H4P_Gangmaster.h>
+//#include<H4P_Gangmaster.h>
 #include<H4P_UPNPServer.h>
 #include<H4P_PresenceDetector.h>
 #include<H4P_Timekeeper.h>

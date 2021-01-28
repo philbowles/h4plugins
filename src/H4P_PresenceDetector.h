@@ -60,7 +60,7 @@ class H4PDetector: public H4Plugin{
             bool        isPresent(){ return _here; }
             void        show() override { reply("%s (%s) %s Present",CSTR(_pName),CSTR(_id),_here ? "":"NOT"); }
 };
-
+/*
 class H4P_UPNPDetector: public H4PDetector {
         H4P_UPNPServer* _pUPNP;
     protected:
@@ -77,7 +77,7 @@ class H4P_UPNPDetectorSource: public H4P_UPNPDetector{
     public:
         H4P_UPNPDetectorSource(const string& pid,const string& tag,const string& id);
 };
-
+*/
 #ifdef ARDUINO_ARCH_ESP8266
 class H4P_IPDetector: public H4PDetector {
         static  bool _inflight;

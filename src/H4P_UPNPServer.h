@@ -35,17 +35,16 @@ SOFTWARE.
 
 STAG(alive);
 
+/*
 using H4P_FN_TAGMATCH   =function<void(uint32_t mx,H4P_CONFIG_BLOCK,bool)>;
 using H4P_TAG_MAP       =unordered_map<string,pair<string,H4P_FN_TAGMATCH>>;
-
+*/
 class H4P_UPNPServer: public H4Plugin {
         H4P_BinaryThing* _btp;
         H4P_WiFi*       _pWiFi;
         AsyncUDP 	    _udp;
         IPAddress		_ubIP;
-        H4P_TAG_MAP     _detect;
-
-//        unordered_set<string>     _otherH4s;
+//        H4P_TAG_MAP     _detect;
 
                 VSCMD(_friendly);
                 VSCMD(_host2);
@@ -93,17 +92,10 @@ class H4P_UPNPServer: public H4Plugin {
                 void           broadcast(uint32_t mx,const string s){ __upnpSend(mx,s,_ubIP,1900); }
                 void           friendlyName(const string& name);
                 void           setBothNames(const string& host,const string& friendly);
-                void           show() override { 
-                    reply("Name: %s",CSTR(_cb[nameTag()]));
-    //                 reply("Neighbours:");
-    //                 for(auto const& o:_otherH4s) reply(CSTR(o));
-                }
+                void           show() override { reply("Name: %s",CSTR(_cb[nameTag()])); }
 //          _syscall only
-             void           _listenTag(const string& tag,const string& value,H4P_FN_TAGMATCH f){
-                 PLOG("listen TAG %s=%s",CSTR(tag),CSTR(value));
-                 _detect[tag]=make_pair(value,f);
-            }
-             void            _hookIn() override;
+//                void           _listenTag(const string& tag,const string& value,H4P_FN_TAGMATCH f){ _detect[tag]=make_pair(value,f); }
+                void           _hookIn() override;
 };
 
 //extern __attribute__((weak)) H4P_UPNPServer h4upnp;

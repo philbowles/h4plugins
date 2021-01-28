@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<root xmlns="urn:schemas-upnp-org:device-1-0">
+<specVersion>
+<major>1</major>
+<minor>0</minor>
+</specVersion>
+<device>
+<pnpx:X_deviceCategory xmlns:pnpx="http://schemas.microsoft.com/windows/pnpx/2005/11">HomeAutomation</pnpx:X_deviceCategory>
+<pnpx:X_hardwareId xmlns:pnpx="http://schemas.microsoft.com/windows/pnpx/2005/11">{%udn%}</pnpx:X_hardwareId> 
+<pnpx:X_compatibleId xmlns:pnpx="http://schemas.microsoft.com/windows/pnpx/2005/11">urn:%updt%</pnpx:X_compatibleId> 
+<deviceType>urn:%updt%</deviceType>
+<friendlyName>%name%</friendlyName>
+<manufacturer>%umfr%</manufacturer>
+<manufacturerURL>https://github.com/philbowles/H4</manufacturerURL>
+<modelDescription>Chez ToiioT H4</modelDescription>
+<modelName>%board%</modelName>
+<modelNumber>%h4P%</modelNumber>
+<modelURL>/</modelURL>
+<serialNumber>%chip%</serialNumber>
+<UDN>uuid:%udn%</UDN>
+<presentationURL>/</presentationURL>
+<serviceList>
+<service>
+<serviceType>urn:%usvc%</serviceType>
+<serviceId>urn:%usid%</serviceId>
+<SCPDURL>/wescp.xml</SCPDURL>
+<controlURL>/upnp</controlURL>
+<eventSubURL></eventSubURL>
+</service>
+</serviceList>
+</device>
+</root>

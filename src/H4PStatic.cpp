@@ -40,7 +40,6 @@ void h4pregisterhandler(H4PID pid,uint32_t t,H4P_FN_EVENTHANDLER f){
         uint32_t inst=1 << i;
         if(t & inst) {
             string e=h4pgetEventName(static_cast<H4P_EVENT_TYPE>(inst));
-            Serial.printf("WTFuckeroo %s t=0x%08x\n",CSTR(e),t);
             if(e.find("No ")==string::npos) h4pevt[inst].push_back(make_pair(pid,f));
         }
     }
@@ -83,9 +82,9 @@ void h4StartPlugins(){
     H4Plugin::_cb[srcTag()]="SYS";
     H4Plugin::_cb[h4pTag()]=H4P_VERSION;
     Serial.printf("H4P %s\n",CSTR(H4Plugin::_cb[h4pTag()]));
-    for(auto const& p:h4pmap) Serial.printf("%s,",CSTR(p.second->_pName));
-    Serial.println();
-    for(auto const& p:h4pmap) { Serial.printf("%s hookin\n",CSTR(p.second->_pName)); p.second->_hookIn(); }
+//    for(auto const& p:h4pmap) Serial.printf("%s,",CSTR(p.second->_pName));
+//    Serial.println();
+    for(auto const& p:h4pmap) { p.second->_hookIn(); }
     for(auto const& p:h4pmap) p.second->_greenLight();
 }
 //

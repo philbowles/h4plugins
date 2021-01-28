@@ -380,7 +380,14 @@ void H4P_WiFi::_rest(AsyncWebServerRequest *request){
 	},nullptr,H4P_TRID_REST);
 }
 
-void H4P_WiFi::_sendSSE(const char* name,const char* msg){ if(_evts && _evts->count()) _evts->send(msg,name,_evtID++); }
+void H4P_WiFi::_sendSSE(const char* name,const char* msg){ 
+    if(_evts && _evts->count()) {
+        if(_evts->avgPacketsWaiting() < 16) { // wtf fix!!!!
+            Serial.printf("APW=%d e=%d n=%s m=%s &name=0x%08x &msg=0x%08x \n",_evts->avgPacketsWaiting(),_evtID,name,msg,&name,&msg);
+            _evts->send(msg,name,_evtID++);
+        } else Serial.printf("***************************** WTF? APW=%d\n",_evts->avgPacketsWaiting());
+    }
+}
 
 void H4P_WiFi::_setPersistentValue(string n,string v,bool reboot){
     if(_cb[n]!=v){
@@ -401,11 +408,15 @@ void H4P_WiFi::_startWebserver(){
             h4.queueFunction([this,client](){
                 PLOG("Handle Client %08x i=%d cLast=%d T/O=%d nC=%d nUI=%d",client,_evtID,client->lastId(),H4P_ASWS_EVT_TIMEOUT,_evts->count(),_userItems.size());
                 if(_evts->count()==1) onViewers(); //if(_onC) _onC(); // first time only R WE SURE?
+
                 for(auto & i:_userItems) {
                     H4P_UI_ITEM u=i.second;
-                    if(u.f) u.value=u.f(); // auto-sync delayed fields
+                    u.shown=false;
                     _sendSSE("ui",CSTR(string(u.id+","+stringFromInt(u.type)+","+u.value+","+(u.c ? "1":"0" ))));
+                    Serial.printf("UIA: %s T=%d v=%s r=%d s=%d\n",CSTR(u.id),u.type,CSTR(u.value),u.r,u.shown);
                 }
+                uiSync();
+
                 h4.repeatWhile([this]{ return _evts->count(); },
                     ((H4P_ASWS_EVT_TIMEOUT*3)/4),
                     [this]{ },
@@ -440,11 +451,11 @@ void H4P_WiFi::_stopWebserver(){
     _badSignal();
 }
 
-void H4P_WiFi::_uiAdd(uint32_t seq,const string& i,H4P_UI_TYPE t,const string& v,H4P_FN_UITXT f,H4P_FN_UICHANGE c){
+void H4P_WiFi::_uiAdd(uint32_t seq,const string& i,H4P_UI_TYPE t,const string& v,H4P_FN_UITXT f,H4P_FN_UICHANGE c,bool r){
     string value=v;
     if(c) value=_cb[i]; // change function implies input / dropdown etc: backed by CB variable
     else if(value=="") value=f ? f():_cb[i];
-    _userItems[seq]={i,t,value,f,c};
+    _userItems[seq]={i,t,value,f,c,r,false};
 }
 
 uint32_t H4P_WiFi::_uichg(vector<string> vs){
@@ -538,12 +549,20 @@ void H4P_WiFi::uiAddInput(const string& name,const string& value,H4P_FN_UICHANGE
 
 void H4P_WiFi::uiSync(){
     if(_evts && _evts->count()){
+// rfk
         for(auto &i:_userItems){
-            H4P_UI_ITEM u=i.second;
-            if(u.f) { // refakta syncCore
-                if(u.f) u.value=u.f();
-                _sendSSE(CSTR(u.id),CSTR(u.value));
+            if(i.second.f) { // refakta syncCore
+                if(i.second.r || (!i.second.shown)){
+                    string newval=i.second.f();
+                    if(i.second.value!=newval){
+//                        Serial.printf("SSE Lite ID %s was %s now %s\n",CSTR(i.second.id),CSTR(i.second.value),CSTR(newval));
+                        i.second.value=newval;
+                        _sendSSE(CSTR(i.second.id),CSTR(newval));
+                        i.second.shown=true;
+                    } //else Serial.printf("SSE Lite ID %s unchanged\n",CSTR(i.second.id));
+                } //else Serial.printf("ID %s not a repeater\n",CSTR(i.second.id));
             }
         }
+// rfk
     }
 }

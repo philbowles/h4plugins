@@ -70,6 +70,8 @@ struct H4P_UI_ITEM { // add title and/or props?
     string          value;
     H4P_FN_UITXT    f;
     H4P_FN_UICHANGE c;
+    bool            r;
+    bool            shown;
 };
 using H4P_UI_LIST       = std::map<int,H4P_UI_ITEM>;
 
@@ -153,12 +155,12 @@ class H4P_WiFi: public H4Plugin, public AsyncWebServer {
                 void            uiAddLabel(const string& name){ _uiAdd(_seq++,name,H4P_UI_LABEL,_cb[name]); }
                 void            uiAddLabel(const string& name,const string& v){ _uiAdd(_seq++,name,H4P_UI_LABEL,v); }
                 void            uiAddLabel(const string& name,const int v){ _uiAdd(_seq++,name,H4P_UI_LABEL,stringFromInt(v)); }
-                void            uiAddLabel(const string& name,H4P_FN_UITXT f){ _uiAdd(_seq++,name,H4P_UI_LABEL,"",f); }
-                void            uiAddLabel(const string& name,H4P_FN_UINUM f){ _uiAdd(_seq++,name,H4P_UI_LABEL,"",[f]{ return stringFromInt(f()); }); }
+                void            uiAddLabel(const string& name,H4P_FN_UITXT f,bool repeat=false){ _uiAdd(_seq++,name,H4P_UI_LABEL,"",f,nullptr,repeat); }
+                void            uiAddLabel(const string& name,H4P_FN_UINUM f,bool repeat=false){ _uiAdd(_seq++,name,H4P_UI_LABEL,"",[f]{ return stringFromInt(f()); },nullptr,repeat); }
                 void            uiAddGPIO();
                 H4_CMD_ERROR    uiAddGPIO(uint8_t pin);
                 void            uiAddBoolean(const string& name,const boolean tf,H4P_FN_UICHANGE a=nullptr){ _uiAdd(_seq++,name,H4P_UI_BOOL,"",[tf]{ return tf ? "1":"0"; },a); }
-                void            uiAddBoolean(const string& name,H4P_FN_UIBOOL f,H4P_FN_UICHANGE a=nullptr){ _uiAdd(_seq++,name,H4P_UI_BOOL,"",[f]{ return f() ? "1":"0"; },a); }
+                void            uiAddBoolean(const string& name,H4P_FN_UIBOOL f,H4P_FN_UICHANGE a=nullptr,bool repeat=false){ _uiAdd(_seq++,name,H4P_UI_BOOL,"",[f]{ return f() ? "1":"0"; },a,repeat); }
                 void            uiAddDropdown(const string& name,H4P_CONFIG_BLOCK options,H4P_FN_UICHANGE onChange=nullptr);
                 void            uiAddInput(const string& name,const string& value="",H4P_FN_UICHANGE onChange=nullptr);
                 void            uiSetInput(const string& name,const string& value){ _sendSSE(CSTR(name),CSTR(value)); }
@@ -180,7 +182,7 @@ class H4P_WiFi: public H4Plugin, public AsyncWebServer {
                 void            _reply(string msg) override { _lines.push_back(msg); }
                 void            _sendSSE(const char* name,const char* msg);
                 void            _setPersistentValue(string n,string v,bool reboot);
-                void            _uiAdd(uint32_t seq,const string& i,H4P_UI_TYPE t,const string& v="",H4P_FN_UITXT f=nullptr,H4P_FN_UICHANGE a=nullptr);
+                void            _uiAdd(uint32_t seq,const string& i,H4P_UI_TYPE t,const string& v="",H4P_FN_UITXT f=nullptr,H4P_FN_UICHANGE a=nullptr,bool r=false);
                 void            _wipe(const string &t){ HAL_FS.remove(CSTR(string("/"+t))); }
                 void            _wipe(initializer_list<char*> l){ for(auto const& t:l) _wipe(t); }
 };
