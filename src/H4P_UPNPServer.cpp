@@ -106,7 +106,7 @@ void H4P_UPNPServer::_handlePacket(string p,IPAddress ip,uint16_t port){
 void H4P_UPNPServer::_listenUDP(){ 
     if(!_udp.listenMulticast(_ubIP, 1900)) return; // some kinda error?
     _udp.onPacket([this](AsyncUDPPacket packet){
-        Serial.printf("pkt sz=%d from %s:%d type %c\n",packet.length(),packet.remoteIP().toString().c_str(),packet.remotePort(),packet.data()[0]);
+//        Serial.printf("pkt sz=%d from %s:%d type %c\n",packet.length(),packet.remoteIP().toString().c_str(),packet.remotePort(),packet.data()[0]);
         string pkt=stringFromBuff(packet.data(),packet.length());
         IPAddress ip=packet.remoteIP();
         uint16_t port=packet.remotePort();
@@ -180,7 +180,7 @@ void H4P_UPNPServer::_stop(){
 }
 
 void H4P_UPNPServer::_notify(const string& phase){ // h4Chunker it up
-    h4Chunker<vector<string>>(_pups,[this,phase](vector<string>::const_iterator i){ 
+    h4Chunker<vector<string>>(_pups,[=](vector<string>::iterator i){ 
         string NT=(*i).size() ? (*i):__makeUSN("");
         string nfy="NOTIFY * HTTP/1.1\r\nHOST:"+string(_ubIP.toString().c_str())+":1900\r\nNTS:ssdp:"+phase+"\r\nNT:"+NT+"\r\n"+__upnpCommon((*i));
         broadcast(H4P_UDP_JITTER,CSTR(nfy));

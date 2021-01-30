@@ -14,13 +14,7 @@ void qIsLow(bool inDanger){
 }
 
 H4P_QueueWarn h4qw(qIsLow,50); // call qIsLow when free Q drops below 50%
-/*
-    Open Serial monitor and try typing any of the following:
-    
-    * h4/show/qwrn
-    * h4/qwrn/pcent/< some sensible percentage>
 
-*/
 void h4setup() { // H4 constructor starts Serial
     Serial.println("H4P_QueueWarn example v"H4P_VERSION);
     h4qw.show(); // show limits

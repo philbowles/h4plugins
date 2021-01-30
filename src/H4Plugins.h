@@ -10,7 +10,6 @@
 #include<H4P_Heartbeat.h>
 #include<H4P_SerialCmd.h>
 #include<H4P_SerialLogger.h>
-//#include<H4P_ExternalSqWave.h>
 #include<H4P_TaskSniffer.h>
 #include<H4P_HeapWarn.h>
 #include<H4P_EmitLoopCount.h>
@@ -29,7 +28,6 @@
 #include<H4P_LocalLogger.h>
 #include<H4P_HttpMySQLLogger.h>
 #include<H4P_RemoteUpdate.h>
-//#include<H4P_Gangmaster.h>
 #include<H4P_UPNPServer.h>
 #include<H4P_PresenceDetector.h>
 #include<H4P_Timekeeper.h>

@@ -32,9 +32,8 @@ SOFTWARE.
 #include<H4PCommon.h>
 
 class H4P_EventListener: public H4Plugin { 
-            H4P_FN_USEREVENT    _f;
-
-            void                _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) override { _f(msg); }
+            H4P_FN_EVENTHANDLER _f;
+            void                _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) override { _f(pid,t,msg); }
     public: 
-        H4P_EventListener(uint32_t filter,H4P_FN_USEREVENT f): _f(f), H4Plugin(H4PID_HEAR,filter){}
+        H4P_EventListener(uint32_t filter,H4P_FN_EVENTHANDLER f): _f(f), H4Plugin(H4PID_HEAR,filter){}
 };

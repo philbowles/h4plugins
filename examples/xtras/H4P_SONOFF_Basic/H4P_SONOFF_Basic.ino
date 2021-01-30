@@ -21,4 +21,4 @@ H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","basic");
 H4P_AsyncMQTT h4mqtt("192.168.1.4",1883);
 H4P_BinarySwitch h4onof(RELAY_BUILTIN,ACTIVE_HIGH,OFF);
 H4P_UPNPServer h4upnp("Sonoff Basic Switch");
-H4P_MultiFunctionButton h4mfb(BUTTON_BUILTIN,INPUT,ACTIVE_LOW,15,LED_BUILTIN,ACTIVE_LOW);
+H4P_MultiFunctionButton h4mfb(BUTTON_BUILTIN,INPUT,ACTIVE_LOW,15);

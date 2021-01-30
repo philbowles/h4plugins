@@ -30,15 +30,11 @@ H4_USE_PLUGINS(115200,10,false) // Serial baud rate, Q size, SerialCmd autostop
 //  ...
 //  vs[4]="42"     in code, use int myInt=PARAM(4);    // 42
 //  vs[5]="666"    in code use int myPayload=H4PAYLOAD_INT; // 666
-// 
- void onMQTTConnect(){
-    Serial.print("USER: MQTT connected\n");
-    h4mqtt.subscribeDevice("cards/#",myCallback);
-}
+//
 
-void onMQTTDisconnect(){
-    Serial.print("USER: MQTT Disconnected\n");
-}
+// necessary forward declarations
+void onMQTTConnect();
+void onMQTTDisconnect();
 
 H4P_VerboseMessages h4vm;
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","testbed");
@@ -65,15 +61,11 @@ uint32_t myCallback(vector<string> vs){
   }
 }
 
-#define U_BOARD_NAME ARDUINO_BOARD
-/*
-    Using any MQTT client MQTTSpy, NODE RED etc etc, subscribe to testbed/# 
-    to see all the messages from this device:
+void onMQTTConnect(){
+    Serial.print("USER: MQTT connected\n");
+    h4mqtt.subscribeDevice("cards/#",myCallback);
+}
 
-    Then, publish topic
-
-    cards/... etc
-*/
-void h4setup() {
-    Serial.println("\nH4 Plugins MQTT example v"H4P_VERSION);
+void onMQTTDisconnect(){
+    Serial.print("USER: MQTT Disconnected\n");
 }

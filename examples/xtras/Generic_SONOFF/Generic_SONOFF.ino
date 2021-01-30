@@ -23,5 +23,5 @@ H4P_WiFi h4wifi(WIFI_SSID,WIFI_PASS);
 H4P_AsyncMQTT h4mqtt(MQTT_SERVER,MQTT_PORT);
 H4P_BinarySwitch h4onof(RELAY_BUILTIN,ACTIVE_HIGH,OFF);
 H4P_UPNPServer h4upnp; // friendly name defaults to "upnp <chip id>"
-H4P_MultiFunctionButton h4mfb(BUTTON_BUILTIN,INPUT,ACTIVE_LOW,15,LED_BUILTIN,ACTIVE_LOW);
+H4P_MultiFunctionButton h4mfb(BUTTON_BUILTIN,INPUT,ACTIVE_LOW,15);
 H4P_RemoteUpdate h4ru(REMOTE_UPDATE_URL,__FILE__);

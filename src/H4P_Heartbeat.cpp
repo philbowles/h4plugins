@@ -41,7 +41,7 @@ void H4P_Heartbeat::_handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) {
 void H4P_Heartbeat::_hookIn() {
     h4pdepend<H4P_EmitTick>(this,H4PID_1SEC);
     _pWiFi=h4pisloaded<H4P_WiFi>(H4PID_WIFI);
-    if(_pWiFi) _pWiFi->_uiAdd(H4P_UIO_UP,"Uptime",H4P_UI_LABEL,"",upTime,false); // cos we don't know it yet
+    if(_pWiFi) _pWiFi->_uiAdd(H4P_UIO_UP,"Uptime",H4P_UI_LABEL,"",upTime,nullptr,true); // cos we don't know it yet
 }
 
 string H4P_Heartbeat::secsToTime(uint32_t sex){ 

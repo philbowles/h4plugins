@@ -35,10 +35,10 @@ SOFTWARE.
 class H4P_MQTTLogger: public H4Plugin {
         H4P_AsyncMQTT*  _pMQTT;
         string          _topic;
-        void _handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source){ _pMQTT->publishDevice(_topic,msg); }
+        void            _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) override { _pMQTT->publishDevice(_topic,msg); }
     protected:
-        virtual void _hookIn() override { _pMQTT=h4pdepend<H4P_AsyncMQTT>(this,H4PID_MQTT); }
-        virtual void _greenLight() override {} // dont autostart
+        virtual void    _hookIn() override { _pMQTT=h4pdepend<H4P_AsyncMQTT>(this,H4PID_MQTT); }
+        virtual void    _greenLight() override {} // dont autostart
     public:
-        H4P_MQTTLogger(const string& topic,uint32_t filter=H4P_EVENT_ALL): _topic(topic),H4Plugin(H4PID_MLOG,filter){}
+        H4P_MQTTLogger(const string& topic,uint32_t filter=H4P_EVENT_ALL): _topic(topic),H4Plugin("mlog",filter){}
 };

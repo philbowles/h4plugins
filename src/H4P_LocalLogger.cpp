@@ -36,7 +36,7 @@ H4P_LocalLogger::H4P_LocalLogger(uint32_t limit,uint32_t filter):  _limit(limit)
         {"msg",    {_pid, 0, CMDNULL}},
         {"clear",  {_pid, 0, CMD(clear)}},
         {"flush",  {_pid, 0, CMD(flush)}}
-            });
+    });
 }
 
 void H4P_LocalLogger::clear(){ HAL_FS.remove(CSTR(string("/"+_fname))); }
@@ -54,10 +54,10 @@ void H4P_LocalLogger::show(){
 //
 //      our raison d'etre
 //
-void H4P_LocalLogger::_handleEvent(const string &msg,H4P_EVENT_TYPE type,const string& source){
-    if(type==H4P_EVENT_FACTORY) clear();
+void H4P_LocalLogger::_handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) {
+    if(t==H4P_EVENT_FACTORY) clear();
     else {
-        vector<string> msgparts={stringFromInt(millis()),h4pgetEventName(type),source,msg};
+        vector<string> msgparts={stringFromInt(millis()),h4pgetEventName(t),h4pnames[pid],msg};
         uint32_t size=h4cmd.write("/"+_fname,join(msgparts,",")+"\n","a");
         if(size > _limit) flush();
     }

@@ -35,7 +35,9 @@ void H4P_BinaryThing::_greenLight() { // hookin ?
     _pMQTT=h4pisloaded<H4P_AsyncMQTT>(H4PID_MQTT);
     if(_pWiFi){
         if(WiFi.getMode()==WIFI_STA) {
-            _pWiFi->_uiAdd(H4P_UIO_ONOF,onofTag(),H4P_UI_ONOF,"",[this]{ return stringFromInt(state()); });
+            _pWiFi->_uiAdd(H4P_UIO_ONOF,onofTag(),H4P_UI_ONOF,"",[this]{ return stringFromInt(state()); },
+            [](const string& x){ Serial.printf("WHY DONT I DEAL HERE ? %s\n",CSTR(x)); }
+            ,true);
             if(_pMQTT) _pMQTT->hookConnect([this](){ _pMQTT->subscribeDevice("slave/#",CMDVS(_slave),H4PC_H4); }); // addcmd slave
         }
     }

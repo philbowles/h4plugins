@@ -38,10 +38,6 @@ enum H4P_SVC_CONTROL {
     H4PSVC_START,
     H4PSVC_STOP
 };
-
-using H4P_FN_EVENT      = function<void(const string &msg,H4P_EVENT_TYPE type,const string& source)>;
-using H4P_FN_USEREVENT  = function<void(const string &msg)>;
-
 class H4P_SerialCmd: public H4Plugin {        
         VSCMD(_event);
         VSCMD(_svcRestart);

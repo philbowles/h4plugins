@@ -54,7 +54,6 @@ vector<string> h4pnames={
     "beat",
     mqttTag(), //
     onofTag(),
-    "mlog",
     upnpTag(), //
     "gang", //
     "mfnb",

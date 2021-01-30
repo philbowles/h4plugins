@@ -111,7 +111,6 @@ enum H4PID {
     H4PID_BEAT, // 20
     H4PID_MQTT, // 21
     H4PID_ONOF,
-    H4PID_MLOG,
     H4PID_UPNP,
     H4PID_GANG,
     H4PID_MFNB,
@@ -155,9 +154,11 @@ using H4P_FN_EVENTHANDLER = function<void(H4PID pid,H4P_EVENT_TYPE t,const strin
 using H4P_EVENT_LISTENER  = pair<H4PID,H4P_FN_EVENTHANDLER>;
 using H4P_EVENT_LISTENERS = vector<H4P_EVENT_LISTENER>;
 using H4P_EVENT_HANDLERS  = unordered_map<uint32_t,H4P_EVENT_LISTENERS>;
+using H4P_FN_USEREVENT    = function<void(const string &msg)>;
 
 void h4pregisterhandler(H4PID pid,uint32_t t,H4P_FN_EVENTHANDLER f);
 void h4pemit(H4PID pid,H4P_EVENT_TYPE t,const char* msg);
+void h4pOnEvent(H4P_EVENT_TYPE t,H4P_FN_USEREVENT f);
 
 extern H4P_EVENT_HANDLERS  h4pevt;
 

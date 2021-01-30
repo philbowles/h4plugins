@@ -23,5 +23,5 @@ void h4setup() {
         Serial.printf("Apparently the secret of %s is %d\n",CSTR(h4ps["secret"]),h4ps.getint("answer"));
         h4ps.inc("answer"); // increments the value: can also dec it
         Serial.println("send h4/reboot repeatedly to see increasingly WRONG answer");
+        Serial.println("send h4/factory to restart from scratch");
     }
-}

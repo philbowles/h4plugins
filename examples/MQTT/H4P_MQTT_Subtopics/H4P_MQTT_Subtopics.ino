@@ -1,21 +1,9 @@
 #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,10,false) // Serial baud rate, Q size, SerialCmd autostop
 
-void onMQTTConnect(){
-    Serial.print("USER: MQTT connected\n");
-    h4mqtt.subscribeDevice("a",myCallback);
-    h4mqtt.subscribeDevice("a/b",myCallback);
-    h4mqtt.subscribeDevice("a/b/c",myCallback);
-}
-
-void onMQTTDisconnect(){
-    Serial.print("USER: MQTT Disconnected\n");
-    h4mqtt.unsubscribeDevice("a");
-    h4mqtt.unsubscribeDevice("a/b");
-    h4mqtt.unsubscribeDevice("a/b/c");
-}
-
-
+// necessary forward declarations
+void onMQTTConnect();
+void onMQTTDisconnect();
 
 H4P_VerboseMessages h4vm;
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","testbed");
@@ -34,26 +22,16 @@ uint32_t myCallback(vector<string> vs){
   }
 }
 
-#define U_BOARD_NAME ARDUINO_BOARD
-/*
-    Open Serial monitor and try typing any of the following:
+void onMQTTConnect(){
+    Serial.print("USER: MQTT connected\n");
+    h4mqtt.subscribeDevice("a",myCallback);
+    h4mqtt.subscribeDevice("a/b",myCallback);
+    h4mqtt.subscribeDevice("a/b/c",myCallback);
+}
 
-    h4/show/mqtt
-    h4/mqtt/change // payload = newbroker,newport,newusername,newpassword
-    h4/mqtt/grid // show all local H4 devices
-    h4/mqtt/restart
-    h4/mqtt/start
-    h4/mqtt/stop
-
-    Using any MQTT client MQTTSpy, NODE RED etc etc, subscribe to testbed/# 
-    to see all the messages from this device:
-
-    Then, publish topics
-
-    testbed/a
-    testbed/a/b
-    testbed/a/b/c
-*/
-void h4setup() {
-    Serial.println("\nH4 Plugins MQTT subtopics example v"H4P_VERSION);
+void onMQTTDisconnect(){
+    Serial.print("USER: MQTT Disconnected\n");
+    h4mqtt.unsubscribeDevice("a");
+    h4mqtt.unsubscribeDevice("a/b");
+    h4mqtt.unsubscribeDevice("a/b/c");
 }

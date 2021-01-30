@@ -49,6 +49,10 @@ void h4pemit(H4PID pid,H4P_EVENT_TYPE t,const char* msg){
     if(h4pevt.count(t)) for(auto const& e:h4pevt[t]) e.second(pid,t,msg);
     h4pGlobalEventHandler(pid,t,msg);
 }
+
+void h4pOnEvent(H4P_EVENT_TYPE t,H4P_FN_USEREVENT f){
+    h4pregisterhandler(H4PID_SYS,static_cast<uint32_t>(t),[f](H4PID i,H4P_EVENT_TYPE t,const string& m){ f(m); });
+}
 //
 //      Plugin names etc
 //
@@ -70,7 +74,7 @@ string h4pgetEventName   (H4P_EVENT_TYPE e){ auto vm=h4pisloaded<H4P_VerboseMess
 string h4pgetTaskType    (uint32_t e){ auto vm=h4pisloaded<H4P_VerboseMessages>(H4PID_VM); return vm ? vm->getTaskType(e):string(stringFromInt(e,"%04d")); }
 string h4pgetTaskName    (uint32_t e){ auto vm=h4pisloaded<H4P_VerboseMessages>(H4PID_VM); return vm ? vm->getTaskName(e):string(stringFromInt(e,"%04d")); }
 //
-//      Lifecycle cabacks
+//      Lifecycle callbacks
 //
 void h4FactoryReset(const string& src){
     h4psysevent(H4PID_SYS,H4P_EVENT_FACTORY,CSTR(stringFromInt(millis())));

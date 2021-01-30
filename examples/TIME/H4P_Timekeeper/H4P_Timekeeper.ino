@@ -47,7 +47,7 @@ H4P_Timekeeper h4tk("0.fr.pool.ntp.org","1.fr.pool.ntp.org",60,H4P_Timekeeper::D
 H4P_AsyncMQTT h4mqtt("192.168.1.4",1883);
 H4P_BinarySwitch h4onof(RELAY_BUILTIN,ACTIVE_HIGH,OFF);
 H4P_UPNPServer h4upnp; // friendly name defaults to "upnp <chip id>"
-H4P_MultiFunctionButton h4mfb(BUTTON_BUILTIN,INPUT,ACTIVE_LOW,15,LED_BUILTIN,ACTIVE_LOW);
+H4P_MultiFunctionButton h4mfb(BUTTON_BUILTIN,INPUT,ACTIVE_LOW,15);
 H4P_RemoteUpdate h4ru("192.168.1.4:1880/update",__FILE__);
 
 void h4setup(){
