@@ -3,7 +3,7 @@
  * see H4 for documentation for details
  */
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,10,false) // Serial baud rate, Q size, SerialCmd autostop
+H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 
 H4P_SerialLogger h4sl;
 H4P_EmitLoopCount elc;

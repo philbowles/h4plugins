@@ -1,5 +1,5 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,10,false) // Serial baud rate, Q size, SerialCmd autostop
+H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 /* 
  *   HARDWARE REQUIRED: 
  *   
@@ -39,9 +39,9 @@ void switchOn(uint8_t led,uint32_t t,H4_FN_VOID f=[](){}){
   h4.once(t,[led](){ gpio.logicalWrite(led,OFF); },f); // run f as soon as led goes off    
 }
 
-void trafficLights(bool on){ // this is  the actual "thing" function
+void trafficLights(bool onoff){ // this is  the actual "thing" function
   static H4_TIMER running=nullptr;
-  if(on){
+  if(onoff){
     switchOn(RED_LIGHT,T1+T2);
     h4.once(T1,[](){
       switchOn(AMBER_LIGHT,T2,[](){ // AMBER stays on for T2, and when it goes off...
@@ -52,7 +52,7 @@ void trafficLights(bool on){ // this is  the actual "thing" function
     if(!running) running=h4.every(2*(T1+T2),[](){ trafficLights(true); }); // rerun yourself
   }
   else { // stop everything
-    h4.cancel(running);
+    h4.cancelAll();
     running=nullptr;
     gpio.logicalWrite(RED_LIGHT,OFF);
     gpio.logicalWrite(AMBER_LIGHT,OFF);

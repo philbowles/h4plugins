@@ -1,5 +1,5 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,10,false) // Serial baud rate, Q size, SerialCmd autostop
+H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 
 H4P_FlasherController h4fc;
 /*
@@ -22,7 +22,7 @@ void h4setup() { // H4 constructor starts Serial
       h4fc.flashPWM(1024,20,LED_BUILTIN,ULED_ACTIVE); // LED depends on platform
     });
     h4.once(30000,[](){ 
-      h4fc.flashPWM(1024,10,LED_BUILTIN,ULED_ACTIVE); // LED depends on platform
+      h4fc.flashPWM(1024,H4_Q_CAPACITY,LED_BUILTIN,ULED_ACTIVE); // LED depends on platform
     });
     h4.once(40000,[](){ 
       h4fc.flashPWM(1024,5,LED_BUILTIN,ULED_ACTIVE); // LED depends on platform

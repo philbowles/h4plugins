@@ -13,7 +13,7 @@ and the appropriat "sense" settings of ACTIVE_HIGH/LOW for each
 
 */
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,10,false) // Serial baud rate, Q size, SerialCmd autostop
+H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 
 H4P_GPIOManager h4gm;
 H4P_FlasherController h4fc;

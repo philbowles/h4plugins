@@ -74,7 +74,7 @@ H4P_SerialCmd is the "command and control" centre of H4 and its plugin system. I
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,10,false) // Serial speed, Q size, SerialCmd autostop
+H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial speed, Q size, SerialCmd autostop
 ```
 
 If you put in a Serial speed, make sure your monitor matches and you will see any output messages. 
@@ -182,7 +182,7 @@ Since we have an empty sketch, there isn't much else to see, so the following ex
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,10,false) // Serial baud rate, Q size, SerialCmd autostop
+H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 H4P_GPIOManager h4gm;
 H4P_FlasherController h4fc;
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","basic");

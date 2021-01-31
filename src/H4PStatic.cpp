@@ -83,9 +83,9 @@ void h4FactoryReset(const string& src){
 }
 
 void h4StartPlugins(){
-    H4Plugin::_cb[srcTag()]="SYS";
-    H4Plugin::_cb[h4pTag()]=H4P_VERSION;
-    Serial.printf("H4P %s\n",CSTR(H4Plugin::_cb[h4pTag()]));
+    _cb[srcTag()]="SYS";
+    _cb[h4pTag()]=H4P_VERSION;
+    Serial.printf("H4P %s\n",CSTR(_cb[h4pTag()]));
 //    for(auto const& p:h4pmap) Serial.printf("%s,",CSTR(p.second->_pName));
 //    Serial.println();
     for(auto const& p:h4pmap) { p.second->_hookIn(); }
@@ -94,6 +94,11 @@ void h4StartPlugins(){
 //
 // General Purpose
 //
+string h4pGetConfig(const string& c){ return _cb[c]; }
+int h4pGetConfigInt(const string& c){ return STOI(_cb[c]); }
+void h4pSetConfig(const string& c,const string& v){ _cb[c]=v; }
+void h4pSetConfig(const string& c,const int v){ _cb[c]=stringFromInt(v); }
+
 string h4preplaceparams(const string& s){ // oh for a working regex!
 	int i=0;
 	int j=0;
@@ -103,7 +108,7 @@ string h4preplaceparams(const string& s){ // oh for a working regex!
         if(s[i]=='%'){
             if(j){
                 string v=s.substr(j,i-j);
-                if(H4Plugin::_cb.count(v)) rv.append(H4Plugin::_cb[v]);
+                if(_cb.count(v)) rv.append(_cb[v]);
                 else rv.append("%"+v+"%");
                 j=0;
             }

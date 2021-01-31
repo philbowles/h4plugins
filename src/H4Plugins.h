@@ -46,4 +46,4 @@
 
 H4P_EVENT_HANDLERS  h4pevt;
 H4GM_PINMAP         H4P_GPIOManager::pins; 
-H4P_CONFIG_BLOCK    H4Plugin::_cb{};
+H4P_CONFIG_BLOCK    _cb{};

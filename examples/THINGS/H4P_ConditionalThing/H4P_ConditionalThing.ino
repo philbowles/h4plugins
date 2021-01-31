@@ -1,5 +1,5 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,10,false) // Serial baud rate, Q size, SerialCmd autostop
+H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 
 boolean condition=true;
 
@@ -9,6 +9,7 @@ OutputPin* pCT=h4gm.Output(LED_BUILTIN,ACTIVE_LOW,OFF);
 
 H4P_ConditionalThing h4onof([](bool b){ return condition; },[](bool b){
       Serial.printf("H4P_ConditionalThing %d [condition=%d]\n",b,condition);
+//    This is effectively what a conditional switch does...but your own app can do any THING  it wants here
       pCT->logicalWrite(b);
     });
 

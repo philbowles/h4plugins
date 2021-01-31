@@ -144,23 +144,25 @@ enum H4P_EVENT_TYPE:uint32_t {
     H4P_EVENT_DLL       = 1 << 14,
     H4P_EVENT_ON        = 1 << 15,
     H4P_EVENT_OFF       = 1 << 16,
-    H4P_EVENT_H4_ENTER  = 1 << 17,
-    H4P_EVENT_H4_LEAVE  = 1 << 18,
+    H4P_EVENT_UISYNC    = 1 << 17,
     H4P_EVENT_HEARTBEAT=0x80000000,
     H4P_EVENT_ALL=0x7fffffff
 };
 
-using H4P_FN_EVENTHANDLER = function<void(H4PID pid,H4P_EVENT_TYPE t,const string& msg)>;
-using H4P_EVENT_LISTENER  = pair<H4PID,H4P_FN_EVENTHANDLER>;
-using H4P_EVENT_LISTENERS = vector<H4P_EVENT_LISTENER>;
-using H4P_EVENT_HANDLERS  = unordered_map<uint32_t,H4P_EVENT_LISTENERS>;
-using H4P_FN_USEREVENT    = function<void(const string &msg)>;
+using H4P_CONFIG_BLOCK      = unordered_map<string,string>;
+
+using H4P_FN_EVENTHANDLER   = function<void(H4PID pid,H4P_EVENT_TYPE t,const string& msg)>;
+using H4P_EVENT_LISTENER    = pair<H4PID,H4P_FN_EVENTHANDLER>;
+using H4P_EVENT_LISTENERS   = vector<H4P_EVENT_LISTENER>;
+using H4P_EVENT_HANDLERS    = unordered_map<uint32_t,H4P_EVENT_LISTENERS>;
+using H4P_FN_USEREVENT      = function<void(const string &msg)>;
 
 void h4pregisterhandler(H4PID pid,uint32_t t,H4P_FN_EVENTHANDLER f);
 void h4pemit(H4PID pid,H4P_EVENT_TYPE t,const char* msg);
 void h4pOnEvent(H4P_EVENT_TYPE t,H4P_FN_USEREVENT f);
 
-extern H4P_EVENT_HANDLERS  h4pevt;
+extern H4P_EVENT_HANDLERS   h4pevt;
+extern H4P_CONFIG_BLOCK     _cb;
 
 template<typename... Args>
 void h4psysevent(H4PID pid,H4P_EVENT_TYPE t,const string& fmt, Args... args){
@@ -176,6 +178,12 @@ string h4pgetTaskType    (uint32_t e);
 string h4pgetTaskName    (uint32_t e);
 //
 void h4FactoryReset(const string& src=userTag());
+
+string h4pGetConfig(const string& c);
+int h4pGetConfigInt(const string& c);
+void h4pSetConfig(const string& c,const string& v);
+void h4pSetConfig(const string& c,const int v);
+
 string h4preplaceparams(const string& s);
 
 #if SANITY
@@ -193,7 +201,6 @@ struct command{
 
 using 	H4_CMD_MAP		    =std::unordered_multimap<string,command>;
 using 	H4_CMD_MAP_I        =H4_CMD_MAP::iterator;
-using   H4P_CONFIG_BLOCK    =std::unordered_map<string,string>;
 using   H4P_FN_PSCHANGE     =function<void(const string&,const string&)>;
 
 enum H4_CMD_ERROR:uint32_t  {
@@ -329,7 +336,7 @@ class H4Plugin {
         virtual void                _stop() { _downHooks(); }
                 string              _uniquify(const string& name,uint32_t uqf=0);
     public:
-        static  H4P_CONFIG_BLOCK    _cb;
+//        static  H4P_CONFIG_BLOCK    _cb;
                 H4PID               _pid;
                 string              _pName;
 //
@@ -344,8 +351,8 @@ class H4Plugin {
 
         H4Plugin(H4PID pid,uint32_t filter=H4P_EVENT_NOOP,H4_FN_VOID svcUp=nullptr,H4_FN_VOID svcDown=nullptr): _eventFilter(filter){ _init(pid,svcUp,svcDown); }
 //
-        static  string      getConfig(const string& c){ return _cb[c]; }
-        static  int         getConfigInt(const string& c){ return STOI(_cb[c]); }
+//        static  string      getConfig(const string& c){ return _cb[c]; }
+//        static  int         getConfigInt(const string& c){ return STOI(_cb[c]); }
                 void        hookConnect(H4_FN_VOID f){ _connected.push_back(f); }
                 void        hookDisconnect(H4_FN_VOID f){ _disconnected.push_back(f); } 
 
@@ -357,8 +364,8 @@ class H4Plugin {
             free(buff);
         }
                 void        restart(){ _restart(); };
-        static  void        setConfig(const string& c,const string& v){ _cb[c]=v; }
-        static  void        setConfig(const string& c,const int v){ _cb[c]=stringFromInt(v); }
+//        static  void        setConfig(const string& c,const string& v){ _cb[c]=v; }
+//        static  void        setConfig(const string& c,const int v){ _cb[c]=stringFromInt(v); }
         virtual void        show(){}
                 void        start();
                 bool        state(){ return _state(); }

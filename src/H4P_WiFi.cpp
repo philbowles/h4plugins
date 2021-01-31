@@ -299,9 +299,27 @@ uint32_t H4P_WiFi::_gpio(vector<string> vs){
 
 void H4P_WiFi::_handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) {
     switch(t){
-        case H4P_EVENT_HEARTBEAT:
-            uiSync();
+        case H4P_EVENT_UISYNC:
+            uint32_t ui=STOI(msg);
+            if(_userItems.count(ui)){
+                auto i=_userItems[ui];
+                Serial.printf("H4P_EVENT_UISYNC src=%s ui=%d item=%s\n",CSTR(h4pnames[pid]),ui,CSTR(i.id));
+                if(i.f) { // refakta syncCore
+                    if(i.r || (!i.shown)){
+                        string newval=i.f();
+                        if(i.value!=newval){
+                            Serial.printf("SSE Lite ID %s was %s now %s\n",CSTR(i.id),CSTR(i.value),CSTR(newval));
+                            i->second.value=newval;
+                            _sendSSE(CSTR(i.id),CSTR(newval));
+                            i.shown=true;
+                        } else Serial.printf("SSE Lite ID %s unchanged\n",CSTR(i.id));
+                    } else Serial.printf("ID %s not a repeater\n",CSTR(i.id));
+                } else Serial.printf("ID %s non functional!!!\n",CSTR(i.id));
+            } else PLOG("never heard of ya %d",ui);
             break;
+//        case H4P_EVENT_HEARTBEAT:
+            //uiSync();
+//            break;
         case H4P_EVENT_FACTORY:
             Serial.printf("%s H4P_EVENT_FACTORY src=%d msg=%s\n",CSTR(_pName),pid,CSTR(msg));
              _clear();
@@ -379,11 +397,18 @@ void H4P_WiFi::_rest(AsyncWebServerRequest *request){
         _lines.clear();
 	},nullptr,H4P_TRID_REST);
 }
+#define ASWS_IS_SHIT 8000
 
-void H4P_WiFi::_sendSSE(const char* name,const char* msg){ 
+//void H4P_WiFi::_sendSSE(const char* name,const char* msg){ 
+void H4P_WiFi::_sendSSE(const string name,const string msg){ /// NOT NOT NOT & - we NEEEEED the copy for the RQ 
     if(_evts && _evts->count()) {
-        if(_evts->avgPacketsWaiting() < 16) _evts->send(msg,name,_evtID++);
-        else PLOG("AsyncWebserver Q full");
+        //if(_evts->avgPacketsWaiting() < 16) _evts->send(msg,name,_evtID++);
+        PLOG("APW=%02d FH=%u QS=%d",_evts->avgPacketsWaiting(),ESP.getFreeHeap(),h4.size());
+        if(ESP.getFreeHeap() > ASWS_IS_SHIT) _evts->send(CSTR(msg),CSTR(name),_evtID++);
+        else {
+            PLOG("***************** REQUEUE SSE %s\n",CSTR(msg));
+            h4.once(500,[=](){ Serial.printf("RQDDDDD %s\n",CSTR(msg)); _sendSSE(CSTR(msg),CSTR(name)); });
+        }
     }
 }
 
@@ -409,12 +434,14 @@ void H4P_WiFi::_startWebserver(){
                 // to cure MASSIVE AsyncWebserver bug / nastiness / p.o.s. :)
                 h4Chunker<H4P_UI_LIST>(_userItems,[=](H4P_UI_LIST::iterator i){
                     H4P_UI_ITEM u=i->second;
-                    u.shown=false;
+                    if(u.f){
+                        u.value=u.f();
+                        u.shown=true; // nullout f in non-rep?
+                    }
                     _sendSSE("ui",CSTR(string(u.id+","+stringFromInt(u.type)+","+u.value+","+(u.c ? "1":"0" ))));
-//                    Serial.printf("UIA: %s T=%d v=%s r=%d s=%d\n",CSTR(u.id),u.type,CSTR(u.value),u.r,u.shown);
-                },50,150); // < tidy this
-                uiSync();
-
+                    Serial.printf("UIA: %s T=%d v=%s r=%d s=%d f=%d c=%d\n",CSTR(u.id),u.type,CSTR(u.value),u.r,u.shown,u.f ? 1:0,u.c ? 1:0);
+                },50,100); // < tidy this
+//                uiSync();
                 h4.repeatWhile([this]{ return _evts->count(); },
                     ((H4P_ASWS_EVT_TIMEOUT*3)/4),
                     [this]{ },
@@ -544,7 +571,7 @@ void H4P_WiFi::uiAddInput(const string& name,const string& value,H4P_FN_UICHANGE
     if(value!="") _cb[name]=value;
     _uiAdd(_seq++,name,H4P_UI_INPUT,_cb[name],nullptr,onChange); 
 }
-
+/*
 void H4P_WiFi::uiSync(){
     if(_evts && _evts->count()){
         h4Chunker<H4P_UI_LIST>(_userItems,[=](H4P_UI_LIST::iterator i){
@@ -552,13 +579,14 @@ void H4P_WiFi::uiSync(){
                 if(i->second.r || (!i->second.shown)){
                     string newval=i->second.f();
                     if(i->second.value!=newval){
-//                        Serial.printf("SSE Lite ID %s was %s now %s\n",CSTR(i->second.id),CSTR(i->second.value),CSTR(newval));
+                        Serial.printf("SSE Lite ID %s was %s now %s\n",CSTR(i->second.id),CSTR(i->second.value),CSTR(newval));
                         i->second.value=newval;
                         _sendSSE(CSTR(i->second.id),CSTR(newval));
                         i->second.shown=true;
-                    } //else Serial.printf("SSE Lite ID %s unchanged\n",CSTR(i->second.id));
-                } //else Serial.printf("ID %s not a repeater\n",CSTR(i->second.id));
+                    } else Serial.printf("SSE Lite ID %s unchanged\n",CSTR(i->second.id));
+                } else Serial.printf("ID %s not a repeater\n",CSTR(i->second.id));
             }
-        });
+        },10,10);
     }
 }
+*/

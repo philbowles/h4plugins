@@ -44,15 +44,15 @@ class H4P_BinaryThing: public H4Plugin{
             H4P_AsyncMQTT*          _pMQTT;
             H4BS_FN_SWITCH  _f;
 
-                    uint32_t _autoOff(vector<string> vs){ return _guardInt1(vs,[this](uint32_t t){ autoOff(t); }); }
+                uint32_t            _autoOff(vector<string> vs){ return _guardInt1(vs,[this](uint32_t t){ autoOff(t); }); }
 
-            virtual void     _greenLight() override ;
-                    void     _publish(bool b);
-                    void     _setSlaves(bool b);
-            virtual void     _setState(bool b);
-                    uint32_t _slave(vector<string> vs);
-                    void     _start() override;
-                    uint32_t _switch(vector<string> vs){ return _guardInt1(vs,[this](bool b){ turn(b); }); }
+        virtual void                _greenLight() override ;
+                void                _publish(bool b);
+                void                _setSlaves(bool b);
+        virtual void                _setState(bool b);
+                uint32_t            _slave(vector<string> vs);
+                void                _start() override;
+                uint32_t            _switch(vector<string> vs){ return _guardInt1(vs,[this](bool b){ turn(b); }); }
     public:
             bool            _state=false;
         H4P_BinaryThing(H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): _f(f),_state(initial),_timeout(timer), H4Plugin(H4PID_ONOF) {
@@ -72,38 +72,39 @@ class H4P_BinaryThing: public H4Plugin{
                 for(auto s:_slaves) reply("slave: %s",CSTR(s));
             }
 
-                    uint32_t getAutoOff(){ return _timeout; }
-                    void     autoOff(uint32_t T){ 
-                        _timeout=T;
-                        _cb[autoTag()]=stringFromInt(T);
+                uint32_t    getAutoOff(){ return _timeout; }
+                void        autoOff(uint32_t T){ 
+                    _timeout=T;
+                    _cb[autoTag()]=stringFromInt(T);
+                }
+                void        slave(const string& otherh4,bool inout=true){ 
+                    if(inout) _slaves.insert(otherh4);
+                    else _slaves.erase(otherh4);
                     }
-                    void     slave(const string& otherh4,bool inout=true){ 
-                        if(inout) _slaves.insert(otherh4);
-                        else _slaves.erase(otherh4);
-                        }
-                    bool     state() { return _state; }
-                    void     turnOff(){ turn(false); }
-                    void     turnOn(){ turn(true); }
-                    void     toggle(){ turn(!_state); }
-                    void     turn(bool b);
+                bool        state() { return _state; }
+                void        turnOff(){ turn(false); }
+                void        turnOn(){ turn(true); }
+                void        toggle(){ turn(!_state); }
+                void        turn(bool b);
 #if H4P_LOG_EVENTS
-                    void    _turn(bool b,const string& src);
+                void        _turn(bool b,const string& src);
 #endif
 };
 using H4_FN_CPRED      = function<uint32_t(bool)>;
 
 class H4P_ConditionalThing: public H4P_BinaryThing{
                 H4_FN_CPRED _predicate;
-        virtual void        _setState(bool b);
-                void        _hookIn() override;
+    protected:
+                void        _greenLight() override;
+                void        _setState(bool b) override;
     public:
         H4P_ConditionalThing(H4_FN_CPRED predicate,H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): 
             _predicate(predicate),
             H4P_BinaryThing(f,initial,timer) {}
-            void show() override { 
-                reply("Condition: %d",_predicate(_state));
-                H4P_BinaryThing::show();
-            }
 
-        void syncCondition();
+                void        show() override { 
+                    reply("Condition: %d",_predicate(_state));
+                    H4P_BinaryThing::show();
+                }
+                void        syncCondition();
 };

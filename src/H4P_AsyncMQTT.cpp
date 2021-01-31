@@ -87,7 +87,8 @@ void H4P_AsyncMQTT::_hookIn() {
             subscribe(CSTR(string(_cb[boardTag()]+cmdhash())),0);
             report();
             _upHooks();
-            _pWiFi->uiSync();
+//            _pWiFi->uiSync();
+            PEVENT(H4P_EVENT_UISYNC,H4P_UIO_MQTT);
             PLOG("MQTT CNX %s:%s",CSTR(_cb[brokerTag()]),CSTR(_cb[portTag()]));
         });
     });
@@ -98,7 +99,8 @@ void H4P_AsyncMQTT::_hookIn() {
                 _badSignal();
                 _discoDone=true;
                 _downHooks();
-                _pWiFi->uiSync();
+                //_pWiFi->uiSync();
+                PEVENT(H4P_EVENT_UISYNC,H4P_UIO_MQTT);
                 PLOG("MQTT DCX %d",reason);
                 if(autorestart && WiFi.status()==WL_CONNECTED) h4.every(H4MQ_RETRY,[this](){ connect(); },nullptr,H4P_TRID_MQRC,true);
             });

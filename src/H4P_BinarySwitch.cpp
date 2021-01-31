@@ -34,11 +34,9 @@ void H4P_BinarySwitch::_hookIn() {
     _pp=_pGPIO->Output(_pin,_sense,_initial,[](H4GPIOPin* ptr){});
 }
 
-void H4P_ConditionalSwitch::syncCondition(){ if(_pWiFi) _pWiFi->_sendSSE(conditionTag(),CSTR(stringFromInt(_predicate(state())))); }
-
 void H4P_ConditionalSwitch::_hookIn() {
     _pWiFi=h4pisloaded<H4P_WiFi>(H4PID_WIFI);
-    if(_pWiFi) _pWiFi->_uiAdd(H4P_UIO_COND,conditionTag(),H4P_UI_BOOL,"",[this]{ return stringFromInt(_predicate(state())); });
+    if(_pWiFi) _pWiFi->_uiAdd(H4P_UIO_COND,conditionTag(),H4P_UI_BOOL,"",[this]{ return stringFromInt(_predicate(state())); },nullptr,true);
     H4P_BinarySwitch::_hookIn();
 }
 
@@ -46,3 +44,5 @@ void H4P_ConditionalSwitch::_setState(bool b) {
     if(_predicate(b)) H4P_BinarySwitch::_setState(b);
     else if(_pWiFi) _pWiFi->uiMessage("Unable: condition disarmed");
 }
+
+void H4P_ConditionalSwitch::syncCondition(){ if(_pWiFi) _pWiFi->_sendSSE(conditionTag(),CSTR(stringFromInt(_predicate(state())))); }

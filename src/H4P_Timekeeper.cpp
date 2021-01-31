@@ -43,15 +43,15 @@ H4P_Timekeeper::H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzo,H4_
         {"change", { _pid,       0, CMDVS(_change)}},
         {"sync",   { _pid,       0, CMD(sync)}},
         {"tz",     { _pid,       0, CMDVS(_tz)}}
-            });
+    });
     sntp_setoperatingmode(SNTP_OPMODE_POLL);
     _setupSNTP(ntp1,ntp2);
     __HALsetTimezone(0);
     _tzo = tzo;
     if(!_fDST) _fDST=[](uint32_t){ return 0; };
 }
-#ifdef ARDUINO_ARCH_ESP8266
 
+#ifdef ARDUINO_ARCH_ESP8266
 void H4P_Timekeeper::__HALsetTimezone(int tzo){
     _tzo=tzo;
     sntp_set_timezone(0);
@@ -59,6 +59,7 @@ void H4P_Timekeeper::__HALsetTimezone(int tzo){
 
 void H4P_Timekeeper::sync(){
 	long stamp=sntp_get_current_timestamp();
+    PLOG("TK sync 8266 stamp=%lu",stamp);
 	if(stamp > 30000){ // 28800 +leeway: default is GMT+8
         stamp+=(_tzo*60);
 		vector<string> dp=split(replaceAll(sntp_get_real_time(stamp + _fDST(stamp)),"  "," ")," ");
@@ -75,6 +76,7 @@ void H4P_Timekeeper::__HALsetTimezone(int tzo){
  }
 
 void H4P_Timekeeper::sync(){
+    PLOG("TK sync ESP32");
     time_t now = 0;
     time(&now);
     uint32_t adjusted=now+_tzo*60;
@@ -114,20 +116,23 @@ uint32_t H4P_Timekeeper::_change(vector<string> vs){ return _guardString2(vs,[th
 uint32_t H4P_Timekeeper::_daily(vector<string> vs){ return __alarmCore(vs,true,[this](bool b){ _btp->turn(b); }); }
 
 void H4P_Timekeeper::_hookIn(){ 
-    h4pdepend<H4P_WiFi>(this,H4PID_WIFI);
     _btp=h4prequire<H4P_BinaryThing>(this,H4PID_ONOF);
+    h4pdepend<H4P_WiFi>(this,H4PID_WIFI);
     h4cmd.addCmd("at",_pid,0,CMDVS(_at));
     h4cmd.addCmd("daily",_pid,0,CMDVS(_daily));
 }
 
 void H4P_Timekeeper::_setupSNTP(const string& ntp1, const string& ntp2){
+    sntp_stop();
     _ntp1=ntp1;
     _ntp2=ntp2;
-    sntp_setservername(0,(char*) _ntp1.c_str());
-    sntp_setservername(1,(char*) _ntp2.c_str());
+    sntp_setservername(0,CSTR(_ntp1));
+    sntp_setservername(1,CSTR(_ntp2));
+    PLOG("NTP Servers: %s %s",CSTR(ntp1),CSTR(ntp2));
 }
 
 void H4P_Timekeeper::_start(){
+    PLOG("TK _START _mss00=%u",_mss00);
     sntp_init();
     if(!_mss00){
         h4.repeatWhile(
@@ -151,6 +156,7 @@ void H4P_Timekeeper::_start(){
 }
 
 void H4P_Timekeeper::_stop(){ 
+    PLOG("TK _STOP");
     h4.cancelSingleton({H4P_TRID_TIME,H4P_TRID_SYNC});
 	sntp_stop();
     _downHooks();
@@ -214,9 +220,9 @@ void H4P_Timekeeper::setScheduleSource(H4P_SCHEDULE shed){
 }
 
 void H4P_Timekeeper::show(){
-//    reply("_mss00=%d, ms since 00:00=%d",_mss00,msSinceMidnight());
+    reply("_mss00=%d, ms since 00:00=%d",_mss00,msSinceMidnight());
     reply("TZO=%d",_tzo);
-    reply("%s %s",CSTR(_ntp1),CSTR(_ntp2));
+    reply("Servers: %s %s",CSTR(_ntp1),CSTR(_ntp2));
     reply("Wallclock=%s, UpTime=%s",CSTR(clockTime()),CSTR(upTime()));
 }
 

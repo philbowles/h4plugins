@@ -32,7 +32,7 @@ SOFTWARE.
 #include<H4P_GPIOManager.h>
 #include<H4P_BinaryThing.h>
 
-class H4P_WiFi;
+//class H4P_WiFi;
 class H4P_BinarySwitch: public H4P_BinaryThing{
             uint8_t         _pin;
             H4GM_SENSE      _sense;
@@ -53,18 +53,18 @@ class H4P_BinarySwitch: public H4P_BinaryThing{
 };
 
 class H4P_ConditionalSwitch: public H4P_BinarySwitch{
-        H4P_WiFi*           _pWiFi;
-        H4_FN_CPRED _predicate;
+                H4_FN_CPRED _predicate;
     protected:
-        virtual void        _setState(bool b) override;
+                void        _setState(bool b) override;
                 void        _hookIn() override;
     public:
         H4P_ConditionalSwitch(uint8_t pin,H4GM_SENSE sense, uint32_t initial,H4_FN_CPRED predicate,H4BS_FN_SWITCH f=nullptr,uint32_t timer=0):
             _predicate(predicate), 
             H4P_BinarySwitch(pin,sense,initial,f,timer){}
-        void syncCondition();
-        void show(){ 
+
+        void show() override { 
             reply("Condition %d",_predicate(state()));
             H4P_BinarySwitch::show();
         }
+        void syncCondition();
 };

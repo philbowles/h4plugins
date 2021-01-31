@@ -56,7 +56,8 @@ void H4P_BinaryThing::_setState(bool b) {
     _state=b;
     _cb[stateTag()]=stringFromInt(b);
     _setSlaves(b);
-    if(_pWiFi) _pWiFi->uiSync();
+//    if(_pWiFi) _pWiFi->uiSync();
+    PEVENT(H4P_EVENT_UISYNC,H4P_UIO_ONOF);
 }
 
 uint32_t H4P_BinaryThing::_slave(vector<string> vs){
@@ -78,7 +79,7 @@ void H4P_BinaryThing::_start() {
     _upHooks();
 }
 
-#if H4P_LOG_EVENTS
+#if H4P_LOG_EVENTS // this is filthy and needs fixing / tidying
 void H4P_BinaryThing::_turn(bool b,const string& src){
     h4.cancelSingleton(H4P_TRID_BTTO);
     if(b && _timeout) h4.once(_timeout,[this](){ _turn(OFF,"btto"); },nullptr,H4P_TRID_BTTO,true);
@@ -103,19 +104,18 @@ void H4P_BinaryThing::turn(bool b){
         _publish(_state);
     }
 }
+#endif
 //
 //      H4P_ConditionalThing
 //
-void H4P_ConditionalThing::_hookIn() {
-    _pWiFi->_uiAdd(H4P_UIO_COND,conditionTag(),H4P_UI_BOOL,"",[this]{ return stringFromInt(_predicate(state())); });
-    H4P_BinaryThing::_hookIn();
+void H4P_ConditionalThing::_greenLight() {
+    if(_pWiFi) _pWiFi->_uiAdd(H4P_UIO_COND,conditionTag(),H4P_UI_BOOL,"",[this]{ return stringFromInt(_predicate(state())); },nullptr,true);
+    H4P_BinaryThing::_greenLight();
 }
 
-void H4P_ConditionalThing:: _setState(bool b) { 
+void H4P_ConditionalThing::_setState(bool b) { 
     if(_predicate(b)) H4P_BinaryThing::_setState(b);
-    else _pWiFi->uiMessage("Unable: condition disarmed");
+    else if(_pWiFi) _pWiFi->uiMessage("Unable: condition disarmed");
 }
 
-void H4P_ConditionalThing::syncCondition() { _pWiFi->_sendSSE(conditionTag(),CSTR(stringFromInt(_predicate(state())))); }
-
-#endif
+void H4P_ConditionalThing::syncCondition() { if(_pWiFi) _pWiFi->_sendSSE(conditionTag(),CSTR(stringFromInt(_predicate(state())))); }

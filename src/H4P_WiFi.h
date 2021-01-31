@@ -73,7 +73,7 @@ struct H4P_UI_ITEM { // add title and/or props?
     bool            r;
     bool            shown;
 };
-using H4P_UI_LIST       = std::map<int,H4P_UI_ITEM>;
+using H4P_UI_LIST       = std::map<uin32_t,H4P_UI_ITEM>;
 
 class H4P_WiFi: public H4Plugin, public AsyncWebServer {
             H4P_FlasherController* _pSignal;
@@ -126,14 +126,14 @@ class H4P_WiFi: public H4Plugin, public AsyncWebServer {
                 H4P_AsyncMQTT*  _pMQTT;
 
         H4P_WiFi(H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): 
-            H4Plugin(H4PID_WIFI,H4P_EVENT_HEARTBEAT | H4P_EVENT_FACTORY,onC,onD),
+            H4Plugin(H4PID_WIFI,H4P_EVENT_UISYNC | H4P_EVENT_FACTORY,onC,onD),
             AsyncWebServer(H4P_WEBSERVER_PORT){
             _cb[ssidTag()]=h4Tag();
             _cb[pskTag()]=h4Tag();
 #else
         H4P_WiFi(string ssid,string psk,string device="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr):
             _device(device),
-            H4Plugin(H4PID_WIFI,H4P_EVENT_HEARTBEAT | H4P_EVENT_FACTORY,onC,onD),
+            H4Plugin(H4PID_WIFI,H4P_EVENT_UISYNC | H4P_EVENT_FACTORY,onC,onD),
             AsyncWebServer(H4P_WEBSERVER_PORT)
             {
             _cb[ssidTag()]=ssid;
@@ -167,7 +167,7 @@ class H4P_WiFi: public H4Plugin, public AsyncWebServer {
                 void            uiSetBoolean(const string& name,const bool b){ _sendSSE(CSTR(name),CSTR(stringFromInt(b))); }
                 void            uiSetLabel(const string& name,const int f){ _sendSSE(CSTR(name),CSTR(stringFromInt(f))); }
                 void            uiSetLabel(const string& name,const string& value){ _sendSSE(CSTR(name),CSTR(value)); }
-                void            uiSync();
+//                void            uiSync();
 //
                 template<typename... Args>
                 void            uiMessage(const string& msg, Args... args){ // variadic T<>
@@ -180,7 +180,7 @@ class H4P_WiFi: public H4Plugin, public AsyncWebServer {
                 bool            _getPersistentValue(string v,string prefix);
                 void            _hookIn() override;
                 void            _reply(string msg) override { _lines.push_back(msg); }
-                void            _sendSSE(const char* name,const char* msg);
+                void            _sendSSE(const string name,const string msg); // NOT NOT NOT &!!!
                 void            _setPersistentValue(string n,string v,bool reboot);
                 void            _uiAdd(uint32_t seq,const string& i,H4P_UI_TYPE t,const string& v="",H4P_FN_UITXT f=nullptr,H4P_FN_UICHANGE a=nullptr,bool r=false);
                 void            _wipe(const string &t){ HAL_FS.remove(CSTR(string("/"+t))); }

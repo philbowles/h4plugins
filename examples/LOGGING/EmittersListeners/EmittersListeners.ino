@@ -1,5 +1,5 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,10,false) // Serial baud rate, Q size, SerialCmd autostop
+H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 
 void h4pGlobalEventHandler(H4PID pid,H4P_EVENT_TYPE t,const string& msg){
   Serial.printf("Big Brother hears EVERYTHING type=%s src=%s %s\n",CSTR(h4pgetEventName(t)),CSTR(h4pnames[pid]),CSTR(msg));

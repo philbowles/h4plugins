@@ -1,6 +1,8 @@
 #include<H4Plugins.h>
 H4_USE_PLUGINS(0,20,true) // Serial baud rate, Q size, SerialCmd autostop
 //
+//  This is designed for an external alarm box, which will only "arm" itself after dark
+//  (it can be manually overridden nd armed via MQTT, command line etc)
 //  Hardware pins:
 //      D1 Light Sensor, D2 "Armed" flashing LED, D3 Siren
 //
@@ -19,10 +21,10 @@ const char* MQTT_PASS="";
 const char* REMOTE_UPDATE_URL="192.168.1.4:1880/update";
 
 boolean armed=false;
-//uint32_t arm(vector<string> vs); // necessary fwd ref
 
-void onMQTTConnect(){ h4mqtt.subscribeDevice("arm",arm); }
-void onMQTTDisconnect(){ h4mqtt.unsubscribeDevice("arm"); }
+// necessary forward references
+void onMQTTConnect();
+void onMQTTDisconnect();
 
 H4P_GPIOManager h4gm;
 H4P_FlasherController h4fc;
@@ -31,6 +33,9 @@ H4P_AsyncMQTT h4mqtt(MQTT_SERVER,MQTT_PORT,MQTT_USER,MQTT_PASS,onMQTTConnect,onM
 H4P_ConditionalSwitch h4onof(SQUAWK,ACTIVE_HIGH,OFF,[](bool){ return armed; });
 H4P_UPNPServer h4upnp;
 H4P_RemoteUpdate h4ru(REMOTE_UPDATE_URL,__FILE__);
+
+void onMQTTConnect(){ h4mqtt.subscribeDevice("arm",arm); }
+void onMQTTDisconnect(){ h4mqtt.unsubscribeDevice("arm"); }
 
 void armingStateChange(bool b){
   if(b) h4fc.flashLED(500,ARMED);

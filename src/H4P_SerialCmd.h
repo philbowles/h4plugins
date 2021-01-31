@@ -45,22 +45,16 @@ class H4P_SerialCmd: public H4Plugin {
         VSCMD(_svcStart);
         VSCMD(_svcStop);
 
-        H4_CMD_MAP_I    __exactMatch(const string& cmd,uint32_t owner);
-        void            __flatten(function<void(string)> fn);
+                H4_CMD_MAP_I    __exactMatch(const string& cmd,uint32_t owner);
+                void            __flatten(function<void(string)> fn);
 
-        uint32_t        _dispatch(vector<string> vs,uint32_t owner);
-        void            _flattenCmds(function<void(string)> fn,string cmd="",string prefix="",uint32_t owner=0);
-        void            _hookIn() override;
-        void            _run();        
-        void            _start() override {
-            h4._hookLoop([this](){ _run(); },_pid);
-            H4Plugin::_start();
-        }
-        void            _stop() override {
-            h4._unHook(_pid);
-            H4Plugin::_stop();
-        }
-        uint32_t        _svcControl(H4P_SVC_CONTROL svc,vector<string> vs);
+                uint32_t        _dispatch(vector<string> vs,uint32_t owner);
+                void            _flattenCmds(function<void(string)> fn,string cmd="",string prefix="",uint32_t owner=0);
+                void            _hookIn() override;
+                void            _run();        
+                void            _start() override { h4._hookLoop([this](){ _run(); },_pid); H4Plugin::_start(); }
+                void            _stop() override { h4._unHook(_pid); H4Plugin::_stop(); }
+                uint32_t        _svcControl(H4P_SVC_CONTROL svc,vector<string> vs);
     public:
         VSCMD(_dump);   // public so logger can use it
         static  string          _dumpTask(task*);

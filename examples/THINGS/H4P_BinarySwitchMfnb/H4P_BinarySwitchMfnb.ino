@@ -1,5 +1,5 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,10,false) // Serial baud rate, Q size, SerialCmd autostop
+H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 /*
  * Try Serial commands
  * 
@@ -10,8 +10,7 @@ H4_USE_PLUGINS(115200,10,false) // Serial baud rate, Q size, SerialCmd autostop
  * 
  * Also try short / medium / long press on USER_BTN
  */
-  // 16 for nodeMCU - change it for your device
-#define USER_BTN 16
+#define USER_BTN 0
 #define UB_ACTIVE ACTIVE_LOW
 #define UL_ACTIVE ACTIVE_LOW
 
@@ -22,7 +21,7 @@ H4P_FlasherController h4fc;
 H4P_BinarySwitch h4onof(LED_BUILTIN,UL_ACTIVE,OFF,[](bool b){
     Serial.print("STATE NOW ");Serial.println(b);
   });
-H4P_MultiFunctionButton h4mfb(USER_BTN,INPUT_PULLUP,UB_ACTIVE,U_DEBOUNCE,LED_BUILTIN,UL_ACTIVE);
+H4P_MultiFunctionButton h4mfb(USER_BTN,INPUT_PULLUP,UB_ACTIVE,U_DEBOUNCE);
 
 void onReboot(){
     Serial.println("Au Revoir");      

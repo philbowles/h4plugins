@@ -1,5 +1,5 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,10,false) // Serial baud rate, Q size, SerialCmd autostop
+H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 
 H4P_VerboseMessages h4vm; // must be created BEFORE any other plugins
 H4P_SerialLogger h4sl; // not essential but helps to see whats going on

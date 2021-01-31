@@ -35,7 +35,8 @@ uint32_t            H4P_Heartbeat::_uptime=0;
 void H4P_Heartbeat::_handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) {
     _uptime=STOI(msg);
     if(_f) _f(_uptime);
-    if(_pWiFi) _pWiFi->uiSync();
+    //if(_pWiFi) _pWiFi->uiSync();
+    PEVENT(H4P_EVENT_UISYNC,H4P_UIO_UP);
 };
 
 void H4P_Heartbeat::_hookIn() {
