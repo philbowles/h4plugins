@@ -65,7 +65,7 @@ class H4P_VerboseMessages: public H4Plugin {
             {H4P_EVENT_DLL,"DLL"},
             {H4P_EVENT_ON,"ON"},
             {H4P_EVENT_OFF,"OFF"},
-            {H4P_EVENT_UISYNC,"UISYNC"},
+            {H4P_EVENT_BACKOFF,"BACKOFF"},
             {H4P_EVENT_HEARTBEAT,"PING"}
         };
 

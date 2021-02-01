@@ -1,12 +1,12 @@
 /*
  MIT License
 
-Copyright (c) 2020 Phil Bowles <h4plugins@gmail.com>
-   github     https://github.com/philbowles/esparto
-   blog       https://8266iot.blogspot.com     
+Copyright (c) 2020 Phil Bowles <H48266@gmail.com>
+   github     https://github.com/philbowles/H4
+   blog       https://8266iot.blogspot.com
    groups     https://www.facebook.com/groups/esp8266questions/
-              https://www.facebook.com/Esparto-Esp8266-Firmware-Support-2338535503093896/
-                			  
+              https://www.facebook.com/H4-Esp8266-Firmware-Support-2338535503093896/
+
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,26 +25,17 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
 */
-#include<H4P_Heartbeat.h>
-#include<H4P_WiFi.h>
-#include<H4P_EmitTick.h>
+#pragma once
 
-uint32_t            H4P_Heartbeat::_uptime=0;
+#include <H4PCommon.h>
 
-void H4P_Heartbeat::_handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) {
-    _uptime=STOI(msg);
-    _pWiFi->uiSync(H4P_UIO_UP);
+class H4P_UILogger: public H4Plugin {
+        string      _fname;
+        uint32_t    _limit;
+
+                void        _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) override {};
+    public:
+        H4P_UILogger(uint32_t filter=H4P_EVENT_ALL) H4Plugin("ulog"){}
 };
-
-void H4P_Heartbeat::_hookIn() {
-    h4prequire<H4P_EmitTick>(this,H4PID_1SEC);
-    _pWiFi=h4pdepend<H4P_WiFi>(this,H4PID_WIFI);
-    _pWiFi->_uiAdd(H4P_UIO_UP,"Uptime",H4P_UI_LABEL,"",upTime,nullptr,true); // cos we don't know it yet
-}
-
-string H4P_Heartbeat::secsToTime(uint32_t sex){ 
-    char buf[15];
-    sprintf(buf,"%3d %02d:%02d:%02d",sex/86400,(sex%86400)/3600,(sex/60)%60,sex%60);
-    return string(buf);
-}

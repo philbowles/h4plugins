@@ -71,9 +71,8 @@ struct H4P_UI_ITEM { // add title and/or props?
     H4P_FN_UITXT    f;
     H4P_FN_UICHANGE c;
     bool            r;
-    bool            shown;
 };
-using H4P_UI_LIST       = std::map<uin32_t,H4P_UI_ITEM>;
+using H4P_UI_LIST       = std::map<uint32_t,H4P_UI_ITEM>;
 
 class H4P_WiFi: public H4Plugin, public AsyncWebServer {
             H4P_FlasherController* _pSignal;
@@ -126,14 +125,14 @@ class H4P_WiFi: public H4Plugin, public AsyncWebServer {
                 H4P_AsyncMQTT*  _pMQTT;
 
         H4P_WiFi(H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): 
-            H4Plugin(H4PID_WIFI,H4P_EVENT_UISYNC | H4P_EVENT_FACTORY,onC,onD),
+            H4Plugin(H4PID_WIFI,H4P_EVENT_FACTORY,onC,onD),
             AsyncWebServer(H4P_WEBSERVER_PORT){
             _cb[ssidTag()]=h4Tag();
             _cb[pskTag()]=h4Tag();
 #else
         H4P_WiFi(string ssid,string psk,string device="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr):
             _device(device),
-            H4Plugin(H4PID_WIFI,H4P_EVENT_UISYNC | H4P_EVENT_FACTORY,onC,onD),
+            H4Plugin(H4PID_WIFI,H4P_EVENT_FACTORY,onC,onD),
             AsyncWebServer(H4P_WEBSERVER_PORT)
             {
             _cb[ssidTag()]=ssid;
@@ -152,37 +151,39 @@ class H4P_WiFi: public H4Plugin, public AsyncWebServer {
                 void            show() override;
                 void            signal(const char* pattern,uint32_t timebase=H4P_SIGNAL_TIMEBASE);
                 void            signalOff();
-                void            uiAddLabel(const string& name){ _uiAdd(_seq++,name,H4P_UI_LABEL,_cb[name]); }
-                void            uiAddLabel(const string& name,const string& v){ _uiAdd(_seq++,name,H4P_UI_LABEL,v); }
-                void            uiAddLabel(const string& name,const int v){ _uiAdd(_seq++,name,H4P_UI_LABEL,stringFromInt(v)); }
-                void            uiAddLabel(const string& name,H4P_FN_UITXT f,bool repeat=false){ _uiAdd(_seq++,name,H4P_UI_LABEL,"",f,nullptr,repeat); }
-                void            uiAddLabel(const string& name,H4P_FN_UINUM f,bool repeat=false){ _uiAdd(_seq++,name,H4P_UI_LABEL,"",[f]{ return stringFromInt(f()); },nullptr,repeat); }
+                uint32_t        uiAddLabel(const string& name){ return _uiAdd(_seq++,name,H4P_UI_LABEL,_cb[name]); }
+                uint32_t        uiAddLabel(const string& name,const string& v){ return _uiAdd(_seq++,name,H4P_UI_LABEL,v); }
+                uint32_t        uiAddLabel(const string& name,const int v){ return _uiAdd(_seq++,name,H4P_UI_LABEL,stringFromInt(v)); }
+                uint32_t        uiAddLabel(const string& name,H4P_FN_UITXT f,bool repeat=false){ return _uiAdd(_seq++,name,H4P_UI_LABEL,"",f,nullptr,repeat); }
+                uint32_t        uiAddLabel(const string& name,H4P_FN_UINUM f,bool repeat=false){ return _uiAdd(_seq++,name,H4P_UI_LABEL,"",[f]{ return stringFromInt(f()); },nullptr,repeat); }
                 void            uiAddGPIO();
-                H4_CMD_ERROR    uiAddGPIO(uint8_t pin);
-                void            uiAddBoolean(const string& name,const boolean tf,H4P_FN_UICHANGE a=nullptr){ _uiAdd(_seq++,name,H4P_UI_BOOL,"",[tf]{ return tf ? "1":"0"; },a); }
-                void            uiAddBoolean(const string& name,H4P_FN_UIBOOL f,H4P_FN_UICHANGE a=nullptr,bool repeat=false){ _uiAdd(_seq++,name,H4P_UI_BOOL,"",[f]{ return f() ? "1":"0"; },a,repeat); }
-                void            uiAddDropdown(const string& name,H4P_CONFIG_BLOCK options,H4P_FN_UICHANGE onChange=nullptr);
-                void            uiAddInput(const string& name,const string& value="",H4P_FN_UICHANGE onChange=nullptr);
-                void            uiSetInput(const string& name,const string& value){ _sendSSE(CSTR(name),CSTR(value)); }
-                void            uiSetBoolean(const string& name,const bool b){ _sendSSE(CSTR(name),CSTR(stringFromInt(b))); }
-                void            uiSetLabel(const string& name,const int f){ _sendSSE(CSTR(name),CSTR(stringFromInt(f))); }
-                void            uiSetLabel(const string& name,const string& value){ _sendSSE(CSTR(name),CSTR(value)); }
-//                void            uiSync();
+                uint32_t        uiAddGPIO(uint8_t pin);
+                uint32_t        uiAddBoolean(const string& name,const boolean tf,H4P_FN_UICHANGE a=nullptr){ return _uiAdd(_seq++,name,H4P_UI_BOOL,"",[tf]{ return tf ? "1":"0"; },a); }
+                uint32_t        uiAddBoolean(const string& name,H4P_FN_UIBOOL f,H4P_FN_UICHANGE a=nullptr,bool repeat=false){ return _uiAdd(_seq++,name,H4P_UI_BOOL,"",[f]{ return f() ? "1":"0"; },a,repeat); }
+                uint32_t        uiAddDropdown(const string& name,H4P_CONFIG_BLOCK options,H4P_FN_UICHANGE onChange=nullptr);
+                uint32_t        uiAddInput(const string& name,const string& value="",H4P_FN_UICHANGE onChange=nullptr);
+                void            uiSetInput(uint32_t ui,const string& value){ _sendChangedSSE(ui,CSTR(value)); }
+                void            uiSetBoolean(uint32_t ui,const bool b){ _sendChangedSSE(ui,CSTR(stringFromInt(b))); }
+                void            uiSetLabel(uint32_t ui,const int f){ _sendChangedSSE(ui,CSTR(stringFromInt(f))); }
+                void            uiSetLabel(uint32_t ui,const string& value){ _sendChangedSSE(ui,CSTR(value)); }
+                void            uiSync();
+                void            uiSync(uint32_t ui);
 //
                 template<typename... Args>
                 void            uiMessage(const string& msg, Args... args){ // variadic T<>
                     char* buff=static_cast<char*>(malloc(H4P_REPLY_BUFFER+1));
                     snprintf(buff,H4P_REPLY_BUFFER,CSTR(msg),args...);
-                    _sendSSE(NULL,buff);
+                    _sendSSE("",buff);
                     free(buff);
                 }
 //          syscall only        
                 bool            _getPersistentValue(string v,string prefix);
                 void            _hookIn() override;
                 void            _reply(string msg) override { _lines.push_back(msg); }
-                void            _sendSSE(const string name,const string msg); // NOT NOT NOT &!!!
+                void            _sendChangedSSE(uint32_t ui,const string& msg); // NOT NOT NOT &!!!
+                void            _sendSSE(const string& name,const string& msg); // NOT NOT NOT &!!!
                 void            _setPersistentValue(string n,string v,bool reboot);
-                void            _uiAdd(uint32_t seq,const string& i,H4P_UI_TYPE t,const string& v="",H4P_FN_UITXT f=nullptr,H4P_FN_UICHANGE a=nullptr,bool r=false);
+                uint32_t        _uiAdd(uint32_t seq,const string& i,H4P_UI_TYPE t,const string& v="",H4P_FN_UITXT f=nullptr,H4P_FN_UICHANGE a=nullptr,bool r=false);
                 void            _wipe(const string &t){ HAL_FS.remove(CSTR(string("/"+t))); }
                 void            _wipe(initializer_list<char*> l){ for(auto const& t:l) _wipe(t); }
 };

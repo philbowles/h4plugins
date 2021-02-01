@@ -144,7 +144,8 @@ enum H4P_EVENT_TYPE:uint32_t {
     H4P_EVENT_DLL       = 1 << 14,
     H4P_EVENT_ON        = 1 << 15,
     H4P_EVENT_OFF       = 1 << 16,
-    H4P_EVENT_UISYNC    = 1 << 17,
+
+    H4P_EVENT_BACKOFF   = 1 << 18,
     H4P_EVENT_HEARTBEAT=0x80000000,
     H4P_EVENT_ALL=0x7fffffff
 };
@@ -311,6 +312,7 @@ extern vector<string> h4pnames;
     #define PEVENT(t,f,...)
     #define PLOG(f,...)
 #endif
+
 H4Plugin* h4pptrfromtxt(const string& s);
 
 class H4Plugin {
@@ -336,7 +338,6 @@ class H4Plugin {
         virtual void                _stop() { _downHooks(); }
                 string              _uniquify(const string& name,uint32_t uqf=0);
     public:
-//        static  H4P_CONFIG_BLOCK    _cb;
                 H4PID               _pid;
                 string              _pName;
 //
@@ -351,8 +352,6 @@ class H4Plugin {
 
         H4Plugin(H4PID pid,uint32_t filter=H4P_EVENT_NOOP,H4_FN_VOID svcUp=nullptr,H4_FN_VOID svcDown=nullptr): _eventFilter(filter){ _init(pid,svcUp,svcDown); }
 //
-//        static  string      getConfig(const string& c){ return _cb[c]; }
-//        static  int         getConfigInt(const string& c){ return STOI(_cb[c]); }
                 void        hookConnect(H4_FN_VOID f){ _connected.push_back(f); }
                 void        hookDisconnect(H4_FN_VOID f){ _disconnected.push_back(f); } 
 
@@ -364,8 +363,6 @@ class H4Plugin {
             free(buff);
         }
                 void        restart(){ _restart(); };
-//        static  void        setConfig(const string& c,const string& v){ _cb[c]=v; }
-//        static  void        setConfig(const string& c,const int v){ _cb[c]=stringFromInt(v); }
         virtual void        show(){}
                 void        start();
                 bool        state(){ return _state(); }

@@ -17,8 +17,6 @@ const char* MQTT_SERVER="192.168.1.4";
 const int   MQTT_PORT=1883;
 const char* REMOTE_UPDATE_URL="192.168.1.4:1880/update";
 
-H4P_GPIOManager h4gm;
-H4P_FlasherController h4fc;
 H4P_WiFi h4wifi(WIFI_SSID,WIFI_PASS);
 H4P_AsyncMQTT h4mqtt(MQTT_SERVER,MQTT_PORT);
 H4P_BinarySwitch h4onof(RELAY_BUILTIN,ACTIVE_HIGH,OFF);

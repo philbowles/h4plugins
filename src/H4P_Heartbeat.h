@@ -35,15 +35,14 @@ using H4P_FN_HEARTBEAT       = function<void(uint32_t)>;
 
 class H4P_WiFi;
 class H4P_Heartbeat: public H4Plugin {
-                H4P_WiFi*        _pWiFi;
-                H4P_FN_HEARTBEAT _f;
-        static  uint32_t         _uptime;
+        H4P_WiFi*               _pWiFi;
+        static  uint32_t        _uptime;
 
                 void        _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) override;
                 void        _hookIn() override; // autostart
                 void        _run();
     public: 
-        H4P_Heartbeat(H4P_FN_HEARTBEAT beat=nullptr): _f(beat), H4Plugin(H4PID_BEAT,H4P_EVENT_HEARTBEAT){}
+        H4P_Heartbeat(): H4Plugin(H4PID_BEAT,H4P_EVENT_HEARTBEAT){}
 
         static string secsToTime(uint32_t sex);
 

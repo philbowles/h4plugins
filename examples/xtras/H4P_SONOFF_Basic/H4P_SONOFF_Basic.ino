@@ -15,8 +15,6 @@ and the appropriat "sense" settings of ACTIVE_HIGH/LOW for each
 #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 
-H4P_GPIOManager h4gm;
-H4P_FlasherController h4fc;
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","basic");
 H4P_AsyncMQTT h4mqtt("192.168.1.4",1883);
 H4P_BinarySwitch h4onof(RELAY_BUILTIN,ACTIVE_HIGH,OFF);
