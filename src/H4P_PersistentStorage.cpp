@@ -31,14 +31,7 @@ SOFTWARE.
 
 #define SEPARATOR "\xff"
 
-void H4P_PersistentStorage::_handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) {
-//    switch(t){
-//        case H4P_EVENT_FACTORY:
-            Serial.printf("%s H4P_EVENT_FACTORY src=%d msg=%s\n",CSTR(_pName),pid,CSTR(msg));
-            clear();
-//            break;
-//    }
-}
+void H4P_PersistentStorage::_handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) { clear(); }
 
 void H4P_PersistentStorage::_hookIn() {
     vector<string> items=split(H4P_SerialCmd::read("/"+_pName),SEPARATOR);
@@ -54,7 +47,7 @@ H4P_PersistentStorage::H4P_PersistentStorage(H4P_FN_PSCHANGE f): _f(f), H4Plugin
         {"clear",   { _pid, 0, CMD(clear)}},
         {"get",     { _pid, 0, CMDVS(_get)}},
         {"set",     { _pid, 0, CMDVS(_set)}}
-            });
+    });
 }
 
 void  H4P_PersistentStorage::setstring(const string& name,const string& value){

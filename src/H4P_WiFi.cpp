@@ -79,7 +79,7 @@ void H4P_WiFi::_start(){
 */
 
 void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
-    SLOG("WIFI EVENT %d",event);
+//    SLOG("WIFI EVENT %d",event);
     switch(event) {
         case WIFI_EVENT_STAMODE_DISCONNECTED:
 			h4.queueFunction([](){ h4pisloaded<H4P_WiFi>(H4PID_WIFI)->_lostIP(); });
@@ -115,6 +115,7 @@ void H4P_WiFi::_start(){
  };
 
 void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
+    /*
     switch (event) {
         case SYSTEM_EVENT_WIFI_READY: 
             Serial.println("WiFi interface ready");
@@ -199,11 +200,12 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
         default: break;
     }
 }
-/*
+*/
     switch(event) {
         case SYSTEM_EVENT_WIFI_READY:
 			h4.queueFunction([](){ h4pisloaded<H4P_WiFi>(H4PID_WIFI)->_coreStart(); });
             break;
+        case SYSTEM_EVENT_STA_STOP:
         case SYSTEM_EVENT_STA_LOST_IP:
 			h4.queueFunction([](){ h4pisloaded<H4P_WiFi>(H4PID_WIFI)->_lostIP(); });
             break;
@@ -212,7 +214,7 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
 			break;
 	}
 }
-*/
+
 #endif
 /*
                                                                                                  C O M M O N   F U N C T I O N S
@@ -230,7 +232,7 @@ void H4P_WiFi::_coreStart(){
     if(!_dns53){
         if(_cannotConnectSTA()) _startAP();
         else if(WiFi.getMode()==WIFI_OFF)  h4pisloaded<H4P_WiFi>(H4PID_WIFI)->HAL_WIFI_startSTA();
-    } //else Serial.printf("DON'T THINK TWICE!!!\n");
+    }
 #else
     if(_cannotConnectSTA() || WiFi.getMode()==WIFI_OFF) h4pisloaded<H4P_WiFi>(H4PID_WIFI)->HAL_WIFI_startSTA();
 #endif
@@ -252,7 +254,6 @@ bool H4P_WiFi::_getPersistentValue(string v,string prefix){
 void H4P_WiFi::_clear(){
 //    WiFi.printDiag(Serial);
     _downHooks();
-    // turn off events?
     WiFi.onEvent([](WiFiEvent_t event){});
     WiFi.mode(WIFI_STA);
     WiFi.begin("H4","H4"); // // === eraseConfig :) becos it wont allow "",""
@@ -280,7 +281,7 @@ void H4P_WiFi::_gotIP(){
 	ArduinoOTA.setRebootOnSuccess(false);	
 	ArduinoOTA.begin(); // matching end???
 
-    PLOG("IP=%s",CSTR(_cb[ipTag()]));
+    Serial.printf("IP=%s\n",CSTR(_cb[ipTag()]));
     _startWebserver();
     _upHooks();
 }
@@ -296,15 +297,7 @@ uint32_t H4P_WiFi::_gpio(vector<string> vs){
     });
 }
 
-void H4P_WiFi::_handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) {
-    uint32_t    ui;
-    switch(t){
-        case H4P_EVENT_FACTORY:
-            Serial.printf("%s H4P_EVENT_FACTORY src=%d msg=%s\n",CSTR(_pName),pid,CSTR(msg));
-             _clear();
-            break;
-    }
-}
+void H4P_WiFi::_handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) { _clear(); }
 
 void H4P_WiFi::_hookIn(){
     _pSignal=h4prequire<H4P_FlasherController>(this,H4PID_WINK);
@@ -313,7 +306,7 @@ void H4P_WiFi::_hookIn(){
     _cb[chipTag()]=HAL_WIFI_chipID();
     _cb[boardTag()]=replaceAll(H4_BOARD,"ESP8266_","");
     if(!_getPersistentValue(deviceTag(),"H4-")) if(_device!="") _cb[deviceTag()]=_device;
-    PLOG("Device %s chip %s",CSTR(_cb[deviceTag()]),CSTR(_cb[chipTag()]));
+    Serial.printf("Device %s chip %s\n",CSTR(_cb[deviceTag()]),CSTR(_cb[chipTag()]));
     _getPersistentValue(h4UITag(),"NO UI! ");
     WiFi.persistent(true);
     WiFi.onEvent(_wifiEvent);
@@ -376,10 +369,8 @@ void H4P_WiFi::_rest(AsyncWebServerRequest *request){
         _lines.clear();
 	},nullptr,H4P_TRID_REST);
 }
-#define ASWS_IS_SHIT 8000
 
 void H4P_WiFi::_sendChangedSSE(uint32_t ui,const string& msg){ 
-//    Serial.printf("SCSSE %s now=%s proposed=%s\n",CSTR(_userItems[ui].id),_userItems[ui].value);
     if(_userItems[ui].value!=msg) {
         _userItems[ui].value=msg;
         _sendSSE(_userItems[ui].id,msg);
@@ -388,11 +379,10 @@ void H4P_WiFi::_sendChangedSSE(uint32_t ui,const string& msg){
 
 void H4P_WiFi::_sendSSE(const string& name,const string& msg){ /// NOT NOT NOT & - we NEEEEED the copy for the RQ 
     if(_evts && _evts->count()) {
-        PLOG("APW=%02d FH=%u QS=%d %s",_evts->avgPacketsWaiting(),ESP.getFreeHeap(),h4.size(),CSTR(msg));
         if(_evts->avgPacketsWaiting() < 32) _evts->send(CSTR(msg),CSTR(name),_evtID++); // hook to sse event q size
         else {
             PEVENT(H4P_EVENT_BACKOFF,"");
-            h4.once(500,[=]{ _sendSSE(name,msg); });
+            h4.once(H4WF_BACKOFF,[=]{ _sendSSE(name,msg); });
         }
         yield();
     }
@@ -409,13 +399,11 @@ void H4P_WiFi::_startWebserver(){
 	reset();
     _evts=new AsyncEventSource("/evt");
     _evts->onConnect([this](AsyncEventSourceClient *client){
-        PLOG("SSE Client %08x i=%d cLast=%d T/O=%d nC=%d",client,_evtID,client->lastId(),H4P_ASWS_EVT_TIMEOUT,_evts->count());
-        if(client->lastId() > _evtID){
-            client->close();
-        }
+//        PLOG("SSE Client %08x i=%d cLast=%d T/O=%d nC=%d",client,_evtID,client->lastId(),H4WF_EVT_TIMEOUT,_evts->count());
+        if(client->lastId() > _evtID) client->close();
         else {
             h4.queueFunction([this,client](){
-                PLOG("Handle Client %08x i=%d cLast=%d T/O=%d nC=%d nUI=%d",client,_evtID,client->lastId(),H4P_ASWS_EVT_TIMEOUT,_evts->count(),_userItems.size());
+//                PLOG("Handle Client %08x i=%d cLast=%d T/O=%d nC=%d nUI=%d",client,_evtID,client->lastId(),H4WF_EVT_TIMEOUT,_evts->count(),_userItems.size());
                 if(_evts->count()==1) onViewers(); //if(_onC) _onC(); // first time only R WE SURE?
                 // to cure MASSIVE AsyncWebserver bug / nastiness / p.o.s. :)
                 h4Chunker<H4P_UI_LIST>(_userItems,[=](H4P_UI_LIST::iterator i){
@@ -423,12 +411,12 @@ void H4P_WiFi::_startWebserver(){
                         i->second.value=i->second.f();
                         if(!i->second.r) i->second.f=nullptr;
                     }
-//                    Serial.printf("UIA: %s T=%d v=%s r=%d s=%d f=%d c=%d\n",CSTR(i->second.id),i->second.type,CSTR(i->second.value),i->second.r,i->second.shown,i->second.f ? 1:0,i->second.c ? 1:0);
+//                    PLOG("UIA: %s T=%d v=%s r=%d s=%d f=%d c=%d\n",CSTR(i->second.id),i->second.type,CSTR(i->second.value),i->second.r,i->second.shown,i->second.f ? 1:0,i->second.c ? 1:0);
                     _sendSSE("ui",CSTR(string(i->second.id+","+stringFromInt(i->second.type)+","+i->second.value+","+(i->second.c ? "1":"0" ))));
-                },100,200); // < tidy this
+                },H4WF_UIJITTER_LO,H4WF_UIJITTER_HI); // < tidy this
 
                 h4.repeatWhile([this]{ return _evts->count(); },
-                    ((H4P_ASWS_EVT_TIMEOUT*3)/4),
+                    ((H4WF_EVT_TIMEOUT*3)/4),
                     [this]{ },
                     [this]{ onNoViewers(); },
                     H4P_TRID_SSET,true
@@ -511,7 +499,6 @@ void H4P_WiFi::change(string ssid,string psk){ // add device / name?
     _cb[pskTag()]=psk;
     HAL_WIFI_startSTA();
     if(_dns53) h4reboot();
-//    else Serial.printf("Don're reboot frtom STA mode!!!\n");
 }
 
 void H4P_WiFi::show() { 
@@ -522,7 +509,7 @@ void H4P_WiFi::show() {
 
 void H4P_WiFi::signal(const char* pattern,uint32_t timebase){_pSignal->flashMorse(pattern,timebase,H4P_SIGNAL_LED,H4P_SIGNAL_SENSE); }
 
-void H4P_WiFi::signalOff(){ PLOG("STOPSIGNAL"); _pSignal->stopLED(H4P_SIGNAL_LED); }
+void H4P_WiFi::signalOff(){ _pSignal->stopLED(H4P_SIGNAL_LED); }
 
 uint32_t H4P_WiFi::uiAddDropdown(const string& name,H4P_CONFIG_BLOCK options,H4P_FN_UICHANGE onChange){
     string opts="";
@@ -563,9 +550,8 @@ void H4P_WiFi::uiSync(uint32_t ui) {
     if(i.f){
         string newval=i.f();
         if(i.value!=newval){
-            Serial.printf("SSE Lite ID %s was %s now %s\n",CSTR(i.id),CSTR(i.value),CSTR(newval));
             _userItems[ui].value=newval;
             _sendSSE(CSTR(i.id),CSTR(newval));
-        } //else Serial.printf("SSE Lite ID %s unchanged\n",CSTR(i.id));
-    } //else Serial.printf("ID %s non functional!!!\n",CSTR(i.id));
+        }
+    }
 }

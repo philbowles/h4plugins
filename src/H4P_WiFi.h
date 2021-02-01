@@ -117,7 +117,6 @@ class H4P_WiFi: public H4Plugin, public AsyncWebServer {
                 void            _stop() override;
     public:
                 void            HAL_WIFI_startSTA(); // Has to be static for bizarre start sequence on ESP32 FFS
-        explicit H4P_WiFi(): H4Plugin(H4PID_WIFI),AsyncWebServer(H4P_WEBSERVER_PORT){}
 //          included here against better wishes due to compiler bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89605
 #if H4P_USE_WIFI_AP
                 void            _startAP();
@@ -130,6 +129,7 @@ class H4P_WiFi: public H4Plugin, public AsyncWebServer {
             _cb[ssidTag()]=h4Tag();
             _cb[pskTag()]=h4Tag();
 #else
+        explicit H4P_WiFi(): H4Plugin(H4PID_WIFI),AsyncWebServer(H4P_WEBSERVER_PORT){}
         H4P_WiFi(string ssid,string psk,string device="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr):
             _device(device),
             H4Plugin(H4PID_WIFI,H4P_EVENT_FACTORY,onC,onD),

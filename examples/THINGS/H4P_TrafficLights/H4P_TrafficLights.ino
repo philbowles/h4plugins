@@ -1,5 +1,10 @@
 #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
+/////////////////////////////////////////////////////////////////////////////////////
+//
+//  This is my "thing": a UK pattern Traffic light sequencer.
+//
+////////////////////////////////////////////////////////////////////////////////////  
 /* 
  *   HARDWARE REQUIRED: 
  *   
@@ -24,11 +29,7 @@ H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCm
 #define GREEN_LIGHT  D8
 
 H4P_GPIOManager gpio;
-/////////////////////////////////////////////////////////////////////////////////////
-//
-//  This is my "thing": a UK pattern Traffic light sequencer.
-//
-////////////////////////////////////////////////////////////////////////////////////  
+
 int T1=5000; // see the phasing.xls spreadsheet for choosing these numbers
 int T2=1250;
 //

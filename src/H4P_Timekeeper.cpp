@@ -121,18 +121,24 @@ void H4P_Timekeeper::_hookIn(){
     h4cmd.addCmd("at",_pid,0,CMDVS(_at));
     h4cmd.addCmd("daily",_pid,0,CMDVS(_daily));
 }
-
+/*
 void H4P_Timekeeper::_setupSNTP(const string& ntp1, const string& ntp2){
-    sntp_stop();
     _ntp1=ntp1;
     _ntp2=ntp2;
     sntp_setservername(0,CSTR(_ntp1));
     sntp_setservername(1,CSTR(_ntp2));
     PLOG("NTP Servers: %s %s",CSTR(ntp1),CSTR(ntp2));
 }
+*/
+void H4P_Timekeeper::_setupSNTP(const string& ntp1, const string& ntp2){
+    sntp_stop();
+    _ntp1=ntp1;
+    _ntp2=ntp2;
+    sntp_setservername(0,(char*) _ntp1.c_str());
+    sntp_setservername(1,(char*) _ntp2.c_str());
+}
 
 void H4P_Timekeeper::_start(){
-    PLOG("TK _START _mss00=%u",_mss00);
     sntp_init();
     if(!_mss00){
         h4.repeatWhile(
@@ -156,7 +162,6 @@ void H4P_Timekeeper::_start(){
 }
 
 void H4P_Timekeeper::_stop(){ 
-    PLOG("TK _STOP");
     h4.cancelSingleton({H4P_TRID_TIME,H4P_TRID_SYNC});
 	sntp_stop();
     _downHooks();

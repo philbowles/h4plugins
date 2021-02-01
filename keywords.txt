@@ -49,7 +49,6 @@ H4P_MDNSDetector	KEYWORD1
 H4P_MDNSDetectorSource	KEYWORD1
 H4P_RemoteUpdate	KEYWORD1
 H4P_HeapWarn	KEYWORD1
-H4P_LoopCount	KEYWORD1
 H4P_Timekeeper	KEYWORD1
 H4P_ToneController	KEYWORD1
 H4P_Sunrise	KEYWORD1
@@ -209,3 +208,7 @@ write	KEYWORD2
 #######################################
 # Constants (	LITERAL11)
 #######################################
+ACTIVE_HIGH	KEYWORD2
+ACTIVE_LOW	KEYWORD2
+OFF	KEYWORD2
+ON	KEYWORD2

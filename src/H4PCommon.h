@@ -298,21 +298,6 @@ enum H4P_UI_ORDER:uint32_t {
 class H4Plugin;
 extern std::map<uint32_t,H4Plugin*> h4pmap;
 extern vector<string> h4pnames;
-
-#if H4P_LOG_EVENTS
-    #define SEVENT(t,f,...) h4psysevent(H4PID_SYS,t,f, ##__VA_ARGS__ )
-    #define SLOG(f,...) h4psysevent(H4PID_SYS,H4P_EVENT_MSG,f, ##__VA_ARGS__ )
-    #define PEVENT(t,f,...) h4psysevent(_pid,t,f, ##__VA_ARGS__ )
-    #define PLOG(f,...) h4psysevent(_pid,H4P_EVENT_MSG,f, ##__VA_ARGS__ )
-    #define h4UserEvent(x,...) { h4psysevent(H4PID_H4,H4P_EVENT_USER,x, ##__VA_ARGS__); }
-#else
-    #define h4UserEvent(x,...)
-    #define SEVENT(t,f,...)
-    #define SLOG(f,...)
-    #define PEVENT(t,f,...)
-    #define PLOG(f,...)
-#endif
-
 H4Plugin* h4pptrfromtxt(const string& s);
 
 class H4Plugin {
@@ -376,22 +361,30 @@ class H4Plugin {
         virtual void        _reply(string msg) { Serial.println(CSTR(msg)); }
         virtual bool        _state(){ return _up; }
                 void        _upHooks();
-
-//        static void         dumpCommands(H4_CMD_MAP cm=_commands){ for(auto const c:cm) Serial.printf("%16s o=%2d l=%2d\n",CSTR(c.first),c.second.owner,c.second.levID); }
 };
+
+#define SEVENT(t,f,...) h4psysevent(H4PID_SYS,t,f, ##__VA_ARGS__ )
+#define PEVENT(t,f,...) h4psysevent(_pid,t,f, ##__VA_ARGS__ )
+
+#if H4P_LOG_EVENTS
+    #define SLOG(f,...) h4psysevent(H4PID_SYS,H4P_EVENT_MSG,f, ##__VA_ARGS__ )
+    #define PLOG(f,...) h4psysevent(_pid,H4P_EVENT_MSG,f, ##__VA_ARGS__ )
+    #define h4UserEvent(x,...) { h4psysevent(H4PID_H4,H4P_EVENT_USER,x, ##__VA_ARGS__); }
+#else
+    #define h4UserEvent(x,...)
+    #define SLOG(f,...)
+    #define PLOG(f,...)
+#endif
 
 template<typename T>
 T* h4pisloaded(H4PID p){ return h4pmap.count(p) ? reinterpret_cast<T*>(h4pmap[p]):nullptr; }
-
-//void h4pdll(H4Plugin* dll);
 
 template<typename T,typename... Args>
 T* h4prequire(H4Plugin* me,H4PID p,Args... args){
     T* test=h4pisloaded<T>(p);
     if(test) return test;
     auto dll=new T(args...);
-    SEVENT(H4P_EVENT_DLL,"%s cascade load %s",CSTR(me->_pName),CSTR(h4pnames[p]));
-//    h4pdll(dll);
+//    SEVENT(H4P_EVENT_DLL,"%s cascade load %s",CSTR(me->_pName),CSTR(h4pnames[p]));
     dll->_hookIn();
     return dll;
 }
@@ -400,7 +393,7 @@ void h4pupcall(H4Plugin* me,H4Plugin* ptr);
 
 template<typename T,typename... Args>
 T* h4pdepend(H4Plugin* me,H4PID p,Args... args){
-    SLOG("%s depends on %s",CSTR(me->_pName),CSTR(h4pnames[p]));
+//    SLOG("%s depends on %s",CSTR(me->_pName),CSTR(h4pnames[p]));
     T* ptr=h4prequire<T>(me,p,args...);
     h4pupcall(me,ptr);
     return ptr;

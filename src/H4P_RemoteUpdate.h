@@ -27,8 +27,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_RemoteUpdate_H
-#define H4P_RemoteUpdate_H
+#pragma once
 
 #include<H4PCommon.h>
 #include<H4P_SerialCmd.h>
@@ -87,5 +86,3 @@ class H4P_RemoteUpdate: public H4Plugin, public HTTPUpdate {
         void fs(){ _entropise([this]{ _updateFromUrl(false,true); }); }
         void fw(){ _entropise([this]{ _updateFromUrl(true,true); }); }
 };
-
-#endif // H4P_RemoteUpdate_H

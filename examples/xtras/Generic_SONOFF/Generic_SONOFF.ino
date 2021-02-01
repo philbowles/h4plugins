@@ -7,7 +7,7 @@ See ChezToiioT for how to auti-configure it on fitrst boot / after factory reset
 retained MQTT messages and the h4/wifi/host2 command
 */
 #include<H4Plugins.h>
-H4_USE_PLUGINS(0,20,true) // Serial baud rate, Q size, SerialCmd autostop
+H4_USE_PLUGINS(0,10,true) // Serial baud rate, Q size, SerialCmd autostop
 //
 //    Configuration
 //

@@ -64,7 +64,6 @@ vector<string> h4pnames={
     "sqll",
     "sset",
     "time"
-//"UDPL"
 };
 
 void H4Plugin::_addLocals(H4_CMD_MAP local){

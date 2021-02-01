@@ -85,9 +85,7 @@ void h4FactoryReset(const string& src){
 void h4StartPlugins(){
     _cb[srcTag()]="SYS";
     _cb[h4pTag()]=H4P_VERSION;
-    Serial.printf("H4P %s\n",CSTR(_cb[h4pTag()]));
-//    for(auto const& p:h4pmap) Serial.printf("%s,",CSTR(p.second->_pName));
-//    Serial.println();
+    Serial.printf("\nH4P %s\n",CSTR(_cb[h4pTag()]));
     for(auto const& p:h4pmap) { p.second->_hookIn(); }
     for(auto const& p:h4pmap) p.second->_greenLight();
 }

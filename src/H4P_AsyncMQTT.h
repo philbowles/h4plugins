@@ -59,21 +59,21 @@ class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
                 bool        _state() override { return connected(); }
                 void        _stop() override;
     public:
-        explicit H4P_AsyncMQTT():H4Plugin(H4PID_MQTT,H4P_EVENT_FACTORY){}
 #if H4P_USE_WIFI_AP
         H4P_AsyncMQTT(H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr,H4P_LWT lwt={"","",0,false}):
             _lwt(lwt), H4Plugin(H4PID_MQTT,H4P_EVENT_FACTORY,onC,onD)
         {
 #else
+        explicit H4P_AsyncMQTT():H4Plugin(H4PID_MQTT,H4P_EVENT_FACTORY){}
         H4P_AsyncMQTT(string broker,uint16_t port, string user="",string pass="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr,H4P_LWT lwt={"","",0,false}):
             _lwt(lwt), H4Plugin(H4PID_MQTT,H4P_EVENT_FACTORY,onC,onD)
         {
-            _cb[pmvTag()]=PANGO_VERSION;
             _cb[brokerTag()]=broker;
             _cb[portTag()]=stringFromInt(port);
             _cb[mQuserTag()]=user,
             _cb[mQpassTag()]=pass;
 #endif
+            _cb[pmvTag()]=PANGO_VERSION;
             _addLocals({
                 {_pName,    { H4PC_H4, _pid, nullptr }}, 
                 {"change",  { _pid, 0, CMDVS(_change) }},

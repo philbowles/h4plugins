@@ -71,9 +71,9 @@ void H4P_UPNPServer::_handlePacket(string p,IPAddress ip,uint16_t port){
             if(parts.size()){
                 string key=uppercase(parts[0]);
                 uhdrs[key]=ltrim(join(vector<string>(++parts.begin(),parts.end()),":"));
-            } else Serial.printf("NO COLONS %s\n",CSTR(h)); 
+            }
         }
-    } //else Serial.printf("TiNY BLOCK Nh=%d\n",hdrs.size()); 
+    }
     uint32_t mx=1000 * atoi(CSTR(replaceAll(uhdrs["CACHE-CONTROL"],"max-age=","")));
 //    bool schroedingerscat=true;
     string ST = uhdrs["ST"];
@@ -106,7 +106,7 @@ void H4P_UPNPServer::_handlePacket(string p,IPAddress ip,uint16_t port){
 void H4P_UPNPServer::_listenUDP(){ 
     if(!_udp.listenMulticast(_ubIP, 1900)) return; // some kinda error?
     _udp.onPacket([this](AsyncUDPPacket packet){
-//        Serial.printf("pkt sz=%d from %s:%d type %c\n",packet.length(),packet.remoteIP().toString().c_str(),packet.remotePort(),packet.data()[0]);
+//        PLOG("pkt sz=%d from %s:%d type %c\n",packet.length(),packet.remoteIP().toString().c_str(),packet.remotePort(),packet.data()[0]);
         string pkt=stringFromBuff(packet.data(),packet.length());
         IPAddress ip=packet.remoteIP();
         uint16_t port=packet.remotePort();

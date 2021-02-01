@@ -39,8 +39,8 @@ SOFTWARE.
         WHEN SUBMITTING BUG REPORTS
         ***********************************************************************
 */
-#define H4P_LOG_EVENTS      1
-#define SANITY              1
+#define H4P_LOG_EVENTS      0
+#define SANITY              0
 /*
         HARDWARE ASSUMPTIONS
 
@@ -87,7 +87,10 @@ enum H4GM_SENSE:uint8_t {
 
 #define H4WF_AP_RATE           500
 #define H4WF_OTA_RATE         1500
-#define H4P_ASWS_EVT_TIMEOUT 30000
+#define H4WF_EVT_TIMEOUT     30000
+#define H4WF_UIJITTER_LO       100
+#define H4WF_UIJITTER_HI       200
+#define H4WF_BACKOFF           500
 
 #define H4P_IPPD_RATE         5000
 #define H4P_PJ_SPREAD            3
