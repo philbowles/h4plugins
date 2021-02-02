@@ -109,8 +109,8 @@ That's it - the rest is the same - you'll get an SMS message when any of the ON 
 * BinarySwitch drives a GPIO HIGH or LOW when  `on`,`off`,`toggle` or `switch` command is received
 * ConditionalThing is a BinaryThing that only operates when user-defined function returns `true`
 * ConditionalSwitch is a BinarySwitch that only operates when user-defined function returns `true`
-* Only one Thing or Switch per app
-* It must be called h4onof
+* Only **one** Thing or Switch per app
+* It must be called `h4onof`
 
 This picture is slightly out-of-date but should give you an idea of how these all "hang together"
 
@@ -162,17 +162,18 @@ H4P_UPNPServer only
   
 ## Topics automatically published
 
-If [H4P_AsyncMQTT](h4mqtt.md) is also used, this plugin publishes `h4/< your device name >/state` with a payload set to the current state whenever the state changes
+If [H4P_AsyncMQTT](h4mqtt.md) is also used, this plugin publishes
+
+`h4/< your device name >/state` 
+
+with a payload set to the current state whenever it changes
 
 ---
 
 (c) 2020 Phil Bowles h4plugins@gmail.com
 
-* [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
-* [Blog](https://8266iot.blogspot.com)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)
-* [Facebook IOT with ESP8266 (moderator)}](https://www.facebook.com/groups/1591467384241011/)
 * [Facebook ESP Developers (moderator)](https://www.facebook.com/groups/ESP8266/)
 * [Support me on Patreon](https://patreon.com/esparto)
