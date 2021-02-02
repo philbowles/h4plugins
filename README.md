@@ -2,7 +2,9 @@
 
 # ESP8266/ESP32 ArduinoIDE library of IOT functions including WiFi, MQTT, OTA updates, NTP, UPNP, SSDP, Alexa voice control and much more...
 
-[Release Notes v1.0.1](docs/rn100.md) This is a *major* release, existing users *must* read the release notes as they will need to make changes to existing code.
+[Release Notes v1.0.1](docs/rn100.md) This is a *major* release, existing users *must* read the release notes as they will need to make changes to existing code. As an *absolute minimum* you will need to update [H4](https://github.com/philbowles/H4), [PangolinMQTT](http://github.com/philbowles/PangolinMQTT) and [ESPAsyncWebServer](https://github.com/philbowles/ESPAsyncWebServer) libraries.
+
+***N.B. The code is tested and stable but parts of the documentation are still being updated. Until this message is removed , refer to the 70+ example sketches for detailed API usage. This document itself is accurate and up-to-date as at 2/2/2021***
 
 ---
 
@@ -13,16 +15,16 @@
 * [List of Plugins](#plugins)
 * [Compatible Hardware](#compatible-hardware)
 * [Installation](#installation)
-
+* [Documentation Master Index](docs/index.md)
 
 ---
 
 # Introduction
 
-Think of [**H4**](https://github.com/philbowles/H4) and its plugins as "IOT Lego" or an "IOT Swiss Army Knife" (or both) to get your IOT app up and running in minutes rather than weeks. If you have some basic C / C++ experience then [**H4**](https://github.com/philbowles/H4) and H4Plugins are for you! 
+Think of [H4](https://github.com/philbowles/H4) and its plugins as "IOT Lego" or an "IOT Swiss Army Knife" (or both) to get your IOT app up and running in minutes rather than weeks. If you have some basic C / C++ experience then [H4](https://github.com/philbowles/H4) and H4Plugins are for you! 
 
 
-H4Plugins includes modules for WiFi + OTA, Webserver, MQTT, numerous common types of GPIO handling (e.g. debouncing, rotary encoders), Amazon Alexa voice control, NTP synchronisation, device presence detection, logging to remote MySQL server and extensive diagnostics. By "plugging " together only the required modules, you can rapidly build your own custom firmware or IOT app. Everything you build will be stable and responsive: the plugins work together to allow multiple simultaneous processes to run, so ***no more WDT resets***! As your experience grows you can extend your app / firmware with H4Plugins' well-documented API and runtime command system. 
+H4Plugins includes modules for WiFi + OTA, Webserver, MQTT, numerous common types of GPIO handling (e.g. debouncing, rotary encoders), Amazon Alexa voice control, NTP synchronisation, device presence detection, logging to remote MySQL server and extensive diagnostics. By "plugging " together only the required modules, you can rapidly build your own custom firmware or IOT app. Everything you build will be stable and responsive: the plugins work together to allow multiple simultaneous processes to run, so ***no more WDT resets***! As your experience grows you can extend your app / firmware with H4Plugins' well-documented API and runtime command system.
 
 ---
 
@@ -30,11 +32,13 @@ H4Plugins includes modules for WiFi + OTA, Webserver, MQTT, numerous common type
 
 [**H4**](https://github.com/philbowles/H4) and its plugin system represent a very different way of getting started on ESP8266 from the "standard" examples found all over the web.
 
-There are some very good reasons for that but it means that there are a few things you need to know about H4 and how it works before "diving in" to the H4Plugins system. Spending a few minutes reading [the basics of H4](https://github.com/philbowles/H4#why-do-i-need-it) will save you days and even weeks of effort, so please digest it all before trying some of the 70+ examples in this repo - it will be time well spent!
+There are some very good reasons for that but it means that there are a few things you need to know about [H4](https://github.com/philbowles/H4) and how it works before "diving in" to the H4Plugins system. Spending a few minutes reading [the basics of H4](https://github.com/philbowles/H4#why-do-i-need-it) will save you days and even weeks of effort, so please digest it all before trying some of the 70+ examples in this repo - it will be time well spent!
 
 Once you "get" how H4 and the plugin system work, you will be able to churn out fully working, multi-functional **stable** IOT apps on ESP8266 in only a few lines of code, compared with literally *hundreds* of lines in the "standard" way of doing things. That's if you can even find anything close to what you need...
 
 So only continue if ( after having read [the basics of H4](https://github.com/philbowles/H4#why-do-i-need-it) ) you now know what *events* are, what *the queue* is and why you need them. To get a "feel" for just how different H4 and H4Plugins are from all the other examples you will find on the web, let's see an example of H4Plugins being used as replacement firmware for a SONOFF Basic switch.
+
+![sonoff](assets/sonoff.jpg)
 
 ## SONOFF Basic Example
 
@@ -44,7 +48,7 @@ What follows is the *entire H4Plugins code* - despite the fact it might look lik
 * AP mode configuration
 * OTA
 * Full control via Serial console
-* Full control via MQTT including publish on state change
+* Full control via MQTT plus publishing of state change
 * Full control via built-in Web console
 * Single-button control for on/off, reboot, factory reset depending on the time pressed down
 * LED pattern signalling, e.g. ... --- ... ("SOS") = No WiFi, two short blips = no MQTT, single slow blip = AP mode etc
@@ -56,27 +60,25 @@ What follows is the *entire H4Plugins code* - despite the fact it might look lik
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,105,false) // Serial baud rate, Q size, SerialCmd autostop
-H4P_GPIOManager h4gm;
-H4P_FlasherController h4fc;
-H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","basic");
+H4_USE_PLUGINS(115200,10,false) // Serial baud rate, Q size, SerialCmd autostop
+H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","salon");
 H4P_AsyncMQTT h4mqtt("192.168.1.4",1883);
 H4P_BinarySwitch h4onof(RELAY_BUILTIN,ACTIVE_HIGH,OFF);
-H4P_UPNPServer h4upnp("Sonoff Basic Switch");
+H4P_UPNPServer h4upnp("Salon Corner Lamp");
 H4P_MultiFunctionButton h4mfb(BUTTON_BUILTIN,INPUT,ACTIVE_LOW,15);
 ```
 
-And here's what you see when you browse to the device:
+And here's what you see when you point your browser to the webserver running inside the device:
 
 ![sonoffbasic](/assets/sonoffbasic.jpg)
 
-The "big red button" switches the device on / off, but you can also do it by MQTT, HTTP, serial monitor, Alexa voice command an *even* the physical button if you have to.
+The "big red button" switches the device on / off, but you can also do it using MQTT, HTTP, serial monitor, Alexa voice command an *even* the physical button if you simply have to.
 
-You alse get a "web console" that allows yout to control the deive in the sa,e way as if ypu were connected via a Serial link. It is also visible to your PC's Network Explorer: double click jumps you straight to the builtin webserver as above.
+You alse get a "web console" that allows yout to control the device in the same way as if you were connected via a Serial link. It is also visible to your PC's Network Explorer: double click jumps you straight to the builtin webserver seen above.
 
 ![sonoffbasic](/assets/upnp2.jpg)
 
-As you can see (from the 9 lines of code :) ), all you need to do is list the modules/functionality you require (each one is a "plugin") and provide a few necessary values such as ssid / passwords etc and the plugins link up with each other, exchange messages between themselves and "stitch" everything together into a seamless piece of stable firmware. If you know of anything easier for both beginners and seasoned developers, please let us know.
+As you can see (from the 7 lines of code :smile: ), pretty much all you need to do is list the modules/functionality you require (each one is a "plugin") and provide a few necessary values such as ssid / passwords etc. The plugins link up with each other, exchange messages between themselves and "stitch" everything together into a seamless piece of stable firmware. If you know of anything easier, please telll us!
 
 ## Designed for programmers
 
@@ -106,9 +108,9 @@ Also please prefer the [Facebook H4  Support / Discussion](https://www.facebook.
 
 ## Switches and "Things"
 
-Many iot devices have one simple thing to do: switch something on/off on a single GPIO - like a relay for example. Of that's all you need, use a plugin with "...Switch" on the end of its name. If you need something a little more fancy, for example to do some other "work" then choose a plugin with "...Thing" on the end of its name. The actual "thing" is a function *you* write so it can be anything, but whatever it is, sending `h4/on` or saying "Alexa...switch on 'thing'" will make it do its thing and `h4/off` will stop it.
+Many iot devices have one simple thing to do: switch something on/off on a single GPIO - like a relay for example. If that's all you need, use a plugin with "...Switch" on the end of its name. If you need something a little more fancy, for example to do some other "work" then choose a plugin with "...Thing" on the end of its name. The actual "thing" is a function *you* write so it can be anything, but whatever it is, sending `h4/on` or saying "Alexa...switch on 'thing'" will make it do its thing and `h4/off` will stop it.
 
-Networking is not required, but if used the webserver will automatically add the "big red switch" and various other options to control the plugin. 
+Networking is not required but if you *are* connected, the webserver will automatically add the "big red switch" and various other options to control the plugin. 
 
 * [**H4P_BinarySwitch**](docs/things.md): Allows control by commands from multiple sources to on/off a single GPIO. 
 
@@ -123,13 +125,13 @@ Networking is not required, but if used the webserver will automatically add the
 
 * [**H4P_AsyncMQTT**](docs/h4mqtt.md): Automatic Connection to MQTT server, with reconnection on failure (without reboot!) allows remote control of H4 as well as the more usual sensing og e.g. sensor data to "the cloud"
 
-* [**H4P_UPNPServer**](docs/things.md): provides full UPNP/SSDP device with Alexa voice control, Windows10 Desktop integration
+* [**H4P_UPNPServer**](docs/things.md): provides full UPNP/SSDP device with Alexa voice control, PC Desktop OS integration
 
 * [**H4P_RemoteUpdate**](docs/h4ru.md): OTA update from remote server
 
-* [**H4P_MultiFunctionButton**](docs/h4mfnb.md): Tact-button giving on/off, reboot,factory reset and forced AP Mode depending on hold time.
+* [**H4P_MultiFunctionButton**](docs/h4mfnb.md): Tact-button giving on/off, reboot, factory reset depending on hold time.
 
-* [**H4P_Heartbeat**](docs/advanced.md): call user-defined function every 1 second and adds "Up Time" to the web UI
+* [**H4P_Heartbeat**](docs/advanced.md): Adds an "Up Time" to the web UI
 
 ### Network time, calendar scheduling
 * [**H4P_Timekeeper**](docs/h4tk.md): NTP server sync for "clock time" alarms and scheduling
@@ -137,10 +139,6 @@ Networking is not required, but if used the webserver will automatically add the
 * [**H4P_Sunrise**](docs/h4tk.md#sunrisesunset) **EXPERIMENTAL** : Gets sunrise / sunset times from public API given Lat/Long
 
 ### Network presence detection
-
-* [**H4P_H4Detector**](docs/h4pd.md): Execute function when specific H4 device joins / leaves network
-
-* [**H4P_H4DetectorSource**](docs/h4pd.md): Switch default BinarySwitch/Thing when specific H4 device joins / leaves network
 
 * [**H4P_IPDetector**](docs/h4pd.md): Execute function when specific IP address joins / leaves network
 
@@ -152,7 +150,7 @@ Networking is not required, but if used the webserver will automatically add the
 
 * [**H4P_UPNPDetector**](docs/h4pd.md): Execute function when specific UPNP device USN joins / leaves network
 
-* [**H4P_UPNPDetectorSource**](docs/h4pd.md): Switch default BinarySwitch/Thing when specific UPNP device USN joins / leaves network
+* [**H4P_UPNPDetectorSource**](docs/h4pd.md): Switch default BinarySwitch/Thing when specific UPNP device joins / leaves network
   
 ## Diagnostic / Logging / Development tools:
 
@@ -173,23 +171,17 @@ Networking is not required, but if used the webserver will automatically add the
 
 * [**H4P_HttpMySQLLogger**](docs/mysql.md): log to remote webserver to update MySQL log db - Includes [example Node.js server](examples/LOGGING/H4P_HttpMySQLLogger/mysqlrest/mysqllogger.code-workspace)
 
-* [**H4P_EventListener**](docs/events.md): General-purpose listenr clls user-defined function on any event / combination of events
+* [**H4P_EventListener**](docs/events.md): General-purpose listener calls user-defined function on any selection of events
 
 ### Event Emitters
 
-* [**H4P_EmitLoopCount**](docs/h4qw.md): Send loops/sec to the event queue for diagnosing bottlencks (requires changes to [H4 config](https://github.com/philbowles/H4/blob/src/config.h)
+* [**H4P_EmitLoopCount**](docs/h4qw.md): Send loops/sec to the event queue for diagnosing bottlencks (requires changes to [H4 config](https://github.com/philbowles/H4/blob/src/config.h) / compile options)
   
 * [**H4P_EmitQ**](docs/events.md): Periodically Send H4 Q size to event queue to help profling / performance tuning
 
 * [**H4P_EmitHeap**](docs/events.md): Periodically Send `getFreeHeap()` value to event queue to help hunt memory leaks
 
 * [**H4P_EmitTick**](docs/events.md): Send synchronous 1x per second on-the-second heartbeat event.
-
-## Specialist Device Drivers
-
-* [**H4P_ExternalSqWave**](docs/h4esw.md): "Proof-of-Concept" Serial driver for cheap ebay square wave device. Demonstrates how sophisitciated WiFi control can be quickly and easily added to basic hardware.
-
-![sqwv](assets/sqwvhardware.jpg)
 
 ---
 
@@ -206,14 +198,13 @@ Networking is not required, but if used the webserver will automatically add the
 
 H4Plugins is tested using
 
-* H4 1.0.0
 * ArduinoIDE 1.8.13
 * ESP8266 core 2.7.4
 * ESP32 core 1.0.4
 
-Use the ArduinoIDE boards manager to install those versions. Earlier version *may* work, but I am only able to offer support when all the above are in use.
+Earlier version *may* work, but I am only able to offer support when all the above are in use.
 
-H4Plugins is a standard Arduino library. The simplest method is to download the zip form the link above and then use the menu command: `Sketch / Include Library / Add .ZIP Library...`
+H4Plugins is a standard Arduino library. The simplest method is to download the zip frm the links below and then use the menu command: `Sketch / Include Library / Add .ZIP Library...`
 
 First you need to install the [H4](https://github.com/philbowles/H4) library. 
 
@@ -223,13 +214,14 @@ Next install the 3rd-party libraries:
 * [ESP8266 ESPAsyncUDP Library](https://github.com/me-no-dev/ESPAsyncUDP)
 * [ESP32 AsyncTCP Library](https://github.com/me-no-dev/AsyncTCP)
 
-The above libraries coexist quite happily if you download all of them to enable targetting both ESP8266 and ESP32.
+The above libraries coexist quite happily if you download all of them to enable targetting both ESP8266 and ESP32. 
+
+Also, install the patched versions of these 3rd-party libraries:
 
 * [ESPAsyncWebServer](https://github.com/philbowles/ESPAsyncWebServer)
 * [ESP8266 ESPAsyncTCP Library](https://github.com/philbowles/ESPAsyncTCP)
 
-**N.B** If you have previously installed the original version of either of the above, by "me-no-dev" you *must* uninstall it and use only the patched version. 
-The author seems unwilling/unable to fix several serious bugs - the above version work *and are required* for correct functioning of H4/Plugins.
+**N.B** If you have previously installed the original version of either of the above, by "me-no-dev" you *must* replace it with the patched version. The originals of these are buggy and will prevent H4/Plugins from working correctly, so the patched versions *are required*.
   
 * Finally, install this H4Plugins library
 
@@ -255,9 +247,9 @@ See [Advanced Topics](docs/advanced.md) for how to simply add H4 optimised board
 ![Optimised Boards](assets/optismall.jpg)
 
 ---
-# Roadmap 
+# What next? 
 
-There is *a lot* in this and the pre-requisite H4 library. For a start, there are 39 individual plugins, as well as several new concepts to learn, although you will probably only use 6 or 7 mof the more common / important ones for most of your apps.
+There is *a lot* in this library and its pre-requisite: the [H4](https://github.com/philbowles/H4) library. For a start, there are over 30 individual plugins, as well as several new concepts to learn, although you will probably only use 6 or 7 of the more common / important ones for most of your apps.
 
 Then there are over 80 example sketches in the two libraries. That's not a typo: it's "over eighty". Every plugin and every possible API call is demonstrated at least once somewhere in that collection. Its designed to help you get up to speed quickly - use it! 90% of the time you will find the start of the app you want to write.
 
@@ -272,32 +264,17 @@ After you have finished reading this file, the recommended path you should follo
 
 4. Read [Common Command and Control: H4P_SerialCmd](docs/ccc.md) as it serves as the basis for dealing with all plugins and all apps you create.
    
-5. Read "Switches and Things" as the vast majority of simple apps will have one of these as is main function...
+5. Read [Switches and Things](docs/things.md) as the vast majority of simple apps will have one of these as is main function...
    
-6. ...such as the basic sonoff app (it works on pretty much any hardware) Compile it and play with controlling it via serial, builtin webserver, mqtt , rest etc
+6. ...such as the [basic sonoff app](examples/XTRAS/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino) (it works on pretty much any hardware) Compile it and play with controlling it via serial, builtin webserver, mqtt , rest etc
    
-7. Read "Event Listeners and Event Emitters" because in this class are some incredibly useful tools for helping you debug your code and log any problems or errors.
+7. Read [Event Listeners and Event Emitters](docs/h4logs.md) because in this class are some incredibly useful tools for helping you debug your code and log any problems or errors.
    
-8. Now work your way through several of the GPIO examples. Start with "raw" and then "debounced" - once you understand those two all the rest will start to make a lot more sense. If you DO have a rotary encoder, hook it up an delight in the ease with which you will be able to use it!
+8. Now work your way through several of the [GPIO examples](examples/GPIO). Start with ["raw"](examples/GPIO/H4GM_Raw/H4GM_Raw.ino) and then ["debounced"](examples/GPIO/H4GM_Debounced/H4GM_Debounced.ino) - once you understand those two all the rest will start to make a lot more sense. If you DO have a [rotary encoder](examples/GPIO/H4GM_Encoder/H4GM_Encoder.ino), hook it up and delight in the ease with which you will be able to use it!
    
-9.  Try a few of the other examples jsut to give yourself an idea of the rage and flexcibility of the whole system
+9.  Try a few of the other examples to give yourself an idea of the range and flexibility of the whole system
     
 10. Read the [Advanced Topics](docs/advanced.md) document for how to set up and deploy an entire self-updating cloud-free framework controlled by NODE-RED
-
----
-# Documentation Index
-
-* [H4 and event-driven programming](https://github.com/philbowles/H4)
-* [Common Command and Control: H4P_SerialCmd](docs/ccc.md)
-* [Switches and Things](docs/things.md)
-* [Event Listeners, Event Emitters and logging](docs/events.md)
-* [Plugins Master Index](docs/master.md)
-* [GPIO Handling](docs/h4gm.md)
-* [WiFi, MQTT and networking](docs/h4wifi.md)
-* [Network Presence Detection](docs/h4pd.md)
-* [Advanced Topics](docs/advanced.md)
-* [FAQs](docs/faq.md)
-* [Raising an Issue](docs/issues.md)
 
 ---
 
@@ -312,14 +289,10 @@ In terms of speed of response, you are *far* more likely to get a rapid answer i
 
 ---
 
-
 (c) 2021 Phil Bowles h4plugins@gmail.com
 
-* [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
-* [Blog](https://8266iot.blogspot.com)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)
-* [Facebook IOT with ESP8266 (moderator)}](https://www.facebook.com/groups/1591467384241011/)
 * [Facebook ESP Developers (moderator)](https://www.facebook.com/groups/ESP8266/)
 * [Support me on Patreon](https://patreon.com/esparto)

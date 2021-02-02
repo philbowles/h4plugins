@@ -189,7 +189,7 @@ H4_USE_PLUGINS(0,20,true) // Serial baud rate=0 == OFF; autostop=true == faster 
 
 This switches off any serial output and auto-stops the H4P_SerialCmd wasting time listening for input. This step alone will make your sketch run almost 2x faster
 
-2. Remove any `h4UserEvent` or `Serial.print...` from your code: step 1 means they won't do anything anyway, so losing them reduces the size of the binary
+2. Remove any `h4pUserEvent` or `Serial.print...` from your code: step 1 means they won't do anything anyway, so losing them reduces the size of the binary
 
 3. Unless you are using MySQL or MQTT logging, edit [config.h](../src/config.h) and remove or comment out the lines containing `#define H4P_LOG_EVENTS` This stops *all* loggers from doing anything: it actually removes the logging code from the binary
 

@@ -72,11 +72,11 @@ class H4P_BinaryThing: public H4Plugin{
                 for(auto s:_slaves) reply("slave: %s",CSTR(s));
             }
 
-                uint32_t    getAutoOff(){ return _timeout; }
                 void        autoOff(uint32_t T){ 
                     _timeout=T;
                     _cb[autoTag()]=stringFromInt(T);
                 }
+                uint32_t    getAutoOff(){ return _timeout; }
                 void        slave(const string& otherh4,bool inout=true){ 
                     if(inout) _slaves.insert(otherh4);
                     else _slaves.erase(otherh4);

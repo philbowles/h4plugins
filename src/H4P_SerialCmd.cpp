@@ -30,7 +30,7 @@ SOFTWARE.
 
 extern void h4FactoryReset(const string& src);
 
-H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Plugin(H4PID_CMD,H4P_EVENT_MSG){
+H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Plugin(H4PID_CMD){
     _addLocals({
         {h4Tag(),      { 0,         H4PC_H4, nullptr}},
         {"help",       { 0,         0, CMD(help) }},
@@ -180,6 +180,12 @@ uint32_t H4P_SerialCmd::_svcStart(vector<string> vs){ return _svcControl(H4PSVC_
 uint32_t H4P_SerialCmd::_svcInfo(vector<string> vs){ return _svcControl(H4PSVC_STATE,vs); }
 
 uint32_t H4P_SerialCmd::_svcStop(vector<string> vs){ return _svcControl(H4PSVC_STOP,vs); }
+//
+//
+//
+void H4P_SerialCmd::addCmd(const string& name,uint32_t owner, uint32_t levID,H4_FN_MSG f){
+    if(__exactMatch(name,owner)==_commands.end()) _commands.insert(make_pair(name,command {owner,levID,f}));
+}
 
 void H4P_SerialCmd::help(){ 
     vector<string> unsorted={};

@@ -18,9 +18,9 @@ myLogger lumberjack(H4P_EVENT_USER);
 void h4setup(){
   static uint32_t pingCount=0;
   h4.once(3000,[](){ 
-    h4UserEvent("666"); 
-    h4UserEvent("669"); 
+    h4pUserEvent("666"); 
+    h4pUserEvent("669"); 
   });
-  h4.every(1000,[](){ h4UserEvent("%d",pingCount++); }); // sends H4P_EVENT_USER, so will get picked up
+  h4.every(1000,[](){ h4pUserEvent("%d",pingCount++); }); // sends H4P_EVENT_USER, so will get picked up
   h4.every(5000,[](){ SEVENT(H4P_EVENT_NOOP,"ignore me"); }); // SEVENT sends system event - ignored by YOU, caught by H4P_SerialLogger
 }

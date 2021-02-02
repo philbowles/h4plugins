@@ -41,8 +41,9 @@ Merely installing the plugin before any other automatically provides the transla
 ```cpp
 #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
-H4P_VerboseMessages h4vm; // must be created BEFORE any others
+H4P_VerboseMessages vm; // should be created BEFORE any others
 
+This plugin is a "singleton" - there may be only one single instance of it in the app. It may be called whatever you choose: prefix all API calls below with `yourchosenname.`
 
 ```
 

@@ -56,8 +56,7 @@ void H4P_BinaryThing::_setState(bool b) {
     _state=b;
     _cb[stateTag()]=stringFromInt(b);
     _setSlaves(b);
-//    if(_pWiFi) _pWiFi->uiSync();
-    _pWiFi->uiSync(H4P_UIO_ONOF);
+    if(_pWiFi) _pWiFi->uiSync(H4P_UIO_ONOF);
 }
 
 uint32_t H4P_BinaryThing::_slave(vector<string> vs){

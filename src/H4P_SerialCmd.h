@@ -61,7 +61,7 @@ class H4P_SerialCmd: public H4Plugin {
 
         H4P_SerialCmd(bool autoStop=false);
         
-                void            addCmd(const string& name,uint32_t owner, uint32_t levID,H4_FN_MSG f=nullptr){  _commands.insert(make_pair(name,command {owner,levID,f})); }
+                void            addCmd(const string& name,uint32_t owner, uint32_t levID,H4_FN_MSG f=nullptr);
                 void            all();
                 void            config(){ for(auto const& c:_cb) reply("%s=%s",CSTR(c.first),CSTR(c.second)); }        
                 void            heap(){ reply("Heap=%u",ESP.getFreeHeap()); }        

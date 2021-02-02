@@ -19,6 +19,6 @@ H4P_EventListener hb(H4P_EVENT_HEARTBEAT,[](H4PID pid,H4P_EVENT_TYPE t,const str
 H4P_EventListener allexceptuser(H4P_EVENT_ALL &~ H4P_EVENT_USER,[](H4PID pid,H4P_EVENT_TYPE t,const string& msg){ Serial.printf("Usr2 sez %s\n",CSTR(msg)); });
 
 void h4setup(){
-  h4.everyRandom(5000,10000,[](){ h4UserEvent("wow signal @ %u",millis()); }); // event emitter
+  h4.everyRandom(5000,10000,[](){ h4pUserEvent("wow signal @ %u",millis()); }); // event emitter
   h4pOnEvent(H4P_EVENT_USER,[](const string& msg){ Serial.printf("User event occurred %s\n",CSTR(msg)); });
 }

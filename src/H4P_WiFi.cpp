@@ -33,7 +33,7 @@ SOFTWARE.
 
 STAG(tcp)
 
-void __attribute__((weak)) onUiChange(const string& name,const string& value){ } //h4UserEvent("onUiChange %s now=%s",CSTR(name),CSTR(value)); }
+void __attribute__((weak)) onUiChange(const string& name,const string& value){ } //h4pUserEvent("onUiChange %s now=%s",CSTR(name),CSTR(value)); }
 void __attribute__((weak)) onViewers(){}
 void __attribute__((weak)) onNoViewers(){}
 /*

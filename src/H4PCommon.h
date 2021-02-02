@@ -369,9 +369,9 @@ class H4Plugin {
 #if H4P_LOG_EVENTS
     #define SLOG(f,...) h4psysevent(H4PID_SYS,H4P_EVENT_MSG,f, ##__VA_ARGS__ )
     #define PLOG(f,...) h4psysevent(_pid,H4P_EVENT_MSG,f, ##__VA_ARGS__ )
-    #define h4UserEvent(x,...) { h4psysevent(H4PID_H4,H4P_EVENT_USER,x, ##__VA_ARGS__); }
+    #define h4pUserEvent(x,...) { h4psysevent(H4PID_H4,H4P_EVENT_USER,x, ##__VA_ARGS__); }
 #else
-    #define h4UserEvent(x,...)
+    #define h4pUserEvent(x,...)
     #define SLOG(f,...)
     #define PLOG(f,...)
 #endif

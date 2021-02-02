@@ -9,7 +9,7 @@
 * [Your first plugin: H4P_SerialCmd](#your-first-plugin-h4p_serialcmd)
 * [The "Plugin is a Service" concept](#the-plugin-is-a-service-concept)
 * [Commands provided by H4P_SerialCmd](#commands-provided-by-h4p_serialcmd)
-* [Formal Specification](h4cmd.md)
+* [Formal API Specification H4P_SerialCmd](h4cmd.md)
   
 ---
 
@@ -29,9 +29,9 @@ H4Plugins allows that switching to be done in a number of ways, including:
 
 (Depending on which plugins you choose to include in your app)
 
-H4/Plugins tries to make the format of all those commands as close as possible and one single, common piece of code is called no matter from which source the event came.
+H4/Plugins tries to make the format of all those commands as close as possible and one single, common piece of code is called no matter from which source the event came. For historical reasons, the overall format is very similar to an MQTT topic.
 
-For example, imagine our device is called demo and is on IP 192.168.1.4
+For example, imagine our device is called `demo` and is on IP 192.168.1.4
 
 * If I am connected to it via a serial console, to turn it on I would type:
 
@@ -58,9 +58,9 @@ For example, imagine our device is called demo and is on IP 192.168.1.4
     h4onof.turn(ON); // plugins have direct calls that map 1:1 onto the commands
 ```
 
-In summary, a command is a command is a command no matter where it comes from. Subject to the necessary quirks of each source, the final part of the command is always the same. This means that when reading the documentation, only that last part of the command is described, no matter how simple or how complex its effect is.
+Quite simply a command is a command is a command no matter where it comes from. Subject to the necessary quirks of each source, the final part of the command is always the same. This means that when reading the documentation, only that last part of the command is described, no matter how simple or how complex its effect is.
 
-If it can be done by *any* of the methods described above, it can - by definition - be done by *all* of them. So in the documentation or support groups you might see "try giving it an h4/reboot" or "what is the result of an h4/show/config?" and how you actually do that to *your* device depends entirely on what plugins you have included: in effect the actual command itself is disconnected from its source - how you choose to get the command into the device is up to you, but the device will do exactly the same thing whichever method you choose.
+If it can be done by *any* of the methods described above, it can - by definition - be done by *all* of them. In the documentation or support groups you might see "try giving it an h4/reboot" or "what is the result of an h4/show/config?" and how you actually do that to *your* device depends entirely on what plugins you have included: in effect the actual command itself is disconnected from its source - how you choose to get the command into the device is up to you, but the device will do exactly the same thing whichever method you choose.
 
 Every plugin has the ability to add its own specific commands on top of those provided by H4P_SerialCmd itself. Details of the additional commands that each plugin adds (if any) are found in the documentation for the relevant plugin - here we will discuss only those that come already "baked-in"
 
@@ -70,7 +70,7 @@ Every plugin has the ability to add its own specific commands on top of those pr
 
 ## What does it do?
 
-H4P_SerialCmd is the "command and control" centre of H4 and its plugin system. It does everything you have read about so far.  It is so improtant that it is included for you automatically when you include the mandatory opening sequence of any and all H4Plugins sketches:
+H4P_SerialCmd is the "command and control" centre of H4 and its plugin system. It does everything you have read about so far.  It is so important that it is included automatically when you use the mandatory opening sequence of any and all H4Plugins sketches:
 
 ```cpp
 #include<H4Plugins.h>
@@ -79,7 +79,7 @@ H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial speed, Q size, SerialCmd au
 
 If you put in a Serial speed, make sure your monitor matches and you will see any output messages. 
 
-Next is the size of the H4 queue. Until you become more expert. just leave it at 10. 
+Next is the size of the H4 queue. `H4_Q_CAPACITY` is just a system-wide default value, currently 10. Some features or techniques may need  bigger queue, you will be told about those when necessary. Until you become more expert. just leave it as it is.
 
 Finally, if you are ready to deploy your app "in the wild" and you will never "talk" to it with a serial cable again, stopping the Serial message handler will improve the performance quite a lot: saying 'true' here says, *"Yes, I want to stop the serial handler, there's no point in wasting machine cycles!*" Until then, and all the time while testing, leave it at 'false' meaning  *"I do **not** want to stop talking to my MCU!"*
 
@@ -115,7 +115,7 @@ Generally, each plugin also provides functions that correspond to the command-li
 h4cmd.showQ();
 ```
 
-Has the same effect as typing "h4/show/q" at the console, MQTT publishing a topic of "yourdevicename/h4/show/q" or receiving `http://< your device ip >/rest/h4/show/q`. The only difference is *that the resulting dump of the H4 queue is sent back to the originating source*, respectively the console, MQTT server, or the web browser.
+Has the same effect as typing `h4/show/q` at the console, MQTT publishing a topic of `yourdevicename/h4/show/q` or the built-inw webserver receiving `http://< your device ip >/rest/h4/show/q`. The only difference is *that the results are sent back to the originating source*, respectively the console, MQTT server, or the web browser.
 
 ---
 
@@ -131,7 +131,7 @@ Often one plugin will depend on another, for example [H4P_AsyncMQTT](h4mqtt.md) 
 
 ## Service control / shortnames
 
-*All* plugins therefore support the following set of "service control" commands. For this reason they will not be mentioned again individually in the relevant sections: only the commands a plugin *adds* to this basic set are covered in each plugin API document.
+*All* plugins therefore support the following set of "service control" commands. For this reason they will not be mentioned again individually in the relevant sections: only the commands and/or functions a plugin *adds* to this basic set are covered in each plugin API document.
 
 Each also has a "shortname" (usually 4-characters) and this is the name you would use as the payload of any of the service control commands. Perhaps unsurprisingly [H4P_WiFi](h4wifi.md) is "wifi" and [H4P_AsyncMQTT](h4mqtt.md) is "mqtt" but some of the other plugins have more interesting shortnames: [H4P_FlasherController](h4fc.md) for example is "wink" :wink:
 
@@ -168,7 +168,7 @@ Let's summarize them briefly then look at some in a little more detail
 
 ### `h4/show/fs` 
 
-*If* you have remembered to upload your LittleFS image, then you should see soemthing like this, which are the files used by the webserver:
+*If* you have remembered to upload your LittleFS image, then you should see something like this, which are the files used by the webserver:
 
 ![empty](../assets/showfs.jpg)
 
@@ -183,8 +183,6 @@ Since we have an empty sketch, there isn't much else to see, so the following ex
 ```cpp
 #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
-H4P_GPIOManager h4gm;
-H4P_FlasherController h4fc;
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","basic");
 H4P_AsyncMQTT h4mqtt("192.168.1.20",1883);
 H4P_BinarySwitch h4onof(RELAY_BUILTIN,ACTIVE_HIGH,OFF);
@@ -216,11 +214,11 @@ What it tells tells us is:
 1. [H4P_GPIOManager](h4gm.md) runs a task every 1000ms. (It is doing this so it can calculate the GPIO pin statistics (per / second) of pins 2 (LED_BUILTIN), 0 (BUTTON_BUILTIN) and 12 (RELAY_BUILTIN)
  which it is managing on behalf of:
  
- * H4P_BinarySwitch to switch the RELAY_BUILTIN on/off
- * H4P_MultiFunctionButton to listen out for button presses on BUTTON_BUILTIN which will tell H4P_BinarySwitch to switch the RELAY_BUILTIN on/off, or reboot or factoiry reset the device (depending on how long the user holds it down)
- * H4P_WiFi to flash LED_BUILTIN to signify abnormal netwrok conditions *and* H4P_MultiFunctionButton to flash it ever more rapidly the longer it is held down to warn the user of impending reboot or factory reset.
+ * [H4P_BinarySwitch](docs/../things.md) to switch the RELAY_BUILTIN on/off
+ * [H4P_MultiFunctionButton](h4mfnb.md) to listen out for button presses on BUTTON_BUILTIN which will tell H4P_BinarySwitch to switch the RELAY_BUILTIN on/off, or reboot or factoiry reset the device (depending on how long the user holds it down)
+ * [H4P_WiFi](h4wifi.md) to flash LED_BUILTIN to signify abnormal netwrok conditions *and* H4P_MultiFunctionButton to flash it ever more rapidly the longer it is held down to warn the user of impending reboot or factory reset.
 
-That's a lot to take in from one line of information, but its an excellent example pf some of the features of H4Plugins at work:
+That's a lot to take in from one line of information, but its an excellent example of some of the features of H4Plugins at work:
 
 * The hierarchy of dependencies: all those three mentioned above depend on (at least) H4P_GPIOMnager, which is why it needs to be mentioned a) at all b) before the plugins that depend on it
 
@@ -230,9 +228,9 @@ That's a lot to take in from one line of information, but its an excellent examp
   
 * The minmal amount of simple code required to perfrom some pretty complex tasks
 
-2. H4P_WiFi is running a task every 1.5 seconds which **H**andles the Arduino **OTA** code, allowing your app to be updated **O**ver-**T**he-**A**ir from the ArduinoIDE
+2. [H4P_WiFi](h4wifi.md) is running a task every 1.5 seconds which **H**andles the Arduino **OTA** code, allowing your app to be updated **O**ver-**T**he-**A**ir from the ArduinoIDE
    
-3. [H4P_UPNPServer](h4upnp.md) Is the plugin responsible for allowing Alexa voice communications. It also is the plugin that allows Windows10 for ecample to "see" the device and be able to jump straight to its web UI: 
+3. [H4P_UPNPServer](h4upnp.md) Is the plugin responsible for allowing Alexa voice communications. It also is the plugin that allows Windows10 for example to "see" the device and be able to jump straight to its web UI: 
 
 ![empty](../assets/upnp2.jpg)
 
@@ -281,11 +279,8 @@ H4_INT_MAP cmdErrors={
 
 (c) 2021 Phil Bowles h4plugins@gmail.com
 
-* [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
-* [Blog](https://8266iot.blogspot.com)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)
-* [Facebook IOT with ESP8266 (moderator)}](https://www.facebook.com/groups/1591467384241011/)
 * [Facebook ESP Developers (moderator)](https://www.facebook.com/groups/ESP8266/)
 * [Support me on Patreon](https://patreon.com/esparto)

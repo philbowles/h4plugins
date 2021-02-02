@@ -9,7 +9,7 @@ H4P_HttpMySQLLogger h4mysql("http://192.168.1.20:8266/"); // trailing slash!!!
 uint32_t serno;
 
 void h4setup(){
-  h4UserEvent("normal call");
-  h4UserEvent("test1"); 
-  h4.every(1000,[](){ h4UserEvent("%u",serno++); });
+  h4pUserEvent("normal call");
+  h4pUserEvent("test1"); 
+  h4.every(1000,[](){ h4pUserEvent("%u",serno++); });
 }

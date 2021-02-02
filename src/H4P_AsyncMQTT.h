@@ -54,6 +54,7 @@ class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
                 void        _badSignal(){ h4pisloaded<H4P_WiFi>(H4PID_WIFI)->signal(". .    ",H4P_SIGNAL_TIMEBASE/2); }
                 void        _greenLight() override; //do not autostart!
         virtual void        _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) override;
+                void        _restart() override { autorestart=true; _stop(); _start(); }
                 void        _setup();
                 void        _start() override;
                 bool        _state() override { return connected(); }

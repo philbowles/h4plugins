@@ -115,7 +115,7 @@ getTaskName	KEYWORD2
 giveTaskName	KEYWORD2
 h4FactoryReset	KEYWORD2
 h4reboot	KEYWORD2
-h4UserEvent	KEYWORD2
+h4pUserEvent	KEYWORD2
 H4P_sirenBuzz	KEYWORD2
 H4P_sirenChirp	KEYWORD2
 H4P_sirenHiLo	KEYWORD2

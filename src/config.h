@@ -39,7 +39,7 @@ SOFTWARE.
         WHEN SUBMITTING BUG REPORTS
         ***********************************************************************
 */
-#define H4P_LOG_EVENTS      0
+#define H4P_LOG_EVENTS      1
 #define SANITY              0
 /*
         HARDWARE ASSUMPTIONS

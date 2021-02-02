@@ -18,7 +18,7 @@ H4P_LocalLogger h4ll(10000); // 10k = amount of LittleFS to use
 
 void h4setup(){
   static uint32_t pingCount=0;
-  h4.once(3000,[](){ h4UserEvent("669"); });
-  h4.every(1000,[](){ h4UserEvent("PING %d",pingCount++); }); // sends H4P_EVENT_USER, so will get picked up
+  h4.once(3000,[](){ h4pUserEvent("669"); });
+  h4.every(1000,[](){ h4pUserEvent("PING %d",pingCount++); }); // sends H4P_EVENT_USER, so will get picked up
   h4.every(5000,[](){ SEVENT(H4P_EVENT_NOOP,"T=%u ignore me",millis()); }); // ignored by YOU, caught by H4P_SerialLogger
 }

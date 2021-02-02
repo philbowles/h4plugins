@@ -20,5 +20,5 @@ H4P_MQTTLogger mqheap("heap",H4P_EVENT_HEAP); // name the topic
 H4P_MQTTLogger mqq("Q",H4P_EVENT_Q); // name the topic
 
 void h4setup(){
-    h4UserEvent("Log tester %d",666); // like printf
+    h4pUserEvent("Log tester %d",666); // like printf
 }
