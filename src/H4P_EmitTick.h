@@ -48,7 +48,7 @@ class H4P_EmitTick: public H4Plugin {
                 }
                 void _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) { _skip=true; }
     public: 
-        H4P_EmitTick(H4_FN_VOID beat=nullptr): H4Plugin(H4PID_1SEC,H4P_EVENT_BACKOFF){}
+        H4P_EmitTick(): H4Plugin(H4PID_1SEC,H4P_EVENT_BACKOFF){}
 
                 void    show() override {
                     H4Plugin::show();

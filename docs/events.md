@@ -20,9 +20,9 @@ Essential background before using the events and/or logging systems
   * :building_construction: mysqllogger
 * Formal API Specifications - Emitters
   * [H4P_EmitHeap](heap.md)
-  * :building_construction: [H4P_EmitLoopCount](loops.md)
-  * :building_construction: [H4P_EmitQ](eq.md)
-  * :building_construction: [H4P_EmitTick](tick.md)
+  * [H4P_EmitLoopCount](loops.md)
+  * [H4P_EmitQ](eq.md)
+  * [H4P_EmitTick](tick.md)
 
 ---
 
@@ -256,10 +256,10 @@ H4Plugins comes with some pre-defined event emitters which are useful during tes
 
 | Plugin | Event | Msg |Note|
 | :--- | :--- | :--- | :---: |
-|H4P_EmitHeap|H4P_EVENT_HEAP|result of `ESP.getFreeHeap()`||
-|H4P_EmitLoopCount|H4P_EVENT_LOOPS|Loops per second|1|
-|H4P_EmitQ|H4P_EVENT_Q|Length of H4 Queue||
-|H4P_EmitTick|H4P_EVENT_HEARTBEAT|Integer number of seconds uptime||
+|[H4P_EmitHeap](heap.md)|H4P_EVENT_HEAP|amount of free heap||
+|[H4P_EmitLoopCount](loops)|H4P_EVENT_LOOPS|Loops per second|1|
+|[H4P_EmitQ](eq.md)|H4P_EVENT_Q|Length of H4 Queue||
+|[H4P_EmitTick](tick.md)|H4P_EVENT_HEARTBEAT|Integer number of seconds uptime||
 
 Notes:
 1. Requires reconfiguration of H4 config

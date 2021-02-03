@@ -84,7 +84,7 @@ More information: [Emitters and Listeners](events.md)
 
 | Symbolic Name | Short Name | Type | Singleton | Purpose |
 | :----------   | :---- | :--- | :-------: | :---    |
-|H4P_TRID_BTTO|BTTO|Once|:tick:|Auto-off Timer (only if auto > 0)|
+|H4P_TRID_BTTO|BTTO|Once|:heavy_check_mark:|Auto-off Timer (only if auto > 0)|
 
 ---
 

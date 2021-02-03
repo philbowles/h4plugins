@@ -1,10 +1,14 @@
 ![H4P Logo](/assets/DiagLogo.jpg)
 
-# H4P_EmitHeap
+# H4P_EmitLoopCount
 
-## Shortname heap
+## Shortname evtq
 
-Emits `H4P_EVENT_HEAP` events at a user-defined frequency. The event message contains the string representation of the amount of free heap space.
+Emits `H4P_EVENT_LOOPS` once per second. This gives a *very* rough estimate of the number of times per second that H4 is able to schedule its task queue.
+
+In an unloaded ESP8266 clocked at 80MHz with an empty queue, this figure is typically 75000 - 85000. This allows a (*very*) rough comparison with how "busy" the current app is, and can be helpful in tracking down bugs, performance bottlenecks etc. Do not treat its absolute value nor meaning as particulalry scientific.
+
+***N.B.*** This may require editing of [H4](https://github.com/philbowles/H4) configuration, because providing this facility is in itself a performance "hit" and is therfore usually "compiled out".
 
 For information on how to use this plugin, see [Event Listeners, Event Emitters and logging](events.md)
 
@@ -13,7 +17,7 @@ For information on how to use this plugin, see [Event Listeners, Event Emitters 
 # Usage
 
 ```cpp
-H4P_EmitHeap heapEmitter(...
+H4P_EmitLoopCount lpsCounter();
 ```
 
 This plugin is a "singleton" - there may be only one single instance of it in the app. 
@@ -21,7 +25,7 @@ It may be instantiated as any name the user chooses, prefix all API calls below 
 
 # Dependencies
 
-N/A
+[H4P_EmitTick](tick.md)
 
 # Commands Added
 
@@ -29,17 +33,17 @@ N/A
 
 # Events Listened for
 
-N/A
+`H4P_EVENT_HEARTBEAT`
 
 # Events Emitted
 
-`H4P_EVENT_HEAP`
+`H4P_EVENT_LOOPS`
 
 # Tasks Run
 
 | Symbolic Name | Short Name | Type | Singleton | Purpose |
 | :----------   | :--- | :--- | :-------: | :---    |
-|H4P_TRID_HLOG|HLOG|every|:heavy_check_mark:|Event frequency timer|
+|N/A|||||
 
 # Service Commands
 
@@ -56,10 +60,7 @@ N/A
 ## Constructor
 
 ```cpp
-/*
-uint32_t f; event frequency in milliseconds
-*/
-H4P_EmitHeap(uint32_t f=1000);
+H4P_EmitLoopCount();
 ```
 
 [Example Sketch](../examples/LOGGING/EmittersListeners/EmittersListeners.ino)
@@ -70,6 +71,6 @@ H4P_EmitHeap(uint32_t f=1000);
 
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
-* [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)
+* [Facebook ESP8266 Programming LoopCountuestions](https://www.facebook.com/groups/esp8266questions/)
 * [Facebook ESP Developers (moderator)](https://www.facebook.com/groups/ESP8266/)
 * [Support me on Patreon](https://patreon.com/esparto)

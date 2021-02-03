@@ -1,10 +1,12 @@
 ![H4P Logo](/assets/DiagLogo.jpg)
 
-# H4P_EmitHeap
+# H4P_EmitTick
 
-## Shortname heap
+## Shortname 1sec
 
-Emits `H4P_EVENT_HEAP` events at a user-defined frequency. The event message contains the string representation of the amount of free heap space.
+Emits `H4P_EVENT_HEARTBEAT` once per second. This is synchronous, called on the main loop and *not* an *exact* asynchronous "hard-realtime" second. It is sent when the number of `millis()` is exactly divisible by 1000. Unless your app loads up the queue with badly-designed long-running tasks, it is reasonably accurate.
+
+It will deliberately "skip a beat" if it detects a `H4P_EVENT_BACKOFF` event. It should therefore not be used to synchronise an RTC, or run your granny's life support system.
 
 For information on how to use this plugin, see [Event Listeners, Event Emitters and logging](events.md)
 
@@ -13,7 +15,7 @@ For information on how to use this plugin, see [Event Listeners, Event Emitters 
 # Usage
 
 ```cpp
-H4P_EmitHeap heapEmitter(...
+H4P_EmitTick ticktock();
 ```
 
 This plugin is a "singleton" - there may be only one single instance of it in the app. 
@@ -29,17 +31,17 @@ N/A
 
 # Events Listened for
 
-N/A
+`H4P_EVENT_BACKOFF`
 
 # Events Emitted
 
-`H4P_EVENT_HEAP`
+`H4P_EVENT_HEARTBEAT`
 
 # Tasks Run
 
 | Symbolic Name | Short Name | Type | Singleton | Purpose |
 | :----------   | :--- | :--- | :-------: | :---    |
-|H4P_TRID_HLOG|HLOG|every|:heavy_check_mark:|Event frequency timer|
+|N/A|||||
 
 # Service Commands
 
@@ -56,10 +58,7 @@ N/A
 ## Constructor
 
 ```cpp
-/*
-uint32_t f; event frequency in milliseconds
-*/
-H4P_EmitHeap(uint32_t f=1000);
+H4P_EmitTick();
 ```
 
 [Example Sketch](../examples/LOGGING/EmittersListeners/EmittersListeners.ino)
@@ -70,6 +69,6 @@ H4P_EmitHeap(uint32_t f=1000);
 
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
-* [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)
+* [Facebook ESP8266 Programming Tickuestions](https://www.facebook.com/groups/esp8266questions/)
 * [Facebook ESP Developers (moderator)](https://www.facebook.com/groups/ESP8266/)
 * [Support me on Patreon](https://patreon.com/esparto)

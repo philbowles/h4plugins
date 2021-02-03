@@ -1,10 +1,10 @@
 ![H4P Logo](/assets/DiagLogo.jpg)
 
-# H4P_EmitHeap
+# H4P_EmitQ
 
-## Shortname heap
+## Shortname evtq
 
-Emits `H4P_EVENT_HEAP` events at a user-defined frequency. The event message contains the string representation of the amount of free heap space.
+Emits `H4P_EVENT_Q` events at a user-defined frequency. The event message contains the string representation of the size of the H4 task Queue.
 
 For information on how to use this plugin, see [Event Listeners, Event Emitters and logging](events.md)
 
@@ -13,7 +13,7 @@ For information on how to use this plugin, see [Event Listeners, Event Emitters 
 # Usage
 
 ```cpp
-H4P_EmitHeap heapEmitter(...
+H4P_EmitQ queueEmitter(...
 ```
 
 This plugin is a "singleton" - there may be only one single instance of it in the app. 
@@ -33,13 +33,13 @@ N/A
 
 # Events Emitted
 
-`H4P_EVENT_HEAP`
+`H4P_EVENT_Q`
 
 # Tasks Run
 
 | Symbolic Name | Short Name | Type | Singleton | Purpose |
 | :----------   | :--- | :--- | :-------: | :---    |
-|H4P_TRID_HLOG|HLOG|every|:heavy_check_mark:|Event frequency timer|
+|H4P_TRID_QLOG|QLOG|every|:heavy_check_mark:|Event frequency timer|
 
 # Service Commands
 
@@ -58,8 +58,10 @@ N/A
 ```cpp
 /*
 uint32_t f; event frequency in milliseconds
+uint32_t scale; multiply the actual value by this amount - this makes the grpah trace much more visible if
+graphed at the same time as e.g. heap with is usually 5 digits
 */
-H4P_EmitHeap(uint32_t f=1000);
+H4P_EmitQ(uint32_t f=1000,uint32_t scale=1)
 ```
 
 [Example Sketch](../examples/LOGGING/EmittersListeners/EmittersListeners.ino)

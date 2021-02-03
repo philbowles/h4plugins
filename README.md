@@ -176,13 +176,13 @@ Networking is not required but if you *are* connected, the webserver will automa
 
 ### Event Emitters
 
-* [H4P_EmitLoopCount](docs/h4qw.md): Send loops/sec to the event queue for diagnosing bottlencks (requires changes to [H4 config](https://github.com/philbowles/H4/blob/src/config.h) / compile options)
+* [H4P_EmitLoopCount](docs/loops.md): Send loops/sec to the event queue for diagnosing bottlencks (requires changes to [H4 config](https://github.com/philbowles/H4/blob/src/config.h) / compile options)
   
-* [H4P_EmitQ](docs/events.md): Periodically Send H4 Q size to event queue to help profling / performance tuning
+* [H4P_EmitQ](docs/eq.md): Periodically Send H4 Q size to event queue to help profling / performance tuning
 
 * [H4P_EmitHeap](docs/heap.md): Periodically Send `getFreeHeap()` value to event queue to help hunt memory leaks
 
-* [H4P_EmitTick](docs/events.md): Send synchronous 1x per second on-the-second heartbeat event.
+* [H4P_EmitTick](docs/tick.md): Send synchronous 1x per second on-the-second heartbeat event.
 
 ---
 
