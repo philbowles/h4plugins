@@ -1,10 +1,10 @@
 ![H4P Flyer](/assets/DiagLogo.jpg) 
 
-# Command Errors (short name="cerr")
+# Verbose Messages
 
-# Adds error-code to meaningful message translation to SerialCmd plugin for H4 Universal Scheduler/Timer.
+## Shortname="vm"
 
-*All plugins depend upon the presence of the [H4 library](https://github.com/philbowles/H4), which must be installed first.*
+Replaces internal system IDs with human-readable nmames / messages to assist in learning / debugging
 
 ---
 
@@ -17,21 +17,6 @@ Translates numeric codes into meaningful messages for:
 * task types
 * task names
 
-For example:
-
-```cpp
-H4_INT_MAP  cmdErrors={
-    {H4_CMD_OK,"OK"},
-    {H4_CMD_UNKNOWN,"Unknown cmd"},
-    {H4_CMD_TOO_FEW_PARAMS,"Too few parameters"},
-    {H4_CMD_TOO_MANY_PARAMS,"Too many parameters"},
-    {H4_CMD_NOT_NUMERIC,"Numeric value expected"},
-    {H4_CMD_OUT_OF_BOUNDS,"Value out of range"},
-    {H4_CMD_NAME_UNKNOWN,"Name not known"},
-    {H4_CMD_PAYLOAD_FORMAT,"Incorrect Payload Format"}
-};
-```
-
 Merely installing the plugin before any other automatically provides the translation(s) without any further ado.
 
 ---
@@ -40,7 +25,7 @@ Merely installing the plugin before any other automatically provides the transla
 
 ```cpp
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
+H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 H4P_VerboseMessages vm; // should be created BEFORE any others
 
 This plugin is a "singleton" - there may be only one single instance of it in the app. It may be called whatever you choose: prefix all API calls below with `yourchosenname.`
@@ -65,17 +50,25 @@ string  getTaskType(uint32_t taskType);
 string  getTaskName(uint32_t taskId); // any taskId
 ```
 
-[Example Code](../examples/BASICS/H4P_VerboseMessages/H4P_VerboseMessages.ino)
+You would normally use these via the following from [Static and Utility functions](statics.md#translating-cryptic-error-codes--system-ids)
+
+```cpp
+std::string h4pgetErrorMessage(uint32_t e); // command errors
+std::string h4pgetEventName   (H4P_EVENT_TYPE e);
+std::string h4pgetTaskType    (uint32_t e); // H4 Timer Task Type e.g. every, once, nTimes etc
+std::string h4pgetTaskName    (uint32_t e); // H4 Timer Task name
+```
+
+[Simple example sketch](../examples/BASICS/H4P_VerboseMessages/H4P_VerboseMessages.ino)
+
+[Task names example](../examples/BASICS/H4_TaskNames/H4_TaskNames.ino)
 
 ---
 
 (c) 2020 Phil Bowles h4plugins@gmail.com
 
-* [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
-* [Blog](https://8266iot.blogspot.com)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)
-* [Facebook IOT with ESP8266 (moderator)}](https://www.facebook.com/groups/1591467384241011/)
 * [Facebook ESP Developers (moderator)](https://www.facebook.com/groups/ESP8266/)
 * [Support me on Patreon](https://patreon.com/esparto)

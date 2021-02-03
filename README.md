@@ -154,7 +154,8 @@ Networking is not required but if you *are* connected, the webserver will automa
   
 ## Diagnostic / Logging / Development tools:
 
-* [**H4P_VerboseMessages**](docs/h4vm.md): Provide text error messages instead of numeric error codes
+* [**H4P_VerboseMessages**](docs/vm.md): Provide text error messages instead of numeric system codes
+  
 * [**H4P_HeapWarn**](docs/h4hw.md): Call user function on low Heap
 
 * [**H4P_QueueWarn**](docs/h4qw.md): Call user function on low Queue

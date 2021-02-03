@@ -203,9 +203,9 @@ This effectively does a `h4/svc/info/XXXX` for every loaded plugin and produces 
 
 ![empty](../assets/showq.jpg)
 
-This shows 3 tasks in H4's queue. Again this will not mean much right now, but it does allow us to look very briefly at another plugin [H4P_VerboseMessages](h4ce.md). If this is included at the top of any sketch, some of the "gibberish" in the `show` commands is translated in to slightly more meaningful gibberish.
+This shows 3 tasks in H4's queue. Again this will not mean much right now, but it does allow us to look very briefly at another plugin [H4P_VerboseMessages](vm.md). If this is included at the top of any sketch, some of the "gibberish" in the `show` commands is translated in to slightly more meaningful gibberish.
 
-Recompiling with [H4P_VerboseMessages](h4ce.md) and running it again we see:
+Recompiling with [H4P_VerboseMessages](vm.md) and running it again we see:
 
 ![empty](../assets/showq2.jpg)
 

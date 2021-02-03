@@ -17,7 +17,7 @@ These may be provided by the user if required
 
 | Function | Source | Purpose |
 | :--- | :--- | :--- |
-|`const char* giveTaskName(uint32_t n);`|[h4vm](h4ce.md)| Translate user's task ID to meaningful name see  [Example Sketch](../examples/BASICS/H4_TaskNames/H4_TaskNames.ino)|
+|`const char* giveTaskName(uint32_t n);`|[h4vm](vm.md)| Translate user's task ID to meaningful name see  [Example Sketch](../examples/BASICS/H4_TaskNames/H4_TaskNames.ino)|
 |h4pGlobalEventHandler(H4PID pid,H4P_EVENT_TYPE t,const string& msg);`|various| Catch-all event handler. See [Event Listeners, Event Emitters and logging](docs/events.md)|
 |`void h4UserLoop(void);`|[H4](https://github.com/philbowles/H4)| 1x per loop - use with caution, requires H4 option setting. see  [Example Sketch](../examples/BASICS/H4_TaskNames/H4_TaskNames.ino)|
 |`void onFactoryReset(void);`|various| Final tidying / freeing of resources immediatley before the event|
@@ -102,7 +102,7 @@ if you do not have matched % signs, it WILL crash!!
 
 To save space and improve performance, H4P identifies all internal entities with numeric codes. Normally the user will never need to come across these, but if they do, they will mean very little. When debugging and testing it is useful to see the human-readable equivalents - which *may* mean a little more.
 
-If [H4P_VerboseMessages](h4ce.md) is in use, then the following functions will return human-readable values
+If [H4P_VerboseMessages](vm.md) is in use, then the following functions will return human-readable values
 
 ```cpp
 std::string h4pgetErrorMessage(uint32_t e); // command errors
