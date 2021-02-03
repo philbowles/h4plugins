@@ -28,10 +28,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-//#ifdef ARDUINO_ARCH_ESP8266
 #include<H4P_Timekeeper.h>
-#ifndef H4P_NO_WIFI
-
 #include<H4P_SerialCmd.h>
 #include<H4P_BinaryThing.h>
 
@@ -40,21 +37,21 @@ void __attribute__((weak)) onRTC(){}
 constexpr uint32_t secsInDay(){ return 86400; }
 constexpr uint32_t msInDay(){ return 1000*secsInDay(); }
 
-H4P_Timekeeper::H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzo,H4_FN_DST fDST): _fDST(fDST), H4Plugin(timeTag()){
-    _cmds={
-        {_pName,   { H4PC_H4, _subCmd, nullptr}}, // root for this plugin, e.g. h4/ME...
-        {"change", { _subCmd,       0, CMDVS(_change)}},
-        {"sync",   { _subCmd,       0, CMD(sync)}},
-        {"tz",     { _subCmd,       0, CMDVS(_tz)}}
-    };
+H4P_Timekeeper::H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzo,H4_FN_DST fDST): _fDST(fDST), H4Plugin(H4PID_TIME){
+    _addLocals({
+        {_pName,   { H4PC_H4, _pid, nullptr}}, // root for this plugin
+        {"change", { _pid,       0, CMDVS(_change)}},
+        {"sync",   { _pid,       0, CMD(sync)}},
+        {"tz",     { _pid,       0, CMDVS(_tz)}}
+    });
     sntp_setoperatingmode(SNTP_OPMODE_POLL);
     _setupSNTP(ntp1,ntp2);
     __HALsetTimezone(0);
     _tzo = tzo;
     if(!_fDST) _fDST=[](uint32_t){ return 0; };
 }
-#ifdef ARDUINO_ARCH_ESP8266
 
+#ifdef ARDUINO_ARCH_ESP8266
 void H4P_Timekeeper::__HALsetTimezone(int tzo){
     _tzo=tzo;
     sntp_set_timezone(0);
@@ -62,13 +59,11 @@ void H4P_Timekeeper::__HALsetTimezone(int tzo){
 
 void H4P_Timekeeper::sync(){
 	long stamp=sntp_get_current_timestamp();
-//    Serial.printf("**************** SYNC S=%u tzo=%d %s\n",stamp,_tzo,sntp_get_real_time(stamp));
+    PLOG("TK sync 8266 stamp=%lu",stamp);
 	if(stamp > 30000){ // 28800 +leeway: default is GMT+8
         stamp+=(_tzo*60);
 		vector<string> dp=split(replaceAll(sntp_get_real_time(stamp + _fDST(stamp)),"  "," ")," ");
-//        dumpvs(dp);
         _mss00=parseTime(dp[3])-millis();
-//        Serial.printf("**************** SYNC S=%u tzo=%d %s ms00=%u\n",stamp,_tzo,sntp_get_real_time(stamp + _fDST(stamp)),_mss00);
 	}
 }
 #else 
@@ -81,6 +76,7 @@ void H4P_Timekeeper::__HALsetTimezone(int tzo){
  }
 
 void H4P_Timekeeper::sync(){
+    PLOG("TK sync ESP32");
     time_t now = 0;
     time(&now);
     uint32_t adjusted=now+_tzo*60;
@@ -97,39 +93,45 @@ uint32_t H4P_Timekeeper::__alarmCore (vector<string> vs,bool daily,H4BS_FN_SWITC
     int T=parseTime(vg[0]);
     if(T<0) return H4_CMD_PAYLOAD_FORMAT;
     string b=vg[1];
-    if(!isNumeric(b)) return H4_CMD_NOT_NUMERIC;
+    if(!stringIsNumeric(b)) return H4_CMD_NOT_NUMERIC;
     int onoff=atoi(CSTR(b));
     if(_mss00){ // onRTC
-        H4EVENT("%s %s -> %s",daily ? "Daily":"S/Shot",CSTR(strTime(T)),onoff ? "ON":"OFF");
+        PLOG("%s %s -> %s",daily ? "Daily":"S/Shot",CSTR(strTime(T)),onoff ? "ON":"OFF");
         int msDue=T-msSinceMidnight();
         if(msDue < 0) msDue+=msInDay();
         uint32_t u=daily ? H4P_TRID_DALY:H4P_TRID_SHOT;
         h4.add([this,f,onoff]{
             if(_mss00) f(onoff);
-            else H4EVENT("RTC ignored"); // don't fire if NTP not sync'ed 
+            //else PLOG("RTC ignored"); // don't fire if NTP not sync'ed 
         },msDue,daily ? msDue:0,H4Countdown(1),nullptr,TAG(daily ? 7:3));
         return H4_CMD_OK;
-    } else H4EVENT("Alarm ignored"); // don't set if NTP not sync'ed
+    } //else PLOG("Alarm ignored"); // don't set if NTP not sync'ed
     return H4_CMD_NOT_NOW; 
 }
 
 uint32_t H4P_Timekeeper::_at(vector<string> vs){ return __alarmCore(vs,false,[this](bool b){ _btp->turn(b); }); }
 
-uint32_t H4P_Timekeeper::_change(vector<string> vs){ return guardString2(vs,[this](string a,string b){ change(a,b); return H4_CMD_OK; }); }
+uint32_t H4P_Timekeeper::_change(vector<string> vs){ return _guardString2(vs,[this](string a,string b){ change(a,b); return H4_CMD_OK; }); }
 
 uint32_t H4P_Timekeeper::_daily(vector<string> vs){ return __alarmCore(vs,true,[this](bool b){ _btp->turn(b); }); }
 
 void H4P_Timekeeper::_hookIn(){ 
-    DEPEND(wifi);
-    H4Plugin* p=isLoaded(onofTag());
-    if(p) {
-        _btp=reinterpret_cast<H4P_BinaryThing*>(p);
-        h4cmd.addCmd("at",_subCmd,0,CMDVS(_at));
-        h4cmd.addCmd("daily",_subCmd,0,CMDVS(_daily));
-    }
+    _btp=h4prequire<H4P_BinaryThing>(this,H4PID_ONOF);
+    h4pdepend<H4P_WiFi>(this,H4PID_WIFI);
+    h4cmd.addCmd("at",_pid,0,CMDVS(_at));
+    h4cmd.addCmd("daily",_pid,0,CMDVS(_daily));
 }
-
+/*
 void H4P_Timekeeper::_setupSNTP(const string& ntp1, const string& ntp2){
+    _ntp1=ntp1;
+    _ntp2=ntp2;
+    sntp_setservername(0,CSTR(_ntp1));
+    sntp_setservername(1,CSTR(_ntp2));
+    PLOG("NTP Servers: %s %s",CSTR(ntp1),CSTR(ntp2));
+}
+*/
+void H4P_Timekeeper::_setupSNTP(const string& ntp1, const string& ntp2){
+    sntp_stop();
     _ntp1=ntp1;
     _ntp2=ntp2;
     sntp_setservername(0,(char*) _ntp1.c_str());
@@ -145,7 +147,7 @@ void H4P_Timekeeper::_start(){
             [this]{ sync(); },
             [this]{
                 static bool gotRTC=false; 
-                H4EVENT("NTP SYNC _mss00=%u %s",_mss00,CSTR(clockTime()));
+                PLOG("NTP SYNC _mss00=%u %s",_mss00,CSTR(clockTime()));
                 if(!gotRTC) {
                     _upHooks();
                     onRTC();
@@ -166,7 +168,7 @@ void H4P_Timekeeper::_stop(){
 }
 
 uint32_t H4P_Timekeeper::_tz(vector<string> vs){
-    return guardInt1(vs,[this](int v){
+    return _guardInt1(vs,[this](int v){
         tz(v); 
         return H4_CMD_OK;
     });
@@ -190,7 +192,6 @@ string H4P_Timekeeper::minutesFromNow(uint32_t m){
 }
 
 int H4P_Timekeeper::parseTime(const string& ts){ // in milliseconds!
-//    Serial.printf("parseTime %s\n",CSTR(ts));
 	vector<string> parts=split(ts,":");
     uint32_t    h,m,s=0;
     switch(parts.size()){
@@ -224,9 +225,9 @@ void H4P_Timekeeper::setScheduleSource(H4P_SCHEDULE shed){
 }
 
 void H4P_Timekeeper::show(){
-//    reply("_mss00=%d, ms since 00:00=%d",_mss00,msSinceMidnight());
+    reply("_mss00=%d, ms since 00:00=%d",_mss00,msSinceMidnight());
     reply("TZO=%d",_tzo);
-    reply("%s %s",CSTR(_ntp1),CSTR(_ntp2));
+    reply("Servers: %s %s",CSTR(_ntp1),CSTR(_ntp2));
     reply("Wallclock=%s, UpTime=%s",CSTR(clockTime()),CSTR(upTime()));
 }
 
@@ -373,5 +374,3 @@ string H4P_Timekeeper::upTime(){
 	uint32_t t=millis();
 	return stringFromInt(t / msInDay(),"%02d:")+strTime(t);
 }
-
-#endif // wifi only

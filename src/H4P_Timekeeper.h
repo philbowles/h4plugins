@@ -28,12 +28,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_Timekeeper_H
-#define H4P_Timekeeper_H
+#pragma once
 
 #include<H4PCommon.h>
-#include<H4P_WiFiSelect.h>
-#ifndef H4P_NO_WIFI
 #ifdef ARDUINO_ARCH_ESP8266
     #include "sntp.h"
 #else
@@ -41,8 +38,8 @@ SOFTWARE.
     #include <time.h>
 #endif
 
+#include<H4P_WiFi.h>
 #include<H4P_BinaryThing.h>
-
 
 using H4P_DURATION = pair<string,string>;
 using H4P_SCHEDULE = vector<H4P_DURATION>;
@@ -71,12 +68,12 @@ class H4P_Timekeeper: public H4Plugin {
                 void        __HALsetTimezone(int);
                 uint32_t    _at(vector<string> vs);
                 uint32_t    _daily(vector<string> vs);
-                void        _hookIn() override;
                 void        _greenLight() override {}; // no autostart
                 void        _setupSNTP(const string& ntp1, const string& ntp2);
                 void        _start() override;
                 void        _stop() override;
     public:
+        H4P_Timekeeper(): H4Plugin(H4PID_TIME){} // required for dependencies
         H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzOffset=0,H4_FN_DST fDST=nullptr);
 ///
 // _tzo = Time Zone Offset in +/- minutes from UTC, not hours.
@@ -105,9 +102,8 @@ class H4P_Timekeeper: public H4Plugin {
                 void        sync();
                 void        tz(int tzOffset);
                 string 		upTime();
+// syscall only
+        void            _hookIn() override;
 };
 
 extern __attribute__((weak)) H4P_Timekeeper h4tk;
-
-#endif // no wifi
-#endif // H4P_Timekeeper_H

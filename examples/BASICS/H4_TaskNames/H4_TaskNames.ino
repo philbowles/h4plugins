@@ -1,5 +1,5 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
+H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 /*
 
 Optional: Allows you to "tag" your tasks with a name* so that you can find them
@@ -8,6 +8,8 @@ Optional: Allows you to "tag" your tasks with a name* so that you can find them
     *keep it to 4 chs or the columns won't line up
 
 */
+H4P_VerboseMessages h4vm;
+
 const char* giveTaskName(uint32_t n){
   static H4_INT_MAP mydata={
     {1,"Tick"},
@@ -20,12 +22,10 @@ const char* giveTaskName(uint32_t n){
 }
 // if you don't want task naming, just delete the above
 
-
-
 void h4setup() {
     h4.everyRandom(5000,10000,[](){ 
     Serial.print(millis());Serial.println(" RUDE INTERRUPTION");
-    h4cmd.dumpQ();
+    h4cmd.showQ();
   },nullptr,4);
 
   h4.every(1000,[]{ Serial.print(millis());Serial.println(" PING "); },nullptr,1);  
@@ -37,7 +37,7 @@ void h4setup() {
       h4.nTimes(11,5000,[](){ // the song is "10 green bottles", but we want to include zero
         uint32_t nBottles=11 - (h4.context->nrq+1);
         Serial.print(nBottles);Serial.println(" green bottles, hangin' on a wall...");
-      },nullptr,99);
+      },nullptr,99); // 99 will give "ANON" !
     },13);
 }
 /*
@@ -47,6 +47,8 @@ void h4setup() {
         that must be called regularly.
 
         If you dont have any, delete the whole function
+
+        NB - SEE H4 config.h as h4UserLoop can be turned off to improve performance
 */
 void h4UserLoop(){
   static long prev=0;

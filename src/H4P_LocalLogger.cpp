@@ -26,38 +26,39 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
-#ifndef ARDUINO_ARCH_STM32
 #include<H4P_LocalLogger.h>
+#include <H4P_SerialCmd.h>
 
-#ifdef H4P_LOG_EVENTS
-//
-H4P_LocalLogger::H4P_LocalLogger(uint32_t limit,uint32_t filter): H4PLogService(logTag(),filter), _limit(limit) {
-    _fname=string(logTag())+".csv";
-    _cmds={
-        {_pName,   {H4PC_H4, _subCmd, nullptr}},
-        {msgTag(), {_subCmd, 0, CMDNULL}},
-        {"clear",  {_subCmd, 0, CMD(clear)}},
-        {"flush",  {_subCmd, 0, CMD(flush)}}
-    };
+H4P_LocalLogger::H4P_LocalLogger(uint32_t limit,uint32_t filter):  _limit(limit), H4Plugin(H4PID_LLOG,filter | H4P_EVENT_FACTORY) {
+    _fname="log.csv";
+    _addLocals({
+        {_pName,   {H4PC_H4, _pid, nullptr}},
+        {"msg",    {_pid, 0, CMDNULL}},
+        {"clear",  {_pid, 0, CMD(clear)}},
+        {"flush",  {_pid, 0, CMD(flush)}}
+    });
 }
 
-void H4P_LocalLogger::clear(){ SPIFFS.remove(CSTR(string("/").append(logTag()))); }
+void H4P_LocalLogger::clear(){ HAL_FS.remove(CSTR(string("/"+_fname))); }
 
 void H4P_LocalLogger::flush(){
     show();
     clear();
 }
 
-void H4P_LocalLogger::show(){ h4cmd._dump(vector<string>{_fname}); }
+void H4P_LocalLogger::show(){
+    uint32_t fsz=HAL_FS.open(CSTR(string("/"+_fname)),"r").size();
+    reply("File /%s size=%u (%u %%full) limit=%u",CSTR(_fname),fsz,(fsz*100)/_limit,_limit);
+    h4cmd._dump(vector<string>{_fname});
+}
 //
 //      our raison d'etre
 //
-void H4P_LocalLogger::_logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target){
-    vector<string> msgparts={stringFromInt(millis()),stringFromInt(type),source,target,msg};
-    uint32_t size=h4cmd.write("/"+_fname,join(msgparts,",")+"\n","a");
-    if(size > _limit) flush();
+void H4P_LocalLogger::_handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) {
+    if(t==H4P_EVENT_FACTORY) clear();
+    else {
+        vector<string> msgparts={stringFromInt(millis()),h4pgetEventName(t),h4pnames[pid],msg};
+        uint32_t size=h4cmd.write("/"+_fname,join(msgparts,",")+"\n","a");
+        if(size > _limit) flush();
+    }
 }
-#endif
-
-#endif

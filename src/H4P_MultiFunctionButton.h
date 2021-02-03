@@ -27,56 +27,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_MultiFunctionButton_HO
-#define H4P_MultiFunctionButton_HO
+#pragma once
 
 #include<H4PCommon.h>
 #include<H4P_GPIOManager.h>
+#include<H4P_FlasherController.h>
 #include<H4P_BinaryThing.h>
 
-#include<H4P_WiFiSelect.h>
-#ifndef H4P_NO_WIFI
-    #include<H4P_WiFi.h>
-#endif
+extern void h4FactoryReset(const string& src);
 
-extern void h4FactoryReset();
 class H4P_MultiFunctionButton: public H4Plugin{
-            H4P_BinaryThing*    _btp;
-            uint8_t             _led;
-            H4GM_SENSE          _active;
+            H4P_FlasherController*  _pSignal;
+            H4P_GPIOManager*        _pGPIO;
+            H4P_BinaryThing*        _btp;
             H4GM_STAGE_MAP _sm={
-#ifdef H4P_LOG_EVENTS
-                {0,[this](H4GPIOPin*){ _btp->_turn(!_btp->state(),_pName); }},
-#else
-                {0,[this](H4GPIOPin*){ _btp->turn(!_btp->state()); }},
-#endif
-                {H43F_REBOOT,[](H4GPIOPin*){ h4reboot(); }},
-                {H43F_FACTORY,[](H4GPIOPin*){ h4FactoryReset(); }}
-#ifndef H4P_NO_WIFI
-                ,{10000,[](H4GPIOPin*){ h4wifi.forceAP(); }}
-#endif
-            };    
-            H4_FN_VOID      _createMS;
+                {0,[this](H4GPIOPin*){ _btp->toggle(); }},
+                {H4MF_REBOOT,[](H4GPIOPin*){ h4reboot(); }},
+                {H4MF_FACTORY,[this](H4GPIOPin*){ h4FactoryReset(_pName); }}//,
+            };
 
-            void            _greenLight() override {} // no autostart
+            void            _greenLight() override {} // no autostart, dpends on wink
             void            _hookIn() override;
-            void            _start() override;
-            void            _stop() override;
-            
-            void progress(H4GPIOPin* ptr);
+            void            _progress(H4GPIOPin* ptr);
     public:
         H4P_MultiFunctionButton(
-//          the input button            
             uint8_t pin,
             uint8_t mode,
             H4GM_SENSE b_sense,
-            uint32_t dbTimeMs, // arbitrary
-//          the linked LED for message flashing
-            uint8_t led,
-            H4GM_SENSE l_sense);
+            uint32_t dbTimeMs);
 };
-
-extern __attribute__((weak)) H4P_MultiFunctionButton h4mfb;
-
-//#endif
-#endif // H4P_MultiFunctionButton_H

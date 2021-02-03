@@ -119,7 +119,7 @@ unordered_map<uint32_t,pair<uint32_t,string>> H4P_ToneController::sirens={
     {H4P_SIREN_WOOPWOOP,{450,"AN3d AN3d AN3d AN3d CN4d CN4d EN4d AN4d BN5d GN5d C#6d R  M "}}
 };
 
-H4P_ToneController::H4P_ToneController(uint32_t tempo): H4Plugin("tone"){
+H4P_ToneController::H4P_ToneController(uint32_t tempo): H4Plugin(H4PID_TONE){
     for(auto const &n:notes) xpose.push_back(n.second); // build ordered table of f
     sort(xpose.begin(),xpose.end());
     for(auto &n:notes) {
@@ -128,7 +128,7 @@ H4P_ToneController::H4P_ToneController(uint32_t tempo): H4Plugin("tone"){
     }
     metronome(tempo);
 
-    _cmds={ {_pName,    { H4PC_H4, 0, CMDVS(_siren) }} };
+    _addLocals({ {_pName,    { H4PC_H4, 0, CMDVS(_siren) }} });
 }
 
 void H4P_ToneController::_repeat(const string& siren,uint8_t pin,uint32_t speed,uint32_t duration){
@@ -148,7 +148,7 @@ uint32_t H4P_ToneController::_siren(vector<string> vs){
     /*
     if(vs.size()<2) return H4_CMD_TOO_FEW_PARAMS;
     if(vs.size()>2) return H4_CMD_TOO_MANY_PARAMS;
-    if(!isNumeric(H4PAYLOAD)) return H4_CMD_NOT_NUMERIC;
+    if(!stringIsNumeric(H4PAYLOAD)) return H4_CMD_NOT_NUMERIC;
     if(H4PAYLOAD_INT > H4P_SIREN_MAX) return H4_CMD_OUT_OF_BOUNDS;
 */
     return H4_CMD_OK;
@@ -171,12 +171,9 @@ void H4P_ToneController::metronome(uint32_t tempo){
             timing[order[i]]=timing[order[i-2]]*2;
             timing[order[i+1]]=(timing[order[i]]*3)/2;
         }
-        /*
-        Serial.printf("Tempo=%d\n",tempo);
-        for(auto const& o:order) Serial.printf("%c=%d\n",o,timing[o]);
-        */
     }
 }
+
 void H4P_ToneController::multiVox(H4P_TUNE tune,uint32_t tempo,int transpose){
     metronome(tempo);
     int i=tune.size()-1;
@@ -217,19 +214,6 @@ void H4P_Voice::_decompose(const string& n,int transpose,H4_FN_VOID chain){//,ui
     string note(n);
     char effect=note.back();note.pop_back();
     char duration=note.back();note.pop_back();
-/* 
-    Serial.printf("T=%u RAW NOTE P%d %s value=%s d=%c(%d) e=%c f1=%d xp=%d f2=%d\n",
-        millis(),
-        _pin,
-        CSTR(n),
-        CSTR(note),
-        duration,
-        H4P_ToneController::timing[duration],
-        effect,
-        H4P_ToneController::xpose[H4P_ToneController::notes[note]],
-        transpose,
-        H4P_ToneController::_transpose(note,transpose));
-*/
     if(H4P_ToneController::notes.count(note)) _tone(H4P_ToneController::_transpose(note,transpose),effect,H4P_ToneController::timing[duration],chain);
 }
 

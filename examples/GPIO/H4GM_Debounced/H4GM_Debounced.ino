@@ -1,5 +1,5 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
+H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 
  //auto-start Serial @ 115200, Q size=20 
 
@@ -10,12 +10,8 @@ and STM32NUCLEO-F429ZI whuch has a user button that is ACTIVE_HIGH
 
 You will probably need to adjust these values for you own device
 */
-#ifdef ARDUINO_ARCH_STM32
-  #define UB_ACTIVE ACTIVE_HIGH
-#else
-  #define USER_BTN 0
-  #define UB_ACTIVE ACTIVE_LOW
-#endif
+#define USER_BTN 0
+#define UB_ACTIVE ACTIVE_LOW
 /*
     ALL GPIO strategies are derived from H4GPIOPin: the following members are available
     inside ALL GPIO pin callbacks, once you have a valid pointer for the pin type using 
@@ -56,7 +52,7 @@ void h4setup() { // H4 constructor starts Serial
     Serial.print("GPIO ");Serial.print(USER_BTN);Serial.print(" ACTIVE ");Serial.println(UB_ACTIVE ? "HIGH":"LOW");
 
     h4gm.Debounced(USER_BTN,INPUT,UB_ACTIVE,U_DBTIME_MS,[](H4GPIOPin* ptr){
-    H4GM_PIN(Debounced); // Required! turns ptr into correct pin-> pointer
+        H4GM_PIN(Debounced); // Required! turns ptr into correct pin-> pointer
         Serial.print("GPIO ");Serial.print(pin->pin);Serial.print(" state ");Serial.print(pin->state);
         Serial.print(" @ uS ");Serial.print(pin->Tevt);Serial.print(" delta=");Serial.print(pin->delta);
         Serial.print(" rate=");Serial.print(pin->cps);Serial.println("/sec");

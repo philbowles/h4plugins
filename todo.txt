@@ -1,22 +1,26 @@
-
-TODO:
-    ret type on guard 1
-SOONER
-    error gone away in nodejs
-    early abort dependfail
 SHORTTERM
-    schedule in cheztoi
+    rework time stuff!!!
+    rework PD for UPNP etc
+    upndp out gangmaster in
+    remove redun this param on require , depend
     H4_TIMER from at,daily
     adv docs + / example creating your own commands
+    retval on ps inc/dec
+    ps discard(x)
 MEDIUMTERM
+    js - type = password if n includes "pass"
+    js - arrowfunctions
+    total event / reaction cmd model - major update
+    passthru ap config params in ctor
     dynamic cmds flash / siren etc
     remote client get
     ESp32 MDNS detector
     ESp32 tonecontroller
-    templatise / mcrofy dependent module detection (and std hookins for runnables?)
 LONGTERM
+    autoOff -> cb
+    upnp analyser device
     dynamic add gpio / thing etc
-    ethernet module stm32
     ESP32 bluetooth PD
     rf bridge
     fix switch.ps1 to use soap etc (revert a la esparto)
+    schedule in cheztoi - now node red :)

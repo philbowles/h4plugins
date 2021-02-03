@@ -28,66 +28,30 @@ SOFTWARE.
 */
 #include<H4P_MultiFunctionButton.h>
 #include<H4P_FlasherController.h>
-
-#include<H4P_WiFiSelect.h>
-#include<H4P_WiFi.h>
 #include<H4P_AsyncMQTT.h>
 
-void H4P_MultiFunctionButton::progress(H4GPIOPin* ptr){ // run this as each stage changes
+void H4P_MultiFunctionButton::_progress(H4GPIOPin* ptr){ // run this as each stage changes
     H4GM_PIN(Multistage); // Create the correct pointer type in 'pin'
     switch(pin->stage){
         case 1: // over 2 seconds, slow flash
-            h4fc.flashLED(H43F_SLOW,_led,_active);     
+            PLOG("STAGE 1 - will reboot");
+            _pSignal->flashLED(H4MF_SLOW,H4P_SIGNAL_LED,H4P_SIGNAL_SENSE);
             break;
         case 2: // over 5 seconds, medium flash
-            h4fc.flashLED(H43F_MEDIUM,_led,_active);     
-            break;
-        case 3: // over 10 seconds, medium flash
-            h4fc.flashLED(H43F_FAST,_led,_active);     
+            PLOG("STAGE 2 - will factory reset");
+            _pSignal->flashLED(H4MF_MEDIUM,H4P_SIGNAL_LED,H4P_SIGNAL_SENSE);
             break;
         default: // do nothing if less than 2 seconds
             break;
     }
 }
 
-#ifndef H4P_NO_WIFI
-void H4P_MultiFunctionButton::_start(){
-    if(isLoaded(wifiTag()) && isLoaded(winkTag())){
-        if(WiFi.getMode() & WIFI_AP) h4fc.flashPWM(1000,10,_led,_active); 
-        else h4fc.stopLED(_led); 
-    }
-    _upHooks();
-}
-
-void H4P_MultiFunctionButton::_stop(){
-    if(isLoaded(wifiTag()) && isLoaded(winkTag())){
-        if(WiFi.getMode() & WIFI_AP) h4fc.stopLED(_led); 
-        else h4fc.flashMorse("... --- ...   ",H43F_TIMEBASE,_led,_active);
-    }
-    _downHooks();
-}
-
 void H4P_MultiFunctionButton::_hookIn(){
-    REQUIREBT;
-    HOOK_IF_LOADED(wifi);
-    DEPEND(wink);
-    _createMS();
-    if(isLoaded(mqttTag())){
-        h4mqtt.hookConnect([this](){ h4fc.stopLED(_led); });
-        h4mqtt.hookDisconnect([this](){ h4fc.flashPattern("10100000",H43F_TIMEBASE,_led,_active); });
-    }
+    _pSignal=h4prequire<H4P_FlasherController>(this,H4PID_WINK);
+    _btp=h4prequire<H4P_BinaryThing>(this,H4PID_ONOF);
+    _pGPIO=h4pdepend<H4P_GPIOManager>(this,H4PID_GPIO);
 }
-#else
-void H4P_MultiFunctionButton::_hookIn(){
-    REQUIREBT;
-    DEPEND(wink);
-    _createMS();
-}
-#endif
 
-H4P_MultiFunctionButton::H4P_MultiFunctionButton(uint8_t pin,uint8_t mode,H4GM_SENSE b_sense,uint32_t dbTimeMs,uint8_t led,H4GM_SENSE l_sense):
-        _led(led),_active(l_sense),H4Plugin(mfnbTag()){
-    H4GM_FN_EVENT cb=bind(&H4P_MultiFunctionButton::progress,this,_1);
-    _createMS=bind(&H4P_GPIOManager::Multistage,&h4gm,pin,mode,b_sense,dbTimeMs,_sm,cb);
+H4P_MultiFunctionButton::H4P_MultiFunctionButton(uint8_t pin,uint8_t mode,H4GM_SENSE b_sense,uint32_t dbTimeMs): H4Plugin(H4PID_MFNB){
+    _pGPIO->pinFactory<MultistagePin>(false,pin,mode,H4GM_PS_MULTISTAGE,b_sense,dbTimeMs,_sm,[this](H4GPIOPin* ptr){ _progress(ptr); });
 }
-//#endif

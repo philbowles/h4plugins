@@ -27,25 +27,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_PresenceDetector_HO
-#define H4P_PresenceDetector_HO
+#pragma once
 
-#include<H4P_WiFiSelect.h>
-#ifndef H4P_NO_WIFI
-
+#include<H4P_WiFi.h>
 #include<H4PCommon.h>
 #include<H4P_SerialCmd.h>
+#include<H4P_UPNPServer.h>
 
 class H4PDetector: public H4Plugin{
     protected:
         H4_TIMER        _pinger;
         H4BS_FN_SWITCH  _f;
 
-            void            _inout(bool b){
+            void        _inout(bool b){
                 if(b!=_here){
                     if(_f) _f(b);
                     _here=b;
-                    SYSEVENT(b ? H4P_LOG_PD_ENTER:H4P_LOG_PD_LEAVE ,"pd",_pName,"%s",b ? "IN":"OUT");
+                    PEVENT(b ? H4P_EVENT_PD_ENTER:H4P_EVENT_PD_LEAVE ,"%s %s",CSTR(_id),b ? "IN":"OUT");
                 }
             }
             void        _stop() override{
@@ -54,28 +52,32 @@ class H4PDetector: public H4Plugin{
             };
             void        _greenLight() override {}
     public:
-        string          _id;
-        bool            _here=false;
+            string      _id;
+            bool        _here=false;
 
-        H4PDetector(const string& pid,const string& id,H4BS_FN_SWITCH f): _id(id),_f(f),H4Plugin(pid){}
-                        
-        bool        isPresent(){ return _here; }
-        void show() override { reply("%s (%s) %s Present",CSTR(_pName),CSTR(_id),_here ? "":"NOT"); }
+            H4PDetector(const string& pid,const string& id,H4BS_FN_SWITCH f): _id(id),_f(f),H4Plugin(pid){}
+                            
+            bool        isPresent(){ return _here; }
+            void        show() override { reply("%s (%s) %s Present",CSTR(_pName),CSTR(_id),_here ? "":"NOT"); }
 };
-
+/*
 class H4P_UPNPDetector: public H4PDetector {
+        H4P_UPNPServer* _pUPNP;
     protected:
-                void        _hookIn() override;
-                void        _start() override;
+            string      _tag;
+            
+            void        _hookIn() override;
+            void        _start() override;
+
     public:
-        H4P_UPNPDetector(const string& friendly,const string& usn,H4BS_FN_SWITCH f=nullptr): H4PDetector(friendly,usn,f){}
+        H4P_UPNPDetector(const string& friendly,const string& tag,const string& value,H4BS_FN_SWITCH f=nullptr): _tag(tag),H4PDetector(friendly,value,f){}
 };
 
 class H4P_UPNPDetectorSource: public H4P_UPNPDetector{
     public:
-        H4P_UPNPDetectorSource(const string& pid,const string& id);
+        H4P_UPNPDetectorSource(const string& pid,const string& tag,const string& id);
 };
-
+*/
 #ifdef ARDUINO_ARCH_ESP8266
 class H4P_IPDetector: public H4PDetector {
         static  bool _inflight;
@@ -94,7 +96,6 @@ class H4P_IPDetectorSource: public H4P_IPDetector{
     public:
         H4P_IPDetectorSource(const string& pid,const string& id);
 };
-#ifdef H4P_USE_OTA
 class H4P_MDNSDetector: public H4PDetector {
         string _service;
         string _protocol;
@@ -113,20 +114,15 @@ class H4P_MDNSDetector: public H4PDetector {
     public:
         H4P_MDNSDetector(const string& friendly,const string& service,const string& protocol,H4BS_FN_SWITCH f=nullptr);
 };
-
-class H4P_H4Detector: public H4P_MDNSDetector {
+/*
+class H4P_H4Detector: public H4P_UPNPDetector {
     public:
-        H4P_H4Detector(const string& local,H4BS_FN_SWITCH f=nullptr): H4P_MDNSDetector(local,"arduino","tcp",f){}
+        H4P_H4Detector(const string& device,H4BS_FN_SWITCH f=nullptr): H4P_UPNPDetector(device,"X-H4-DEVICE",device,f){}
 };
 
 class H4P_H4DetectorSource: public H4P_H4Detector{
     public:
         H4P_H4DetectorSource(const string& local);
 };
-
-#endif // OTA
+*/
 #endif // esp8266
-
-#endif // wifi
-
-#endif // H4P_PresenceDetector_HO

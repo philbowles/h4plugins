@@ -27,41 +27,35 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_PersistentStorage_HO
-#define H4P_PersistentStorage_HO
+#pragma once
 
-#ifndef ARDUINO_ARCH_STM32
 #include<H4PCommon.h>
+#include<H4P_UPNPServer.h>
 
 class H4P_PersistentStorage: public H4Plugin {
-        H4P_CONFIG_BLOCK psRam={};
-        H4P_FN_PSCHANGE    _f;
+        H4P_CONFIG_BLOCK    psRam={};
+        H4P_FN_PSCHANGE     _f=nullptr;
 
         VSCMD(_get);
         VSCMD(_set);
         
+        void         _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) override;
         void         _hookIn() override;
         void         _showItem(const string& n){ reply("%s=%s",CSTR(n),CSTR(psRam[n])); }
     public:
-        string& operator[](const string& name){
-            return psRam[name];
-        }
-
+        string& operator[](const string& name){ return psRam[name]; }
         H4P_PersistentStorage(H4P_FN_PSCHANGE f=nullptr);
 
         void          clear();
-        void          dec(const string& name){ if(isNumeric(psRam[name])) setint(name,getint(name)-1); }
+        void          dec(const string& name){ if(stringIsNumeric(psRam[name])) setint(name,getint(name)-1); }
         bool          exists(const string& name){ return psRam.count(name); }
         string        getstring(const string& name){ return psRam[name]; }
         int           getint(const string& name){ return atoi(CSTR(psRam[name])); }
-        void          inc(const string& name){ if(isNumeric(psRam[name])) setint(name,getint(name)+1); }
+        void          inc(const string& name){ if(stringIsNumeric(psRam[name])) setint(name,getint(name)+1); }
         void          setstring(const string& name,const string& value);
         void          setint(const string& name,int value){ setstring(name,stringFromInt(value)); }
         
         void          show() override { for(auto const& p:psRam) _showItem(p.first); }
 };
 
-extern __attribute__((weak)) H4P_PersistentStorage h4ps;
-
-#endif
-#endif // H4P_PersistentStorage_H
+//extern __attribute__((weak)) H4P_PersistentStorage h4ps;

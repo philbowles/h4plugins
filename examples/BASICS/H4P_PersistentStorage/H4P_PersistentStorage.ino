@@ -1,10 +1,9 @@
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
+H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 
 void onChange(const string& name,const string& value){
     Serial.printf("ITEM %s changed to %s\n",CSTR(name),CSTR(value));
 }
-
 
 H4P_PersistentStorage h4ps(onChange);
 
@@ -24,5 +23,5 @@ void h4setup() {
         Serial.printf("Apparently the secret of %s is %d\n",CSTR(h4ps["secret"]),h4ps.getint("answer"));
         h4ps.inc("answer"); // increments the value: can also dec it
         Serial.println("send h4/reboot repeatedly to see increasingly WRONG answer");
+        Serial.println("send h4/factory to restart from scratch");
     }
-}

@@ -26,41 +26,71 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#define H4P_VERSION "0.5.7"
+#pragma once
 
-// comment this out to prevent and logging by EVENT( whatever ) messages
-#define H4P_LOG_EVENTS
+#define H4P_VERSION "1.0.1"
+/*
+        DIAGNOSTICS
+        comment out H4P_LOG_EVENTS to prevent any logging by EVENT( whatever ) messages
+        Increases performance, reduces binary size, increases free heap, but ...
+        
+        **********************************************************************
+        YOU MUST H4P_LOG_EVENTS DEFINED AND INCLUDE ALL SERIAL MONITOR OUTPUT
+        WHEN SUBMITTING BUG REPORTS
+        ***********************************************************************
+*/
+#define H4P_LOG_EVENTS      1
+#define SANITY              0
+/*
+        HARDWARE ASSUMPTIONS
 
-// comment this out to save a little flash if OTA not required
-#define H4P_USE_OTA
+        Most boards have a builtin LED where they have this will be defined by LED_BUILTIN
+        of you want to use a differetn one, change H4P_SIGNAL_LED to your chosen GPIO (NOT ARDUINO DIGOTAL PIN NUMBER!!!)
+
+        Also it is very common for builtin LEDs to be "Active Low" meaning it is ON when the pin is driven to GND = "LOW" = 0
+        if yours is Active HIGH (ON when the pin id driven to Vcc = HIGH = 1 ) then change H4P_SIGNAL_SENSE to 1
+
+        These affect the way wifi, mqtt and multfunction buttons do their signalling
+        H4P_SIGNAL_TIMEBASE is the speed at which the signal pattern cycles - see the documentation for flashPattern API
+*/
+enum H4GM_SENSE:uint8_t {
+    ACTIVE_LOW,
+    ACTIVE_HIGH
+};
+
+#define H4P_SIGNAL_LED  LED_BUILTIN
+#define H4P_SIGNAL_SENSE ACTIVE_LOW
+#define H4P_SIGNAL_TIMEBASE     175
+
+
+#define H4P_WEBSERVER_PORT      80
+// Make sure you read the documentation and have arrangements in place for using AP mode :)
+#define H4P_USE_WIFI_AP          0
 /*
             TWEAKABLES
 */
-#ifndef H4PCONFIG_H
-#define H4PCONFIG_H
-
-#define H4P_REPLY_BUFFER    512
-
-#define H4ESW_MAX_F         150000
-#define H4ESW_MAX_D            100
-#define H4ESW_TIMEOUT           50
+#define H4P_REPLY_BUFFER       256
+#define H4P_EVENT_BUFFER       256
 
 //#define H4FC_MORSE_SUPPORT
 
-#define H4MQ_RETRY            10000
+#define H4MQ_RETRY           10000
 
 #define H4P_UDP_JITTER         250
 #define H4P_UDP_REFRESH     300000
 #define H4P_UDP_REPEAT           2
 
-#define H43F_SLOW              250
-#define H43F_MEDIUM            125
-#define H43F_FAST               25
-#define H43F_TIMEBASE          175
-#define H43F_REBOOT           2000
-#define H43F_FACTORY          5000
+#define H4MF_SLOW              250
+#define H4MF_MEDIUM            125
+#define H4MF_REBOOT           2000
+#define H4MF_FACTORY          5000
 
-#define H4WF_OTA_RATE         1000
+#define H4WF_AP_RATE           500
+#define H4WF_OTA_RATE         1500
+#define H4WF_EVT_TIMEOUT     30000
+#define H4WF_UIJITTER_LO       100
+#define H4WF_UIJITTER_HI       200
+#define H4WF_BACKOFF           500
 
 #define H4P_IPPD_RATE         5000
 #define H4P_PJ_SPREAD            3
@@ -73,6 +103,6 @@ SOFTWARE.
 #define H4P_TIME_HOLDOFF      2000
 #define H4P_TIME_RESYNC    3600000
 
-#define H4P_SAFE_MINIMUM     20000
-
-#endif
+constexpr const char* h4pTag(){ return "h4P"; }
+constexpr const char* httpTag(){ return "http://"; }
+constexpr const char* rootTag(){ return "upnp:rootdevice"; }

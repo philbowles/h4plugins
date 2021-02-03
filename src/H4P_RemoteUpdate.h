@@ -27,18 +27,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_RemoteUpdate_H
-#define H4P_RemoteUpdate_H
+#pragma once
 
 #include<H4PCommon.h>
 #include<H4P_SerialCmd.h>
-/*
-enum HTTPUpdateResult {
-    HTTP_UPDATE_FAILED,
-    HTTP_UPDATE_NO_UPDATES,
-    HTTP_UPDATE_OK
-};
-*/
+
 #ifdef ARDUINO_ARCH_ESP8266
     #include<ESP8266httpUpdate.h>
 class H4P_RemoteUpdate: public H4Plugin, public ESP8266HTTPUpdate {
@@ -46,46 +39,50 @@ class H4P_RemoteUpdate: public H4Plugin, public ESP8266HTTPUpdate {
     #include<HTTPUpdate.h>
 class H4P_RemoteUpdate: public H4Plugin, public HTTPUpdate {
 #endif
+                H4P_WiFi*   _pWiFi;
                 WiFiClient  _c;
                 string      _url;
                 void        _entropise(H4_FN_VOID f){ h4.onceRandom(H4P_PJ_LO,H4P_PJ_HI * H4P_RUPD_STRETCH,f); }
-                void        _greenLight(){} // no autostart
-                void        _hookIn(){ DEPEND(wifi); }
+                void        _greenLight(){
+                    if(_pWiFi->_getPersistentValue(rupdTag(),"")) _url=_cb[rupdTag()];
+                    _cb[rupdTag()]=httpTag()+_url; 
+                } // no autostart
+                void        _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) override { _pWiFi->_wipe(rupdTag()); }
+                void        _hookIn(){ _pWiFi=h4pdepend<H4P_WiFi>(this,H4PID_WIFI); }
                 void        _updateFromUrl(bool fw,bool reboot){
-                    String updateUrl=CSTR(replaceAll((_url+"/"+_cb[boardTag()]+"/"+_cb["date"])," ","_"));
-                    String version=fw ? H4P_VERSION:CSTR(_cb["h4sv"]);
-                    H4EVENT("%s [%s]",CSTR(updateUrl),CSTR(version));
-                    h4wifi._downHooks();
-                    t_httpUpdate_return rv=fw ? update(_c,updateUrl,version):updateSpiffs(_c,updateUrl,version);
+                    string endpoint=_cb[rupdTag()]+"/"+_cb[deviceTag()];
+                    t_httpUpdate_return rv=fw ? update(_c,CSTR(endpoint)):updateSpiffs(_c,CSTR(endpoint));
                     switch(rv){
                         case HTTP_UPDATE_OK:
                             if(reboot) h4reboot();
                             break;
                         case HTTP_UPDATE_NO_UPDATES:
-                            h4wifi._upHooks();
-                            H4EVENT("up2date");
+                            PLOG("Already up to date");
                             break;
                         default:
-                            h4wifi._upHooks();
-                            H4EVENT("FAIL %d: %s", getLastError(), getLastErrorString().c_str());
+                            PLOG("FAIL %d: %s", getLastError(), getLastErrorString().c_str());
                     }
                 }
     public:
-        H4P_RemoteUpdate(const string& url): _url(url),H4Plugin(rupdTag()){
-            _cmds={
-                {_pName,       { H4PC_H4,_subCmd  , nullptr}},
-                {"both",       { _subCmd, 0, CMD(both)}},
-                {"spiffs",     { _subCmd, 0, CMD(spiffs)}},
-                {"update",     { _subCmd, 0, CMD(firmware)}}
-            }; 
+ #if H4P_USE_WIFI_AP
+        H4P_RemoteUpdate(const char* bin): H4Plugin(H4PID_RUPD){
+#else
+        H4P_RemoteUpdate(const string& url,const char* bin): _url(url),  H4Plugin(H4PID_RUPD,H4P_EVENT_FACTORY){
+#endif
+            _cb["bin"]=bin;
+            _addLocals({
+                {_pName,       { H4PC_H4,_pid  , nullptr}},
+                {"both",       { _pid, 0, CMD(both)}},
+                {"fs",         { _pid, 0, CMD(fs)}},
+                {"fw",         { _pid, 0, CMD(fw)}}
+            });
         }
+
         void both(){
             _entropise([this]{ _updateFromUrl(false,false); }); // spiffs, no reboot
-            firmware();
+            fw(); // fw + reboot
         }
-        void show() override { reply("url: %s",CSTR(_url)); }
-        void spiffs(){ _entropise([this]{ _updateFromUrl(false,true); }); }
-        void firmware(){ _entropise([this]{ _updateFromUrl(true,true); }); }
+        void show() override { reply("url: %s",CSTR(_cb[rupdTag()])); }
+        void fs(){ _entropise([this]{ _updateFromUrl(false,true); }); }
+        void fw(){ _entropise([this]{ _updateFromUrl(true,true); }); }
 };
-
-#endif // H4P_RemoteUpdate_H

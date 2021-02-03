@@ -27,16 +27,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_GPIOManager.h>
-//#include<algorithm>
-#include <numeric>
+#include<H4P_EmitTick.h>
 
-H4GPIOPin::H4GPIOPin(            
+H4GPIOPin::H4GPIOPin(
     uint8_t _p,
     uint8_t _g,
     H4GM_STYLE _s,
     uint8_t _a,
     H4GM_FN_EVENT _f
-    ):            
+    ):
     pin(_p),
     gpioType(_g),
     style(_s),
@@ -48,12 +47,12 @@ H4GPIOPin::H4GPIOPin(
 //
 void H4GPIOPin::_pinFactoryCommon(bool onof){ // optimise for no logging
     if(onof){
-        H4P_BinaryThing* btp=reinterpret_cast<H4P_BinaryThing*>(H4Plugin::isLoaded(onofTag()));
+        auto btp=h4pisloaded<H4P_BinaryThing>(H4PID_ONOF);
         if(btp){
             onEvent=[this,btp](H4GPIOPin* pp){ 
                 if(pp->style==H4GM_PS_LATCHING) {
                     if(pp->nEvents) btp->toggle(); // POTENTIAL BUG! if btp already commanded on, 1st time wont toggle
-    #ifdef H4P_LOG_EVENTS
+    #if H4P_LOG_EVENTS
                 } else btp->_turn(pp->logicalRead(),gpioTag()+string("("+stringFromInt(pin)+"/"+stringFromInt(style)+")"));
     #else
                 } else btp->turn(pp->logicalRead());
@@ -68,22 +67,8 @@ void H4GPIOPin::_pinFactoryCommon(bool onof){ // optimise for no logging
     begin();
 }
 
-#ifdef H4P_LOG_EVENTS
-string H4GPIOPin::dump(){ // tart this up - complete rework
-    /*
-    Serial.print("PIN ");Serial.println(pin);
-    Serial.print(" gpioType=");Serial.println(gpioType);
-    Serial.print(" style=");Serial.println(style);
-    Serial.print(" sense=");Serial.println(sense);
-    Serial.print(" Tevt=");Serial.println(Tevt);
-    Serial.print(" state=");Serial.println(state);
-    Serial.print(" delta=");Serial.println(delta);
-    Serial.print(" rate=");Serial.println(rate);
-    Serial.print(" Rpeak=");Serial.println(Rpeak);
-    Serial.print(" cps=");Serial.println(cps);
-    Serial.print(" cMax=");Serial.println(cMax);
-    Serial.print(" nEvents=");Serial.println(nEvents);
-    */
+#if H4P_LOG_EVENTS
+string H4GPIOPin::dump(){
     char buf[128];
     sprintf(buf,"%2d %2d %2d %2d %6d %6d %6d %6d %6d %6d %6d %6d",pin,gpioType,style,sense,Tevt,state,delta,rate,Rpeak,cps,cMax,(int) nEvents);
     return(buf);
@@ -93,7 +78,7 @@ string H4GPIOPin::dump(){ // tart this up - complete rework
 void H4GPIOPin::stampEvent(){
     unsigned long now=micros();
     delta=now - Tevt;
-    Tevt=now;      
+    Tevt=now;
     cps++;
 }
 
@@ -114,25 +99,26 @@ void H4GPIOPin::run(){
 //
 //      H4P_GPIOManager
 //
-//#define SCALE 1 // cmd to change it
+void H4P_GPIOManager::_handleEvent(H4PID pid,H4P_EVENT_TYPE type,const string &msg){
+    for(auto p:pins){
+        H4GPIOPin* ptr=p.second;         
+        if(!((ptr->cps) < ptr->cMax)) ptr->_syncState();
+        ptr->rate=(ptr->cps);
+        ptr->Rpeak=std::max(ptr->Rpeak,ptr->rate);
+        ptr->cps=0;
+    }
+};
+
+void H4P_GPIOManager::_hookIn(){ h4prequire<H4P_EmitTick>(this,H4PID_1SEC); }
 
 void H4P_GPIOManager::_start(){
-    h4._hookLoop([this](){ _run(); },_subCmd);
-    h4.every(1000,[this](){
-        for(auto p:pins){
-            H4GPIOPin* ptr=p.second;         
-            if(!((ptr->cps) < ptr->cMax)) ptr->_syncState();
-            ptr->rate=(ptr->cps);
-            ptr->Rpeak=std::max(ptr->Rpeak,ptr->rate);
-            ptr->cps=0;
-        }
-    },nullptr,H4P_TRID_GPIO,true);
+    h4._hookLoop([this](){ _run(); },_pid);
     H4Plugin::_start();
 }
 
 void  H4P_GPIOManager::_run(){ for(auto const& p:pins) (p.second)->run(); }
 
-H4P_GPIOManager::H4P_GPIOManager(): H4Plugin(gpioTag()){}
+H4P_GPIOManager::H4P_GPIOManager(): H4Plugin(H4PID_GPIO,H4P_EVENT_HEARTBEAT){ }
 //
 //      (oblique) strategies
 //
@@ -172,7 +158,7 @@ void DebouncedPin::stateChange(){
 FilteredPin::FilteredPin(uint8_t _p,uint8_t _g,H4GM_STYLE _s,uint8_t _a,uint8_t _f,H4GM_FN_EVENT _c): H4GPIOPin(_p,_g,_s,_a,_c),filter(_f) {}
 
 LatchingPin::LatchingPin(uint8_t _p,uint8_t _g,H4GM_STYLE _s,uint8_t _a,uint32_t _t,H4GM_FN_EVENT _c):CircularPin(_p,_g,_s,_a,_t,2,_c) {
-    latched=!state; // begin() calls sendState(), which toggles it...so "untoggle" it!
+    latched=!state; // begin() calls sendState(), which toggles it, so "untoggle" it!
 }
 void LatchingPin::lastCall(){
     latched=stage==1 ? ON:OFF;
@@ -200,17 +186,17 @@ void MultistagePin::sendEvent(){
         for(auto const& s:stageMap) {
             if(s.first) stageTimer.push_back(h4.once(s.first,[this](){
                 held=stageMap[++stage].first;
-                H4GPIOPin::sendEvent();
+                DebouncedPin::sendEvent();
                 },nullptr,H4P_TRID_MULT)); 
         }
     }
     else {
         if(delta){
             for(auto const& t:stageTimer) h4.cancel(t);
-            stageTimer.clear();stageTimer.shrink_to_fit();
+            stageTimer.clear();stageTimer.shrink_to_fit(); // really?
             held=delta;
             stageMap[stage].second(this);
-        } else H4GPIOPin::sendEvent();// inital time only 
+        } else DebouncedPin::sendEvent();// inital time only 
     }
 }
 
@@ -231,7 +217,6 @@ void PolledPin::read(){
 AnalogAveragePin::AnalogAveragePin(uint8_t _p,uint32_t _f,uint32_t n,H4GM_FN_EVENT _c): _n(n), PolledPin(_p,INPUT,H4GM_PS_THRESHA,ACTIVE_HIGH,_f,true,_c) {}
 void AnalogAveragePin::read(){
     _samples.push_back(analogRead(pin));
-//    Serial.printf("sample %u=%u\n",_samples.size(),_samples.back());
     if(_samples.size() == _n){
         state=std::accumulate( _samples.begin(), _samples.end(), 0) / _samples.size();
         _samples.clear();
@@ -305,12 +290,6 @@ void EncoderAutoPin::setValue(int v){
 //
 //      H4P_GPIOManager
 //
-OutputPin* H4P_GPIOManager::isOutput(uint8_t p){
-    H4GPIOPin* output;
-    if((output=isManaged(p)) && output->style==H4GM_PS_OUTPUT) return reinterpret_cast<OutputPin*>(output);
-    return nullptr;
-}
-
 uint32_t H4P_GPIOManager::logicalRead(uint8_t p){ if(pins.count(p)) return pins[p]->logicalRead(); }
 
 void H4P_GPIOManager::logicalWrite(uint8_t p,uint8_t l) { 

@@ -27,61 +27,69 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_AsyncMQTT_HO
-#define H4P_AsyncMQTT_HO
+#pragma once
 
 #include<H4PCommon.h>
 #include<H4P_SerialCmd.h>
-#include<H4P_WiFiSelect.h>
-#ifndef H4P_NO_WIFI
 #include<H4P_WiFi.h>
-
-#include<AsyncMQTT.h>
+#include<PangolinMQTT.h>
 
 struct H4P_LWT {
-    const char*      topic;
+    const char*     topic;
     const char*     payload;
-    int         QOS;
-    bool        retain;
+    int             QOS;
+    bool            retain;
 };
 
-class H4P_AsyncMQTT: public H4Plugin, public AsyncMQTT{
-            bool            autorestart=true;
-            string          device;
-            struct H4P_LWT  _lwt;
+class H4P_AsyncMQTT: public H4Plugin, public PangolinMQTT{
+                H4P_WiFi*       _pWiFi;
+                bool            autorestart=true;
+                string          device;
+                string          prefix=string(h4Tag()).append("/");
+                struct H4P_LWT  _lwt;
+                unordered_set<string>  _reportList={"bin",boardTag(),ipTag(),h4pTag(),h4UITag(),pmvTag()};
 
-        VSCMD(_change);
+                VSCMD(_change);
 
-                void        _greenLight() override;
-                void        _hookIn() override;
+                void        _badSignal(){ h4pisloaded<H4P_WiFi>(H4PID_WIFI)->signal(". .    ",H4P_SIGNAL_TIMEBASE/2); }
+                void        _greenLight() override; //do not autostart!
+        virtual void        _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) override;
+                void        _restart() override { autorestart=true; _stop(); _start(); }
                 void        _setup();
-                void        _signal();
                 void        _start() override;
                 bool        _state() override { return connected(); }
                 void        _stop() override;
     public:
-        H4P_AsyncMQTT(string broker,uint16_t port, string user="",string pass="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr,H4P_LWT lwt={"","",0,false}):
-            _lwt(lwt), H4Plugin(mqttTag(),onC,onD)
+#if H4P_USE_WIFI_AP
+        H4P_AsyncMQTT(H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr,H4P_LWT lwt={"","",0,false}):
+            _lwt(lwt), H4Plugin(H4PID_MQTT,H4P_EVENT_FACTORY,onC,onD)
         {
-            _cb["broker"]=broker;
+#else
+        explicit H4P_AsyncMQTT():H4Plugin(H4PID_MQTT,H4P_EVENT_FACTORY){}
+        H4P_AsyncMQTT(string broker,uint16_t port, string user="",string pass="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr,H4P_LWT lwt={"","",0,false}):
+            _lwt(lwt), H4Plugin(H4PID_MQTT,H4P_EVENT_FACTORY,onC,onD)
+        {
+            _cb[brokerTag()]=broker;
             _cb[portTag()]=stringFromInt(port);
-            _cb["muser"]=user,
-            _cb["mpasswd"]=pass;
-
-            _cmds={ {_pName,    { H4PC_H4, 0, CMDVS(_change) }} };
+            _cb[mQuserTag()]=user,
+            _cb[mQpassTag()]=pass;
+#endif
+            _cb[pmvTag()]=PANGO_VERSION;
+            _addLocals({
+                {_pName,    { H4PC_H4, _pid, nullptr }}, 
+                {"change",  { _pid, 0, CMDVS(_change) }},
+                {"report",  { _pid, 0, CMD(report) }}
+            });
         }
-                void        change(const string& broker,uint16_t port);
-                void        publishDevice(const string& topic,const string& payload="");
-                void        publishDevice(const string& topic,uint32_t payload){ publishDevice(topic,stringFromInt(payload)); }
+                void        addReportingItem(const string& ri){ _reportList.insert(ri); }
+                void        change(const string& broker,uint16_t port,const string& user,const string& passwd);
+                void        publishDevice(const string& topic,const string& payload,uint8_t qos=0, bool retain=false){ xPublish(CSTR(string(prefix+topic)),payload,qos,retain); }
+                void        publishDevice(const string& topic,uint32_t payload,uint8_t qos=0, bool retain=false){ publishDevice(topic,stringFromInt(payload),qos,retain); }
+                void        report();
+                void        show() override;
                 void        subscribeDevice(string topic,H4_FN_MSG f,H4PC_CMD_ID root=H4PC_ROOT);
                 void        unsubscribeDevice(string topic);
-
     //          syscall only
-                void        _reply(string msg) override { publish(CSTR(string("h4/"+_cb[deviceTag()]+"/reply")),0,false,(uint8_t*) msg.data()); }
-                void        show() override { reply("Server: %s:%s %s",CSTR(_cb["broker"]),CSTR(_cb[portTag()]),connected() ? "CNX":"DCX"); }
+                void        _hookIn() override;
+                void        _reply(string msg) override { publishDevice("reply",msg); }
 };
-
-    extern __attribute__((weak)) H4P_AsyncMQTT h4mqtt;
-#endif
-
-#endif // H4P_AsyncMQTT_H

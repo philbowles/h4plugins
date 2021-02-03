@@ -7,7 +7,14 @@
     "settings": {
         "VSCodeCounter.showInStatusBar": true,
         "files.associations": {
-            "*.cppx": "cpp"
+            "*.cppx": "cpp",
+            "string": "cpp",
+            "deque": "cpp",
+            "list": "cpp",
+            "vector": "cpp",
+            "typeinfo": "cpp",
+            "functional": "cpp",
+            "*.tcc": "cpp"
         }
     }
 }

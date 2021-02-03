@@ -27,13 +27,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_Sunrise_H
-#define H4P_Sunrise_H
+#pragma once
 
 #include<H4PCommon.h>
-#include<H4P_WiFiSelect.h>
-#ifndef H4P_NO_WIFI
-
 #include<H4P_Timekeeper.h>
 
 enum H4P_EPHEMERA {
@@ -42,6 +38,7 @@ enum H4P_EPHEMERA {
 };
 
 class H4P_Sunrise: public H4Plugin {
+        H4P_Timekeeper*    _pTime;
                 string      _latlong;
 
                 string      _ephTime(H4P_EPHEMERA e){ return _cb[e==SUNRISE ? "sunrise":"sunset"]; }
@@ -51,7 +48,8 @@ class H4P_Sunrise: public H4Plugin {
                 void        _setupSNTP(const string& ntp1, const string& ntp2);
                 void        _start() override;
     public:
-        H4P_Sunrise(const string& latitude,const string& longitude): H4Plugin("sset"){ _latlong="lat="+latitude+"&lng="+longitude; }
+//        H4P_Sunrise(){}
+        H4P_Sunrise(const string& latitude,const string& longitude): H4Plugin(H4PID_SSET){ _latlong="lat="+latitude+"&lng="+longitude; }
 
                 void        at(H4P_EPHEMERA riseOrSet,bool onoff,H4BS_FN_SWITCH f){ h4tk.at(_ephTime(riseOrSet),onoff,f); }
                 void        atSource(H4P_EPHEMERA riseOrSet,bool onoff){ h4tk.atSource(_ephTime(riseOrSet),onoff); }
@@ -63,7 +61,4 @@ class H4P_Sunrise: public H4Plugin {
                 }
 };
 
-extern __attribute__((weak)) H4P_Sunrise h4ss;
-
-#endif //Wifi only
-#endif // H4P_Sunrise_H
+//extern __attribute__((weak)) H4P_Sunrise h4ss;

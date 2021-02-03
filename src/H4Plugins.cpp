@@ -28,51 +28,81 @@ SOFTWARE.
 */
 #include<H4PCommon.h>
 #include<H4P_SerialCmd.h>
-
-void __attribute__((weak)) onFactoryReset(){}
-
-vector<H4_FN_VOID>  H4Plugin::_factoryChain;
 //
-bool stringIsAlpha(const string& s){ return !(std::find_if(s.begin(), s.end(),[](char c) { return !std::isalpha(c); }) != s.end()); }
-//
-void h4StartPlugins(){
-    for(auto const& p:H4Plugin::_plugins) { p->_startup(); }
-    for(auto const& p:H4Plugin::_plugins) { p->_hookIn(); }
-    for(auto const& p:H4Plugin::_plugins) {
-        H4Plugin::_factoryChain.push_back(p->_factoryHook);
-        h4.hookReboot(p->_rebootHook);
-    }
-    for(auto const& p:H4Plugin::_plugins) { p->_greenLight(); }
-    reverse(H4Plugin::_factoryChain.begin(),H4Plugin::_factoryChain.end());
-    H4Plugin::_factoryChain.push_back(onFactoryReset);
+vector<string> h4pnames={
+    h4Tag(), // ROOT
+    "H4P", // H4
+    "R2", // SHOW
+    "QVC", // SVC
+    "vm",
+    "cmd",
+    "1sec",
+    "esqw",
+    "evtq",
+    "heap",
+    "ears",
+    "hwrn",
+    "llog",
+    "loop",
+    "qwrn",
+    "snif",
+    "stor",
+    "tone",
+    gpioTag(), //
+    "wink",
+    wifiTag(), //
+    "beat",
+    mqttTag(), //
+    onofTag(),
+    upnpTag(), //
+    "gang", //
+    "mfnb",
+    "pdip",
+    "pdmd",
+    "pdup",
+    rupdTag(),
+    "sqll",
+    "sset",
+    "time"
+};
+
+void H4Plugin::_addLocals(H4_CMD_MAP local){
+    _commands.insert(local.begin(),local.end());
+    local.clear();
 }
 
-void h4FactoryReset(){
-    H4::_runRebootChain();
-    for(auto &c:H4Plugin::_factoryChain) c();
-    h4rebootCore();
+void H4Plugin::_envoi(const string& s){
+    string source=_cb[srcTag()];
+    auto pp=h4pptrfromtxt(source);
+    if(pp) pp->_reply(CSTR(s)); // send reply back to originating source
+    else Serial.printf("SRC *%s* %s\n",CSTR(source),CSTR(s));
 }
 
-vector<uint32_t> H4Plugin::expectInt(string pl,const char* delim){
+vector<uint32_t> H4Plugin::_expectInt(string pl,const char* delim){
     vector<uint32_t> results;
     vector<string> tmp=split(pl,delim);
     for(auto const& t:tmp){
-        if(!isNumeric(t)) return {};
+        if(!stringIsNumeric(t)) return {};
         results.push_back(STOI(t));
     }
     return results;
 }
 
-uint32_t H4Plugin::guardInt1(vector<string> vs,function<void(uint32_t)> f){
-    return guard1(vs,[f,this](vector<string> vs){
-        auto vi=expectInt(H4PAYLOAD);
+uint32_t H4Plugin::_guard1(vector<string> vs,H4_FN_MSG f){
+    if(!vs.size()) return H4_CMD_TOO_FEW_PARAMS;
+    return vs.size()>1 ? H4_CMD_TOO_MANY_PARAMS:f(vs);
+}
+
+uint32_t H4Plugin::_guardInt1(vector<string> vs,function<void(uint32_t)> f){
+    return _guard1(vs,[f,this](vector<string> vs){
+        auto vi=_expectInt(H4PAYLOAD);
         if(vi.size()==1) return ([f](uint32_t v){ f(v); return H4_CMD_OK; })(vi[0]);
         return H4_CMD_NOT_NUMERIC;
     });
-}        
+}
 
-uint32_t H4Plugin::guardString2(vector<string> vs,function<H4_CMD_ERROR(string,string)> f){
-    return guard1(vs,[f,this](vector<string> vs){
+uint32_t H4Plugin::_guardString2(vector<string> vs,function<H4_CMD_ERROR(string,string)> f){
+    return _guard1(vs,[f,this](vector<string> vs){
         auto vg=split(H4PAYLOAD,",");
         if(vg.size()<3){ 
             if(vg.size()>1) return ([f](string s1,string s2){ return f(s1,s2); })(vg[0],vg[1]);
@@ -82,50 +112,40 @@ uint32_t H4Plugin::guardString2(vector<string> vs,function<H4_CMD_ERROR(string,s
     });
 }
 
-void H4Plugin::reply(const char* fmt,...){ // find pub sub size
-    char buff[H4P_REPLY_BUFFER+1];
-    va_list ap; 
-    va_start(ap, fmt); 
-    vsnprintf(buff,H4P_REPLY_BUFFER,fmt,ap);
-    va_end(ap);
-    string source=_cb[srcTag()];
-    H4Plugin* p=isLoaded(source);
-    if(p) p->_reply(buff);
-    else Serial.println(buff);
-}
-
-void H4Plugin::_startup(){
-    _commands.insert(_cmds.begin(),_cmds.end());
-    _cmds.clear();
+void H4Plugin::_init(H4PID pid,H4_FN_VOID svcUp,H4_FN_VOID svcDown){
+    _pid=pid;
+    h4pmap[pid]=this;
+    _pName=lowercase(h4pnames[pid]);
+    h4pregisterhandler(pid,_eventFilter,[this](H4PID i,H4P_EVENT_TYPE t,const string& m){ _handleEvent(i,t,m); });
+    if(svcUp) hookConnect(svcUp);
+    if(svcDown) hookDisconnect(svcDown);
 }
 
 void H4Plugin::start() {
     if(!state()){
-        H4EVENT("svc start %s",CSTR(_pName));
+        _up=true;
         _start(); // call the overrideable
     }
 }
 
-void H4Plugin::stop() { 
+void H4Plugin::stop() {
     if(state()){
+        _up=false;
         _stop(); // call the overrideable
-        H4EVENT("svc stop %s",CSTR(_pName));
     }
 }
 
 void H4Plugin::_upHooks(){ 
-    _up=true;
-    SYSEVENT(H4P_LOG_SVC_UP,"svc",_pName,"UP");
+    SEVENT(H4P_EVENT_SVC_UP,_pName,"");
     for(auto const& c:_connected) c();
 }
 
 void H4Plugin::_downHooks(){
-    // reverse? 
     for(auto const& c:_disconnected) c();
-    SYSEVENT(H4P_LOG_SVC_DOWN,"svc",_pName,"DN");
-    _up=false;
+    SEVENT(H4P_EVENT_SVC_DOWN,_pName,"");
 }
-//
-//      H4PlogService
-//
-void H4PLogService::_hookIn(){ h4cmd._hookLogChain(bind(&H4PLogService::_filterLog,this,_1,_2,_3,_4)); }
+
+string H4Plugin::_uniquify(const string& name,uint32_t uqf){
+    string tmp=name+(uqf ? stringFromInt(uqf):"");
+    return h4pptrfromtxt(tmp) ? _uniquify(name,uqf+1):tmp;
+}

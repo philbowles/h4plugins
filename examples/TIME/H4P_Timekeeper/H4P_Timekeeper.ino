@@ -43,13 +43,12 @@ void onRTC(){
 H4P_GPIOManager h4gm;
 H4P_FlasherController h4fc;
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX"); // device defaults to "H4-<chip id>"
-H4P_AsyncWebServer h4asws;
 H4P_Timekeeper h4tk("0.fr.pool.ntp.org","1.fr.pool.ntp.org",60,H4P_Timekeeper::DST_EU); // 60 minutes cos France is GMT+1
 H4P_AsyncMQTT h4mqtt("192.168.1.4",1883);
 H4P_BinarySwitch h4onof(RELAY_BUILTIN,ACTIVE_HIGH,OFF);
 H4P_UPNPServer h4upnp; // friendly name defaults to "upnp <chip id>"
-H4P_MultiFunctionButton h4mfb(BUTTON_BUILTIN,INPUT,ACTIVE_LOW,15,LED_BUILTIN,ACTIVE_LOW);
-H4P_RemoteUpdate h4ru("http://192.168.1.4:1880/update");
+H4P_MultiFunctionButton h4mfb(BUTTON_BUILTIN,INPUT,ACTIVE_LOW,15);
+H4P_RemoteUpdate h4ru("192.168.1.4:1880/update",__FILE__);
 
 void h4setup(){
   h4.every(30000,[]{ Serial.printf("clock time: %s\n",CSTR(h4tk.clockTime())); });

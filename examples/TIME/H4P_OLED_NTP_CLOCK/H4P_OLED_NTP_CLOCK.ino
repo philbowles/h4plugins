@@ -13,11 +13,10 @@ and the appropriat "sense" settings of ACTIVE_HIGH/LOW for each
 
 */
 #include<H4Plugins.h>
-H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
+H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 
 #include <SPI.h>
 #include <Wire.h>
-//#include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
 #define OLED_RESET 0  // GPIO0
@@ -34,12 +33,11 @@ H4P_GPIOManager h4gm;
 H4P_FlasherController h4fc;
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","ntpclock");
 H4P_AsyncMQTT h4mqtt("192.168.1.4",1883);
-H4P_AsyncWebServer h4asws;
 H4P_Timekeeper h4tk("0.fr.pool.ntp.org","1.fr.pool.ntp.org",2); // 1 cos France is GMT+1
 
 H4P_BinarySwitch h4onof(RELAY_BUILTIN,ACTIVE_HIGH,OFF);
 H4P_UPNPServer h4upnp("Salon Eiffel Tower");
-H4P_MultiFunctionButton h4mfb(BUTTON_BUILTIN,INPUT,ACTIVE_LOW,15,LED_BUILTIN,ACTIVE_LOW);
+H4P_MultiFunctionButton h4mfb(BUTTON_BUILTIN,INPUT,ACTIVE_LOW,15);
 
 void h4setup(){
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 64x48)

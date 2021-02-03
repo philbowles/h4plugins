@@ -26,12 +26,14 @@ H4_USE_PLUGINS(115200,SMALL_Q,false) // Serial baud rate, Q size, SerialCmd auto
 void qIsLow(bool inDanger){ 
   if(inDanger) {
     Serial.println("Warning, Will Robinson - low Q!!!"); // See 1960s TV SciFi series "Lost in Space" :)
-    h4cmd.dumpQ();
+    h4cmd.showQ();
   }
 }
 
+H4P_VerboseMessages vm;
 H4P_QueueWarn h4qw(qIsLow,50); // call qIsLow when free Q drops below 50%
 H4P_TaskSniffer h4ts;
+
 /*
     We are going to name our own tasks so that they are obvious in the dump.
     If we don't do this, all tasks wil appear as "ANON"

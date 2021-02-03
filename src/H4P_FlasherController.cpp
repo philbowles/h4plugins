@@ -59,20 +59,50 @@ std::unordered_map<char,string>	H4P_FlasherController::_morse={
 	{'z',"--.."}
 };
 #endif /////////////////////////////////////// _MORSE_SUPPORT
-
 //
 //      H4P_FlasherController
 //
-void H4P_FlasherController::_flash(uint32_t period,uint8_t duty,uint8_t pin,uint8_t active){
-	if(duty < 100){
-		h4fc.stopLED(pin);
-		_flashMap[pin]=new H4Flasher(pin,period,duty,active);
+void H4P_FlasherController::_dynaLoad(uint8_t pin,H4GM_SENSE active,H4FC_FN_F1 f1,H4FC_FN_F2 f2){
+    auto fp=_flashMap[pin];
+    if(fp){
+        fp->stop();
+        f1(fp);
+    }
+    else {
+        auto opp=reinterpret_cast<OutputPin*>(_pGPIO->isManaged(pin));
+        if(opp && opp->style==H4GM_PS_OUTPUT) _flashMap[pin]=f2(opp);//_flashMap[pin]=new H4Flasher(opp,period,duty); // ***********************************************;
+        else {
+            opp=_pGPIO->Output(pin,active,OFF);
+            _dynaLoad(pin,active,f1,f2);
+        }
+    }
+}
+
+void H4P_FlasherController::_flash(uint32_t period,uint8_t duty,uint8_t pin,H4GM_SENSE active){
+    // cancel any existing!!!
+    stopLED(pin);
+	if(duty < 100){ // sanity
+        _dynaLoad(pin,active,
+            [period,duty](H4Flasher* fp){ fp->PWM(period,duty); },
+            [period,duty,this](OutputPin* opp){ return new H4Flasher(opp,period,duty); }
+        );
 	}
 }
 
-void H4P_FlasherController::flashLED(uint32_t period,uint8_t pin,uint8_t active){ _flash(period*2,50,pin,active); }// simple symmetric SQ wave on/off
+void H4P_FlasherController::_hookIn() { _pGPIO=h4prequire<H4P_GPIOManager>(this,H4PID_GPIO); }
 
-void H4P_FlasherController::flashMorse(const char* _pattern,uint32_t _timebase,uint8_t pin,uint8_t active){// flash arbitrary pattern ... --- ... convert dot / dash into Farnsworth Timing
+void H4P_FlasherController::flashPattern(const char* _pattern,uint32_t _timebase,uint8_t pin,H4GM_SENSE active){
+    // cancel any existing!!!
+    stopLED(pin);
+    _dynaLoad(pin,active,
+        [_pattern,_timebase](H4Flasher* fp){ fp->flashPattern(_pattern, _timebase); },
+        [_pattern,_timebase,this](OutputPin* opp){ return new H4Flasher(opp,_pattern,_timebase); }
+    );
+}
+
+void H4P_FlasherController::flashLED(uint32_t period,uint8_t pin,H4GM_SENSE active){ _flash(period*2,50,pin,active); }// simple symmetric SQ wave on/off
+
+void H4P_FlasherController::flashMorse(const char* _pattern,uint32_t _timebase,uint8_t pin,H4GM_SENSE active){// flash arbitrary pattern ... --- ... convert dot / dash into Farnsworth Timing
 	string ms;
 	vector<string> sym=split(_pattern," ");
 	for(auto const& s:sym) {
@@ -84,7 +114,7 @@ void H4P_FlasherController::flashMorse(const char* _pattern,uint32_t _timebase,u
 }
 
 #ifdef H4FC_MORSE_SUPPORT
-void H4P_FlasherController::flashMorseText(const char* letters,uint32_t timebase,uint8_t pin,uint8_t active){
+void H4P_FlasherController::flashMorseText(const char* letters,uint32_t timebase,uint8_t pin,H4GM_SENSE active){
 	string ditdah;
 	for(auto const& c:string(letters)) {
 		char lc=tolower(c);
@@ -94,73 +124,51 @@ void H4P_FlasherController::flashMorseText(const char* letters,uint32_t timebase
 }
 #endif
 
-void H4P_FlasherController::flashPattern(const char* _pattern,uint32_t _timebase,uint8_t pin,uint8_t active){// flash arbitrary pattern 10000111000110
-    stopLED(pin);
-    _flashMap[pin]=new H4Flasher(pin,_pattern,_timebase,active);
-}
-
-void H4P_FlasherController::flashPWM(uint32_t period,uint8_t duty,uint8_t pin,uint8_t active){ _flash(period,duty,pin,active);	}// flash "PWM"
+void H4P_FlasherController::flashPWM(uint32_t period,uint8_t duty,uint8_t pin,H4GM_SENSE active){ _flash(period,duty,pin,active);	}// flash "PWM"
 
 bool H4P_FlasherController::isFlashing(uint8_t pin){ return _flashMap.count(pin); }
 
-void H4P_FlasherController::pulseLED(uint32_t period,uint8_t pin,uint8_t active){ _flash(period,0,pin,active); }
+void H4P_FlasherController::pulseLED(uint32_t period,uint8_t pin,H4GM_SENSE active){ _flash(period,0,pin,active); }
 
 void H4P_FlasherController::stopLED(uint8_t pin){
 	if(_flashMap.count(pin)) {
-		_flashMap[pin]->stop();
-		delete _flashMap[pin];
+        auto fp=_flashMap[pin];
+		fp->stop();
+		delete fp;
 		_flashMap.erase(pin);
 	}
 }    
 //
 //      H4Flasher
 //
-H4Flasher::H4Flasher(uint8_t pin,uint32_t period,uint8_t duty,uint8_t active): _pin(pin),_active(active){ 
-    autoOutput();
-    PWM(period,duty);
-}
+H4Flasher::H4Flasher(OutputPin* opp,uint32_t period,uint8_t duty): _opp(opp){ PWM(period,duty); }
 
-H4Flasher::H4Flasher(uint8_t pin,const char* pattern,uint32_t timebase,uint8_t active): _pin(pin),_active(active){ 
-    autoOutput();
-    flashPattern(timebase,pattern); 
-}
-
-void H4Flasher::autoOutput(){ if(H4Plugin::isLoaded(gpioTag())) h4gm.Output(_pin,a ? ACTIVE_HIGH:ACTIVE_LOW,OFF); } // tidy
-
-void H4Flasher::_toggle() { digitalWrite(_pin,!digitalRead(_pin)); }
+H4Flasher::H4Flasher(OutputPin* opp,const char* pattern,uint32_t timebase): _opp(opp){ flashPattern(pattern,timebase); }
 
 void H4Flasher::_pulse(uint32_t width) {
-	_toggle();
-	_off=h4.once(width,[this](){ _toggle(); },nullptr,H4P_TRID_PP1x);
+	_opp->toggle();
+	_off=h4.once(width,[this](){ _opp->toggle(); },nullptr,H4P_TRID_PP1x);
 }
 
 void H4Flasher::PWM(uint32_t period,uint8_t duty){
-	ms="";t=0;p=period;d=duty;
 	if(duty){
 		stop();
 		uint32_t width=(duty*period)/100;
 		_pulse(width); 
-		_timer=h4.every(period,bind([this](int width){ _pulse(width); },width),nullptr,H4P_TRID_PWM1);
+		_timer=h4.every(period,[this,width](){ _pulse(width); },nullptr,H4P_TRID_PWM1);
 	} else _pulse(period);
 }
 
-void H4Flasher::flashPattern(uint32_t _base,const char* _pattern){
-	ms=_pattern;t=_base;p=d=0;
+void H4Flasher::flashPattern(const char* pattern,uint32_t timebase){
 	stop();
-	ms=_pattern;
-	_timer=h4.every(_base,[this]( ){
-		static char prev='0';
-		char c=ms.front();
-		if(c!=prev) {
-		  _toggle();
-		  prev=c;
-		}
-		rotate(ms.begin(),++ms.begin(),ms.end());
+    _dots=pattern;
+	_timer=h4.every(timebase,[this](){
+        _opp->logicalWrite(_dots.front() - 0x30);
+		rotate(_dots.begin(),++_dots.begin(),_dots.end());
 	},nullptr,H4P_TRID_PATN);
 }
-			
+
 void H4Flasher::stop(){
-	_timer=h4.cancel(_timer);
-	_off=h4.cancel(_off);
-	digitalWrite(_pin,!_active); // OFF
+	h4.cancel({_timer,_off});
+	_opp->logicalWrite(OFF); // OFF
 }

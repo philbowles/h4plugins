@@ -3,7 +3,7 @@ EXT:
 LOCATION: http://%ip%:80/we
 OPT: "http://schemas.upnp.org/upnp/1/0/"; ns=01
 01-NLS: %chip%
-SERVER: Forked AsyncWebServer, UPnP/1.0, H4/%h4v%
+SERVER: Forked AsyncWebServer, UPnP/1.0, H4/%h4P%
 X-H4-Device: %device%
 X-H4-Chip: %chip%
 X-User-Agent: redsonic

@@ -1,6 +1,4 @@
-#ifndef ARDUINO_ARCH_STM32
-#include<H4P_WiFiSelect.h>
-#ifndef H4P_NO_WIFI
+//#include<H4P_WiFiSelect.h>
 #include "asyncHTTPrequest.h"
 
 //**************************************************************************************************************
@@ -27,8 +25,8 @@ asyncHTTPrequest::asyncHTTPrequest()
     , _response(nullptr)
     , _chunks(nullptr)
     , _headers(nullptr)
-{
-    DEBUG_HTTP("New request.");}
+{}
+    //DEBUG_HTTP("New request."); 
 
 //**************************************************************************************************************
 asyncHTTPrequest::~asyncHTTPrequest(){
@@ -45,7 +43,7 @@ asyncHTTPrequest::~asyncHTTPrequest(){
 void    asyncHTTPrequest::setDebug(bool debug){
     if(_debug || debug) {
         _debug = true;
-        DEBUG_HTTP("setDebug(%s) version %s\r\n", debug ? "on" : "off", asyncHTTPrequest_h);
+        //DEBUG_HTTP("setDebug(%s) version %s\r\n", debug ? "on" : "off", asyncHTTPrequest_h);
     }
 	_debug = debug;
 }
@@ -57,7 +55,7 @@ bool    asyncHTTPrequest::debug(){
 
 //**************************************************************************************************************
 bool	asyncHTTPrequest::open(const char* method, const char* URL){
-    DEBUG_HTTP("open(%s, %.32s)\r\n", method, URL);
+    //DEBUG_HTTP("open(%s, %.32s)\r\n", method, URL);
     if(_readyState != readyStateUnsent && _readyState != readyStateDone) {return false;}
     _requestStartTime = millis();
     delete _URL;
@@ -100,13 +98,13 @@ void    asyncHTTPrequest::onReadyStateChange(readyStateChangeCB cb, void* arg){
 
 //**************************************************************************************************************
 void	asyncHTTPrequest::setTimeout(int seconds){
-    DEBUG_HTTP("setTimeout(%d)\r\n", seconds);
+    //DEBUG_HTTP("setTimeout(%d)\r\n", seconds);
     _timeout = seconds;
 }
 
 //**************************************************************************************************************
 bool	asyncHTTPrequest::send(){
-    DEBUG_HTTP("send()\r\n");
+    //DEBUG_HTTP("send()\r\n");
     if( ! _buildRequest()) return false;
     _send();
     return true;
@@ -114,7 +112,7 @@ bool	asyncHTTPrequest::send(){
 
 //**************************************************************************************************************
 bool    asyncHTTPrequest::send(String body){
-    DEBUG_HTTP("send(String) %s... (%d)\r\n", body.substring(0,16).c_str(), body.length());
+    //DEBUG_HTTP("send(String) %s... (%d)\r\n", body.substring(0,16).c_str(), body.length());
     _addHeader("Content-Length", String(body.length()).c_str());
     if( ! _buildRequest()) return false;
     _request->write(body);
@@ -124,7 +122,7 @@ bool    asyncHTTPrequest::send(String body){
 
 //**************************************************************************************************************
 bool	asyncHTTPrequest::send(const char* body){
-    DEBUG_HTTP("send(char*) %s.16... (%d)\r\n",body, strlen(body));
+    //DEBUG_HTTP("send(char*) %s.16... (%d)\r\n",body, strlen(body));
     _addHeader("Content-Length", String(strlen(body)).c_str());
     if( ! _buildRequest()) return false;
     _request->write(body);
@@ -134,7 +132,7 @@ bool	asyncHTTPrequest::send(const char* body){
 
 //**************************************************************************************************************
 bool	asyncHTTPrequest::send(const uint8_t* body, size_t len){
-    DEBUG_HTTP("send(char*) %s.16... (%d)\r\n",(char*)body, len);
+    //DEBUG_HTTP("send(char*) %s.16... (%d)\r\n",(char*)body, len);
     _addHeader("Content-Length", String(len).c_str());
     if( ! _buildRequest()) return false;
     _request->write(body, len);
@@ -144,7 +142,7 @@ bool	asyncHTTPrequest::send(const uint8_t* body, size_t len){
 
 //**************************************************************************************************************
 bool	asyncHTTPrequest::send(xbuf* body, size_t len){
-    DEBUG_HTTP("send(char*) %s.16... (%d)\r\n", body->peekString(16).c_str(), len);
+    //DEBUG_HTTP("send(char*) %s.16... (%d)\r\n", body->peekString(16).c_str(), len);
     _addHeader("Content-Length", String(len).c_str());
     if( ! _buildRequest()) return false;
     _request->write(body, len);
@@ -154,7 +152,7 @@ bool	asyncHTTPrequest::send(xbuf* body, size_t len){
 
 //**************************************************************************************************************
 void    asyncHTTPrequest::abort(){
-    DEBUG_HTTP("abort()\r\n");
+    //DEBUG_HTTP("abort()\r\n");
     if(! _client) return;
     _client->abort();
 }
@@ -170,34 +168,34 @@ int	asyncHTTPrequest::responseHTTPcode(){
 
 //**************************************************************************************************************
 String	asyncHTTPrequest::responseText(){
-    DEBUG_HTTP("responseText() ");
+    //DEBUG_HTTP("responseText() ");
     if( ! _response || _readyState < readyStateLoading || ! available()){
-        DEBUG_HTTP("responseText() no data\r\n");
+        //DEBUG_HTTP("responseText() no data\r\n");
         return String(); 
     }       
     String localString;
     size_t avail = available();
     if( ! localString.reserve(avail)) {
-        DEBUG_HTTP("!responseText() no buffer\r\n")
+        //DEBUG_HTTP("!responseText() no buffer\r\n")
         _HTTPcode = HTTPCODE_TOO_LESS_RAM;
         _client->abort();
         return String();
     }
     localString = _response->readString(avail);
     _contentRead += localString.length();
-    DEBUG_HTTP("responseText() %s... (%d)\r\n", localString.substring(0,16).c_str() , avail);
+    //DEBUG_HTTP("responseText() %s... (%d)\r\n", localString.substring(0,16).c_str() , avail);
     return localString;
 }
 
 //**************************************************************************************************************
 size_t  asyncHTTPrequest::responseRead(uint8_t* buf, size_t len){
     if( ! _response || _readyState < readyStateLoading || ! available()){
-        DEBUG_HTTP("responseRead() no data\r\n");
+        //DEBUG_HTTP("responseRead() no data\r\n");
         return 0;
     } 
     size_t avail = available() > len ? len : available();
     _response->read(buf, avail);
-    DEBUG_HTTP("responseRead() %.16s... (%d)\r\n", (char*)buf , avail);
+    //DEBUG_HTTP("responseRead() %.16s... (%d)\r\n", (char*)buf , avail);
     _contentRead += avail;
     return avail;
 }
@@ -219,7 +217,7 @@ size_t	asyncHTTPrequest::responseLength(){
 
 //**************************************************************************************************************
 void	asyncHTTPrequest::onData(onDataCB cb, void* arg){
-    DEBUG_HTTP("onData() CB set\r\n");
+    //DEBUG_HTTP("onData() CB set\r\n");
     _onDataCB = cb;
     _onDataCBarg = arg;
 }
@@ -258,8 +256,8 @@ bool  asyncHTTPrequest::_parseURL(String url){
     int hostBeg = 0;
     _URL = new URL;
     _URL->scheme = new char[8];
-    strcpy(_URL->scheme, "HTTP://");
-    if(url.substring(0,7).equalsIgnoreCase("HTTP://")){
+    strcpy(_URL->scheme, httpTag());
+    if(url.substring(0,7).equalsIgnoreCase(httpTag())){
         hostBeg += 7; 
     }
     else if(url.substring(0,8).equalsIgnoreCase("HTTPS://")){
@@ -282,13 +280,13 @@ bool  asyncHTTPrequest::_parseURL(String url){
     strcpy(_URL->path, url.substring(pathBeg, queryBeg).c_str());
     _URL->query = new char[url.length() - queryBeg + 1];
     strcpy(_URL->query, url.substring(queryBeg).c_str());
-    DEBUG_HTTP("_parseURL() %s%s:%d%s%.16s\r\n", _URL->scheme, _URL->host, _URL->port, _URL->path, _URL->query);
+    //DEBUG_HTTP("_parseURL() %s%s:%d%s%.16s\r\n", _URL->scheme, _URL->host, _URL->port, _URL->path, _URL->query);
     return true;
 }
 
 //**************************************************************************************************************
 bool  asyncHTTPrequest::_connect(){
-    DEBUG_HTTP("_connect()\r\n");
+    //DEBUG_HTTP("_connect()\r\n");
     if( ! _client){
         _client = new AsyncClient();
     }
@@ -302,7 +300,7 @@ bool  asyncHTTPrequest::_connect(){
     _client->onError([](void *obj, AsyncClient *client, uint32_t error){((asyncHTTPrequest*)(obj))->_onError(client, error);}, this);
     if( ! _client->connected()){
         if( ! _client->connect(_URL->host, _URL->port)) {
-            DEBUG_HTTP("!client.connect(%s, %d) failed\r\n", _URL->host, _URL->port);
+            //DEBUG_HTTP("!client.connect(%s, %d) failed\r\n", _URL->host, _URL->port);
             _HTTPcode = HTTPCODE_NOT_CONNECTED;
             _setReadyState(readyStateDone);
             return false;
@@ -317,7 +315,7 @@ bool  asyncHTTPrequest::_connect(){
 
 //**************************************************************************************************************
 bool   asyncHTTPrequest::_buildRequest(){
-    DEBUG_HTTP("_buildRequest()\r\n");
+    //DEBUG_HTTP("_buildRequest()\r\n");
     
         // Build the header.
 
@@ -346,9 +344,9 @@ bool   asyncHTTPrequest::_buildRequest(){
 //**************************************************************************************************************
 size_t  asyncHTTPrequest::_send(){
     if( ! _request) return 0;
-    DEBUG_HTTP("_send() %d\r\n", _request->available());
+    //DEBUG_HTTP("_send() %d\r\n", _request->available());
     if( ! _client->connected() || ! _client->canSend()){
-        DEBUG_HTTP("*can't send\r\n");
+        //DEBUG_HTTP("*can't send\r\n");
         return 0;
     }
     size_t supply = _request->available();
@@ -367,7 +365,7 @@ size_t  asyncHTTPrequest::_send(){
         _request = nullptr;
     }
     _client->send();
-    DEBUG_HTTP("*sent %d\r\n", sent);
+    //DEBUG_HTTP("*sent %d\r\n", sent);
     _lastActivity = millis(); 
     return sent;
 }
@@ -376,7 +374,7 @@ size_t  asyncHTTPrequest::_send(){
 void  asyncHTTPrequest::_setReadyState(readyStates newState){
     if(_readyState != newState){
         _readyState = newState;          
-        DEBUG_HTTP("_setReadyState(%d)\r\n", _readyState);
+        //DEBUG_HTTP("_setReadyState(%d)\r\n", _readyState);
         if(_readyStateChangeCB){
             _readyStateChangeCB(_readyStateChangeCBarg, this, _readyState);
         }
@@ -386,24 +384,24 @@ void  asyncHTTPrequest::_setReadyState(readyStates newState){
 //**************************************************************************************************************
 void  asyncHTTPrequest::_processChunks(){
     while(_chunks->available()){
-        DEBUG_HTTP("_processChunks() %.16s... (%d)\r\n", _chunks->peekString(16).c_str(), _chunks->available());
+        //DEBUG_HTTP("_processChunks() %.16s... (%d)\r\n", _chunks->peekString(16).c_str(), _chunks->available());
         size_t _chunkRemaining = _contentLength - _contentRead - _response->available();
         _chunkRemaining -= _response->write(_chunks, _chunkRemaining);
         if(_chunks->indexOf("\r\n") == -1){
             return;
         }
         String chunkHeader = _chunks->readStringUntil("\r\n");
-        DEBUG_HTTP("*getChunkHeader %.16s... (%d)\r\n", chunkHeader.c_str(), chunkHeader.length());
+        //DEBUG_HTTP("*getChunkHeader %.16s... (%d)\r\n", chunkHeader.c_str(), chunkHeader.length());
         size_t chunkLength = strtol(chunkHeader.c_str(),nullptr,16);
         _contentLength += chunkLength;
         if(chunkLength == 0){
             char* connectionHdr = respHeaderValue("connection");
             if(connectionHdr && (strcasecmp_P(connectionHdr,PSTR("disconnect")) == 0)){
-                DEBUG_HTTP("*all chunks received - closing TCP\r\n");
+                //DEBUG_HTTP("*all chunks received - closing TCP\r\n");
                 _client->close();
             }
             else {
-                DEBUG_HTTP("*all chunks received - no disconnect\r\n"); 
+                //DEBUG_HTTP("*all chunks received - no disconnect\r\n"); 
             }
             _requestEndTime = millis();
             _lastActivity = 0;
@@ -425,7 +423,7 @@ ________________________________________________________________________________
 
 //**************************************************************************************************************
 void  asyncHTTPrequest::_onConnect(AsyncClient* client){
-    DEBUG_HTTP("_onConnect handler\r\n");
+    //DEBUG_HTTP("_onConnect handler\r\n");
     _client = client;
     _setReadyState(readyStateOpened);
     _response = new xbuf;
@@ -445,7 +443,7 @@ void  asyncHTTPrequest::_onPoll(AsyncClient* client){
     if(_timeout && (millis() - _lastActivity) > (_timeout * 1000)){
         _client->close();
         _HTTPcode = HTTPCODE_TIMEOUT;
-        DEBUG_HTTP("_onPoll timeout\r\n");
+        //DEBUG_HTTP("_onPoll timeout\r\n");
     }
     if(_onDataCB && available()){
         _onDataCB(_onDataCBarg, this, available());
@@ -454,13 +452,13 @@ void  asyncHTTPrequest::_onPoll(AsyncClient* client){
 
 //**************************************************************************************************************
 void  asyncHTTPrequest::_onError(AsyncClient* client, int8_t error){
-    DEBUG_HTTP("_onError handler error=%d\r\n", error);
+    //DEBUG_HTTP("_onError handler error=%d\r\n", error);
     _HTTPcode = error;
 }
 
 //**************************************************************************************************************
 void  asyncHTTPrequest::_onDisconnect(AsyncClient* client){
-    DEBUG_HTTP("_onDisconnect handler\r\n");
+    //DEBUG_HTTP("_onDisconnect handler\r\n");
     if(_readyState < readyStateOpened){
         _HTTPcode = HTTPCODE_NOT_CONNECTED;
     }
@@ -480,7 +478,7 @@ void  asyncHTTPrequest::_onDisconnect(AsyncClient* client){
 
 //**************************************************************************************************************
 void  asyncHTTPrequest::_onData(void* Vbuf, size_t len){
-    DEBUG_HTTP("_onData handler %.16s... (%d)\r\n",(char*) Vbuf, len);
+    //DEBUG_HTTP("_onData handler %.16s... (%d)\r\n",(char*) Vbuf, len);
     _lastActivity = millis();
     
                 // Transfer data to xbuf
@@ -512,11 +510,11 @@ void  asyncHTTPrequest::_onData(void* Vbuf, size_t len){
     if( ! _chunked && (_response->available() + _contentRead) >= _contentLength){
         char* connectionHdr = respHeaderValue("connection");
         if(connectionHdr && (strcasecmp_P(connectionHdr,PSTR("disconnect")) == 0)){
-            DEBUG_HTTP("*all data received - closing TCP\r\n");
+            //DEBUG_HTTP("*all data received - closing TCP\r\n");
             _client->close();
         }
         else {
-            DEBUG_HTTP("*all data received - no disconnect\r\n");
+            //DEBUG_HTTP("*all data received - no disconnect\r\n");
         }
         _requestEndTime = millis();
         _lastActivity = 0;
@@ -534,7 +532,7 @@ void  asyncHTTPrequest::_onData(void* Vbuf, size_t len){
 
 //**************************************************************************************************************
 bool  asyncHTTPrequest::_collectHeaders(){
-    DEBUG_HTTP("_collectHeaders()\r\n");
+    //DEBUG_HTTP("_collectHeaders()\r\n");
 
             // Loop to parse off each header line.
             // Drop out and return false if no \r\n (incomplete)
@@ -585,7 +583,7 @@ bool  asyncHTTPrequest::_collectHeaders(){
 
     hdr = _getHeader("Transfer-Encoding"); 
     if(hdr && strcasecmp_P(hdr->value, PSTR("chunked")) == 0){
-        DEBUG_HTTP("*transfer-encoding: chunked\r\n");
+        //DEBUG_HTTP("*transfer-encoding: chunked\r\n");
         _chunked = true;
         _contentLength = 0;
         _chunks = new xbuf;
@@ -721,6 +719,3 @@ asyncHTTPrequest::header* asyncHTTPrequest::_getHeader(int ndx){
     }
     return hdr;
 }
-
-#endif
-#endif

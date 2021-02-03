@@ -27,28 +27,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_LocalLogger_HO
-#define H4P_LocalLogger_HO
+#pragma once
 
-#ifndef ARDUINO_ARCH_STM32
 #include <H4PCommon.h>
-#ifdef H4P_LOG_EVENTS
 
-#include <H4P_SerialCmd.h>
-
-class H4P_LocalLogger: public H4PLogService {
+class H4P_LocalLogger: public H4Plugin {
         string      _fname;
         uint32_t    _limit;
 
-        virtual void        _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target);
+                void        _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) override;
     public:
-        H4P_LocalLogger(uint32_t limit=10000,uint32_t filter=H4P_LOG_ALL); // amount of free SPIFFS space to use
+        H4P_LocalLogger(uint32_t limit=10000,uint32_t filter=H4P_EVENT_ALL); // amount of free SPIFFS space to use
 
                 void        clear();
                 void        flush();
                 void        show() override;
 };
-#endif // stm32
-#endif
-
-#endif // H4P_LocalLogger_H

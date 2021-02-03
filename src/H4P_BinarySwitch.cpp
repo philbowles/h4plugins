@@ -27,18 +27,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_BinarySwitch.h>
-#ifndef H4P_NO_WIFI
-    #include<H4P_AsyncWebServer.h>
-    #include<H4P_AsyncMQTT.h>
-    void H4P_ConditionalSwitch::syncCondition(){ if(isLoaded(aswsTag())) h4asws._sendSSE(ConditionTag(),CSTR(stringFromInt(_predicate(state())))); }
-#else
-    void H4P_ConditionalSwitch::syncCondition(){}
-#endif
+#include<H4P_WiFi.h>
+
+void H4P_BinarySwitch::_hookIn() {
+    auto _pGPIO=h4prequire<H4P_GPIOManager>(this,H4PID_GPIO);
+    _pp=_pGPIO->Output(_pin,_sense,_initial,[](H4GPIOPin* ptr){});
+}
 
 void H4P_ConditionalSwitch::_hookIn() {
-    REQUIRE(gpio);
+    _pWiFi=h4pisloaded<H4P_WiFi>(H4PID_WIFI);
+    if(_pWiFi) _pWiFi->_uiAdd(H4P_UIO_COND,conditionTag(),H4P_UI_BOOL,"",[this]{ return stringFromInt(_predicate(state())); },nullptr,true);
     H4P_BinarySwitch::_hookIn();
-#ifndef H4P_NO_WIFI
-    if(isLoaded(aswsTag())) h4asws._uiAdd(ConditionTag(),H4P_UI_BOOL,[this]{ return stringFromInt(_predicate(state())); });
-#endif
 }
+
+void H4P_ConditionalSwitch::_setState(bool b) { 
+    if(_predicate(b)) H4P_BinarySwitch::_setState(b);
+    else if(_pWiFi) _pWiFi->uiMessage("Unable: condition disarmed");
+}
+
+void H4P_ConditionalSwitch::syncCondition(){ if(_pWiFi) _pWiFi->_sendSSE(conditionTag(),CSTR(stringFromInt(_predicate(state())))); }

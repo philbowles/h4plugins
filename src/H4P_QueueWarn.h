@@ -27,13 +27,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_QueueWarn_HO
-#define H4P_QueueWarn_HO
+#pragma once
 
 #include<H4PCommon.h>
 
 class H4P_QueueWarn: public H4Plugin {
-    //protected:
         VSCMD(_qwPcent);
 //
         uint32_t                limit;
@@ -45,11 +43,11 @@ class H4P_QueueWarn: public H4Plugin {
 
         void            _run();
         void            _start() override {
-            h4._hookLoop([this](){ _run(); },_subCmd);
+            h4._hookLoop([this](){ _run(); },_pid);
             H4Plugin::_start();
         }
         void            _stop() override {
-            h4._unHook(_subCmd);
+            h4._unHook(_pid);
             H4Plugin::_stop();
         }
     public:
@@ -59,6 +57,4 @@ class H4P_QueueWarn: public H4Plugin {
         void        pcent(uint32_t pc);
 };
 
-extern __attribute__((weak)) H4P_QueueWarn h4qw;
-
-#endif // H4P_QueueWarn_H
+//extern __attribute__((weak)) H4P_QueueWarn h4qw;

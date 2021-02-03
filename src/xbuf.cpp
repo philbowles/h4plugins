@@ -1,6 +1,4 @@
-#ifndef ARDUINO_ARCH_STM32
-#include<H4P_WiFiSelect.h>
-#ifndef H4P_NO_WIFI
+//#include<H4P_WiFiSelect.h>
 #include <xbuf.h>
 
 xbuf::xbuf(const uint16_t segSize)
@@ -266,5 +264,3 @@ void        xbuf::remSeg(){
     }   
     _offset = 0;
 }
-#endif
-#endif

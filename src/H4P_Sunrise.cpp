@@ -28,9 +28,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_Sunrise.h>
-#include<H4P_WiFiSelect.h>
-#ifndef H4P_NO_WIFI
-
 #include<H4P_SerialCmd.h>
 #include <WiFiClientSecure.h>
 
@@ -66,10 +63,7 @@ SOFTWARE.
 #endif
 
 
-void H4P_Sunrise::_hookIn(){ 
-    REQUIRE(wifi);
-    DEPEND(time);
-}
+void H4P_Sunrise::_hookIn(){ _pTime=h4pdepend<H4P_Timekeeper>(this,H4PID_TIME); }
 
 void H4P_Sunrise::_parse(const string& s){
     vector<string> parts=split(replaceAll(s,"\"",""),":");
@@ -113,15 +107,14 @@ void H4P_Sunrise::_start(){
                     vector<string> chop2=split(chop,","); // "sunrise":"5:11:52 AM" 
                     _parse(chop2[0]);
                     _parse(chop2[1]);
-                    H4EVENT("s/r=%s s/s=%s",CSTR(_cb["sunrise"]),CSTR(_cb["sunset"]));
-                    h4tk.daily("01:00",ON,[this](bool b){
+                    PLOG("s/r=%s s/s=%s",CSTR(_cb["sunrise"]),CSTR(_cb["sunset"]));
+                    _pTime->daily("01:00",ON,[this](bool b){
                         _cb.erase("sunrise");
                         _start();
                     });
                 }
-            } else H4EVENT("sset FAIL %d",httpCode);
+            } else PLOG("sset FAIL %d",httpCode);
         https.end();
         }
-    } //else H4EVENT("ALREADY GOT SS %s",CSTR(_cb["sunrise"]));
+    } //else PLOG("ALREADY GOT SS %s",CSTR(_cb["sunrise"]));
 }
-#endif // wifi only

@@ -27,19 +27,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4SerialCmd_H
-#define H4SerialCmd_H
+#pragma once
 
 #include<H4PCommon.h>
-using  namespace std::placeholders;
-
-#ifndef ARDUINO_ARCH_STM32 
-    #ifdef ARDUINO_ARCH_ESP8266
-        #include<FS.h>
-    #else
-        #include<SPIFFS.h>
-    #endif
-#endif
+#include<H4P_VerboseMessages.h>
 
 enum H4P_SVC_CONTROL {
     H4PSVC_RESTART,
@@ -47,68 +38,44 @@ enum H4P_SVC_CONTROL {
     H4PSVC_START,
     H4PSVC_STOP
 };
-
-using H4P_FN_LOG = function<void(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target)>;
-
-extern void h4FactoryReset();
-class H4P_SerialCmd: public H4Plugin {
-        vector<H4P_FN_LOG>  _logChain;
-        
+class H4P_SerialCmd: public H4Plugin {        
+        VSCMD(_event);
         VSCMD(_svcRestart);
         VSCMD(_svcInfo);
         VSCMD(_svcStart);
         VSCMD(_svcStop);
 
-        H4_CMD_MAP_I    __exactMatch(const string& cmd,uint32_t owner);
-        void            __flatten(function<void(string)> fn);
+                H4_CMD_MAP_I    __exactMatch(const string& cmd,uint32_t owner);
+                void            __flatten(function<void(string)> fn);
 
-        uint32_t        _dispatch(vector<string> vs,uint32_t owner);
-        void            _hookIn() override;
-        void            _flattenCmds(function<void(string)> fn,string cmd="",string prefix="",uint32_t owner=0);
-        string          _errorString(uint32_t e);
-        uint32_t        _svcControl(H4P_SVC_CONTROL svc,vector<string> vs);
-
-        void            _run();        
-        void            _greenLight(){ start(); }
-        void            _start() override {
-            h4._hookLoop([this](){ _run(); },_subCmd);
-            H4Plugin::_start();
-            Serial.printf("H4P Version %s\n",H4P_VERSION);
-        }
-        void            _stop() override {
-            h4._unHook(_subCmd);
-            H4Plugin::_stop();
-        }
+                uint32_t        _dispatch(vector<string> vs,uint32_t owner);
+                void            _flattenCmds(function<void(string)> fn,string cmd="",string prefix="",uint32_t owner=0);
+                void            _hookIn() override;
+                void            _run();        
+                void            _start() override { h4._hookLoop([this](){ _run(); },_pid); H4Plugin::_start(); }
+                void            _stop() override { h4._unHook(_pid); H4Plugin::_stop(); }
+                uint32_t        _svcControl(H4P_SVC_CONTROL svc,vector<string> vs);
     public:
+        VSCMD(_dump);   // public so logger can use it
+        static  string          _dumpTask(task*);
+
         H4P_SerialCmd(bool autoStop=false);
-#ifndef ARDUINO_ARCH_STM32
-        static  string          read(const string& fn);
-        static  uint32_t        write(const string& fn,const string& data,const char* mode="w");
-        void                    showSPIFFS();
-        void                    heap(){ reply("Heap=%u",ESP.getFreeHeap()); }        
-#endif
+        
+                void            addCmd(const string& name,uint32_t owner, uint32_t levID,H4_FN_MSG f=nullptr);
                 void            all();
                 void            config(){ for(auto const& c:_cb) reply("%s=%s",CSTR(c.first),CSTR(c.second)); }        
-                void            plugins();
-
-        VSCMD(_dump);   // public so logger can use it
-
-                void            dumpQ();
-        static  string          _dumpTask(task*);
-//      user
-                void            addCmd(const string& name,uint32_t owner, uint32_t levID,H4_FN_MSG f=nullptr){  _commands.insert(make_pair(name,command {owner,levID,f})); }
+                void            heap(){ reply("Heap=%u",ESP.getFreeHeap()); }        
                 void            help();
-                uint32_t        invokeCmd(string,string="",const char* src=userTag());			
+                uint32_t        invokeCmd(string,string="",const char* src=userTag());
                 uint32_t        invokeCmd(string,uint32_t,const char* src=userTag()); 
-                void            logEventType(H4P_LOG_TYPE,const string& src,const string& tgt,const string& fmt,...);
-                void            removeCmd(const string& name,uint32_t _subCmd=0); 
+                void            plugins();
+        static  string          read(const string& fn);
+                void            removeCmd(const string& name,uint32_t _pid=0);
+                void            showFS();
+                void            showQ();
+        static  uint32_t        write(const string& fn,const string& data,const char* mode="w");
 //      syscall only
-                void            _hookLogChain(H4P_FN_LOG f){ _logChain.push_back(f); }
-                void            _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target);
                 uint32_t        _executeCmd(string topic, string pload);
-                uint32_t        _simulatePayload(string flat,const char* src=scmdTag());
+                uint32_t        _simulatePayload(string flat,const char* src=cmdTag());
 };
-
 extern __attribute__((weak)) H4P_SerialCmd h4cmd;
-
-#endif // H4SerialCmd_H

@@ -26,15 +26,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifndef ARDUINO_ARCH_STM32
 #include<H4P_HeapWarn.h>
 #include<H4P_SerialCmd.h>
 
-H4P_HeapWarn::H4P_HeapWarn(function<void(bool)> f,uint32_t pc): _f(f),H4Plugin("hwrn"){
-    _cmds={
-        {_pName,   {H4PC_H4, _subCmd, nullptr}},
-        {"pcent",  {_subCmd,   0, CMDVS(_hwPcent)}}
-    };
+H4P_HeapWarn::H4P_HeapWarn(function<void(bool)> f,uint32_t pc): _f(f),H4Plugin(H4PID_HWRN){
+    _addLocals({
+        {_pName,   {H4PC_H4, _pid, nullptr}},
+        {"pcent",  {_pid,   0, CMDVS(_hwPcent)}}
+            });
     _minh=_initial=ESP.getFreeHeap();
     _limit=_setLimit(pc);
     show();
@@ -46,12 +45,12 @@ void H4P_HeapWarn::_run(){
     if(hsize < _minh) _minh=hsize;
     bool state=hsize < _limit;
     if(state ^ warned) {
-        H4EVENT("Heap Warn %d %d",state,hsize);
+        PLOG("Heap Warn %d %d",state,hsize);
         _f(state);
     }
     warned=state;
 }
-uint32_t H4P_HeapWarn::_hwPcent(vector<string> vs){ return guardInt1(vs,bind(&H4P_HeapWarn::pcent,this,_1)); }
+uint32_t H4P_HeapWarn::_hwPcent(vector<string> vs){ return _guardInt1(vs,[this](uint32_t && i){ pcent(i); }); }
 
 uint32_t H4P_HeapWarn::_setLimit(uint32_t v){ return (_initial*v)/100; }
 #define H4P_ABSMIN_HPCNT    5
@@ -64,5 +63,3 @@ void H4P_HeapWarn::show(){
     reply("Hwarn: startvalue=%d warn when size < %d",_initial,_limit);
     reply("Hwarn: min level=%d [%d%%]",_minh,(_minh*100)/_initial);
 }
-
-#endif // stm32

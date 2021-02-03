@@ -27,23 +27,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-#ifndef H4P_MQTTLogger_HO
-#define H4P_MQTTLogger_HO
+#pragma once
 
-#ifndef ARDUINO_ARCH_STM32
 #include <H4PCommon.h>
 #include <H4P_AsyncMQTT.h>
 
-class H4P_MQTTLogger: public H4PLogService {
-        void _logEvent(const string &msg,H4P_LOG_TYPE type,const string& source,const string& target){ h4mqtt.publishDevice(_pName,msg); }
+class H4P_MQTTLogger: public H4Plugin {
+        H4P_AsyncMQTT*  _pMQTT;
+        string          _topic;
+        void            _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) override { _pMQTT->publishDevice(_topic,msg); }
     protected:
-        virtual void _hookIn() override {
-            DEPEND(mqtt);
-            H4PLogService::_hookIn();
-        }
-        virtual void _greenLight() override {} // dont autostart
+        virtual void    _hookIn() override { _pMQTT=h4pdepend<H4P_AsyncMQTT>(this,H4PID_MQTT); }
+        virtual void    _greenLight() override {} // dont autostart
     public:
-        H4P_MQTTLogger(const string& topic,uint32_t filter=H4P_LOG_ALL): H4PLogService(topic,filter){}
+        H4P_MQTTLogger(const string& topic,uint32_t filter=H4P_EVENT_ALL): _topic(topic),H4Plugin("mlog",filter){}
 };
-#endif
-#endif // H4P_MQTTLogger_H
