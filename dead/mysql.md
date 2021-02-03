@@ -41,7 +41,7 @@ These fields are described in the [general logging documenatation](events.md)
 
 ---
 
-# H4P_SerialLogger (name "hlog")
+# H4P_HttpMySQLLogger (name "hlog")
 
 ## Usage
 

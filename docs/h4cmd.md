@@ -28,7 +28,7 @@ None: Included automatically by the mandatory opening sequence.
 H4_USE_PLUGINS(115200,10,false)
 ```
 
-This plugin is a "singleton" - there may be only one signle instance of it in the app. It is called `h4cmd`, prefix all API calls below with `h4cmd.`
+This plugin is a "singleton" - there may be only one single instance of it in the app. It is called `h4cmd`, prefix all API calls below with `h4cmd.`
 
 ---
 

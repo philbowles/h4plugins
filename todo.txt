@@ -1,5 +1,7 @@
 SHORTTERM
-    rework time stuff!!!
+    fix dump / localloger to avoid large file crash
+    fix HTTP logger database
+    rework time stuff!!! epscially TZ etc
     rework PD for UPNP etc
     upndp out gangmaster in
     remove redun this param on require , depend

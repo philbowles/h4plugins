@@ -1,327 +1,275 @@
 ![H4P Logo](/assets/DiagLogo.jpg)
 
-# Logging / Loggers
+# Events, Emitters and Listeners
 
-## Adds event logging to multiple destinations for H4 Universal Scheduler/Timer + Plugins.
-
-*All plugins depend upon the presence of the [H4 library](https://github.com/philbowles/H4), which must be installed first.*
+Essential background before using the events and/or logging systems
 
 ---
 
-# What do they do?
+# Contents
 
-H4Plugins loggers can send messages to a variety of destinations, depending on which logger you choose. There are currently 
+* [Definitions](#defintions)
+* [Anatomy of an Event Handler](#anatomy-of-an-event-handler)
+* [Event Listeners](#event-listeners)
+* [Event Emitters](#event-emitters)
+* Formal API Specifications - Listeners
+  * [H4P_EventListener](ears.md)
+  * [H4P_SerialLogger](slog.md)
+  * [H4P_LocalLogger](llog.md)
+  * [H4P_MQTTLogger](mlog.md)
+  * :building_construction: mysqllogger
+* Formal API Specifications - Emitters
+  * [H4P_EmitHeap](heap.md)
+  * :building_construction: [H4P_EmitLoopCount](loops.md)
+  * :building_construction: [H4P_EmitQ](eq.md)
+  * :building_construction: [H4P_EmitTick](tick.md)
 
-* H4P_HttpMySQLLogger which sends logged events to a remote Webserver for storage in a MySQL database
-  **N.B. H4P_HttpMySQLLogger is experimental and has [its own documentation page](h4mysql.md)**
+---
 
-* H4P_MQTTLogger sends log messages to MQTT Server
-* H4P_MQTTHeapLogger a specialised H4P_MQTTLogger which periodically logs value of FreeHeap to MQTT
-* H4P_MQTTQueueLogger a specialised H4P_MQTTLogger which periodically logs size of queue to MQTT
-* H4P_SerialLogger which does exactly what it says on the tin
+# Defintions
 
-Writing your own logger is seriously easy (see below)
+If you have used javascript, these concepts should already by familiar to you, but read on to ensure you understand H4Plugins use of the terminology. Similarly if you are familiar with MQTT, H4Plugins events are much like topics in the publish / subscribe model.
 
-The important thing to note is that each logger is called in turn, thus you can log to several destinations at a time for a single message. The serial logger is a useful diagnostic aid, as it shows what is getting logged to other - less visible - destinations, e.g. remote servers.
+You should know already from reading the [H4 documentation](https://github.com/philbowles/H4) why we need "Event-driven programming", but what exactly *is* an event?
 
-Also note that the main interface `h4cmd.logEventType(H4P_EVENT_TYPE,const string& src,const string& tgt,const string& fmt,...)` (which operates like `printf` with variable number of parameters) will simply do nothing if no loggers are installed. This allows it to be left in the code and "switched on or off" by commenting out the loggers, which can be flipped back in at a stroke for testing.
+The answer may sound too vague, but an event is anything that happens in the real world - or your own code - that users or other plugins may be be interested in. The usual reason for being "interested" is that they may need to *do* something when that event occurs.
 
-Better still. there is a macro `h4pUserEvent("printf-style %s",...)` which simply calls `h4cmd.logEventType` "under the hood" but can be "compiled out" by removing the `#define H4P_LOG_EVENTS` entry in `config.h`, which reduces the size of the binary. Unless you have good reason (which will be rare) then you should always use `h4pUserEvent`.
+Let's take a simple example and assume that you want to reset your device to its "factory settings". There are several plugins that save configuration data. Each one of them needs to be told that a factory reset is in progress so they can clear up their own data. Because it is *you, the user* who chooses which plugins get loaded, H4Plugins needs a flexible system to call only those that are in use to tell them to clean up.
 
-Finally, most loggers have  `filter` parameter which allows the logger to operate on only certain event types:
+It does this by creating / sending or "emitting" an event - specifically `H4P_EVENT_FACTORY`. It just throws it into the air, like a red distress flare. It knows that anybody who sees the flare and recognises its significance will know there is suddenly work to do...
+
+Every plugin, when it starts up, tells H4Plugins which events it is interested in (in our analogy, what colour flare(s) it will respond to). It has some code / process associated with the event known as an "event handler" and we call this declaration of interest "registering an event". The plugin is now an "Event Listener". Anything that can send an event is an "Event Emitter" - it is perfectly possible to be both at the same time.
+
+---
+
+# Anatomy of an Event Handler
+
+Technically speaking, an Event Listener is *any* piece of code that registers a handler for a known event and provides a callback function of the form:
 
 ```cpp
-enum H4P_EVENT_TYPE {
-    H4P_LOG_H4=1,
-    H4P_LOG_SVC_UP=2,
-    H4P_LOG_SVC_DOWN=4,
-    H4P_LOG_CMD=8,
-    H4P_LOG_USER=16,
-    H4P_LOG_MQTT_HEAP=64,
-    H4P_LOG_MQTT_Q=128,
-    H4P_LOG_PD_ENTER=256,
-    H4P_LOG_PD_LEAVE=512,
-    H4P_LOG_MQTT_ERROR=1024,
-    H4P_LOG_ALL=0xffffffff,
-    H4P_LOG_ERROR=H4P_LOG_ALL
-};
+void MyVeryOwnEventHandler(H4PID pid,H4P_EVENT_TYPE t,const string& msg){ ... do some interesting stuff }
 ```
 
-The values are chosen such that logical operations can be use , e.g. `H4P_LOG_SVC_UP | H4P_LOG_SVC_DOWN` will react only to those two service events. Another example is `H4P_LOG_ALL & ~H4P_LOG_SVC_UP &~ H4P_LOG_SVC_DOWN` which will *exclude* service events. The default filter is `H4P_LOG_ALL`;
+All plugins do this automatically, so all plugins are - by definition - Event Listeners. Whether they actually choose to listen / react is another matter: many don't take advantage of the feature as they don't have any need / interest in any of the events.
+
+* `pid` is the plugin ID of the plugin that sent or "emitted" this event. Most of the time it doesn't matter *who* caused the event, but it can be useful when trying to track down bugs.
+* `t` is the type of event. See the table below
+
+* `msg` is optional information about that event. It is different for every event type
+
+## Events
+
+| Event Name | Meaning | Msg contains | Note |
+| :--- | :--- | :--- | :---: |
+|H4P_EVENT_NOOP|Nothing||1|
+|H4P_EVENT_MSG|Arbitrary message|user-defined|2|
+|H4P_EVENT_SVC_UP|Plugin service up|shortname|3|
+|H4P_EVENT_SVC_DOWN|Plugin service down|shortname|3|
+|H4P_EVENT_CMD|A command was entered|The command|3|
+|H4P_EVENT_USER|User event|user-defined||
+|H4P_EVENT_HEAP|Heap has been measured|current size||
+|H4P_EVENT_Q|Q length has been measured|current size||
+|H4P_EVENT_LOOPS|Loops/sec measured|current count||
+|H4P_EVENT_PD_ENTER|A device has joined the network|device ID|3|
+|H4P_EVENT_PD_LEAVE|A device has left the network|device ID|3|
+|H4P_EVENT_MQTT_ERROR|PangolinMQTT internal error|error code|3|
+|H4P_EVENT_REBOOT|About to reboot|||
+|H4P_EVENT_FACTORY|About to factory reset|||
+|H4P_EVENT_CMDREPLY|Result of H4P_EVENT_CMD|Error code 0=OK||
+|H4P_EVENT_DLL|Plugin dynamically loaded|shortname|3|
+|H4P_EVENT_ON|`h4onof` went ON||3|
+|H4P_EVENT_OFF|`h4onof` went OFF||3|
+|H4P_EVENT_BACKOFF|webUI Q buffer exceeded||3,4|
+|H4P_EVENT_HEARTBEAT|One second has passed|N seconds uptime|3|
+|H4P_EVENT_ALL|Include ALL events||5|
+
+Notes:
+1. Useful for testing / debugging. If *anything* happens when this is sent, you have a problem!
+2. This is the most common type used by loggers
+3. Internal use, information only. Do not emit.
+4. This is due to the terrible design of AsyncWebserver library: It cannot keep up with the rte of messages being sent, and is almsot certain to crsh uness you stop sending *immediately*
+5. Except `H4P_EVENT_HEARTBEAT` - those get really annoying really quickly :smile: . If you *really* want "all" (and you don't) use 0xffffffff
+
+## Handling your own events
+
+If you are interested in a single event, there is a simple function you can call:
+
+```cpp
+void h4pOnEvent(H4P_EVENT_TYPE t,H4P_FN_USEREVENT f);
+```
+
+Names a function `f` (or defines a lambda) to handle the specific event type `t`. For example:
+
+```cpp
+...
+void sayGoodbye(const string& msg){ // msg is unused in H4P_EVENT_FACTORY
+    Serial.println("Morituri te salutant*");
+}
+...
+h4pOnEvent(H4P_EVENT_FACTORY,sayGoodbye);
+```
+
+*Latin for *"We who are about to die, salute you"*
+
+If more than one event type needs to be monitored, you need an [H4P_EventListener](ears.md), but before that you need to know how to combine events.
+
+## Handling Multiple Events
+
+### Combining Events
+
+Multiple Events types are specified at the same time by packing them all into bit-mask. Naming several events then uses the C/C++ language biwise-or operator: `|` (vertical bar)
+
+```cpp
+uint32_t myMultipleEventBitmask = H4P_EVENT_REBOOT | H4P_EVENT_FACTORY;
+...
+// myEventHandler will get called if either H4P_EVENT_REBOOT OR H4P_EVENT_FACTORY occurs
+H4P_EventListener ears1(myMultipleEventBitmask,myEventHandler); 
+```
+
+### Excluding Events
+
+Again using standard C/C++ language bitwise logic operators, this time `&` and `~` (complement) we can exclude certain events. 
+Saying `H4P_EVENT_ALL &~ H4P_EVENT_HEARTBEAT` will handle everything *except* `H4P_EVENT_HEARTBEAT`. The `&~` should be read as "and not"
 
 ---
 
-# What information gets logged?
+# Event Listeners
 
-The logging interface send the following data items to each logger:
+## Logging
 
-* Msg: the content of the message
+A Logger is simply a plugin that listens for some event type(s) and then does something useful with them, usually showing, saving, relaying, sending them somewhere.
+
+For example, the ready-made loggers tha come with H4Plugins:
+
+* [H4P_SerialLogger](slog.md) displays the event information on the Serial Monitor.
+* [H4P_LocalLogger](llog.md) saves the event to a `log.csv` file in Flash FS
+* [H4P_MQTTLogger](mlog.md) publishes the event with a user-chosen topic name to the MQTT Server.
+* H4P_HttpMySQLLogger sends events to a remote Webserver for storage in a MySQL database
   
-* Event type (see above)
+**N.B. H4P_HttpMySQLLogger is experimental and has [its own documentation page](h4mysql.md)**
 
-* Source: Origin of the event
+### Creating Your own logger
 
-For `H4P_LOG_SVC_UP` and `H4P_LOG_SVC_DOWN` this will be "H4"
-For `H4P_LOG_CMD` it is the sub-system that initiated the cmd
-    * "serl" when issued from the serial console
-    * "mqtt" in response to a subscribed topic
-    * "asws" if it came from the AsyncWebServer HTTP REST interface
-    * "upnp" when from a UPNP device e.g. Amazon Alexa
-    * "user" when called directly from user code
+Writing your own logger is extremely easy. As mentioned above, all you need to do is implement an event handling function. There is a [Custom Logger example sketch](../examples/LOGGING/H4P_CustomLogger/H4P_CustomLogger.ino) but it is *so* simple, we will look at it in detail here.
 
-* Target: will usually be empty or "H4" when sent by anything other than MQTT. For subscribed topics, it will be the prefix of the MQTT publish as described in [H4P_AsyncMQTT](h4mqtt.md). In summary, one of:
-  * all
-  * < your board type > e.g. "WEMOS_D1MINI"
-  * < the device chip ID > e.g. "17D858"
-  * < your device name > e.g. "myIOTdevice"
-
----
-
-# Loggers
-
-Most loggers implement `h4/xxxx/msg/any old message` to put any message you choose into the log
-
-# H4P_SerialLogger (name "slog")
-
-## Usage
+First is the custom logger class. We name it "lumberjack" for a bit of fun:
 
 ```cpp
-#include<H4Plugins.h>
-H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
-H4P_SerialLogger h4sl(...
-```
-
-## Prequisites
-
-none
-
-## Additional Commands
-
-none
-
----
-
-## API
-
-Constructor takes `uint32_t` filter parameter that defaults to `H4P_LOG_ALL`.
-
-[Example Code](../examples/LOGGING/H4P_Loggers/H4P_Loggers.ino)
-
----
-
-# H4P_LocalLogger (name "log") [ ESP8266 / ESP32 only ]
-
-H4P_LocalLogger reserves a user-defind amount of free SPIFFS space to create a log file. When that amount has been exceeded, it will `flush` the log, i.e. it will print the contents to the serial monitor and empty the file.
-
-**WARNING** *Choose a small value for the log file size - if the value is close to the amount of free heap (about 30k) then the MCU will crash when it tries to flush the file, as it will need more than the available RAM to read the file. This is a short-term debugging aid, **NOT** a long-term archival solution. For the latter, you need to send the log messages "offsite" to e.g. a remote server with MQTT or HTTP.*
-
-## Usage
-
-```cpp
-#include<H4Plugins.h>
-H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
-H4P_LocalLogger h4ll;
-```
-
-## Prequisistes
-
-Board must be compiled with an option to reserve an amount of SPIFFS
-
-## Additional Commands
-
-* h4/log/clear
-* h4/log/flush
-
----
-
-# Example of raw log file
-
-## Format
-
-millis(),type,source,target,error,message
-
-```cpp
-6136,2,mqtt,all,0,h4/mqtt/online/flogger
-52947,2,kybd,self,0,h4/reboot
-101,0,h4,,0,log
-106,0,h4,,0,slog
-142,3,code,self,0,Xtest
-146,3,code,self,0,test1
-151,3,code,self,0,Ztest2
-530,0,h4,,0,mqtt
-648,0,h4,,0,upnp
-653,0,h4,,0,asws
-658,0,h4,,0,wifi
-5535,2,mqtt,all,0,h4/mqtt/online/flogger
-92,0,h4,,0,log
-98,0,h4,,0,slog
-103,3,code,self,0,normal call
-108,3,code,self,0,test1
-112,3,code,self,0,Ztest2
-12446,2,kybd,self,0,help
-```
-
-# API
-
-```cpp
-// constructor
-H4P_LocalLogger(uint32_t limit=10000,uint32_t filter=H4P_LOG_ALL); // limit=amount of free SPIFFS space to use
-
-void clear(); // empties the log
-void flush(); // show then clear
-void show();
-
-```
-
-[Example Code](../examples/LOGGING/H4P_Loggers/H4P_Loggers.ino)
-
----
-
-# H4P_MQTTLogger (name: see text) [ ESP8266 / ESP32 only ]
-
-H4P_MQTTLogger differs from other plugins, as it allows multiple instances in the same sketch - each differentiated byt the topic is publishes. The topic is alos use for the name in any command handling.
-
-## Usage
-
-```cpp
-#include<H4Plugins.h>
-H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
-...
-H4P_MQTTLogger h4m1("first",...
-// optional: H4P_MQTTLogger h4m2("2nd",...
-// ...               "
-// optional: H4P_MQTTLogger h4m999("police",...
-
-```
-
-## Prequisistes
-
-H4P_WiFi
-H4P_AsyncMQTT
-
-## Additional Commands
-
-none
-
----
-
-## API
-
-```cpp
-H4P_MQTTLogger(const string& topic,uint32_t filter=H4P_LOG_ALL);
-```
-
-[Example Code](../examples/LOGGING/H4P_MQTTLogger/H4P_MQTTLogger.ino)
-
----
-
-# H4P_MQTTHeapLogger (name "heap") [ ESP8266 / ESP32 only ]
-
-H4P_MQTTHeapLogger is a specalised version of H4P_MQTTLogger which periodically publishes the `heap` topic with a payload of the current free heap
-
-## Usage
-
-```cpp
-#include<H4Plugins.h>
-H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
-...
-H4P_MQTTHeapLogger h4hl(...
-```
-
-## Prequisistes
-
-H4P_WiFi
-H4P_AsyncMQTT
-
-## Additional Commands
-
-none
-
----
-
-# API
-
-```cpp
-// constructor
-H4P_MQTTHeapLogger(uint32_t frequency,uint32_t filter=H4P_LOG_ALL); // frequency is in milliseconds
-```
-
-[Example Code](../examples/LOGGING/H4P_MQTTHeapLogger/H4P_MQTTHeapLogger.ino)
-----
-
-# H4P_MQTTQueueLogger (name "qlog") [ ESP8266 / ESP32 only ]
-
-H4P_MQTTQueueLogger is a specalised version of H4P_MQTTLogger which periodically publishes the `qlog` topic with a payload of H4 queue size
-
-## Usage
-
-```cpp
-#include<H4Plugins.h>
-H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
-...
-H4P_MQTTQueueLogger h4ql(...
-```
-
-## Prequisistes
-
-H4P_WiFi
-H4P_AsyncMQTT
-
-## Additional Commnds
-
-none
-
----
-
-# API
-
-```cpp
-// constructor
-H4P_MQTTQueueLogger(uint32_t frequency,uint32_t filter=H4P_LOG_ALL); // frequency is in milliseconds
-```
-
-[Example Code](../examples/LOGGING/H4P_MQTTHeapLogger/H4P_MQTTHeapLogger.ino)
-
----
-
-# Advanced topics
-
-## Writing your own logger
-
-Let's assume you want a logger that prints the milliseconds uptime of the MCU before each message
-
-The code would look like this:
-
-```cpp
-
-#include <H4PCommon.h>
-
-class myLogger: public EventListener {
-        void _logEvent(const string &msg,H4P_EVENT_TYPE type,const string& source,const string& target,uint32_t error){
-            Serial.print("myLogger ");
-            Serial.print(millis());
-            Serial.print(" ");
-            Serial.println(msg.c_str()); // or  Serial.println(CSTR(msg));
+class myLogger: public H4Plugin {
+        void _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) override {
+            uint32_t msgvalue=atoi(msg.c_str());
+            if(msgvalue%2) Serial.printf("That's odd! Type=%s from %s msg=%s\n",h4pgetEventName(t).c_str(),h4pnames[pid].c_str(),msg.c_str());
         }
     public:
-        myLogger(): EventListener("mylog"){}
+        myLogger(uint32_t filter=H4P_EVENT_ALL): H4Plugin("lumberjack",filter){}
 };
-
 ```
 
-...and that's it! Then add the new logger to your sketch - Everything else is automatic.
+You could omit the filter parameter and "hard-code" a type or types that you register with the underlying H4Plugin like this:
 
-[Example Code](../examples/LOGGING/H4P_CustomLogger/H4P_CustomLogger.ino)
+```cpp
+    public:
+        myLogger(): H4Plugin("lumberjack",H4P_EVENT_USER | H4P_EVENT_MSG){}
+```
+
+But its far more flexible to just pass through whatever the user decides when they instantiate your logger:
+
+
+```cpp
+myLogger im_a_lumberjack_and_im_ok(H4P_EVENT_USER);
+```
+
+The event handler is very simple (but unusual and not very useful!). It expects the message to contain an integer value and it ignores everything except the odd values.
+
+This means that unless you can guarantee that any event you listen to contains a single integer in its message - which usually you can't - then you need to be very careful!
+
+If we restrict ourselves in the app to emitting H4P_EVENT_USER messages with an integer in the message, then our example will work.
+
+## A generic Listener
+
+While the above information is good to know, there's a shortcut which does 90% of it for you, the [H4P_EventListener](ears.md) plugin. All you need to do is slot in the actual "meat" of the function to be called whenever any registered event occurs 
+
+```cpp
+void myHandler(H4PID pid,H4P_EVENT_TYPE t,const string& msg){ ...do something wonderful...};
+...
+H4P_EventListener bigBrother( ...events you want ... ,myHandler);
+```
+
+---
+# Event Emitters
+
+So far everything has been about Listening for events, but how do we actually make them happen? Before we continue, it has to be stressed that ***unless you have declared a listener...*** of some kind before doing any of what follows, ***...you will see nothing***! As a minimum, the [H4P_SerialLogger](slog.md) is suggested, which will send all its output to the serial monitor.
+
+The most fundamental method is to call:
+
+
+```cpp
+void h4psysevent(H4PID pid,H4P_EVENT_TYPE t,const std::string& fmt, Args... args);
+```
+
+But this requires you to know...
+
+* A valid `pid` value
+* The content and format (if any) of the message expected by the specific H4P_EVENT_TYPE
+  
+... so there are some shortcuts and easier ways
+
+## Simple message logging
+
+First there is
+
+```cpp
+void h4pUserEvent(const char* format,...);
+```
+
+Which emits an event of type `H4P_EVENT_USER` with a message made up from `printf`-style format string and optional list of parameters, e.g. `h4pUserEvent("Something %s interesting happened","mildly");` - basically anything you want.
+
+Then there is the even easier `PLOG` macro:
+
+```cpp
+PLOG("My sensor value from GPIO %d = %d",myPin,666);
+```
+
+The difference between this and `h4pUserEvent` is that `PLOG` emits `H4P_EVENT_MSG` events, which is the "standard" for anything that logs "useful information" re progress / performance / diagnostics etc. More improtanty it can be "compiled out"
+
+If you edit [config.h](../src/config.h) and set:
+
+```cpp
+#define H4P_LOG_EVENTS      0
+```
+
+The all `PLOG` calls in your code effecitvely disappear, making you code leaner, meaner and a lot less chatty. This is great for "production" but not very helpful while testing and/or ebugging, so until you are 100% happy with your code, leave it set to 1.
+
+## Simple event emitting
+
+You should restrict your emissions to `H4P_EVENT_USER` and `H4P_EVENT_MSG` since these two can (usually) do no harm. Emitting any other event can cause bad things to happen if you do it at the wrong time or get the message contents wrong. But if you feel you *must* then use the `PEVENT` macro, e.g.
+
+```cpp
+PEVENT(H4P_EVENT_REBOOT,"Because my counter reached %d",666);
+```
+
+Because events usually affect processing and/or lifecycle, unlike `PLOG`, `PEVENT` cannot be "compiled out".
+
+## "Standard" emitters
+
+H4Plugins comes with some pre-defined event emitters which are useful during testing or debugging:
+
+| Plugin | Event | Msg |Note|
+| :--- | :--- | :--- | :---: |
+|H4P_EmitHeap|H4P_EVENT_HEAP|result of `ESP.getFreeHeap()`||
+|H4P_EmitLoopCount|H4P_EVENT_LOOPS|Loops per second|1|
+|H4P_EmitQ|H4P_EVENT_Q|Length of H4 Queue||
+|H4P_EmitTick|H4P_EVENT_HEARTBEAT|Integer number of seconds uptime||
+
+Notes:
+1. Requires reconfiguration of H4 config
 
 ---
 
-(c) 2020 Phil Bowles h4plugins@gmail.com
+(c) 2021 Phil Bowles h4plugins@gmail.com
 
-* [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
-* [Blog](https://8266iot.blogspot.com)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)
-* [Facebook IOT with ESP8266 (moderator)}](https://www.facebook.com/groups/1591467384241011/)
 * [Facebook ESP Developers (moderator)](https://www.facebook.com/groups/ESP8266/)
 * [Support me on Patreon](https://patreon.com/esparto)

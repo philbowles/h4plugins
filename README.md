@@ -30,7 +30,7 @@ H4Plugins includes modules for WiFi + OTA, Webserver, MQTT, numerous common type
 
 # Diving in
 
-[**H4**](https://github.com/philbowles/H4) and its plugin system represent a very different way of getting started on ESP8266 from the "standard" examples found all over the web.
+[H4](https://github.com/philbowles/H4) and its plugin system represent a very different way of getting started on ESP8266 from the "standard" examples found all over the web.
 
 There are some very good reasons for that but it means that there are a few things you need to know about [H4](https://github.com/philbowles/H4) and how it works before "diving in" to the H4Plugins system. Spending a few minutes reading [the basics of H4](https://github.com/philbowles/H4#why-do-i-need-it) will save you days and even weeks of effort, so please digest it all before trying some of the 70+ examples in this repo - it will be time well spent!
 
@@ -96,15 +96,15 @@ Also please prefer the [Facebook H4  Support / Discussion](https://www.facebook.
 
 ## Basics & GPIO (no network required)
 
-* [**H4P_SerialCmd**](docs/h4cmd.md): Send commands to control and/or diagnose all other plugins. This is so important, it is automatically included for you and its the first plugin you should get to know.
+* [H4P_SerialCmd](docs/h4cmd.md): Send commands to control and/or diagnose all other plugins. This is so important, it is automatically included for you and its the first plugin you should get to know.
 
-* [**H4P_FlasherController**](docs/h4fc.md): One-line coding of multiple simultaneous LED flashing by Square Wave, PWM, abitrary pattern and Morse code
+* [H4P_FlasherController](docs/h4fc.md): One-line coding of multiple simultaneous LED flashing by Square Wave, PWM, abitrary pattern and Morse code
 
-* [**H4P_GPIOManager**](docs/h4gm.md): One-line coding / mangement of a variety of different GPIO strategies, e.g. debouncing, decoding of rotary encoders, etc - there are NN in all to choose from to match pretty much any kind of hardware you might want attach to the GPIO.
+* [H4P_GPIOManager](docs/h4gm.md): One-line coding / mangement of a variety of different GPIO strategies, e.g. debouncing, decoding of rotary encoders, etc - there are NN in all to choose from to match pretty much any kind of hardware you might want attach to the GPIO.
 
-* [**H4P_ToneController**](docs/h4tc.md) Buzzer, tones, sirens and...yes, actual music! Can play simultaneous different "voices" (musical parts) on multiple buzzers.
+* [H4P_ToneController](docs/h4tc.md) Buzzer, tones, sirens and...yes, actual music! Can play simultaneous different "voices" (musical parts) on multiple buzzers.
 
-* [**H4P_PersistentStorage**](docs/h4stor.md): Save name/value pairs across reboots (requires LittleFS)
+* [H4P_PersistentStorage](docs/h4stor.md): Save name/value pairs across reboots (requires LittleFS)
 
 ## Switches and "Things"
 
@@ -112,77 +112,77 @@ Many iot devices have one simple thing to do: switch something on/off on a singl
 
 Networking is not required but if you *are* connected, the webserver will automatically add the "big red switch" and various other options to control the plugin. 
 
-* [**H4P_BinarySwitch**](docs/things.md): Allows control by commands from multiple sources to on/off a single GPIO. 
+* [H4P_BinarySwitch](docs/things.md): Allows control by commands from multiple sources to on/off a single GPIO. 
 
-* [**H4P_BinaryThing**](docs/things.md): user-defined function that can be controlled by commands from multiple sources
+* [H4P_BinaryThing](docs/things.md): user-defined function that can be controlled by commands from multiple sources
 
-* [**H4P_ConditionalSwitch**](docs/things.md): H4P_BinarySwitch that only operates when user-define function returns true
+* [H4P_ConditionalSwitch](docs/things.md): H4P_BinarySwitch that only operates when user-define function returns true
 
-* [**H4P_ConditionalThing**](docs/things.md): H4P_BinaryThing that only operates when user-define function returns true
+* [H4P_ConditionalThing](docs/things.md): H4P_BinaryThing that only operates when user-define function returns true
 ## WiFi and networking
 
-* [**H4P_WiFi**](docs/h4wifi.md): Automatic Connection / reconnection manager, builtin webserver, AP configuration, OTA programming. Also uses LED_BUILTIN to signal network state via various flashing patterns.
+* [H4P_WiFi](docs/h4wifi.md): Automatic Connection / reconnection manager, builtin webserver, AP configuration, OTA programming. Also uses LED_BUILTIN to signal network state via various flashing patterns.
 
-* [**H4P_AsyncMQTT**](docs/h4mqtt.md): Automatic Connection to MQTT server, with reconnection on failure (without reboot!) allows remote control of H4 as well as the more usual sensing og e.g. sensor data to "the cloud"
+* [H4P_AsyncMQTT](docs/h4mqtt.md): Automatic Connection to MQTT server, with reconnection on failure (without reboot!) allows remote control of H4 as well as the more usual sensing og e.g. sensor data to "the cloud"
 
-* [**H4P_UPNPServer**](docs/things.md): provides full UPNP/SSDP device with Alexa voice control, PC Desktop OS integration
+* [H4P_UPNPServer](docs/things.md): provides full UPNP/SSDP device with Alexa voice control, PC Desktop OS integration
 
-* [**H4P_RemoteUpdate**](docs/h4ru.md): OTA update from remote server
+* [H4P_RemoteUpdate](docs/h4ru.md): OTA update from remote server
 
-* [**H4P_MultiFunctionButton**](docs/h4mfnb.md): Tact-button giving on/off, reboot, factory reset depending on hold time.
+* [H4P_MultiFunctionButton](docs/h4mfnb.md): Tact-button giving on/off, reboot, factory reset depending on hold time.
 
-* [**H4P_Heartbeat**](docs/advanced.md): Adds an "Up Time" to the web UI
+* [H4P_Heartbeat](docs/advanced.md): Adds an "Up Time" to the web UI
 
 ### Network time, calendar scheduling
-* [**H4P_Timekeeper**](docs/h4tk.md): NTP server sync for "clock time" alarms and scheduling
+* [H4P_Timekeeper](docs/h4tk.md): NTP server sync for "clock time" alarms and scheduling
 
-* [**H4P_Sunrise**](docs/h4tk.md#sunrisesunset) **EXPERIMENTAL** : Gets sunrise / sunset times from public API given Lat/Long
+* [H4P_Sunrise](docs/h4tk.md#sunrisesunset) **EXPERIMENTAL** : Gets sunrise / sunset times from public API given Lat/Long
 
 ### Network presence detection
 
-* [**H4P_IPDetector**](docs/h4pd.md): Execute function when specific IP address joins / leaves network
+* [H4P_IPDetector](docs/h4pd.md): Execute function when specific IP address joins / leaves network
 
-* [**H4P_IPDetectorSource**](docs/h4pd.md): Switch default BinarySwitch/Thing when specific IP address joins / leaves network
+* [H4P_IPDetectorSource](docs/h4pd.md): Switch default BinarySwitch/Thing when specific IP address joins / leaves network
 
-* [**H4P_MDNSDetector**](docs/h4pd.md): Execute function when specific MDNS service/protocol found / lost on network
+* [H4P_MDNSDetector](docs/h4pd.md): Execute function when specific MDNS service/protocol found / lost on network
 
-* [**H4P_MDNSDetectorSource**](docs/h4pd.md): Switch default BinarySwitch/Thing when specific MDNS service/protocol found / lost on network
+* [H4P_MDNSDetectorSource](docs/h4pd.md): Switch default BinarySwitch/Thing when specific MDNS service/protocol found / lost on network
 
-* [**H4P_UPNPDetector**](docs/h4pd.md): Execute function when specific UPNP device USN joins / leaves network
+* [H4P_UPNPDetector](docs/h4pd.md): Execute function when specific UPNP device USN joins / leaves network
 
-* [**H4P_UPNPDetectorSource**](docs/h4pd.md): Switch default BinarySwitch/Thing when specific UPNP device joins / leaves network
+* [H4P_UPNPDetectorSource](docs/h4pd.md): Switch default BinarySwitch/Thing when specific UPNP device joins / leaves network
   
 ## Diagnostic / Logging / Development tools:
 
-* [**H4P_VerboseMessages**](docs/vm.md): Provide text error messages instead of numeric system codes
+* [H4P_VerboseMessages](docs/vm.md): Provide text error messages instead of numeric system codes
   
-* [**H4P_HeapWarn**](docs/h4hw.md): Call user function on low Heap
+* [H4P_HeapWarn](docs/h4hw.md): Call user function on low Heap
 
-* [**H4P_QueueWarn**](docs/h4qw.md): Call user function on low Queue
+* [H4P_QueueWarn](docs/h4qw.md): Call user function on low Queue
 
-* [**H4P_TaskSniffer**](docs/h4ts.md): Low-level task / queue dumper for H4 + Plugins
+* [H4P_TaskSniffer](docs/h4ts.md): Low-level task / queue dumper for H4 + Plugins
 
 ### Event Listeners
 
-* [**H4P_SerialLogger**](docs/events.md): Event logging to serial monitor
+* [H4P_SerialLogger](docs/slog.md): Event logging to serial monitor
 
-* [**H4P_LocalLogger**](docs/events.md): Event logging to LittleFS file
+* [H4P_LocalLogger](docs/llog.md): Event logging to LittleFS file
 
-* [**H4P_MQTTLogger**](docs/events.md): Event logging to MQTT Server
+* [H4P_MQTTLogger](docs/mlog.md): Event logging to MQTT Server
 
-* [**H4P_HttpMySQLLogger**](docs/mysql.md): log to remote webserver to update MySQL log db - Includes [example Node.js server](examples/LOGGING/H4P_HttpMySQLLogger/mysqlrest/mysqllogger.code-workspace)
+* [H4P_HttpMySQLLogger](docs/mysql.md): log to remote webserver to update MySQL log db - Includes [example Node.js server](examples/LOGGING/H4P_HttpMySQLLogger/mysqlrest/mysqllogger.code-workspace)
 
-* [**H4P_EventListener**](docs/events.md): General-purpose listener calls user-defined function on any selection of events
+* [H4P_EventListener](docs/ears.md): General-purpose listener calls user-defined function on any selection of events
 
 ### Event Emitters
 
-* [**H4P_EmitLoopCount**](docs/h4qw.md): Send loops/sec to the event queue for diagnosing bottlencks (requires changes to [H4 config](https://github.com/philbowles/H4/blob/src/config.h) / compile options)
+* [H4P_EmitLoopCount](docs/h4qw.md): Send loops/sec to the event queue for diagnosing bottlencks (requires changes to [H4 config](https://github.com/philbowles/H4/blob/src/config.h) / compile options)
   
-* [**H4P_EmitQ**](docs/events.md): Periodically Send H4 Q size to event queue to help profling / performance tuning
+* [H4P_EmitQ](docs/events.md): Periodically Send H4 Q size to event queue to help profling / performance tuning
 
-* [**H4P_EmitHeap**](docs/events.md): Periodically Send `getFreeHeap()` value to event queue to help hunt memory leaks
+* [H4P_EmitHeap](docs/heap.md): Periodically Send `getFreeHeap()` value to event queue to help hunt memory leaks
 
-* [**H4P_EmitTick**](docs/events.md): Send synchronous 1x per second on-the-second heartbeat event.
+* [H4P_EmitTick](docs/events.md): Send synchronous 1x per second on-the-second heartbeat event.
 
 ---
 
