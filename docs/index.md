@@ -9,9 +9,15 @@
 * [H4 and event-driven programming](https://github.com/philbowles/H4#why-do-i-need-it)
 * [Common Command and Control: H4P_SerialCmd](ccc.md)
 * [Static and Utility functions](statics.md)
-* [Switches and Things](docs/things.md)
+* ["Things", "Switches", "Sources" and "Slaves"](docs/things.md)
 * :building_construction: [Event Listeners, Event Emitters and logging](docs/events.md)
-* Plugins API
+* :building_construction: [GPIO Handling](docs/h4gm.md)
+* :building_construction: [WiFi, MQTT and networking](docs/h4wifi.md)
+* :building_construction: [Network Presence Detection](docs/h4pd.md)
+* :building_construction: [Advanced Topics](docs/advanced.md)
+* :building_construction: [Known Issues / FAQs](docs/faq.md)
+* :building_construction: [Raising an Issue](docs/issues.md)
+* Plugins APIs
   * :building_construction: [H4P_AsyncMQTT](h4pxxxx.md)
   * [H4P_BinarySwitch](swings.md)
   * [H4P_BinaryThing](swings.md)
@@ -43,12 +49,6 @@
   * :building_construction: [H4P_UPNPServer](h4pxxxx.md)
   * :building_construction: [H4P_VerboseMessages](h4pxxxx.md)
   * [H4P_WiFi](h4pxxxx.md)
-* :building_construction: [GPIO Handling](docs/h4gm.md)
-* :building_construction: [WiFi, MQTT and networking](docs/h4wifi.md)
-* :building_construction: [Network Presence Detection](docs/h4pd.md)
-* :building_construction: [Advanced Topics](docs/advanced.md)
-* :building_construction: [Known Issues / FAQs](docs/faq.md)
-* :building_construction: [Raising an Issue](docs/issues.md)
 * :building_construction: Youtube videos
   * Introduction
   * ... etc

@@ -2,7 +2,7 @@
 
 # BinarySwitch, BinaryThing, ConditionalSwitch, ConditionalThing
 
-## Provide on/off/toggle/switch/auto commands to a GPIO (...Switch) or functional object (...Thing) output
+## Provide on/off/toggle/switch/auto commands to a GPIO (...Switch) or functional object (...Thing)
 
 ## Shortname "onof"
 
@@ -35,15 +35,17 @@ H4P_BinarySwitch h4onof(...
 
 ```
 
-All of the plugins may only exists as a "singleton" - there may be only one single instance of it in the app. It *must* be called `h4onof`, prefix all API calls below with `h4onof.`
+All of the plugins must exist only as a "singleton" - there must be only one single instance of it in the app. It *must* be called `h4onof`, prefix all API calls below with `h4onof.`
 
 ---
 
 # Dependencies
 
-* [H4P_GPIOManager](h4gm.md) which should occur first. If this is omitted, it will be dynamically loaded
+* [H4P_GPIOManager](h4gm.md) 
   
-All plugins add features to [H4P_Wifi](h4wifi.md) (The webUI "Big Red Switch") and [H4P_AsyncMQTT](h4mqtt.md) (auto-publish state) if either of those plugins is used and so should be placed *after* those.
+This should be declared before `h4onof`. If this is omitted, it will be dynamically loaded.
+  
+All plugins add features to [H4P_Wifi](h4wifi.md) (The webUI "Big Red Switch") and [H4P_AsyncMQTT](h4mqtt.md) (auto-publish state) if either of those plugins is used and so  `h4onof` should be placed *after* those.
 
 The `Conditional...` variants also add a read-only boolean to the webUI to denote the current condition.
 
@@ -61,20 +63,20 @@ The `Conditional...` variants also add a read-only boolean to the webUI to denot
 
 ---
 
-# s Emitted
+# Events Emitted
 
-* H4P__ON
-* H4P__OFF
+* H4P_EVENT_OFF
+* H4P_EVENT_ON
   
-More information on [ Emitters and Listeners](s.md)
+More information: [Emitters and Listeners](events.md)
 
 ---
 
-# s Listened for
+# Events Listened for
 
 N/A
 
-More information on [ Emitters and Listeners](s.md)
+More information: [Emitters and Listeners](events.md)
 
 ---
 
@@ -82,7 +84,7 @@ More information on [ Emitters and Listeners](s.md)
 
 | Symbolic Name | Short Name | Type | Singleton | Purpose |
 | :----------   | :---- | :--- | :-------: | :---    |
-|H4P_TRID_BTTO|BTTO|Once|:x:|Auto-off Timer (only if auto > 0)|
+|H4P_TRID_BTTO|BTTO|Once|:tick:|Auto-off Timer (only if auto > 0)|
 
 ---
 
@@ -92,9 +94,13 @@ More information on [ Emitters and Listeners](s.md)
 
 ---
 
-## Topics automatically published
+# Topics automatically published
 
-If [H4P_AsyncMQTT](h4mqtt.md) is also used, this plugin publishes `h4/< your device name >/state` with a payload set to the current state whenever the state changes
+If [H4P_AsyncMQTT](h4mqtt.md) is also used, this plugin publishes 
+
+`h4/< your device name >/state` 
+
+with a payload set to the current state whenever the state changes
 
 ---
 
@@ -192,7 +198,7 @@ void syncCondition();
 
 Synchronise webUI view of "Conditon" with its true state.
 
-This should be called whenever the value returned by the predicate function would have changed. Oly the user can know what constitutes the condition, and thus when its state on the webUI needs to be updated, H4Pl;uginscannot know this, therefore it is essentia that he user clls this function at the relevant time in the life of the `Conditional...` plugin
+This should be called whenever the value returned by the predicate function will have changed by the next time it is called. Only the user can know what criteria constitute the condition, and thus when its state on the webUI needs to be updated. It is essential therefore, that the user calls this function at the relevant time in the life of the `Conditional...` plugin to keep the webUI "in sync".
 
 ---
 
@@ -202,36 +208,35 @@ This should be called whenever the value returned by the predicate function woul
 
 ### Things
 
-[BinaryThing](../examples/THINGS/H4P_BinaryThing/H4P_BinaryThing.ino)
-[BinaryThing with Auto-Off](../examples/THINGS/H4P_BinaryThingAutoOff/H4P_BinaryThingAutoOff.ino)
-[ConditionalThing](../examples/THINGS/H4P_ConditionalThing/H4P_ConditionalThing.ino)
-[Advanced Thing (Traffic Light Sequencer)](../examples/THINGS/H4P_TrafficLights/H4P_TrafficLights.ino)
+* [BinaryThing](../examples/THINGS/H4P_BinaryThing/H4P_BinaryThing.ino)
+* [BinaryThing with Auto-Off](../examples/THINGS/H4P_BinaryThingAutoOff/H4P_BinaryThingAutoOff.ino)
+* [ConditionalThing](../examples/THINGS/H4P_ConditionalThing/H4P_ConditionalThing.ino)
+* [Advanced Thing (Traffic Light Sequencer)](../examples/THINGS/H4P_TrafficLights/H4P_TrafficLights.ino)
 
 ### Switches
 
-[BinarySwitch](../examples/THINGS/H4P_BinarySwitch/H4P_BinarySwitch.ino)
-[BinarySwitch with Multifunction button](../examples/THINGS/H4P_BinarySwitchMfnb/H4P_BinarySwitchMfnb.ino)
-[BinarySwitch with MQTT](../examples/THINGS/H4P_BinarySwitchMQTT/H4P_BinarySwitchMQTT.ino)
-[ConditionalSwitch](../examples/THINGS/H4P_ConditionalSwitch/H4P_ConditionalSwitch.ino)
-[Real-world ConditionalSwitch (Light-dependent Alarm)](../examples/THINGS/H4P_Generic_SQUAWK/H4P_Generic_SQUAWK.ino)
+* [BinarySwitch](../examples/THINGS/H4P_BinarySwitch/H4P_BinarySwitch.ino)
+* [BinarySwitch with Multifunction button](../examples/THINGS/H4P_BinarySwitchMfnb/H4P_BinarySwitchMfnb.ino)
+* [BinarySwitch with MQTT](../examples/THINGS/H4P_BinarySwitchMQTT/H4P_BinarySwitchMQTT.ino)
+* [ConditionalSwitch](../examples/THINGS/H4P_ConditionalSwitch/H4P_ConditionalSwitch.ino)
+* [Real-world ConditionalSwitch (Light-dependent Alarm)](../examples/THINGS/H4P_Generic_SQUAWK/H4P_Generic_SQUAWK.ino)
 
----
 
-# Input Examples
+## Input Examples
 
 You need to read the [H4P_GPIOManager](h4gm.md) documentation before using these
 
-[AnalogThresholdSource](../examples/GPIO/H4GM_DebouncedSource/H4GM_DebouncedSource.ino)
-[DebouncedSource](../examples/GPIO/H4GM_DebouncedSource/H4GM_DebouncedSource.ino)
-[EncoderSource](../examples/GPIO/H4GM_EncoderSource/H4GM_EncoderSource.ino)
-[LatchingSource](../examples/GPIO/H4GM_LatchingSource/H4GM_LatchingSource.ino)
-[PolledSource](../examples/GPIO/H4GM_PolledSource/H4GM_PolledSource.ino)
-[RawSource](../examples/GPIO/H4GM_RawSource/H4GM_RawSource.ino)
-[RetriggeringSource](../examples/GPIO/H4GM_RetriggeringSource/H4GM_RetriggeringSource.ino)
+* [AnalogThresholdSource](../examples/GPIO/H4GM_DebouncedSource/H4GM_DebouncedSource.ino)
+* [DebouncedSource](../examples/GPIO/H4GM_DebouncedSource/H4GM_DebouncedSource.ino)
+* [EncoderSource](../examples/GPIO/H4GM_EncoderSource/H4GM_EncoderSource.ino)
+* [LatchingSource](../examples/GPIO/H4GM_LatchingSource/H4GM_LatchingSource.ino)
+* [PolledSource](../examples/GPIO/H4GM_PolledSource/H4GM_PolledSource.ino)
+* [RawSource](../examples/GPIO/H4GM_RawSource/H4GM_RawSource.ino)
+* [RetriggeringSource](../examples/GPIO/H4GM_RetriggeringSource/H4GM_RetriggeringSource.ino)
 
 You need to read the [H4P_UPNPServer](upnp.md) documentation before using:
 
-[UPNPServer](../examples/XTRAS/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
+* [UPNPServer](../examples/XTRAS/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
 
 ---
 

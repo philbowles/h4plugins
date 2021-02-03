@@ -1,7 +1,3 @@
-FREEZE THE GODDAMN CODE AND STOP TWEAKING!!!!!
-FULL 32/ap reversion Tester
-TODO:SOONER
-    realign KW
 SHORTTERM
     rework time stuff!!!
     rework PD for UPNP etc

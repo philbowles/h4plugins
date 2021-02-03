@@ -38,9 +38,13 @@ You can have many as you like all linked to the single *output* `h4onof`. Each o
 * RetriggeringSource [Example Code](../examples/GPIO/H4GM_RetriggeringSource/H4GM_RetriggeringSource.ino)
 
 In addition, you may also have:
-* H4P_MultiFunctionButton [Example Code](../examples/XTRAS/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
 
-The [H4P_MultiFunctionButton](h4mfnb.md) provides an easy way to switch your Thing/Switch with a physical button, reboot it or factory reset it, depending on how long you hold the button down.
+* H4P_MultiFunctionButton [Example Code](../examples/XTRAS/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
+* [UPNPServer](h4upnp/md)
+
+The [H4P_MultiFunctionButton](h4mfnb.md) provides an easy way to switch your Thing/Switch with a physical button. The "Multi-function" aspect of it also allows you to reboot the device or factory reset it, depending on how long you hold the button down. A simple short "stab" though serves as your devices on/off button.
+
+The [UPNPServer](h4upnp/md) provides (among other thigs) the abiity to detect Amazon "Alexa" voice commands an pass them to the Thing/Switch
 
 ## Simple Example with a ...Switch
 
@@ -94,7 +98,7 @@ The light will go off when:
 * The PIR "times out" after 10 seconds.
 * OFF command received from any source, e.g. MQTT etc
 
-## "Thing" example
+## "...Thing" example
 
 Now assume that instead of the light going ON you want your device to send you an SMS
 
@@ -129,44 +133,6 @@ The important thing to realise is that the master does not control / override th
 By the same token if the master has a *shorter* auto-off time than the slave - say 3 seconds in the above example - then all the slaves will go off after 3 seconds whether they have their own 5 second auto-off timers or not!
 
 When you use any of these in your app, they automatically add `h4/slave` to the list of available commands. See [Things/Switches API](swings.md) for details on how to use it.
-
----
-# Usage
-
-```cpp
-#include<H4Plugins.h>
-H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
-
-H4P_BinarySwitch h4onof(...
-// OR H4P_BinaryThing h4onof(...
-// OR H4P_ConditionalThing h4onof(...
-// OR H4P_ConditionalSwitch h4onof(...
-```
-
-## Dependencies
-
-* [H4P_GPIOManager](h4gm.md) Plugin
-
-## Commands Added
-
-* h4/auto/T (automatic off time T milliseconds)
-* h4/off
-* h4/on
-* h4/switch/n (payload n = 1 or 0)
-* h4/toggle (invert current state)
-* h4/state // report state
-
-H4P_UPNPServer only
-
-* h4/upnp/N (payload N= new UPNP "friendly name")
-  
-## Topics automatically published
-
-If [H4P_AsyncMQTT](h4mqtt.md) is also used, this plugin publishes
-
-`h4/< your device name >/state` 
-
-with a payload set to the current state whenever it changes
 
 ---
 
