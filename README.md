@@ -4,7 +4,7 @@
 
 [Release Notes v1.0.1](docs/rn100.md) This is a *major* release, existing users *must* read the release notes as they will need to make changes to existing code. As an *absolute minimum* you will need to update [H4](https://github.com/philbowles/H4), [PangolinMQTT](http://github.com/philbowles/PangolinMQTT) and [ESPAsyncWebServer](https://github.com/philbowles/ESPAsyncWebServer) libraries.
 
-***N.B. The code is tested and stable but parts of the documentation are still being updated. Until this message is removed , refer to the 70+ example sketches for detailed API usage. This document itself is accurate and up-to-date as at 2/2/2021***
+***N.B. The code is tested and stable but parts of the documentation are still being updated. Until this message is removed , refer to the 70+ example sketches for detailed API usage. This document itself is accurate and up-to-date as at 3/2/2021***
 
 ---
 
