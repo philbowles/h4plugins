@@ -1,4 +1,6 @@
 SHORTTERM
+    privatise wifi signalOFF
+    fix static boolean
     fix dump / localloger to avoid large file crash
     fix HTTP logger database
     rework time stuff!!! epscially TZ etc

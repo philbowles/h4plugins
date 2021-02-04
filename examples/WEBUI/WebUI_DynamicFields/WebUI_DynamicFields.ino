@@ -3,7 +3,7 @@ H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCm
 
 H4P_FN_UIBOOL randomBool=[]{ return random(0,50) > 25; };
 int derivedInt(){ return -1; }
-std::string runtimeText(){ return H4Plugin::getConfig("chip").append("/").append(H4P_VERSION); }
+std::string runtimeText(){ return h4pGetConfig("chip").append("/").append(H4P_VERSION); }
 
 H4_TIMER  Tim1;
 

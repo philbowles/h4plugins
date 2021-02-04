@@ -149,7 +149,7 @@ class H4P_WiFi: public H4Plugin, public AsyncWebServer {
                 void            change(string ssid,string psk);
                 void            host(const string& host){ _setPersistentValue(deviceTag(),host,true); }
                 void            show() override;
-                void            signal(const char* pattern,uint32_t timebase=H4P_SIGNAL_TIMEBASE);
+                void            signal(const char* pattern,uint32_t timebase=H4P_SIGNAL_TIMEBASE); // privatise these @ 1.0.2 ?
                 void            signalOff();
                 uint32_t        uiAddLabel(const string& name){ return _uiAdd(_seq++,name,H4P_UI_LABEL,_cb[name]); }
                 uint32_t        uiAddLabel(const string& name,const string& v){ return _uiAdd(_seq++,name,H4P_UI_LABEL,v); }
@@ -158,7 +158,8 @@ class H4P_WiFi: public H4Plugin, public AsyncWebServer {
                 uint32_t        uiAddLabel(const string& name,H4P_FN_UINUM f,bool repeat=false){ return _uiAdd(_seq++,name,H4P_UI_LABEL,"",[f]{ return stringFromInt(f()); },nullptr,repeat); }
                 void            uiAddGPIO();
                 uint32_t        uiAddGPIO(uint8_t pin);
-                uint32_t        uiAddBoolean(const string& name,const boolean tf,H4P_FN_UICHANGE a=nullptr){ return _uiAdd(_seq++,name,H4P_UI_BOOL,"",[tf]{ return tf ? "1":"0"; },a); }
+//                uint32_t        uiAddBoolean(const string& name,const boolean tf,H4P_FN_UICHANGE a=nullptr){ return _uiAdd(_seq++,name,H4P_UI_BOOL,"",[tf]{ return tf ? "1":"0"; },a); }
+                uint32_t        uiAddBoolean(const string& name,const boolean tf){ return _uiAdd(_seq++,name,H4P_UI_BOOL,"",[tf]{ return tf ? "1":"0"; }); }
                 uint32_t        uiAddBoolean(const string& name,H4P_FN_UIBOOL f,H4P_FN_UICHANGE a=nullptr,bool repeat=false){ return _uiAdd(_seq++,name,H4P_UI_BOOL,"",[f]{ return f() ? "1":"0"; },a,repeat); }
                 uint32_t        uiAddDropdown(const string& name,H4P_CONFIG_BLOCK options,H4P_FN_UICHANGE onChange=nullptr);
                 uint32_t        uiAddInput(const string& name,const string& value="",H4P_FN_UICHANGE onChange=nullptr);

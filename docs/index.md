@@ -6,6 +6,7 @@
 
 ---
 
+* :building_construction: [Why the name "H4"? A little history](h4.md)
 * [H4 and event-driven programming](https://github.com/philbowles/H4#why-do-i-need-it)
 * [Common Command and Control: H4P_SerialCmd](ccc.md)
 * [Static and Utility functions](statics.md)
@@ -13,12 +14,13 @@
 * [Event Listeners, Event Emitters and logging](events.md)
 * :building_construction: [GPIO Handling](docs/h4gm.md)
 * :building_construction: [WiFi, MQTT and networking](docs/h4wifi.md)
+* [Customising the web UI](webui.md)
 * :building_construction: [Network Presence Detection](docs/h4pd.md)
 * :building_construction: [Advanced Topics](docs/advanced.md)
 * [Known Issues / FAQs](docs/faq.md)
 * [Raising an Issue](docs/issues.md)
 * Plugins APIs
-  * :building_construction: [H4P_AsyncMQTT](h4pxxxx.md)
+  * :building_construction: [H4P_AsyncMQTT](h4pmqtt.md)
   * [H4P_BinarySwitch](swings.md)
   * [H4P_BinaryThing](swings.md)
   * [H4P_ConditionalSwitch](swings.md)
@@ -47,7 +49,7 @@
   * :building_construction: [H4P_ToneController](h4pxxxx.md)
   * :building_construction: [H4P_UPNPServer](h4pxxxx.md)
   * [H4P_VerboseMessages](vm.md)
-  * [H4P_WiFi](h4pxxxx.md)
+  * [H4P_WiFi](h4pwifi.md)
 * :building_construction: Youtube videos
   * Introduction
   * ... etc

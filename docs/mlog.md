@@ -10,6 +10,19 @@ For information on how to use this plugin, see [Event Listeners, Event Emitters 
 
 ---
 
+## Contents
+
+* [Usage](#usage)
+* [Dependencies](#dependencies)
+* [Commands Added](#commands-added)
+* [Events Emitted](#s-emitted)
+* [Events Listened for](#s-listened-for)
+* [Tasks Run](#tasks-run)
+* [Service Commands](#service-commands)
+* [API](#api)
+
+---
+
 # Usage
 
 H4P_MQTTLogger is a multiple-use plugin: there can be many in one app.

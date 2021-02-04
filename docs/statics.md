@@ -18,11 +18,12 @@ These may be provided by the user if required
 | Function | Source | Purpose |
 | :--- | :--- | :--- |
 |`const char* giveTaskName(uint32_t n);`|[h4vm](vm.md)| Translate user's task ID to meaningful name see  [Example Sketch](../examples/BASICS/H4_TaskNames/H4_TaskNames.ino)|
-|h4pGlobalEventHandler(H4PID pid,H4P_EVENT_TYPE t,const string& msg);`|various| Catch-all event handler. See [Event Listeners, Event Emitters and logging](events.md)|
 |`void h4UserLoop(void);`|[H4](https://github.com/philbowles/H4)| 1x per loop - use with caution, requires H4 option setting. see  [Example Sketch](../examples/BASICS/H4_TaskNames/H4_TaskNames.ino)|
+|h4pGlobalEventHandler(H4PID pid,H4P_EVENT_TYPE t,const string& msg);`|various| Catch-all event handler. See [Event Listeners, Event Emitters and logging](events.md)|
 |`void onFactoryReset(void);`|various| Final tidying / freeing of resources immediatley before the event|
 |`void onMQTTError(e,info);`|[MQTT](h4mqtt.md)| General MQTT error handler|
 |`void onReboot(void);`|various| Final tidying / freeing of resources immediatley before the event|
+|`void onUiChange(const string& name,const string& value);`|[WiFi](h4wifi.md)|If no specific field change function given|
 
 ---
 

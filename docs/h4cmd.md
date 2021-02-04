@@ -6,6 +6,8 @@
 
 Provides common command / control functions to all other plugins and allows control of device from serial console.
 
+---
+
 ## Contents
 
 * [Usage](#usage)

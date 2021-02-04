@@ -5,12 +5,7 @@
 ## Shortname="vm"
 
 Replaces internal system IDs with human-readable nmames / messages to assist in learning / debugging
-
----
-
-# What does it do?
-
-Translates numeric codes into meaningful messages for:
+Translates:
 
 * error codes
 * log types
@@ -18,6 +13,19 @@ Translates numeric codes into meaningful messages for:
 * task names
 
 Merely installing the plugin before any other automatically provides the translation(s) without any further ado.
+
+---
+
+## Contents
+
+* [Usage](#usage)
+* [Dependencies](#dependencies)
+* [Commands Added](#commands-added)
+* [Events Emitted](#s-emitted)
+* [Events Listened for](#s-listened-for)
+* [Tasks Run](#tasks-run)
+* [Service Commands](#service-commands)
+* [API](#api)
 
 ---
 

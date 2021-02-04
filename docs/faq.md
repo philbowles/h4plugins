@@ -21,6 +21,7 @@ As a result there are a number of factors to take into account:
 * Try to minimise the number of dynamically updating fields you add.
 * If you ignore the previous advice, try not to leave the browser open for long periods of time. All of these things seem to aggravate AsyncWebserver code.
   
+Regular updates e.g. 1x per second "Up Time" are anything btu smooth.. they will jump / stutter / lag etc as AsyncWebserver fills its queue and the webUI has to buffer (or ultimately abandon) its updates to avboid a crash.
 ## HttpMySQLlogger
 
 The supporting database has not yer been updated to reflect the new 1.0.1 event structure, so the example code will fail, and the documentation is out-of-date. Fixing both of those is in the "todo" list, but not particularly near the top.
@@ -28,6 +29,12 @@ The supporting database has not yer been updated to reflect the new 1.0.1 event 
 ## Presence Detection
 
 Not particularly well tested, and H4 detection has been temporarily withdrawn. The whole susbsytem is to be rewritten soon(ish) (for 1.0.2?) to make much better use of the new event system. Therefore, any issues on this front will be well down the list of priorities. Be patient. I'm sure nobody even uses it so I don't even know why I'm writing this right now.
+
+## Minor bugs - will be fixed @ 1.0.2
+
+* uiAddBoolean (static version) should not have "change function" -  workaround: default it to nullptr
+* example sketch WebUI_DynamicFields has syntax error: replace H4Plugin::getConfig with h4pGetConfig
+* H4P_WiFi functions signal and signalOff shoul not be public: do not call them
 
 ---
 
@@ -57,7 +64,7 @@ There are several reasons:
 
 3. The 10% of people who *do* actually need it usually do so for one reason only: because they want to deploy their code into someone else's network, whose details they don't always know in advance, and they want that third party to be able to enter the credentials themselves...in the same way that most commercially-available devices do, but H4Plugins was never designed to work that way or be part of a commerical product.
 
-H4Plugins was designed from the very beginning for home use. But those 10% of users who cuase 90% of the support issues are usually charging people money for that deployment and - presumably - support...which they then expect that *I* provide for free!
+H4Plugins was designed from the very beginning for home use. But those 10% of users who cause 90% of the support issues are usually charging people money for that deployment and - presumably - support...which they then expect that *I* provide for free!
 
 In summary then, it is to reduce my support burden by preventing the library from being used beyond its design parameters.
 
