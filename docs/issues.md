@@ -59,15 +59,6 @@ More important is what is *not* in it: and that is anything that does not contri
 
 What's *in* it is the smallest possible amount of code that shows the problem.
 
----
-
-# Additional advice
-
-To reduce the amount of time taken to solve the issue, here are some guidelines that will speed things up:
-
-1. If I ask for additional information, *just provide **exactly** what I ask for*. Please don't try to second guess me and give me something *more* or *different* or *"better"* or that you think might also help... Also, please don't ask me *why* I need it - no matter how irrelevant it may sound to *you*, it just wastes time. *I* know what I need to know - trust me - I am not going to waste both our time asking for extra stuff I know I don't need! So the fact I ask means I know I need it, so just give it to me. I will explain *why* I needed it *after* I have solved the problem.
-
-2. If at any point you find yourself needing to say "I can't give you that, it's proprietary" then you are already in the wrong place - we need to be discussing a formal support contract. I am more than happy to sign any NDAs and be paid market rates to help you get your private code working with my free public code.
 
 ---
 
