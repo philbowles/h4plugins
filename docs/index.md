@@ -6,7 +6,7 @@
 
 ---
 
-* :building_construction: [Why the name "H4"? A little history](h4.md)
+* [Why the name "H4"? A little history](h4.md)
 * [H4 and event-driven programming](https://github.com/philbowles/H4#why-do-i-need-it)
 * [Common Command and Control: H4P_SerialCmd](ccc.md)
 * [Static and Utility functions](statics.md)
