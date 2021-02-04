@@ -283,8 +283,8 @@ After you have finished reading this file, the recommended path you should follo
 
 H4 / H4Plugins are designed to be easy to use, but the price of that is that the project is large and complex "under the hood". Its flexibility means that there are as many ways to do things as there are different programming styles. Because my resources are limited, I must insist that all reports provide at least enough information for me to replicate the problem. What you need to provide is described fully in [Raising an Issue](docs/issues.md)
 
-In terms of speed of response, you are *far* more likely to get a rapid answer if you "ping" me on one of the social media links below: I'm on those every day at some point, I may only visit GitHub once a week or so.
- # N.B. No problem report / issue will be considered or dealt with unless it complies FULLY with the requires laid out in [Raising an Issue](docs/issues.md) . 
+In terms of speed of response, you are *far* more likely to get a rapid answer if you "ping" me on one of the social media links below: I'm on those every day at some point; I may only visit GitHub once a week or so.
+ # N.B. No problem report / issue will be considered or dealt with unless it complies FULLY with the requirements laid out in [Raising an Issue](docs/issues.md) . 
  
  #### Help me to help YOU by provding all the information required in the relevant format
 

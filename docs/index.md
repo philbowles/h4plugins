@@ -15,8 +15,8 @@
 * :building_construction: [WiFi, MQTT and networking](docs/h4wifi.md)
 * :building_construction: [Network Presence Detection](docs/h4pd.md)
 * :building_construction: [Advanced Topics](docs/advanced.md)
-* :building_construction: [Known Issues / FAQs](docs/faq.md)
-* :building_construction: [Raising an Issue](docs/issues.md)
+* [Known Issues / FAQs](docs/faq.md)
+* [Raising an Issue](docs/issues.md)
 * Plugins APIs
   * :building_construction: [H4P_AsyncMQTT](h4pxxxx.md)
   * [H4P_BinarySwitch](swings.md)
