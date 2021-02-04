@@ -37,9 +37,7 @@ Not particularly well tested, and H4 detection has been temporarily withdrawn. T
 
 An easy one to open with :). Because I do this for free in my spare time and it is immensely complex and time-consuming. It was designed for *me* , by *me* to make *my* home automation system work. If it somehow does not fit *your* requirements and *your* system, well basically that's tough. If on hearing that you are not happy, then basically it's even tougher, but it changes nothing. If you don't like it, don't use it, it's as simple as that. It makes no difference to me either way.
 
-I share this project in the hope that it might help people and if it does that they will be grateful and happy. I do not get paid to smile politely in the face of stupidity and/or put up with rudeness from people who reap the benefits of my efforts and don't even say "thank you". Or who get heated because I refuse to change my design to suit *their* bizarre one-in-a-million edge case. Or who argue when I explain that it's their code at fault, not the library. Or who "won't be told". Or who say "my code doesn't work" without showing it to me or telling me how it breaks. Or who think because I put this up in public for my own entertainment that somehow I am now obliged to them or that somehow I owe them a duty to listen to them or care what they think or that there is some pressing need to fix *their* bug faster than I decide to, if at all...See also my reasons for removing support for AP mode. :smile:
-
-I do this for fun. Help me keep it that way by obeying the one simple rule in this repo: ***Be polite or you will be blocked***.
+I share this project in the hope that it might help people and if it does that they will be grateful and happy. I do this for fun. Help me keep it that way by obeying the one simple rule in this repo: ***Be polite or you will be blocked***.
 
 ## How do I get the device into AP mode?
 
@@ -59,7 +57,7 @@ There are several reasons:
 
 3. The 10% of people who *do* actually need it usually do so for one reason only: because they want to deploy their code into someone else's network, whose details they don't always know in advance, and they want that third party to be able to enter the credentials themselves...in the same way that most commercially-available devices do, but H4Plugins was never designed to work that way or be part of a commerical product.
 
-H4Plugins was designed from the very beginning for home use. But those 10% of users who cuase 90% of the support issues are usually charging people money for that deployment and - presumably - support...which they then expect, nay, *demand* that *I* provide for free!
+H4Plugins was designed from the very beginning for home use. But those 10% of users who cuase 90% of the support issues are usually charging people money for that deployment and - presumably - support...which they then expect that *I* provide for free!
 
 In summary then, it is to reduce my support burden by preventing the library from being used beyond its design parameters.
 
@@ -67,15 +65,9 @@ In summary then, it is to reduce my support burden by preventing the library fro
 
 There are two routes:
 
-1. By being a nice friendly, helpful beta tester, or a subscriber to my Youtube channel (once it gets going) or a [Patreon supporter](https://patreon.com/esparto) who agrees that it will be used purely for personal use and not deployed commercially for gain.
+1. By being a helpful beta tester, or a subscriber to my Youtube channel (once it gets going) or a [Patreon supporter](https://patreon.com/esparto) who agrees that it will be used purely for personal use and not deployed commercially for gain.
 
-2. By contacting me to discuss a formal support contract. It's only going to be "a cup of coffee" type thing...I'm not doing this to make money, I'm doing it to prevent the abuse of my good nature by unscrupulous and/or rude people. If *you* are making money out of *my* work, I feel I should be getting at least *something* in return - Politeness and trust are always a good start.
-
-For background: This is not a decision I have taken lightly. Technically, it took a *huge* amount of redesign and testing to de-couple AP mode from the rest of the project into one single file that a) breaks nothing when absent and b) "just works" when present.
-
-Morally, it was *not* done for some fanciful fear of being taken avantage of, but from *actual experience* of getting "grief" and yes, even rudeness, from people deploying earlier versions for commercial gain. The equation did not balance for me: You use *my* work, *my* efforts to make money, you offer me nothing in return - not even thanks - yet *still* you feel you have the right to hound *me* for *free* support? It doesn't feel right somehow, does it?
-
-I found it hard to devote my own free time to people raising issues including phrases such as "one of my clients..." or "my users don't like having to..." or "yes, but I have my customers to think of...". I always wanted to reply "Then use a commercial product and pay the going rate for modifications and support".
+2. By contacting me to discuss a formal support contract. It's only going to be "a cup of coffee" type thing...I'm not doing this to make money, I'm doing it to prevent the abuse of my good nature by unscrupulous and/or rude people. If *you* are making money out of *my* work, I feel I should be getting at least *something* in return. I find it hard to devote my own free time to people raising issues including phrases such as "one of my clients..." or "my users don't like having to..." or "yes, but I have my customers to think of...".
 
 ---
 
