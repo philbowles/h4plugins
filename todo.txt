@@ -17,6 +17,7 @@ MEDIUMTERM
     total event / reaction cmd model - major update
     passthru ap config params in ctor
     dynamic cmds flash / siren etc
+    commands to e.g. throttle pins at run-time    
     remote client get
     ESp32 MDNS detector
     ESp32 tonecontroller

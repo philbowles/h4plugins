@@ -99,6 +99,8 @@ void H4GPIOPin::run(){
 //
 //      H4P_GPIOManager
 //
+H4P_GPIOManager::H4P_GPIOManager(): H4Plugin(H4PID_GPIO,H4P_EVENT_HEARTBEAT){ }
+
 void H4P_GPIOManager::_handleEvent(H4PID pid,H4P_EVENT_TYPE type,const string &msg){
     for(auto p:pins){
         H4GPIOPin* ptr=p.second;         
@@ -117,8 +119,6 @@ void H4P_GPIOManager::_start(){
 }
 
 void  H4P_GPIOManager::_run(){ for(auto const& p:pins) (p.second)->run(); }
-
-H4P_GPIOManager::H4P_GPIOManager(): H4Plugin(H4PID_GPIO,H4P_EVENT_HEARTBEAT){ }
 //
 //      (oblique) strategies
 //

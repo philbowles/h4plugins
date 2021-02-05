@@ -47,12 +47,15 @@ It may be instantiated as any name the user chooses, prefix all API calls below 
 
 # Events Emitted
 
+`H4P_EVENT_BACKOFF`
 
 # Tasks Run
 
 | Symbolic Name | Short Name | Type | Singleton | Purpose |
 | :----------   | :--- | :--- | :-------: | :---    |
-|H4P_TRID_HOTA|OTA|every|:heavy_check_mark:|OTA handler|
+|H4P_TRID_HOTA|HOTA|every|:heavy_check_mark:|OTA handler|
+|H4P_TRID_REST|REST|QF|:heavy_check_mark:|HTTP REST handler|
+|H4P_TRID_SSET|SSET|repeatwhile|:heavy_check_mark:|webUI SSE sender|
 
 # Service Commands
 
