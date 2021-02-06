@@ -12,6 +12,8 @@ SHORTTERM
     retval on ps inc/dec
     ps discard(x)
 MEDIUMTERM
+    EVENT types for warnings e.g. low heap / high Q etc?
+    +/- disasteraverter "" "" ?
     js - type = password if n includes "pass"
     js - arrowfunctions
     total event / reaction cmd model - major update

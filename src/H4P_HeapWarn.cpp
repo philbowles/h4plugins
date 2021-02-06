@@ -33,7 +33,7 @@ H4P_HeapWarn::H4P_HeapWarn(function<void(bool)> f,uint32_t pc): _f(f),H4Plugin(H
     _addLocals({
         {_pName,   {H4PC_H4, _pid, nullptr}},
         {"pcent",  {_pid,   0, CMDVS(_hwPcent)}}
-            });
+    });
     _minh=_initial=ESP.getFreeHeap();
     _limit=_setLimit(pc);
     show();

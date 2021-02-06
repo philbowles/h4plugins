@@ -31,8 +31,6 @@ SOFTWARE.
 
 #include<H4PCommon.h>
 
-using H4P_FN_HEARTBEAT       = function<void(uint32_t)>;
-
 class H4P_WiFi;
 class H4P_Heartbeat: public H4Plugin {
         H4P_WiFi*               _pWiFi;

@@ -56,5 +56,3 @@ class H4P_QueueWarn: public H4Plugin {
         void        show() override;
         void        pcent(uint32_t pc);
 };
-
-//extern __attribute__((weak)) H4P_QueueWarn h4qw;

@@ -131,9 +131,10 @@ Networking is not required but if you *are* connected, the webserver will automa
 
 * [H4P_MultiFunctionButton](docs/h4mfnb.md): Tact-button giving on/off, reboot, factory reset depending on hold time.
 
-* [H4P_Heartbeat](docs/advanced.md): Adds an "Up Time" to the web UI
+* [H4P_Heartbeat](docs/beat.md): Adds an "Up Time" to the web UI
 
 ### Network time, calendar scheduling
+
 * [H4P_Timekeeper](docs/h4tk.md): NTP server sync for "clock time" alarms and scheduling
 
 * [H4P_Sunrise](docs/h4tk.md#sunrisesunset) **EXPERIMENTAL** : Gets sunrise / sunset times from public API given Lat/Long
