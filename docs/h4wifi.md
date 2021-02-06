@@ -4,7 +4,7 @@
 
 ## Shortname wifi
 
-Provides WiFi management / reconnection, Asynchronous Webserver, AP mode configuration* and OTA updates.
+Provides WiFi management / reconnection, Asynchronous Webserver, and OTA updates.
 
 ---
 
@@ -19,11 +19,13 @@ Provides WiFi management / reconnection, Asynchronous Webserver, AP mode configu
 * [Service Commands](#service-commands)
 * [API](#api)
 
+---
 # Usage
 
 ```cpp
 H4P_WiFi whiffy(...
 ```
+
 This plugin is a "singleton" - there may be only one single instance of it in the app. 
 It may be instantiated as any name the user chooses, prefix all API calls below with `myChosenName.`
 
@@ -32,14 +34,13 @@ It may be instantiated as any name the user chooses, prefix all API calls below 
 [H4P_GPIOManager](h4gm.md)
 [H4P_FlasherController](h4gm.md)
 
-* You must copy the `data` sub-folder to your sketch folder and upload to LittleFS (ESP8266) or SPIFFS (ESP32). To do this you will need to intall either the [LittleFS upload tool](https://github.com/earlephilhower/arduino-esp8266littlefs-plugin) or the [ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin) (or both). 
+* You must copy the `data` sub-folder to your sketch folder and upload to LittleFS (ESP8266) or SPIFFS (ESP32). To do this you will need to intall either the [LittleFS upload tool](https://github.com/earlephilhower/arduino-esp8266littlefs-plugin) or the [ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin) (or both).
 
-### Commands Added
+# Commands Added
 
-* h4/factory (clear credentials + reboot)
-* h4/wifi/change/x,y (payload x,y = newssid,newpassword)
-* h4/wifi/clear (use with caution = "factory reset")
-* h4/wifi/host/x (payload x = new device name. Causes a reboot. Remains until factory reset)
+* `h4/wifi/change/x,y` (payload x,y = newssid,newpassword)
+* `h4/wifi/host/x` (payload x = new device name. Causes a reboot. Remains until factory reset)
+* `h4/wifi/msg/x` (payload x = messge to be sent to scrolling message area in webUI
 
 # Events Listened for
 
@@ -90,7 +91,6 @@ H4P_WiFi(string ssid,string psk,string device="",H4_FN_VOID onC=nullptr,H4_FN_VO
 
 // Command and control
 void change(string ssid,string psk); // connect to new SSID
-void clear(); // erase any previoulsy stored credentials - think: "factory reset"
 void host() // change device name. Causes a reboot
 /*
 webUI functions
