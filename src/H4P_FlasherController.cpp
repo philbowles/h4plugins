@@ -70,7 +70,7 @@ void H4P_FlasherController::_dynaLoad(uint8_t pin,H4GM_SENSE active,H4FC_FN_F1 f
     }
     else {
         auto opp=reinterpret_cast<OutputPin*>(_pGPIO->isManaged(pin));
-        if(opp && opp->style==H4GM_PS_OUTPUT) _flashMap[pin]=f2(opp);//_flashMap[pin]=new H4Flasher(opp,period,duty); // ***********************************************;
+        if(opp && opp->style==H4GM_PS_OUTPUT) _flashMap[pin]=f2(opp);
         else {
             opp=_pGPIO->Output(pin,active,OFF);
             _dynaLoad(pin,active,f1,f2);

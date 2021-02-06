@@ -29,7 +29,7 @@
   * [H4P_EmitLoopCount](loops.md)
   * [H4P_EmitTick](eq.md)
   * [H4P_EventListener](ears.md)
-  * :building_construction: [H4P_FlasherController](h4pxxxx.md)
+  * [H4P_FlasherController](h4fc.md)
   * [H4P_GPIOManager](h4pxxxx.md)
   * :building_construction: [H4P_HeapWarn](h4pxxxx.md)
   * :building_construction: [H4P_Heartbeat](h4pxxxx.md)

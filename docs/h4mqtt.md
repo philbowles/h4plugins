@@ -56,8 +56,8 @@ It may be instantiated as any name the user chooses, prefix all API calls below 
 
 # Service Commands
 
-`stop` will disconnect from WiFi and initiate closedown of all Plugins the depend on WiFi
-`start` will connect to WiFi and start webserver and all dependent services
+`stop` will disconnect from MQTT and initiate closedown of all Plugins the depend on MQTT
+`start` will connect to MQTT and start all dependent services
 
 # Callbacks
 

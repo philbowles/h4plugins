@@ -26,7 +26,7 @@ You need to have read [GPIO Handling](gpio.md) before using this plugin.
 # Usage
 
 ```cpp
-H4P_GPIOManager h4gm();
+H4P_GPIOManager h4gm;
 ```
 
 This plugin is a "singleton" - there may be only one single instance of it in the app. 
