@@ -213,10 +213,10 @@ What it tells tells us is:
 
 1. [H4P_GPIOManager](h4gm.md) runs a task every 1000ms. (It is doing this so it can calculate the GPIO pin statistics (per / second) of pins 2 (LED_BUILTIN), 0 (BUTTON_BUILTIN) and 12 (RELAY_BUILTIN)
  which it is managing on behalf of:
- 
- * [H4P_BinarySwitch](docs/../things.md) to switch the RELAY_BUILTIN on/off
- * [H4P_MultiFunctionButton](h4mfnb.md) to listen out for button presses on BUTTON_BUILTIN which will tell H4P_BinarySwitch to switch the RELAY_BUILTIN on/off, or reboot or factoiry reset the device (depending on how long the user holds it down)
- * [H4P_WiFi](h4wifi.md) to flash LED_BUILTIN to signify abnormal netwrok conditions *and* H4P_MultiFunctionButton to flash it ever more rapidly the longer it is held down to warn the user of impending reboot or factory reset.
+
+* [H4P_BinarySwitch](docs/../things.md) to switch the RELAY_BUILTIN on/off 
+* [H4P_MultiFunctionButton](h4mfnb.md) to listen out for button presses on BUTTON_BUILTIN which will tell H4P_BinarySwitch to switch the RELAY_BUILTIN on/off, or reboot or factoiry reset the device (depending on how long the user holds it down)
+* [H4P_WiFi](h4wifi.md) to flash LED_BUILTIN to signify abnormal netwrok conditions *and* H4P_MultiFunctionButton to flash it ever more rapidly the longer it is held down to warn the user of impending reboot or factory reset.
 
 That's a lot to take in from one line of information, but its an excellent example of some of the features of H4Plugins at work:
 
@@ -228,9 +228,9 @@ That's a lot to take in from one line of information, but its an excellent examp
   
 * The minmal amount of simple code required to perfrom some pretty complex tasks
 
-2. [H4P_WiFi](h4wifi.md) is running a task every 1.5 seconds which **H**andles the Arduino **OTA** code, allowing your app to be updated **O**ver-**T**he-**A**ir from the ArduinoIDE
+1. [H4P_WiFi](h4wifi.md) is running a task every 1.5 seconds which **H**andles the Arduino **OTA** code, allowing your app to be updated **O**ver-**T**he-**A**ir from the ArduinoIDE
    
-3. [H4P_UPNPServer](h4upnp.md) Is the plugin responsible for allowing Alexa voice communications. It also is the plugin that allows Windows10 for example to "see" the device and be able to jump straight to its web UI: 
+2. [H4P_UPNPServer](h4upnp.md) Is the plugin responsible for allowing Alexa voice communications. It also is the plugin that allows Windows10 for example to "see" the device and be able to jump straight to its web UI: 
 
 ![empty](../assets/upnp2.jpg)
 

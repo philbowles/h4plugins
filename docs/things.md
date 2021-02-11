@@ -39,12 +39,12 @@ You can have many as you like all linked to the single *output* `h4onof`. Each o
 
 In addition, you may also have:
 
-* H4P_MultiFunctionButton [Example Code](../examples/XTRAS/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
-* [UPNPServer](h4upnp/md)
+* [H4P_MultiFunctionButton](h4mfnb.md) [Example Code](../examples/XTRAS/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
+* [UPNPServer](h4upnp.md)
 
 The [H4P_MultiFunctionButton](h4mfnb.md) provides an easy way to switch your Thing/Switch with a physical button. The "Multi-function" aspect of it also allows you to reboot the device or factory reset it, depending on how long you hold the button down. A simple short "stab" though serves as your devices on/off button.
 
-The [UPNPServer](h4upnp/md) provides (among other thigs) the abiity to detect Amazon "Alexa" voice commands an pass them to the Thing/Switch
+The [UPNPServer](h4upnp.md) provides (among other thigs) the abiity to detect Amazon "Alexa" voice commands an pass them to the Thing/Switch
 
 ## Simple Example with a ...Switch
 

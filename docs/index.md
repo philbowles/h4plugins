@@ -36,7 +36,7 @@
   * :building_construction: [H4P_HttpMySQLLogger](h4pxxxx.md)
   * [H4P_LocalLogger](llog.md)
   * [H4P_MQTTLogger](mlog.md)
-  * :building_construction: [H4P_MultiFunctionButton](h4pxxxx.md)
+  * [H4P_MultiFunctionButton](h4mfnb.md)
   * :building_construction: [H4P_PersistentStorage](h4pxxxx.md)
   * :building_construction: [H4P_PresenceDetector](h4pxxxx.md)
   * [H4P_QueueWarn](h4qw.md)
