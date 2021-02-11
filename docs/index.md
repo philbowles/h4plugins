@@ -47,7 +47,7 @@
   * :building_construction: [H4P_TaskSniffer](h4pxxxx.md)
   * :building_construction: [H4P_Timekeeper](h4pxxxx.md)
   * :building_construction: [H4P_ToneController](h4pxxxx.md)
-  * :building_construction: [H4P_UPNPServer](h4pxxxx.md)
+  * [H4P_UPNPServer](upnp.md)
   * [H4P_VerboseMessages](vm.md)
   * [H4P_WiFi](h4pwifi.md)
 * :building_construction: Youtube videos

@@ -125,7 +125,7 @@ Networking is not required but if you *are* connected, the webserver will automa
 
 * [H4P_AsyncMQTT](docs/h4mqtt.md): Automatic Connection to MQTT server, with reconnection on failure (without reboot!) allows remote control of H4 as well as the more usual sensing og e.g. sensor data to "the cloud"
 
-* [H4P_UPNPServer](docs/things.md): provides full UPNP/SSDP device with Alexa voice control, PC Desktop OS integration
+* [H4P_UPNPServer](docs/upnp.md): provides full UPNP/SSDP device with Alexa voice control, PC Desktop OS integration
 
 * [H4P_RemoteUpdate](docs/h4ru.md): OTA update from remote server
 

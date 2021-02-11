@@ -89,11 +89,11 @@ class H4P_UPNPServer: public H4Plugin {
             });
         }
 
-                void           broadcast(uint32_t mx,const string s){ __upnpSend(mx,s,_ubIP,1900); }
                 void           friendlyName(const string& name);
                 void           setBothNames(const string& host,const string& friendly);
                 void           show() override { reply("Name: %s",CSTR(_cb[nameTag()])); }
 //          _syscall only
+                void           _broadcast(uint32_t mx,const string s){ __upnpSend(mx,s,_ubIP,1900); }
 //                void           _listenTag(const string& tag,const string& value,H4P_FN_TAGMATCH f){ _detect[tag]=make_pair(value,f); }
                 void           _hookIn() override;
 };

@@ -230,7 +230,7 @@ That's a lot to take in from one line of information, but its an excellent examp
 
 1. [H4P_WiFi](h4wifi.md) is running a task every 1.5 seconds which **H**andles the Arduino **OTA** code, allowing your app to be updated **O**ver-**T**he-**A**ir from the ArduinoIDE
    
-2. [H4P_UPNPServer](h4upnp.md) Is the plugin responsible for allowing Alexa voice communications. It also is the plugin that allows Windows10 for example to "see" the device and be able to jump straight to its web UI: 
+2. [H4P_UPNPServer](upnp.md) Is the plugin responsible for allowing Alexa voice communications. It also is the plugin that allows Windows10 for example to "see" the device and be able to jump straight to its web UI: 
 
 ![empty](../assets/upnp2.jpg)
 

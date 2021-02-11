@@ -23,7 +23,7 @@ If your app only needs to switch a single GPIO like a relay or a lamp, then a "S
 
 There can only be one *output* Thing (or Switch) in a sketch/app and it must be named as `h4onof`. It is the default handler for any `on` or `off` command. On the *input* side of things, you can have as many ways as you like to trigger it.
 
-You should already be familiar with [Serial Commands](h4cmd.md), [MQTT](h4mqtt.md), [HTTP REST](h4wifi.md), [UPNP device](h4upnp) (e.g. Amazon Alexa voice command) as ways to send `on`,`off`,`toggle` or `switch` commands to you device, now there are many more, called "Sources".
+You should already be familiar with [Serial Commands](h4cmd.md), [MQTT](h4mqtt.md), [HTTP REST](h4wifi.md), [UPNP device](upnp.md) (e.g. Amazon Alexa voice command) as ways to send `on`,`off`,`toggle` or `switch` commands to you device, now there are many more, called "Sources".
 
 A Source is simply a plugin that automatically sets the default output `h4onof` plugin to same as the Source's own state. It is a [linked GPIO input connector](h5gpio.md).
 
@@ -40,11 +40,11 @@ You can have many as you like all linked to the single *output* `h4onof`. Each o
 In addition, you may also have:
 
 * [H4P_MultiFunctionButton](h4mfnb.md) [Example Code](../examples/XTRAS/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
-* [UPNPServer](h4upnp.md)
+* [UPNPServer](upnp.md)
 
 The [H4P_MultiFunctionButton](h4mfnb.md) provides an easy way to switch your Thing/Switch with a physical button. The "Multi-function" aspect of it also allows you to reboot the device or factory reset it, depending on how long you hold the button down. A simple short "stab" though serves as your devices on/off button.
 
-The [UPNPServer](h4upnp.md) provides (among other thigs) the abiity to detect Amazon "Alexa" voice commands an pass them to the Thing/Switch
+The [UPNPServer](upnp.md) provides (among other things) the abiity to detect Amazon "Alexa" voice commands an pass them to the Thing/Switch
 
 ## Simple Example with a ...Switch
 

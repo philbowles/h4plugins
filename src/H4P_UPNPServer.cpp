@@ -110,7 +110,7 @@ void H4P_UPNPServer::_listenUDP(){
         string pkt=stringFromBuff(packet.data(),packet.length());
         IPAddress ip=packet.remoteIP();
         uint16_t port=packet.remotePort();
-        h4.queueFunction([=](){ _handlePacket(pkt,ip,port); });
+        h4.queueFunction([=](){ _handlePacket(pkt,ip,port); }); // shud be named etc
     }); 
 }
 
@@ -183,7 +183,7 @@ void H4P_UPNPServer::_notify(const string& phase){ // h4Chunker it up
     h4Chunker<vector<string>>(_pups,[=](vector<string>::iterator i){ 
         string NT=(*i).size() ? (*i):__makeUSN("");
         string nfy="NOTIFY * HTTP/1.1\r\nHOST:"+string(_ubIP.toString().c_str())+":1900\r\nNTS:ssdp:"+phase+"\r\nNT:"+NT+"\r\n"+__upnpCommon((*i));
-        broadcast(H4P_UDP_JITTER,CSTR(nfy));
+        _broadcast(H4P_UDP_JITTER,CSTR(nfy));
     });
 }
 
