@@ -36,7 +36,7 @@ It may be instantiated as any name the user chooses, prefix all API calls below 
 
 ## Commands Added
 
-* `h4/mqtt/change/w,x,y,z` (payload: w=newbroker, x=newport, y=newusername, z=newpassword)
+* `h4/mqtt/change/w,x[,y,z]` (payload: w=newbroker, x=newport, y=newusername, z=newpassword)
 * `h4/mqtt/report` // display basic details about the device
 
 # Events Listened for

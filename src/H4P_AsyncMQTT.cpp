@@ -34,9 +34,10 @@ void __attribute__((weak)) onMQTTError(uint8_t e,int info){ SLOG("DEFAULT OE CAL
 uint32_t H4P_AsyncMQTT::_change(vector<string> vs){
     return _guard1(vs,[this](vector<string> vs){
         auto vg=split(H4PAYLOAD,",");
-        if(vg.size()!=4) return H4_CMD_PAYLOAD_FORMAT;
+        if(vg.size()!=2 && vg.size()!=4) return H4_CMD_PAYLOAD_FORMAT;
         if(!stringIsNumeric(vg[1])) return H4_CMD_NOT_NUMERIC;
-        change(vg[0],STOI(vg[1]),vg[2],vg[3]); // change this to a vs?
+        if(vg.size()==4) change(vg[0],STOI(vg[1]),vg[2],vg[3]); // change this to a vs?
+        else change(vg[0],STOI(vg[1]),"","");
         return H4_CMD_OK;
     });
 }
