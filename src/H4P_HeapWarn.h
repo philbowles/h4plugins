@@ -29,9 +29,9 @@ SOFTWARE.
 */
 #pragma once
 
-#include<H4PCommon.h>
+#include<H4Service.h>
 
-class H4P_HeapWarn: public H4Plugin {
+class H4P_HeapWarn: public H4Service {
         VSCMD(_hwPcent);
 
         function<void(bool)>    _f;
@@ -41,17 +41,20 @@ class H4P_HeapWarn: public H4Plugin {
 
             void        _run();
             uint32_t    _setLimit(uint32_t v);
-            void        _start() override {
-                h4._hookLoop([this](){ _run(); },_pid);
-                H4Plugin::_start();
-            }
-            void        _stop() override {
-                h4._unHook(_pid);
-                H4Plugin::_stop();
-            }
     public:
         H4P_HeapWarn(function<void(bool)> f,uint32_t pc=50);
 
-        void        show() override;
+#if H4P_LOG_MESSAGES
+        void        info() override;
+#endif
         void        pcent(uint32_t pc);
+
+        void        svcUp() override {
+            h4._hookLoop([this](){ _run(); },_pid);
+            H4Service::svcUp();
+        }
+        void        svcDown() override {
+            h4._unHook(_pid);
+            H4Service::svcUp();
+        }
 };

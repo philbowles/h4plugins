@@ -26,95 +26,39 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#include<H4P_SerialCmd.h>
 #include<H4P_BinaryThing.h>
-#include<H4P_WiFi.h>
-#include<H4P_AsyncMQTT.h>
 
-void H4P_BinaryThing::_greenLight() { // hookin ?
-    _pWiFi=h4pisloaded<H4P_WiFi>(H4PID_WIFI);
-    _pMQTT=h4pisloaded<H4P_AsyncMQTT>(H4PID_MQTT);
-    if(_pWiFi){
-        if(WiFi.getMode()==WIFI_STA) {
-            _pWiFi->_uiAdd(H4P_UIO_ONOF,onofTag(),H4P_UI_ONOF,"",[this]{ return stringFromInt(state()); },
-            [](const string& x){}
-            ,true);
-            if(_pMQTT) _pMQTT->hookConnect([this](){ _pMQTT->subscribeDevice("slave/#",CMDVS(_slave),H4PC_H4); }); // addcmd slave
-        }
-    }
+void H4P_BinaryThing::_onChange(bool b){
+    h4puiSync(onofTag(),CSTR(stringFromInt(b)));
+    h4.queueFunction([=](){ _thing(b); });
+    auto off=h4p.gvGetInt(autoOffTag());
+    if(off) h4.once(off,[=]{ _setState(OFF); });
 }
 
-void H4P_BinaryThing::_publish(bool b){ if(_pMQTT) _pMQTT->publishDevice(stateTag(),b); }
+void H4P_BinaryThing::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg){ if(_running && svc==stateTag()) _onChange(STOI(msg)); }
 
-void H4P_BinaryThing::_setSlaves(bool b){
-    for(auto s:_slaves){
-        string t=s+"/h4/switch";
-        if(_pMQTT) _pMQTT->xPublish(CSTR(t),stringFromInt(b));
-    }
+void H4P_BinaryThing::_init(){
+    h4puiAdd(onofTag(),H4P_UI_ONOF,"o");
+    h4puiAdd(autoOffTag(),H4P_UI_INPUT,"o");
 }
 
-void H4P_BinaryThing::_setState(bool b) {
-    _state=b;
-    _cb[stateTag()]=stringFromInt(b);
-    _setSlaves(b);
-    if(_pWiFi) _pWiFi->uiSync(H4P_UIO_ONOF);
-}
+void H4P_BinaryThing::_setState(bool b) { h4p.gvSetInt(stateTag(),b); }
 
-uint32_t H4P_BinaryThing::_slave(vector<string> vs){
-    if(vs.size()<2) return H4_CMD_TOO_FEW_PARAMS;
-    if(vs.size()>2) return H4_CMD_TOO_MANY_PARAMS;
-    if(!stringIsAlpha(vs[0])) return H4_CMD_PAYLOAD_FORMAT;
-    if(!stringIsNumeric(H4PAYLOAD)) return H4_CMD_NOT_NUMERIC;
-    if(H4PAYLOAD_INT > 1) return H4_CMD_OUT_OF_BOUNDS;
-    slave(vs[0],H4PAYLOAD_INT);
-    PLOG("%s slave %s",H4PAYLOAD_INT ? "Added":"Removed",CSTR(vs[0]));
-    show();
-    return H4_CMD_OK;
-}
+void H4P_BinaryThing::autoOff(uint32_t T){ h4p.gvSetInt(autoOffTag(),T); }
 
-void H4P_BinaryThing::_start() { 
-    H4Plugin::_start();
-    if(_f) _f(_state);
-    turn(_state);
-    _upHooks();
-}
-
-#if H4P_LOG_EVENTS // this is filthy and needs fixing / tidying
-void H4P_BinaryThing::_turn(bool b,const string& src){
+void H4P_BinaryThing::svcDown() { 
     h4.cancelSingleton(H4P_TRID_BTTO);
-    if(b && _timeout) h4.once(_timeout,[this](){ _turn(OFF,"btto"); },nullptr,H4P_TRID_BTTO,true);
-    if(b!=_state){
-        _setState(b);
-        if(_f) _f(_state);
-        _publish(_state);
-//        PLOG("%s %s",CSTR(src),(_state ? "ON":"OFF")); // specialise
-        PEVENT(_state ? H4P_EVENT_ON:H4P_EVENT_OFF,"%s",CSTR(src)); // specialise
-    }
+    H4Service::svcDown();
 }
-
-void H4P_BinaryThing::turn(bool b){ _turn(b,userTag()); }
-// syscall only
-#else
-void H4P_BinaryThing::turn(bool b){
-    h4.cancelSingleton(H4P_TRID_BTTO);
-    if(b && _timeout) h4.once(_timeout,[this](){ turn(OFF); },nullptr,H4P_TRID_BTTO,true);
-    if(b!=_state){
-        _setState(b);
-        if(_f) _f(_state);
-        _publish(_state);
-    }
-}
-#endif
 //
 //      H4P_ConditionalThing
 //
-void H4P_ConditionalThing::_greenLight() {
-    if(_pWiFi) _pWiFi->_uiAdd(H4P_UIO_COND,conditionTag(),H4P_UI_BOOL,"",[this]{ return stringFromInt(_predicate(state())); },nullptr,true);
-    H4P_BinaryThing::_greenLight();
+void H4P_ConditionalThing::_init() {
+    h4puiAdd(conditionTag(),H4P_UI_BOOL,"o","",H4P_UILED_BI);
+    H4P_BinaryThing::_init();
 }
 
-void H4P_ConditionalThing::_setState(bool b) { 
-    if(_predicate(b)) H4P_BinaryThing::_setState(b);
-    else if(_pWiFi) _pWiFi->uiMessage("Unable: condition disarmed");
-}
+void H4P_ConditionalThing::_setState(bool b) { if(_predicate()) H4P_BinaryThing::_setState(b); }
 
-void H4P_ConditionalThing::syncCondition() { if(_pWiFi) _pWiFi->_sendSSE(conditionTag(),CSTR(stringFromInt(_predicate(state())))); }
+void H4P_ConditionalThing::syncCondition() { h4puiSync(conditionTag(),CSTR(stringFromInt(_predicate()))); }

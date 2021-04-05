@@ -1,6 +1,6 @@
 ![H4P Logo](/assets/GPIOLogo.jpg)
 
-# H4P_FlasherController 
+# H4P_Signaller 
 
 ## Shortname wink
 
@@ -17,7 +17,7 @@ These are "fire-and-forget" functions: once started, the LED "does its thing" wh
 
  Many people think of LEDs in terms of "ON" and "OFF" rather than digital states HIGH and LOW or 1 and 0. To complicate things, LEDs can be physically wired two ways: "active HIGH" which follows the "normal" way of thinking about digital GPIOs: set the pin HIGH and the LED turns ON.
 
-Unfortunately many boards (e.g. ESP8266 and ESP32 have their onboard LEDs wired as "active LOW" where setting the GPIO to LOW turns the LED ON, the exact opposite of active HIGH and confusing to many people. When the user wants to stop an LED flashing, it needs to be turned OFF whether it is active-HIGH or active-LOW. In order to do this correctly, H4P_FlasherController needs to know if the LED is wired active-HIGH or active-LOW. The final parameter to all of the API calls that create a flashing pin is "active" and defaults to HIGH.
+Unfortunately many boards (e.g. ESP8266 and ESP32 have their onboard LEDs wired as "active LOW" where setting the GPIO to LOW turns the LED ON, the exact opposite of active HIGH and confusing to many people. When the user wants to stop an LED flashing, it needs to be turned OFF whether it is active-HIGH or active-LOW. In order to do this correctly, H4P_Signaller needs to know if the LED is wired active-HIGH or active-LOW. The final parameter to all of the API calls that create a flashing pin is "active" and defaults to HIGH.
   
 (*The output device does not have to be an LED - it is just that this is the most common and easiest to understand. It can be any GPIO-driven device that does react badly to rapid switching*)
 
@@ -39,7 +39,7 @@ Unfortunately many boards (e.g. ESP8266 and ESP32 have their onboard LEDs wired 
 # Usage
 
 ```cpp
-H4P_FlasherController h4fc;
+H4P_Signaller h4fc;
 ```
 
 This plugin is a "singleton" - there may be only one single instance of it in the app. 
@@ -47,7 +47,7 @@ It may be instantiated as any name the user chooses, prefix all API calls below 
 
 # Dependencies
 
-[**H4P_GPIOManager**](h4gm.md)
+[**H4P_PinMachine**](h4gm.md)
 
 ### Commands Added
 
@@ -89,7 +89,7 @@ All times in milliseconds
 
 ```cpp
 // Constructor
-H4P_FlasherController();
+H4P_Signaller();
 
 // Simple flash, 50% square wave: ON for rate ms, OFF for rate ms
 flashLED(uint32_t rate, uint8_t pin = LED_BUILTIN,uint8_t active=HIGH);

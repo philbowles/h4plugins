@@ -41,11 +41,11 @@ It may be instantiated as any name the user chooses, prefix all API calls below 
 
 # Events Listened for
 
-`H4P_EVENT_FACTORY`
+`H4PE_FACTORY`
 
 # Events Emitted
 
-`H4P_EVENT_MQTT_ERROR`
+`H4PE_MQTT_ERROR`
 
 # Tasks Run
 

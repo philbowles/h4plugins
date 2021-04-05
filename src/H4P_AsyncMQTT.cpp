@@ -26,46 +26,59 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#include<H4P_SerialCmd.h>
 #include<H4P_AsyncMQTT.h>
-#include<H4P_WiFi.h>
 
-void __attribute__((weak)) onMQTTError(uint8_t e,int info){ SLOG("DEFAULT OE CALL e=%d info=%d",e,info); }
-
-uint32_t H4P_AsyncMQTT::_change(vector<string> vs){
+uint32_t H4P_AsyncMQTT::_change(vector<string> vs){  // broker,uname,pword,port
     return _guard1(vs,[this](vector<string> vs){
         auto vg=split(H4PAYLOAD,",");
         if(vg.size()!=4) return H4_CMD_PAYLOAD_FORMAT;
-        if(!stringIsNumeric(vg[1])) return H4_CMD_NOT_NUMERIC;
-        change(vg[0],STOI(vg[1]),vg[2],vg[3]); // change this to a vs?
+        if(!stringIsNumeric(vg[3])) return H4_CMD_NOT_NUMERIC;
+        change(vg[0],vg[1],vg[2],STOI(vg[3])); // change this to a vs?
         return H4_CMD_OK;
     });
 }
-
-void H4P_AsyncMQTT::_handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg){ _pWiFi->_wipe(mqconfTag()); }
-
-void H4P_AsyncMQTT::_hookIn() { 
-    _pWiFi=h4pdepend<H4P_WiFi>(this,H4PID_WIFI);
-#if H4P_USE_WIFI_AP
-    if(_pWiFi->_getPersistentValue(mqconfTag(),"")){
-        vector<string> mqconf=split(_cb[mqconfTag()],",");
-        _cb[brokerTag()]=mqconf[0];
-        _cb[portTag()]=mqconf[1];
-        _cb[mQuserTag()]=mqconf.size() > 2 ? mqconf[2]:"";
-        _cb[mQpassTag()]=mqconf.size() > 3 ? mqconf[3]:"";
+/*
+            [this](const string& b){ 
+*/
+void H4P_AsyncMQTT::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg){ 
+    switch(t){
+        case H4PE_GV_CHANGE:
+            /*
+            if(svc==brokerTag()) {
+                restart();
+                break;
+            }
+            */
+            if(svc==stateTag()) {
+                publishDevice(stateTag(),msg);
+                break;
+            }
+//        default:
+//            Serial.printf("%s CATASTROPHE %s %s %s\n",CSTR(_me),CSTR(svc),CSTR(h4pGetEventName(t)),CSTR(msg));
     }
-    _cb.erase(mqconfTag());
-#endif
-    onError([=](uint8_t && e,int && info){
-        PEVENT(H4P_EVENT_MQTT_ERROR,"e=%d info=%d",e,info);
-        onMQTTError(e,info);
-        }
-    );
+}
 
-    device=_cb[deviceTag()];
+void H4P_AsyncMQTT::_init() {
+#if H4P_USE_WIFI_AP
+    if(h4p.gvExists(mqconfTag())){
+        vector<string> mqconf=split(h4p[mqconfTag()],",");
+        h4p[brokerTag()]=mqconf[0];
+        h4p[portTag()]=mqconf[1];
+        h4p[mQuserTag()]=mqconf.size() > 2 ? mqconf[2]:"";
+        h4p[mQpassTag()]=mqconf.size() > 3 ? mqconf[3]:"";
+    }
+//    h4p.erase(mqconfTag());
+#endif
+    h4p.gvSetInt(_me,0,false);
+
+    onError([=](uint8_t && e,int && info){ XEVENT(H4PE_SYSWARN,"%d,%d",e,info); });
+
+    device=h4p[deviceTag()];
     setClientId(CSTR(device));
     if(_lwt.topic=="") {
         _lwt.topic=CSTR(string(prefix+device+"/offline"));
-        _lwt.payload=CSTR(_cb[chipTag()]);
+        _lwt.payload=CSTR(h4p[chipTag()]);
     }
     setWill(_lwt.topic,_lwt.QOS,_lwt.retain,_lwt.payload);
     prefix+=device+"/";
@@ -73,106 +86,101 @@ void H4P_AsyncMQTT::_hookIn() {
     onMessage([this](const char* topic, const uint8_t* payload, size_t length, uint8_t qos, bool retain,bool dup){
         string top(topic);
         string pload=stringFromBuff((uint8_t*) payload,length);
-        h4.queueFunction([top,pload](){ h4cmd._executeCmd(CSTR(string(mqttTag()).append("/").append(top)),pload); },nullptr,H4P_TRID_MQMS);
+        h4.queueFunction([top,pload](){ h4p._executeCmd(CSTR(string(mqttTag()).append("/").append(top)),pload); },nullptr,H4P_TRID_MQMS);
     });
 
     onConnect([this](bool b){
         h4.queueFunction([this](){
-            _pWiFi->signalOff();
+            _signalOff();
             h4.cancelSingleton(H4P_TRID_MQRC);
+//            Serial.printf("T=%u KILL MQRC\n",millis());
+//            h4p.showQ();
             _discoDone=false;
-            subscribe(CSTR(string("all").append(cmdhash())),0);
+            subscribe(CSTR(string(allTag()).append(cmdhash())),0);
             subscribe(CSTR(string(device+cmdhash())),0);
-            subscribe(CSTR(string(_cb[chipTag()]+cmdhash())),0);
-            subscribe(CSTR(string(_cb[boardTag()]+cmdhash())),0);
+            subscribe(CSTR(string(h4p[chipTag()]+cmdhash())),0);
+            subscribe(CSTR(string(h4p[boardTag()]+cmdhash())),0);
             report();
-            _upHooks();
-//            _pWiFi->uiSync();
-            _pWiFi->uiSync(H4P_UIO_MQTT);
-            PLOG("MQTT CNX %s:%s",CSTR(_cb[brokerTag()]),CSTR(_cb[portTag()]));
+            h4p[_me]=stringFromInt(_running=true);
+            SYSINFO("CNX %s:%s",CSTR(h4p[brokerTag()]),CSTR(h4p[portTag()]));
+            H4Service::svcUp();
         });
     });
 
     onDisconnect([this](int8_t reason){
         if(!_discoDone){
             h4.queueFunction([this,reason](){
-                _badSignal();
+                _signalBad();
                 _discoDone=true;
-                _downHooks();
-                //_pWiFi->uiSync();
-                _pWiFi->uiSync(H4P_UIO_MQTT);
-                PLOG("MQTT DCX %d",reason);
-                if(autorestart && WiFi.status()==WL_CONNECTED) h4.every(H4MQ_RETRY,[this](){ connect(); },nullptr,H4P_TRID_MQRC,true);
+                h4p[_me]=stringFromInt(_running=false);
+                h4p.gvInc(nDCXTag());
+                SYSINFO("DCX %d",reason);
+                H4Service::svcDown();
+                if(autorestart && WiFi.status()==WL_CONNECTED) {
+                    Serial.printf("T=%u KICK OFF MQRC\n",millis()); 
+                    h4.every(H4MQ_RETRY,[this](){ connect(); },nullptr,H4P_TRID_MQRC,true); // MUST be > 18sec due to shit lib ESpAsynTCP
+                }
             });
         }
     });
-}
 
-void H4P_AsyncMQTT::_greenLight(){
     if(WiFi.getMode()==WIFI_STA){
-        _pWiFi->_uiAdd(H4P_UIO_PMV,"Pangolin",H4P_UI_LABEL,_cb[pmvTag()]);
-        _pWiFi->_uiAdd(H4P_UIO_MQB,brokerTag(),H4P_UI_LABEL,"",[]{ return _cb[brokerTag()]; }); // cos we don't know it yet
-        _pWiFi->_uiAdd(H4P_UIO_MQP,portTag(),H4P_UI_LABEL,"",[]{ return _cb[portTag()]; }); // cos we don't know it yet
-        _pWiFi->_uiAdd(H4P_UIO_MQTT,uppercase(mqttTag()),H4P_UI_BOOL,"",
-        [this]{ return stringFromInt(_state()); },
-        [this](const string& b){ 
-            if(b=="1") _start();
-            else _stop();
-            PLOG("MQTT %s by user",b=="1" ? "Started":"Stopped");
-            _pWiFi->uiMessage("MQTT %s by user",b=="1" ? "Started":"Stopped");
-        },true);
+        h4puiAdd(_me,H4P_UI_BOOL,"m","",H4P_UILED_BI);
+        h4puiAdd("Pangolin",H4P_UI_LABEL,"m",h4p[pmvTag()]); // mhang!
+        h4puiAdd(brokerTag(),H4P_UI_LABEL,"m"); // cos we don't know it yet
+        h4puiAdd(portTag(),H4P_UI_LABEL,"m"); // cos we don't know it yet
+        h4puiAdd(nDCXTag(),H4P_UI_LABEL,"m"); // cos we don't know it yet
     }
 }
 
 void H4P_AsyncMQTT::_setup(){ // allow for TLS
-    string broker=_cb[brokerTag()];
-    uint16_t port=atoi(CSTR(_cb[portTag()]));
-    setServer(CSTR(broker),port);
-    if(_cb[mQuserTag()]!="") setCredentials(CSTR(_cb[mQuserTag()]),CSTR(_cb[mQpassTag()])); // optimise tag()
-}
-
-void H4P_AsyncMQTT::_start(){
-    if(WiFi.getMode()==WIFI_STA) {
-        _badSignal();
-        _setup();
-        autorestart=true;
-        connect();
+    if(h4p[brokerTag()]==""){
+        string ip=CSTR(WiFi.H4P_FALLBACK_IP().toString());
+        int x=atoi(CSTR(ip));
+        if(x==192){ // yes, I know .168 etc
+            h4p[brokerTag()]=ip;
+            h4p[portTag()]="1883";
+            SYSINFO("MQTT DEFAULTED TO %s:%s",CSTR(h4p[brokerTag()]),CSTR(h4p[portTag()]));
+        } else SYSWARN("TYPE h4/mqtt/change/...etc to get MQTT!","");
     }
+
+    setServer(CSTR(h4p[brokerTag()]),h4p.gvGetInt(portTag()));
+    if(h4p[mQuserTag()]!="") setCredentials(CSTR(h4p[mQuserTag()]),CSTR(h4p[mQpassTag()])); // optimise tag()
 }
 
-void H4P_AsyncMQTT::_stop(){
-    autorestart=false;
-    disconnect(true);
-}
-
-void H4P_AsyncMQTT::change(const string& broker,uint16_t port,const string& user,const string& passwd){ // add creds
-    PLOG("MQTT change to %s:%d user=%s",CSTR(broker),port,CSTR(user));
-    H4Plugin::stop();
-    _cb[brokerTag()]=broker;
-    _cb[portTag()]=stringFromInt(port);
-    _cb[mQuserTag()]=user;
-    _cb[mQpassTag()]=passwd;
+void H4P_AsyncMQTT::change(const string& broker,const string& user,const string& passwd,uint16_t port){ // add creds
+    XLOG("MQTT change to %s:%d user=%s",CSTR(broker),port,CSTR(user));
+//   H4Service::svcDown();
+    h4p[portTag()]=stringFromInt(port);
+    h4p[mQuserTag()]=user;
+    h4p[mQpassTag()]=passwd;
+    h4p[brokerTag()]=broker; // use thgis to trigger change
 #if H4P_USE_WIFI_AP
-    _cb[mqconfTag()]=_cb[brokerTag()]+","+_cb[portTag()]+","+_cb[mQuserTag()]+","+_cb[mQpassTag()];
-    _pWiFi->_save(mqconfTag());
+//    h4p[mqconfTag()]=h4p[brokerTag()].append(",").append(h4p[portTag()]),append(",").append(h4p[mQuserTag()]).append(",").append(h4p[mQpassTag()]);;
 #endif
     restart();
 }
 
-void H4P_AsyncMQTT::report(){
-    string j="{";
-    for(auto const r:_reportList) j+="\""+r+"\":\""+_cb[r]+"\",";
-    j.pop_back();
-    publishDevice("report",j+"}");
-    PLOG("Reporting %s}",CSTR(j));
-}
-
-void H4P_AsyncMQTT::show(){
-    reply("Server: %s, port:%s, %s",CSTR(_cb[brokerTag()]),CSTR(_cb[portTag()]),connected() ? "CNX":"DCX");
+#if H4P_LOG_MESSAGES
+void H4P_AsyncMQTT::info(){
+    H4Service::info();
+    reply(" Server: %s, port:%s, %s",CSTR(h4p[brokerTag()]),CSTR(h4p[portTag()]),connected() ? "CNX":"DCX");
     string reporting;
     for(auto const r:_reportList) reporting+=r+",";
     reporting.pop_back();
-    reply("Report: %s",CSTR(reporting));
+    reply(" Report: %s",CSTR(reporting));
+}
+#endif
+
+void H4P_AsyncMQTT::report(){
+    string j="{";
+    for(auto const r:_reportList) {
+        j+="\""+r+"\":\"";
+        j.append(h4p[r]).append("\",");
+    }
+    j.pop_back();
+    publishDevice(reportTag(),j+"}");
+    XLOG("Reporting %s}",CSTR(j));
 }
 
 void H4P_AsyncMQTT::subscribeDevice(string topic,H4_FN_MSG f,H4PC_CMD_ID root){
@@ -181,9 +189,25 @@ void H4P_AsyncMQTT::subscribeDevice(string topic,H4_FN_MSG f,H4PC_CMD_ID root){
         topic.pop_back();
         topic.pop_back();
     }
-    h4cmd.addCmd(topic,root,0,f);
+    h4p.addCmd(topic,root,0,f);
     subscribe(CSTR(fullTopic),0);
-    PLOG("Subscribed to %s",CSTR(fullTopic));
+    XLOG("Subscribed to %s",CSTR(fullTopic));
+}
+
+void H4P_AsyncMQTT::svcUp(){
+//    Serial.printf("H4P_AsyncMQTT::svcUp\n");
+    if(WiFi.getMode()==WIFI_STA) {
+        _signalBad();
+        _setup();
+        autorestart=true;
+//        Serial.printf("CCCCCCCCCCCCCCCCCCCCC THIS IS ONLY ONE OF TWO....\n");
+        connect();
+    }
+}
+
+void H4P_AsyncMQTT::svcDown(){
+    autorestart=false;
+    disconnect(true);
 }
 
 void H4P_AsyncMQTT::unsubscribeDevice(string topic){
@@ -192,7 +216,7 @@ void H4P_AsyncMQTT::unsubscribeDevice(string topic){
         topic.pop_back();
         topic.pop_back();
     }
-    h4cmd.removeCmd(topic);
+    h4p.removeCmd(topic);
     unsubscribe(CSTR(fullTopic));
-    PLOG("Unsubscribed from %s\n",CSTR(topic));
+    XLOG("Unsubscribed from %s\n",CSTR(topic));
 }

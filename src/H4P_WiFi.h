@@ -29,7 +29,7 @@ SOFTWARE.
 */
 #pragma once
 
-#include<H4PCommon.h>
+#include<H4Service.h>
 
 #ifdef ARDUINO_ARCH_ESP8266
     #include<ESP8266WiFi.h>
@@ -46,129 +46,97 @@ SOFTWARE.
 #include<DNSServer.h>
 #include<ArduinoOTA.h>
 #include<H4P_SerialCmd.h>
-#include<H4P_BinaryThing.h>
+#include<H4P_Signaller.h>
 #include<ESPAsyncWebServer.h>
-#include<H4P_FlasherController.h>
 //
-enum H4P_UI_TYPE {
-    H4P_UI_LABEL,
-    H4P_UI_TEXT,
-    H4P_UI_BOOL,
-    H4P_UI_ONOF,
-    H4P_UI_INPUT,
-    H4P_UI_DROPDOWN
-};
-
-using H4P_FN_UITXT      = function<string(void)>;
-using H4P_FN_UINUM      = function<int(void)>;
-using H4P_FN_UIBOOL     = function<boolean(void)>;
-using H4P_FN_UICHANGE   = function<void(const string&)>;
 
 struct H4P_UI_ITEM { // add title and/or props?
-    string          id;
     H4P_UI_TYPE     type;
-    string          value;
-    H4P_FN_UITXT    f;
-    H4P_FN_UICHANGE c;
-    bool            r;
+    H4P_FN_UIGET    f;
+    uint8_t         color;
+    string          h;
 };
-using H4P_UI_LIST       = std::map<uint32_t,H4P_UI_ITEM>;
 
-class H4P_WiFi: public H4Plugin, public AsyncWebServer {
-            H4P_FlasherController* _pSignal;
-            H4P_GPIOManager*       _pGPIO;
-
+using H4P_UI_LIST       = std::map<string,H4P_UI_ITEM>;
+class H4P_WiFi: public H4Service, public AsyncWebServer {
+#if H4P_USE_WIFI_AP
             DNSServer*          _dns53=nullptr;
+#endif
 //
-            H4P_BinaryThing*    _btp=nullptr;
-            string              _device;
+            bool                _discoDone;
             uint32_t            _evtID=0;
             AsyncEventSource*   _evts;
             vector<string>      _lines={};
-            H4P_UI_LIST         _userItems={};
-            uint32_t            _seq=H4P_UIO_USER;
-
-            H4_CMD_ERROR        __uichgCore(const string& a,const string& b,H4P_FN_UICHANGE f);
 //
                 VSCMD(_change);
-                VSCMD(_gpio);
-                VSCMD(_host);
                 VSCMD(_msg);
-                VSCMD(_uichg);
 
                 string          HAL_WIFI_chipID();
                 void            HAL_WIFI_disconnect();
                 void            HAL_WIFI_setHost(const string& host);
 //
+                void            __uiAdd(const string& msg);
+
         static  String          _aswsReplace(const String& var);
-                void            _badSignal(){ PLOG("SOS"); signal("... --- ...   "); }
                 void            _clear();
-                bool            _cannotConnectSTA(){ return WiFi.psk()=="H4" || WiFi.psk()==""; }
+                bool            _cannotConnectSTA(){ 
+//                    Serial.printf("_cannotConnectSTA() ssid=%s psk=%s can/not=%d\n",CSTR(WiFi.SSID()),CSTR(WiFi.psk()),WiFi.SSID()==h4Tag() || WiFi.psk()==""); 
+                    return WiFi.SSID()==h4Tag() || WiFi.psk()=="";
+                }
+                void            _commonStartup();
                 void            _coreStart();
                 void            _gotIP();
-                void            _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) override;
                 void            _lostIP();
                 void            _rest(AsyncWebServerRequest *request);
+                void            _signalBad(){ h4p[ipTag()]=""; YEVENT(H4PE_SIGNAL,"175,...   ---   ...   "); }
                 void            _startWebserver();
                 void            _stopWebserver();
         static  void            _wifiEvent(WiFiEvent_t event);
         //      service essentials
-                void            _start() override;
-                void            _stop() override;
+    protected:
+        virtual void            _handleEvent(const string& s,H4PE_TYPE t,const string& msg) override;
     public:
                 void            HAL_WIFI_startSTA(); // Has to be static for bizarre start sequence on ESP32 FFS
 //          included here against better wishes due to compiler bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89605
 #if H4P_USE_WIFI_AP
                 void            _startAP();
-                void            _save(const string& s){ H4P_SerialCmd::write("/"+s,_cb[s]); }
-                H4P_AsyncMQTT*  _pMQTT;
+                void            _save(const string& s){ H4P_SerialCmd::write("/"+s,h4p[s]); }
 
-        H4P_WiFi(H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): 
-            H4Plugin(H4PID_WIFI,H4P_EVENT_FACTORY,onC,onD),
+        H4P_WiFi(): 
+            H4Service(wifiTag(),H4PE_FACTORY | H4PE_GPIO | H4PE_GV_CHANGE | H4PE_UIADD | H4PE_UISYNC),
             AsyncWebServer(H4P_WEBSERVER_PORT){
-            _cb[ssidTag()]=h4Tag();
-            _cb[pskTag()]=h4Tag();
+                h4p[ssidTag()]=h4Tag();
+                h4p[pskTag()]=h4Tag();
 #else
-        explicit H4P_WiFi(): H4Plugin(H4PID_WIFI),AsyncWebServer(H4P_WEBSERVER_PORT){}
-        H4P_WiFi(string ssid,string psk,string device="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr):
-            _device(device),
-            H4Plugin(H4PID_WIFI,H4P_EVENT_FACTORY,onC,onD),
-            AsyncWebServer(H4P_WEBSERVER_PORT)
-            {
-            _cb[ssidTag()]=ssid;
-            _cb[pskTag()]=psk;
+        explicit H4P_WiFi(): H4Service(wifiTag()),AsyncWebServer(H4P_WEBSERVER_PORT){}
+
+        H4P_WiFi(string ssid,string psk,string device=""):
+            H4Service(wifiTag(),H4PE_FACTORY | H4PE_GPIO | H4PE_GV_CHANGE | H4PE_UIADD | H4PE_UISYNC),
+            AsyncWebServer(H4P_WEBSERVER_PORT){
+                h4p.gvSetstring(ssidTag(),ssid,true);
+                h4p.gvSetstring(pskTag(),psk,true);
+                h4p.gvSetstring(deviceTag(),device,true);
 #endif
-            _addLocals({
-                {_pName,    { H4PC_H4, _pid, nullptr}},
-                {"change",  { _pid, 0, CMDVS(_change)}},
-                {"host",    { _pid, 0, CMDVS(_host)}},
-                {"msg",     { _pid, 0, CMDVS(_msg)}},
-                {"uichg",   { _pid, 0, CMDVS(_uichg)}}
-            });
-        }
+                _commonStartup();
+            }
                 void            change(string ssid,string psk);
-                void            host(const string& host){ _setPersistentValue(deviceTag(),host,true); }
-                void            show() override;
-                void            signal(const char* pattern,uint32_t timebase=H4P_SIGNAL_TIMEBASE); // privatise these @ 1.0.2 ?
-                void            signalOff();
-                uint32_t        uiAddLabel(const string& name){ return _uiAdd(_seq++,name,H4P_UI_LABEL,_cb[name]); }
-                uint32_t        uiAddLabel(const string& name,const string& v){ return _uiAdd(_seq++,name,H4P_UI_LABEL,v); }
-                uint32_t        uiAddLabel(const string& name,const int v){ return _uiAdd(_seq++,name,H4P_UI_LABEL,stringFromInt(v)); }
-                uint32_t        uiAddLabel(const string& name,H4P_FN_UITXT f,bool repeat=false){ return _uiAdd(_seq++,name,H4P_UI_LABEL,"",f,nullptr,repeat); }
-                uint32_t        uiAddLabel(const string& name,H4P_FN_UINUM f,bool repeat=false){ return _uiAdd(_seq++,name,H4P_UI_LABEL,"",[f]{ return stringFromInt(f()); },nullptr,repeat); }
-                void            uiAddGPIO();
-                uint32_t        uiAddGPIO(uint8_t pin);
-//                uint32_t        uiAddBoolean(const string& name,const boolean tf,H4P_FN_UICHANGE a=nullptr){ return _uiAdd(_seq++,name,H4P_UI_BOOL,"",[tf]{ return tf ? "1":"0"; },a); }
-                uint32_t        uiAddBoolean(const string& name,const boolean tf){ return _uiAdd(_seq++,name,H4P_UI_BOOL,"",[tf]{ return tf ? "1":"0"; }); }
-                uint32_t        uiAddBoolean(const string& name,H4P_FN_UIBOOL f,H4P_FN_UICHANGE a=nullptr,bool repeat=false){ return _uiAdd(_seq++,name,H4P_UI_BOOL,"",[f]{ return f() ? "1":"0"; },a,repeat); }
-                uint32_t        uiAddDropdown(const string& name,H4P_CONFIG_BLOCK options,H4P_FN_UICHANGE onChange=nullptr);
-                uint32_t        uiAddInput(const string& name,const string& value="",H4P_FN_UICHANGE onChange=nullptr);
-                void            uiSetInput(uint32_t ui,const string& value){ _sendChangedSSE(ui,CSTR(value)); }
-                void            uiSetBoolean(uint32_t ui,const bool b){ _sendChangedSSE(ui,CSTR(stringFromInt(b))); }
-                void            uiSetLabel(uint32_t ui,const int f){ _sendChangedSSE(ui,CSTR(stringFromInt(f))); }
-                void            uiSetLabel(uint32_t ui,const string& value){ _sendChangedSSE(ui,CSTR(value)); }
-                void            uiSync();
-                void            uiSync(uint32_t ui);
+#if H4P_LOG_MESSAGES
+                void            info() override;
+#endif
+//
+        virtual void            svcDown() override;
+        virtual void            svcUp() override;
+//
+                void            uiAddLabel(const string& name,const string& section="u"){ _uiAdd(name,H4P_UI_LABEL,section); }
+                void            uiAddLabel(const string& name,const string& v,string section="u"){ _uiAdd(name,H4P_UI_LABEL,section,v); }
+                void            uiAddLabel(const string& name,const int v,const string& section="u"){ _uiAdd(name,H4P_UI_LABEL,section,stringFromInt(v)); }
+                void            uiAddBoolean(const string& name,const string& section="u"){ _uiAdd(name,H4P_UI_BOOL,section); }
+                void            uiAddDropdown(const string& name,H4P_NVP_MAP options,const string& section="u");
+                void            uiAddInput(const string& name,const string& section="u");
+                void            uiSetInput(const string& ui,const string& value){ _sendSSE(ui,CSTR(value)); }
+                void            uiSetBoolean(const string& ui,const bool b){ _sendSSE(ui,CSTR(stringFromInt(b))); }
+                void            uiSetLabel(const string& ui,const int f){ _sendSSE(ui,CSTR(stringFromInt(f))); }
+                void            uiSetLabel(const string& ui,const string& value){ _sendSSE(ui,CSTR(value)); }
 //
                 template<typename... Args>
                 void            uiMessage(const string& msg, Args... args){ // variadic T<>
@@ -178,15 +146,9 @@ class H4P_WiFi: public H4Plugin, public AsyncWebServer {
                     free(buff);
                 }
 //          syscall only        
-                bool            _getPersistentValue(string v,string prefix);
-                void            _hookIn() override;
+        virtual void            _init() override;
                 void            _reply(string msg) override { _lines.push_back(msg); }
-                void            _sendChangedSSE(uint32_t ui,const string& msg); // NOT NOT NOT &!!!
-                void            _sendSSE(const string& name,const string& msg); // NOT NOT NOT &!!!
-                void            _setPersistentValue(string n,string v,bool reboot);
-                uint32_t        _uiAdd(uint32_t seq,const string& i,H4P_UI_TYPE t,const string& v="",H4P_FN_UITXT f=nullptr,H4P_FN_UICHANGE a=nullptr,bool r=false);
-                void            _wipe(const string &t){ HAL_FS.remove(CSTR(string("/"+t))); }
-                void            _wipe(initializer_list<char*> l){ for(auto const& t:l) _wipe(t); }
+                void            _sendSSE(const string& name,const string& msg);
+                void            _signalOff(){ YEVENT(H4PE_SIGNAL,""); }
+                void            _uiAdd(const string& name,H4P_UI_TYPE t,string h="u",const string& v="",uint8_t c=H4P_UILED_BI);
 };
-
-//extern __attribute__((weak)) H4P_WiFi h4wifi;

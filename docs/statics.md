@@ -19,7 +19,7 @@ These may be provided by the user if required
 | :--- | :--- | :--- |
 |`const char* giveTaskName(uint32_t n);`|[h4vm](vm.md)| Translate user's task ID to meaningful name see  [Example Sketch](../examples/BASICS/H4_TaskNames/H4_TaskNames.ino)|
 |`void h4UserLoop(void);`|[H4](https://github.com/philbowles/H4)| 1x per loop - use with caution, requires H4 option setting. see  [Example Sketch](../examples/BASICS/H4_TaskNames/H4_TaskNames.ino)|
-|h4pGlobalEventHandler(H4PID pid,H4P_EVENT_TYPE t,const string& msg);`|various| Catch-all event handler. See [Event Listeners, Event Emitters and logging](events.md)|
+|h4pGlobalEventHandler(const string& svc,H4PE_TYPE t,const string& msg);`|various| Catch-all event handler. See [Event Listeners, Event Emitters and logging](events.md)|
 |`void onFactoryReset(void);`|various| Final tidying / freeing of resources immediatley before the event|
 |`void onMQTTError(e,info);`|[MQTT](h4mqtt.md)| General MQTT error handler|
 |`void onReboot(void);`|various| Final tidying / freeing of resources immediatley before the event|
@@ -35,7 +35,7 @@ These may be provided by the user if required
 h4FactoryReset();
 ```
 
-Emits `H4P_EVENT_FACTORY` and once all listeners have completed, erases any stored configuration data (N.B. **NOT** the FS webserver files) then reboots the device
+Emits `H4PE_FACTORY` and once all listeners have completed, erases any stored configuration data (N.B. **NOT** the FS webserver files) then reboots the device
 
 **WARNING** *this will delete all saved configuration data before doing a reboot - use with caution!*
 
@@ -49,7 +49,7 @@ Emits `H4P_EVENT_FACTORY` and once all listeners have completed, erases any stor
 h4reboot();
 ```
 
-"*Does exactly what it says on the tin.*" Emits `H4P_EVENT_REBOOT` and once all listeners have completed, reboots the device
+"*Does exactly what it says on the tin.*" Emits `H4PE_REBOOT` and once all listeners have completed, reboots the device
 
 
 ### Equivalent command: h4/reboot
@@ -107,7 +107,7 @@ If [H4P_VerboseMessages](vm.md) is in use, then the following functions will ret
 
 ```cpp
 std::string h4pgetErrorMessage(uint32_t e); // command errors
-std::string h4pgetEventName   (H4P_EVENT_TYPE e);
+std::string h4pgetEventName   (H4PE_TYPE e);
 std::string h4pgetTaskType    (uint32_t e); // H4 Timer Task Type e.g. every, once, nTimes etc
 std::string h4pgetTaskName    (uint32_t e); // H4 Timer Task name
 ```
@@ -117,7 +117,7 @@ Users can name their own tasks: see `giveTaskName` callback [above](#global-call
 ### Event Handling
 
 ```cpp
-void h4pOnEvent(H4P_EVENT_TYPE t,H4P_FN_USEREVENT f);
+void h4pOnEvent(H4PE_TYPE t,H4P_FN_USEREVENT f);
 ```
 
 Names a function `f` (or defines a lambda) to handle the specific event type `t`. If more than one event type needs to be monitored, use [H4P_EventListener](docs/events.md)
@@ -126,7 +126,7 @@ Names a function `f` (or defines a lambda) to handle the specific event type `t`
 void h4pUserEvent(const char* format,...);
 ```
 
-Emits an event of type `H4P_EVENT_USER` with a message made up from `printf`-style format string and optional list of parameters, e.g. `h4pUserEvent("Something %s interesting happened","mildly");`
+Emits an event of type `H4PE_USER` with a message made up from `printf`-style format string and optional list of parameters, e.g. `h4pUserEvent("Something %s interesting happened","mildly");`
 
 ---
 
@@ -134,13 +134,13 @@ Emits an event of type `H4P_EVENT_USER` with a message made up from `printf`-sty
 
 ```cpp
 
-template<typename T,typename... Args> T* h4pdepend(H4Plugin* me,H4PID p,Args... args); // dynamically load plugin and hook start/stop dependencies
-void h4pemit(H4PID pid,H4P_EVENT_TYPE t,const char* msg); // worker function of h4psysevent to avoid template code bloat
+template<typename T,typename... Args> T* h4pdepend(H4Service* me,H4PID p,Args... args); // dynamically load plugin and hook start/stop dependencies
+void h4pemit(const string& svc,H4PE_TYPE t,const char* msg); // worker function of h4psysevent to avoid template code bloat
 template<typename T> T* h4pisloaded(H4PID p); // returns nullptr if Plugi not in use
-void h4pregisterhandler(H4PID pid,uint32_t t,H4P_FN_EVENTHANDLER f); // adds an event handler function to the correct event chain
-template<typename T,typename... Args> T* h4prequire(H4Plugin* me,H4PID p,Args... args); // // dynamically load plugin, no hook-in
-template<typename... Args> void h4psysevent(H4PID pid,H4P_EVENT_TYPE t,const std::string& fmt, Args... args);
-void h4pupcall(H4Plugin* me,H4Plugin* ptr); // worker function of h4pdepend to avoid template code bloat
+void h4pregisterhandler(const string& svc,uint32_t t,H4P_FN_EVENTHANDLER f); // adds an event handler function to the correct event chain
+template<typename T,typename... Args> T* h4prequire(H4Service* me,H4PID p,Args... args); // // dynamically load plugin, no hook-in
+template<typename... Args> void h4psysevent(const string& svc,H4PE_TYPE t,const std::string& fmt, Args... args);
+void h4pupcall(H4Service* me,H4Service* ptr); // worker function of h4pdepend to avoid template code bloat
 
 ```
 
@@ -151,15 +151,15 @@ void h4pupcall(H4Plugin* me,H4Plugin* ptr); // worker function of h4pdepend to a
 These are handy shortforms of `h4psysevent` calls with predefined values. All have `f` as a `printf`-style format string followed by optional parameters
 
 ```cpp
-SEVENT(t,f,...); // Send event of type t from global context, i.e. NOT withing code of H4Plugin
-PEVENT(t,f,...); // Send event of type t from within code of H4Plugin
+SEVENT(t,f,...); // Send event of type t from global context, i.e. NOT withing code of H4Service
+PEVENT(t,f,...); // Send event of type t from within code of H4Service
 ```
 
-The following `H4P_EVENT_MSG` emitters will be compiled out unless `H4P_LOG_EVENTS` is set to 1 in [`config.h`](../src/config.h)
+The following `H4PE_MSG` emitters will be compiled out unless `H4P_LOG_EVENTS` is set to 1 in [`config.h`](../src/config.h)
 
 ```cpp
-SLOG(f,...); // Emit message event from global context, i.e. NOT within code of H4Plugin
-PLOG(f,...); // Emit message event from within code of H4Plugin
+SLOG(f,...); // Emit message event from global context, i.e. NOT within code of H4Service
+XLOG(f,...); // Emit message event from within code of H4Service
 ```
 
 ---

@@ -29,11 +29,18 @@ SOFTWARE.
 */
 #pragma once
 
-#include<H4PCommon.h>
+#include<H4Service.h>
 
-class H4P_EventListener: public H4Plugin { 
+class H4P_EventListener: public H4Service{ 
             H4P_FN_EVENTHANDLER _f;
-            void                _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) override { _f(pid,t,msg); }
+    protected:
+        virtual void _handleEvent(const string& s,H4PE_TYPE t,const string& m) override { if(_running) _f(s,t,m); }
     public: 
-        H4P_EventListener(uint32_t filter,H4P_FN_EVENTHANDLER f): _f(f), H4Plugin(H4PID_HEAR,filter){}
+        H4P_EventListener(uint32_t filter,H4P_FN_EVENTHANDLER f): _f(f), H4Service("ears",filter,false){ _running=true; } // get up a.s.a.p.
+};
+
+class H4P_SerialLogger: public H4P_EventListener{ 
+    public:
+        H4P_SerialLogger(uint32_t filter=H4PE_ALL): 
+            H4P_EventListener(filter,[](const string& s,H4PE_TYPE t,const string& m){ Serial.printf("SLOG: %s %s %s\n",CSTR(s),CSTR(h4pGetEventName(t)),CSTR(m)); }){}
 };

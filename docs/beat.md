@@ -40,7 +40,7 @@ N/A
 
 # Events Listened for
 
-`H4P_EVENT_HEARTBEAT`
+`H4PE_HEARTBEAT`
 
 # Events Emitted
 

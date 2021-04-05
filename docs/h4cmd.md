@@ -30,7 +30,7 @@ None: Included automatically by the mandatory opening sequence.
 H4_USE_PLUGINS(115200,10,false)
 ```
 
-This plugin is a "singleton" - there may be only one single instance of it in the app. It is called `h4cmd`, prefix all API calls below with `h4cmd.`
+This plugin is a "singleton" - there may be only one single instance of it in the app. It is called `h4p`, prefix all API calls below with `h4p.`
 
 ---
 
@@ -58,8 +58,8 @@ None, but when preceded by [H4P_VerboseMessages](h4vm.md), numeric codes / error
 
 # Events Emitted
 
-* H4P_EVENT_FACTORY
-* H4P_EVENT_REBOOT
+* H4PE_FACTORY
+* H4PE_REBOOT
 
 More information on [Event Emitters and Listeners](docs/../events.md)
 

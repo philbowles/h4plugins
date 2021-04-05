@@ -33,7 +33,7 @@ Not particularly well tested, and H4 detection has been temporarily withdrawn. T
 ## Minor bugs - will be fixed @ 1.0.2
 
 * uiAddBoolean (static version) should not have "change function" -  workaround: default it to nullptr
-* example sketch WebUI_DynamicFields has syntax error: replace H4Plugin::getConfig with h4pGetConfig
+* example sketch WebUI_DynamicFields has syntax error: replace H4Service::getConfig with h4pGetConfig
 * H4P_WiFi functions signal and signalOff shoul not be public: do not call them
 
 ---

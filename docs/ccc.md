@@ -9,7 +9,7 @@
 * [Your first plugin: H4P_SerialCmd](#your-first-plugin-h4p_serialcmd)
 * [The "Plugin is a Service" concept](#the-plugin-is-a-service-concept)
 * [Commands provided by H4P_SerialCmd](#commands-provided-by-h4p_serialcmd)
-* [Formal API Specification H4P_SerialCmd](h4cmd.md)
+* [Formal API Specification H4P_SerialCmd](h4p.md)
   
 ---
 
@@ -53,7 +53,7 @@ For example, imagine our device is called `demo` and is on IP 192.168.1.4
 * I can turn it on from code in several ways:
 
 ```cpp
-    h4cmd.invokeCmd("h4/on"); // invoke any command you could type at the serial console
+    h4p.invokeCmd("h4/on"); // invoke any command you could type at the serial console
     ...
     h4onof.turn(ON); // plugins have direct calls that map 1:1 onto the commands
 ```
@@ -104,7 +104,7 @@ Any command that can be typed on the console, received from MQTT or the http RES
 SerialCmd provides the `invokeCmd` function which takes parameters for topic and payload. Using the above example, you could call it thus:
 
 ```cpp
-h4cmd.invokeCmd("h4/some/cmd/with/many/levels","42,666");
+h4p.invokeCmd("h4/some/cmd/with/many/levels","42,666");
 ```
 
 * Direct call
@@ -112,7 +112,7 @@ h4cmd.invokeCmd("h4/some/cmd/with/many/levels","42,666");
 Generally, each plugin also provides functions that correspond to the command-line equivalent, but are more efficient than the `invokeCmd` method. For example, calling
 
 ```cpp
-h4cmd.showQ();
+h4p.showQ();
 ```
 
 Has the same effect as typing `h4/show/q` at the console, MQTT publishing a topic of `yourdevicename/h4/show/q` or the built-inw webserver receiving `http://< your device ip >/rest/h4/show/q`. The only difference is *that the results are sent back to the originating source*, respectively the console, MQTT server, or the web browser.
@@ -133,7 +133,7 @@ Often one plugin will depend on another, for example [H4P_AsyncMQTT](h4mqtt.md) 
 
 *All* plugins therefore support the following set of "service control" commands. For this reason they will not be mentioned again individually in the relevant sections: only the commands and/or functions a plugin *adds* to this basic set are covered in each plugin API document.
 
-Each also has a "shortname" (usually 4-characters) and this is the name you would use as the payload of any of the service control commands. Perhaps unsurprisingly [H4P_WiFi](h4wifi.md) is "wifi" and [H4P_AsyncMQTT](h4mqtt.md) is "mqtt" but some of the other plugins have more interesting shortnames: [H4P_FlasherController](h4fc.md) for example is "wink" :wink:
+Each also has a "shortname" (usually 4-characters) and this is the name you would use as the payload of any of the service control commands. Perhaps unsurprisingly [H4P_WiFi](h4wifi.md) is "wifi" and [H4P_AsyncMQTT](h4mqtt.md) is "mqtt" but some of the other plugins have more interesting shortnames: [H4P_Signaller](h4fc.md) for example is "wink" :wink:
 
 Let's assume we are dealing with "wifi"
 
@@ -187,7 +187,7 @@ H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","basic");
 H4P_AsyncMQTT h4mqtt("192.168.1.20",1883);
 H4P_BinarySwitch h4onof(RELAY_BUILTIN,ACTIVE_HIGH,OFF);
 H4P_UPNPServer h4upnp("Sonoff Basic Switch");
-H4P_MultiFunctionButton h4mfb(BUTTON_BUILTIN,INPUT,ACTIVE_LOW,15);
+h4pMultifunctionButton h4mfb(BUTTON_BUILTIN,INPUT,ACTIVE_LOW,15);
 ```
 ### `h4/svc/info/wifi`
 
@@ -211,12 +211,12 @@ Recompiling with [H4P_VerboseMessages](vm.md) and running it again we see:
 
 What it tells tells us is:
 
-1. [H4P_GPIOManager](h4gm.md) runs a task every 1000ms. (It is doing this so it can calculate the GPIO pin statistics (per / second) of pins 2 (LED_BUILTIN), 0 (BUTTON_BUILTIN) and 12 (RELAY_BUILTIN)
+1. [H4P_PinMachine](h4gm.md) runs a task every 1000ms. (It is doing this so it can calculate the GPIO pin statistics (per / second) of pins 2 (LED_BUILTIN), 0 (BUTTON_BUILTIN) and 12 (RELAY_BUILTIN)
  which it is managing on behalf of:
 
 * [H4P_BinarySwitch](docs/../things.md) to switch the RELAY_BUILTIN on/off 
-* [H4P_MultiFunctionButton](h4mfnb.md) to listen out for button presses on BUTTON_BUILTIN which will tell H4P_BinarySwitch to switch the RELAY_BUILTIN on/off, or reboot or factoiry reset the device (depending on how long the user holds it down)
-* [H4P_WiFi](h4wifi.md) to flash LED_BUILTIN to signify abnormal netwrok conditions *and* H4P_MultiFunctionButton to flash it ever more rapidly the longer it is held down to warn the user of impending reboot or factory reset.
+* [h4pMultifunctionButton](h4mfnb.md) to listen out for button presses on BUTTON_BUILTIN which will tell H4P_BinarySwitch to switch the RELAY_BUILTIN on/off, or reboot or factoiry reset the device (depending on how long the user holds it down)
+* [H4P_WiFi](h4wifi.md) to flash LED_BUILTIN to signify abnormal netwrok conditions *and* h4pMultifunctionButton to flash it ever more rapidly the longer it is held down to warn the user of impending reboot or factory reset.
 
 That's a lot to take in from one line of information, but its an excellent example of some of the features of H4Plugins at work:
 

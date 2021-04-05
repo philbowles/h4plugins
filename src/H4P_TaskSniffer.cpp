@@ -27,14 +27,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_TaskSniffer.h>
-#include<H4P_SerialCmd.h>
+//#include<H4P_SerialCmd.h>
 
 uint32_t H4P_TaskSniffer::__incexc(vector<string> vs,function<void(vector<uint32_t>)> f){
     return _guard1(vs,[f,this](vector<string> vs){
         auto vi=_expectInt(H4PAYLOAD);
         if(vi.size()) return ([f,this](vector<uint32_t> vu){ 
             f(vu);
-            show(); 
+//            info(); 
             return H4_CMD_OK;
         })(vi);
         else {
@@ -45,7 +45,7 @@ uint32_t H4P_TaskSniffer::__incexc(vector<string> vs,function<void(vector<uint32
                     vector<uint32_t> expanded;
                     for(uint32_t i=range[0];i<range[1]+1;i++) expanded.push_back(i);
                     f(expanded);
-                    show();
+//                    info();
                     return H4_CMD_OK;
                 } else return H4_CMD_PAYLOAD_FORMAT;
             } else return H4_CMD_NOT_NUMERIC;
@@ -55,10 +55,10 @@ uint32_t H4P_TaskSniffer::__incexc(vector<string> vs,function<void(vector<uint32
 
 void H4P_TaskSniffer::_common(){
     _addLocals({
-        {_pName,      {H4PC_H4, _pid, nullptr}},
+        {_me,       {H4PC_H4, _pid, nullptr}},
         {"include", {_pid, 0, CMDVS(_tsInclude)}},
         {"exclude", {_pid, 0, CMDVS(_tsExclude)}}
-            });
+    });
     h4._hookEvent([this](H4_TASK_PTR && a, const char && b){ _taskDump(a,b); });
 }
 
@@ -75,7 +75,8 @@ uint32_t H4P_TaskSniffer::_tsExclude(vector<string> vs){ return __incexc(vs,[thi
 
 uint32_t H4P_TaskSniffer::_tsInclude(vector<string> vs){ return __incexc(vs,[this](vector<uint32_t> vi){ include(vi); }); }
 
-void H4P_TaskSniffer::show(){
+#if H4P_LOG_MESSAGES
+void H4P_TaskSniffer::info(){
     vector<uint32_t> sorted;
     reply("ts List: \n");
     for(auto const& h:hitList) sorted.push_back(h);
@@ -83,20 +84,21 @@ void H4P_TaskSniffer::show(){
     for(auto const& s:sorted) { reply("%d, ",s); }
     reply("\n");
 }
+#endif
 //
 //      public 
 //
-H4P_TaskSniffer::H4P_TaskSniffer(): H4Plugin(H4PID_SNIF){ 
+H4P_TaskSniffer::H4P_TaskSniffer(): H4Service(snifTag()){ 
     for(uint32_t i=0;i<100;i++) hitList.insert(i);
     _common();
 }
 
-H4P_TaskSniffer::H4P_TaskSniffer(uint32_t i): H4Plugin(H4PID_SNIF){ 
+H4P_TaskSniffer::H4P_TaskSniffer(uint32_t i): H4Service(snifTag()){ 
     include(i);
     _common();
 }
 
-H4P_TaskSniffer::H4P_TaskSniffer(initializer_list<uint32_t> i): H4Plugin(H4PID_SNIF){ 
+H4P_TaskSniffer::H4P_TaskSniffer(initializer_list<uint32_t> i): H4Service(snifTag()){ 
     include(i);
     _common();
 }

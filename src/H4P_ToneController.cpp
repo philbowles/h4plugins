@@ -119,7 +119,7 @@ unordered_map<uint32_t,pair<uint32_t,string>> H4P_ToneController::sirens={
     {H4P_SIREN_WOOPWOOP,{450,"AN3d AN3d AN3d AN3d CN4d CN4d EN4d AN4d BN5d GN5d C#6d R  M "}}
 };
 
-H4P_ToneController::H4P_ToneController(uint32_t tempo): H4Plugin(H4PID_TONE){
+H4P_ToneController::H4P_ToneController(uint32_t tempo): H4Service("tune"){
     for(auto const &n:notes) xpose.push_back(n.second); // build ordered table of f
     sort(xpose.begin(),xpose.end());
     for(auto &n:notes) {
@@ -128,7 +128,7 @@ H4P_ToneController::H4P_ToneController(uint32_t tempo): H4Plugin(H4PID_TONE){
     }
     metronome(tempo);
 
-    _addLocals({ {_pName,    { H4PC_H4, 0, CMDVS(_siren) }} });
+    _addLocals({ {_me,    { H4PC_H4, 0, CMDVS(_siren) }} });
 }
 
 void H4P_ToneController::_repeat(const string& siren,uint8_t pin,uint32_t speed,uint32_t duration){

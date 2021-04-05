@@ -29,17 +29,19 @@ SOFTWARE.
 */
 #pragma once
 
-#include <H4PCommon.h>
+#include <H4Service.h>
 
-class H4P_LocalLogger: public H4Plugin {
+class H4P_LocalLogger: public H4Service {
         string      _fname;
         uint32_t    _limit;
 
-                void        _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) override;
+                void        _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override;
     public:
-        H4P_LocalLogger(uint32_t limit=10000,uint32_t filter=H4P_EVENT_ALL); // amount of free SPIFFS space to use
+        H4P_LocalLogger(uint32_t limit=10000,uint32_t filter=H4PE_ALL); // amount of free SPIFFS space to use
 
                 void        clear();
                 void        flush();
-                void        show() override;
+#if H4P_LOG_MESSAGES
+                void        info() override;
+#endif
 };

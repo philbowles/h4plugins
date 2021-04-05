@@ -26,76 +26,100 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include<H4PCommon.h>
-#include<H4P_VerboseMessages.h>
+#include<H4Service.h>
+#include<H4P_SerialCmd.h>
 
-void __attribute__((weak)) onFactoryReset(){}
-void __attribute__((weak)) onReboot(){}
-void __attribute__((weak)) h4pGlobalEventHandler(H4PID pid,H4P_EVENT_TYPE t,const string& msg){}
+extern std::unordered_map<string,H4Service*> h4pmap;
+string h4pSrc=h4pTag();
+
+void __attribute__((weak)) h4pGlobalEventHandler(const string& svc,H4PE_TYPE t,const string& msg){}
 //
 //   Events Listeners Emitters
 //
-void h4pregisterhandler(H4PID pid,uint32_t t,H4P_FN_EVENTHANDLER f){
+void h4pregisterhandler(const string& svc,uint32_t t,H4P_FN_EVENTHANDLER f){
     for(int i=0;i<32;i++){
         uint32_t inst=1 << i;
-        if(t & inst) {
-            string e=h4pgetEventName(static_cast<H4P_EVENT_TYPE>(inst));
-            if(e.find("No ")==string::npos) h4pevt[inst].push_back(make_pair(pid,f));
-        }
+        if(t & inst) if(h4pGetEventName(static_cast<H4PE_TYPE>(inst))!="") h4pevt[inst].push_back(make_pair(svc,f)); // fix this
     }
 }
 
-void h4pemit(H4PID pid,H4P_EVENT_TYPE t,const char* msg){
-    if(h4pevt.count(t)) for(auto const& e:h4pevt[t]) e.second(pid,t,msg);
-    h4pGlobalEventHandler(pid,t,msg);
+void h4pevent(const string& svc,H4PE_TYPE t,const string& msg){
+    if(h4pevt.count(t)) for(auto const& e:h4pevt[t]) e.second(svc,t,msg);
+    h4pGlobalEventHandler(svc,t,msg);
 }
 
-void h4pOnEvent(H4P_EVENT_TYPE t,H4P_FN_USEREVENT f){
-    h4pregisterhandler(H4PID_SYS,static_cast<uint32_t>(t),[f](H4PID i,H4P_EVENT_TYPE t,const string& m){ f(m); });
+void h4pOnEvent(H4PE_TYPE t,H4P_FN_USEREVENT e){
+    h4pregisterhandler(userTag(),static_cast<uint32_t>(t),[e](const string& i,H4PE_TYPE t,const string& m){ e(m); });
 }
-//
-//      Plugin names etc
-//
-H4Plugin* h4pptrfromtxt(const string& s){
-    auto i=find(h4pnames.begin(),h4pnames.end(),s);
-    return i!=h4pnames.end() ? h4pmap[distance(h4pnames.begin(),i)]:nullptr;
-}
-
-void h4pupcall(H4Plugin* me,H4Plugin* ptr){
-    ptr->hookConnect([me](){ me->start(); });
-    ptr->hookDisconnect([me](){ me->stop(); });
-}
-//
-//
-//      Verbosity
-//
-string h4pgetErrorMessage(uint32_t e){ auto vm=h4pisloaded<H4P_VerboseMessages>(H4PID_VM); return vm ? vm->getErrorMessage(e):string("Error "+stringFromInt(e)); }
-string h4pgetEventName   (H4P_EVENT_TYPE e){ auto vm=h4pisloaded<H4P_VerboseMessages>(H4PID_VM); return vm ? vm->getEventName(e):string("E"+stringFromInt(e,"0x%08x")); }
-string h4pgetTaskType    (uint32_t e){ auto vm=h4pisloaded<H4P_VerboseMessages>(H4PID_VM); return vm ? vm->getTaskType(e):string(stringFromInt(e,"%04d")); }
-string h4pgetTaskName    (uint32_t e){ auto vm=h4pisloaded<H4P_VerboseMessages>(H4PID_VM); return vm ? vm->getTaskName(e):string(stringFromInt(e,"%04d")); }
 //
 //      Lifecycle callbacks
 //
-void h4FactoryReset(const string& src){
-    h4psysevent(H4PID_SYS,H4P_EVENT_FACTORY,CSTR(stringFromInt(millis())));
-    onFactoryReset();
-    h4rebootCore();
-}
+[[noreturn]] void h4pFactoryReset(){ h4psysevent(userTag(),H4PE_FACTORY,""); }// QEVENT(H4PE_FACTORY); }
+
+[[noreturn]] void h4pReboot(){ h4psysevent(userTag(),H4PE_REBOOT,""); }
+
+#if SANITY
+#include<H4P_PinMachine.h>
+#include<H4P_Gatekeeper.h>
+
+extern H4P_ROAMER_MAP          h4pRoamers;
 
 void h4StartPlugins(){
-    _cb[srcTag()]="SYS";
-    _cb[h4pTag()]=H4P_VERSION;
-    Serial.printf("\nH4P %s\n",CSTR(_cb[h4pTag()]));
-    for(auto const& p:h4pmap) { p.second->_hookIn(); }
-    for(auto const& p:h4pmap) p.second->_greenLight();
+    Serial.printf("Registered to start:\n");
+    for(auto const& s:h4pmap) Serial.printf(" %s\n",CSTR(s.first));
+    Serial.printf("GPIOs defined:\n");
+    for(auto const& p:h4pPinMap) {
+        Serial.printf(" %02d S=%d C=%d NPL=%d\n",p.first,p.second->_s,p.second->_c,p.second->_pipeline.size()); 
+        p.second->dump();
+    }
+    Serial.printf("Roamers defined:\n");
+    for(auto const& p:h4pRoamers) Serial.printf("%s\n",CSTR(p->_describe())); 
+#else
+void h4StartPlugins(){
+#endif
+    h4psysevent(h4pTag(),H4PE_SYSINFO,"%s",H4P_VERSION);
+    h4pevent(h4pTag(),H4PE_BOOT);
+    h4pevent(h4pTag(),H4PE_STAGE2);
+//  must reverse reboot and factory chains so that cmd always gets last bite
+    reverse(h4pevt[H4PE_REBOOT].begin(),h4pevt[H4PE_REBOOT].end());
+    reverse(h4pevt[H4PE_FACTORY].begin(),h4pevt[H4PE_FACTORY].end());
+//
+/*
+#if SANITY
+    for(auto const& s:h4pmap){
+        auto ps=s.second;
+        if(!ps->_running){
+            if(ps->_parent!="") h4psysevent(h4pTag(),H4PE_SYSINFO,"%s waits %s\n",CSTR(s.first),CSTR(ps->_parent));
+            else  {
+                h4psysevent(h4pTag(),H4PE_SYSWARN,"%s ZOMBIE!!\n",CSTR(s.first));
+                ps->svcUp();
+            }
+        }
+    }
+#endif
+*/
+//
+//    reclaim some junk:
+//      unfilters all services from boot/stage2 to prevent any chance of "double-dip"
+//      unlinks event handlers for boot/stage2 since nothing can/will ever use them again (see above :) )
+//
+    for(auto e:initializer_list<H4PE_TYPE>{H4PE_BOOT,H4PE_STAGE2}){
+        h4pevt.erase(e);
+        h4pClearEvent(e);
+        for(auto s:h4pmap) s.second->_filter&=~e;
+    }
+    for(auto &e:h4pevt) e.second.shrink_to_fit();
+    h4psysevent(h4pTag(),H4PE_SYSINFO,"Ready: Heap=%u",HAL_getFreeHeap());
 }
-//
-// General Purpose
-//
-string h4pGetConfig(const string& c){ return _cb[c]; }
-int h4pGetConfigInt(const string& c){ return STOI(_cb[c]); }
-void h4pSetConfig(const string& c,const string& v){ _cb[c]=v; }
-void h4pSetConfig(const string& c,const int v){ _cb[c]=stringFromInt(v); }
+
+string flattenMap(const H4P_NVP_MAP& m,const string& fs,const string& rs){
+    string flat;
+    if(m.size()){
+        for(auto const& nvp:m) flat+=nvp.first+fs+nvp.second+rs;
+        flat.pop_back();
+    }
+    return flat;
+}
 
 string h4preplaceparams(const string& s){ // oh for a working regex!
 	int i=0;
@@ -106,7 +130,7 @@ string h4preplaceparams(const string& s){ // oh for a working regex!
         if(s[i]=='%'){
             if(j){
                 string v=s.substr(j,i-j);
-                if(_cb.count(v)) rv.append(_cb[v]);
+                if(h4p.gvExists(v)) rv.append(h4p[v]);
                 else rv.append("%"+v+"%");
                 j=0;
             }
@@ -117,42 +141,23 @@ string h4preplaceparams(const string& s){ // oh for a working regex!
     rv.shrink_to_fit();
 	return rv.c_str();
 }
+
+void h4puiAdd(const string& n,H4P_UI_TYPE t,string h,const string& v,uint8_t c){ h4psysevent(h,H4PE_UIADD,"%s,%d,%s,%s,%d",CSTR(n),t,CSTR(v),CSTR(h),c); }
+
+void h4puiSync(const string& n,const string& v){ h4psysevent(n,H4PE_UISYNC,"%s",CSTR(v)); }
 /*
 TESTERS / DIAG
 */
 #if SANITY
-void h4psanitycheck(){
-    Serial.printf("SANITY CHECKS\n");
-    std::map<uint32_t,string> names;
-    int i=0;
-    for(auto n:h4pnames){
-        Serial.printf("name %02d %4s ptr=0x%08x\n",i,CSTR(n),h4pmap.count(i) ? (void*) h4pmap[i]:0 );
-        names[i]=n;
-        i++;
-    }
-    i=0;
-    for(auto n:h4pmap) Serial.printf("i=%02d idx=%02d ptr=0x%08x name=%s\n",i++,n.first,(void*) n.second,CSTR(names[n.first]));
-
-    Serial.printf("EVENTS LISTENED\n");
-    unordered_set<uint32_t> listeners;
-    unordered_map<uint32_t,vector<H4P_EVENT_TYPE>> earmap;
+void h4pInventory(){
     for(auto et:h4pevt){
-        Serial.printf("%s [0x%08x]\n",CSTR(h4pgetEventName(static_cast<H4P_EVENT_TYPE>(et.first))),et.first);
+        Serial.printf("%s [0x%08x] Listeners:\n",CSTR(h4pGetEventName(static_cast<H4PE_TYPE>(et.first))),et.first);
         for(auto el:et.second){
-            uint32_t i=static_cast<int>(el.first);
-            auto p=h4pmap.count(i) ? h4pmap[i]:nullptr;
-            Serial.printf("\t%s(%d)\n",p ? CSTR(h4pmap[i]->_pName):"?",el.first);
-            listeners.insert(i);
-            earmap[i].push_back(static_cast<H4P_EVENT_TYPE>(et.first));
+            string svc=el.first;
+            Serial.printf("  %s\n",CSTR(svc));
         }
     }
-    Serial.printf("EVENTS LISTENERS\n");
-    for(auto pid:listeners){
-        auto p=h4pmap.count(pid) ? h4pmap[pid]:nullptr;
-        Serial.printf("%s(%d)\n",p ? CSTR(h4pmap[pid]->_pName):"?",pid);
-        for(auto e:earmap[pid]){
-            Serial.printf("\t%s [0x%08x]\n",CSTR(h4pgetEventName(static_cast<H4P_EVENT_TYPE>(e))),e);
-        }
-    }
+    Serial.println();
+    h4p.plugins();
 }
 #endif

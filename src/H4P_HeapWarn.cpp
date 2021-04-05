@@ -27,16 +27,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_HeapWarn.h>
-#include<H4P_SerialCmd.h>
 
-H4P_HeapWarn::H4P_HeapWarn(function<void(bool)> f,uint32_t pc): _f(f),H4Plugin(H4PID_HWRN){
+H4P_HeapWarn::H4P_HeapWarn(function<void(bool)> f,uint32_t pc): _f(f),H4Service("hwrn"){
     _addLocals({
-        {_pName,   {H4PC_H4, _pid, nullptr}},
-        {"pcent",  {_pid,   0, CMDVS(_hwPcent)}}
+        {_me,      {H4PC_H4, _pid, nullptr}},
+        {pcentTag(),  {_pid,   0, CMDVS(_hwPcent)}}
     });
-    _minh=_initial=ESP.getFreeHeap();
+    _minh=_initial=HAL_getFreeHeap();
     _limit=_setLimit(pc);
-    show();
+//    info();
 }
 
 void H4P_HeapWarn::_run(){
@@ -45,21 +44,27 @@ void H4P_HeapWarn::_run(){
     if(hsize < _minh) _minh=hsize;
     bool state=hsize < _limit;
     if(state ^ warned) {
-        PLOG("Heap Warn %d %d",state,hsize);
+        SYSWARN("Heap,%d,%d",state,hsize);
         _f(state);
     }
     warned=state;
 }
+
 uint32_t H4P_HeapWarn::_hwPcent(vector<string> vs){ return _guardInt1(vs,[this](uint32_t && i){ pcent(i); }); }
 
 uint32_t H4P_HeapWarn::_setLimit(uint32_t v){ return (_initial*v)/100; }
 #define H4P_ABSMIN_HPCNT    5
 void H4P_HeapWarn::pcent(uint32_t pc){
     _limit=constrain(_setLimit(pc),H4P_ABSMIN_HPCNT,(uint32_t) _initial);
-    show();
+#if H4P_LOG_MESSAGES
+    info();
+#endif
 }
 
-void H4P_HeapWarn::show(){
-    reply("Hwarn: startvalue=%d warn when size < %d",_initial,_limit);
-    reply("Hwarn: min level=%d [%d%%]",_minh,(_minh*100)/_initial);
+#if H4P_LOG_MESSAGES
+void H4P_HeapWarn::info(){
+    H4Service::info();
+    reply(" Startvalue=%d warn when size < %d",_initial,_limit);
+    reply(" Min level=%d [%d%%]",_minh,(_minh*100)/_initial);
 }
+#endif

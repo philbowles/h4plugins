@@ -51,7 +51,7 @@ or
   
 # Events Listened for
 
-`H4P_EVENT_FACTORY`
+`H4PE_FACTORY`
 
 # Events Emitted
 

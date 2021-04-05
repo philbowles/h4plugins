@@ -14,5 +14,5 @@ H4P_Heartbeat hb;
 H4P_AsyncMQTT cutie;
 H4P_BinarySwitch h4onof(RELAY_BUILTIN,ACTIVE_HIGH,OFF);
 H4P_UPNPServer h4upnp;
-H4P_MultiFunctionButton h4mfb(BUTTON_BUILTIN,INPUT,ACTIVE_LOW,15);
+h4pMultifunctionButton h4mfb(BUTTON_BUILTIN,INPUT,H4P_ASSUMED_SENSE,15);
 H4P_RemoteUpdate h4ru(__FILE__);

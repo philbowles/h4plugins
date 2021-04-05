@@ -29,30 +29,27 @@ SOFTWARE.
 */
 #pragma once
 
-#include<H4PCommon.h>
-#include<H4P_SerialCmd.h>
+#include<H4Service.h>
 
-class H4P_EmitTick: public H4Plugin {
+class H4P_EmitTick: public H4Service {
             uint32_t    _uptime;
-            bool        _skip=false;
-
-                void    _run() {
-                    uint32_t now=millis();
-                    uint32_t nowsec=now/1000;
-                    if(!(now%1000) && nowsec!=_uptime) {
-                        _uptime=nowsec;
-                        if(!_skip) PEVENT(H4P_EVENT_HEARTBEAT,"%u",_uptime);
-//                        else PLOG("BEAT SKIPPED");
-                        _skip=false;
-                    }
-                }
-                void _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) { _skip=true; }
     public: 
-        H4P_EmitTick(): H4Plugin(H4PID_1SEC,H4P_EVENT_BACKOFF){}
-
-                void    show() override {
-                    H4Plugin::show();
-                    reply("Uptime %u",_uptime);
+        virtual void    _init() override {
+                    h4._hookLoop([this](){
+                        uint32_t now=millis();
+                        uint32_t nowsec=now/1000;
+                        if(!(now%1000) && nowsec!=_uptime) {
+                            _uptime=nowsec;
+                            XEVENT(H4PE_HEARTBEAT,"%u",_uptime);
+                        }
+                    },_pid);
                 }
-                void    _hookIn() override { h4._hookLoop([this](){ _run(); },_pid); }
+
+        H4P_EmitTick(): H4Service(tickTag()){}
+/*
+                void    info() override {
+                    H4Service::info();
+                    reply("Upsecs %u",_uptime);
+                }
+*/
 };

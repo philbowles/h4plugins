@@ -4,9 +4,9 @@
 
 ## Shortname 1sec
 
-Emits `H4P_EVENT_HEARTBEAT` once per second. This is synchronous, called on the main loop and *not* an *exact* asynchronous "hard-realtime" second. It is sent when the number of `millis()` is exactly divisible by 1000. Unless your app loads up the queue with badly-designed long-running tasks, it is reasonably accurate.
+Emits `H4PE_HEARTBEAT` once per second. This is synchronous, called on the main loop and *not* an *exact* asynchronous "hard-realtime" second. It is sent when the number of `millis()` is exactly divisible by 1000. Unless your app loads up the queue with badly-designed long-running tasks, it is reasonably accurate.
 
-It will deliberately "skip a beat" if it detects a `H4P_EVENT_BACKOFF` event. It should therefore not be used to synchronise an RTC, or run your granny's life support system.
+It will deliberately "skip a beat" if it detects a `H4PE_BACKOFF` event. It should therefore not be used to synchronise an RTC, or run your granny's life support system.
 
 For information on how to use this plugin, see [Event Listeners, Event Emitters and logging](events.md)
 
@@ -45,11 +45,11 @@ N/A
 
 # Events Listened for
 
-`H4P_EVENT_BACKOFF`
+`H4PE_BACKOFF`
 
 # Events Emitted
 
-`H4P_EVENT_HEARTBEAT`
+`H4PE_HEARTBEAT`
 
 # Tasks Run
 

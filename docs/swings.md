@@ -41,7 +41,7 @@ All of the plugins must exist only as a "singleton" - there must be only one sin
 
 # Dependencies
 
-* [H4P_GPIOManager](h4gm.md) 
+* [H4P_PinMachine](h4gm.md) 
   
 This should be declared before `h4onof`. If this is omitted, it will be dynamically loaded.
   
@@ -65,8 +65,8 @@ The `Conditional...` variants also add a read-only boolean to the webUI to denot
 
 # Events Emitted
 
-* H4P_EVENT_OFF
-* H4P_EVENT_ON
+* H4PE_OFF
+* H4PE_ON
   
 More information: [Emitters and Listeners](events.md)
 
@@ -224,7 +224,7 @@ This should be called whenever the value returned by the predicate function will
 
 ## Input Examples
 
-You need to read the [H4P_GPIOManager](h4gm.md) documentation before using these
+You need to read the [H4P_PinMachine](h4gm.md) documentation before using these
 
 * [AnalogThresholdSource](../examples/GPIO/H4GM_DebouncedSource/H4GM_DebouncedSource.ino)
 * [DebouncedSource](../examples/GPIO/H4GM_DebouncedSource/H4GM_DebouncedSource.ino)

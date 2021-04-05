@@ -27,20 +27,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_Heartbeat.h>
-#include<H4P_WiFi.h>
-#include<H4P_EmitTick.h>
 
-uint32_t            H4P_Heartbeat::_uptime=0;
+void H4P_Heartbeat::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg) {
+    switch(t){
+        case H4PE_HEARTBEAT:
+            h4p[upTimeTag()]=secsToTime(STOI(msg));
+            break;
+#if H4P_UI_HEALTH
+        case H4PE_HEAP:
+            h4puiSync(heapTag(),msg);
+            break;
+        case H4PE_LOOPS:
+            h4puiSync("LPS",msg);
+            break;
+        case H4PE_Q:
+            h4puiSync("Q",msg);
+            break;
+#endif
+    }
+}
 
-void H4P_Heartbeat::_handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) {
-    _uptime=STOI(msg);
-    _pWiFi->uiSync(H4P_UIO_UP);
-};
-
-void H4P_Heartbeat::_hookIn() {
-    h4prequire<H4P_EmitTick>(this,H4PID_1SEC);
-    _pWiFi=h4pdepend<H4P_WiFi>(this,H4PID_WIFI);
-    _pWiFi->_uiAdd(H4P_UIO_UP,"Uptime",H4P_UI_LABEL,"",upTime,nullptr,true); // cos we don't know it yet
+void H4P_Heartbeat::_init() {
+    h4p.gvSetInt(upTimeTag(),0,false);
+    h4puiAdd(upTimeTag(),H4P_UI_LABEL,"s");
+#if H4P_UI_HEALTH
+    h4puiAdd("Q",H4P_UI_LABEL,"h");
+    h4puiAdd(heapTag(),H4P_UI_LABEL,"h");
+    h4puiAdd("LPS",H4P_UI_LABEL,"h");
+#endif
 }
 
 string H4P_Heartbeat::secsToTime(uint32_t sex){ 

@@ -27,38 +27,44 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_LocalLogger.h>
-#include <H4P_SerialCmd.h>
+#include<H4P_SerialCmd.h>
 
-H4P_LocalLogger::H4P_LocalLogger(uint32_t limit,uint32_t filter):  _limit(limit), H4Plugin(H4PID_LLOG,filter | H4P_EVENT_FACTORY) {
+H4P_LocalLogger::H4P_LocalLogger(uint32_t limit,uint32_t filter):  _limit(limit), H4Service("llog",filter | H4PE_FACTORY) {
+    _running=true; // early start
     _fname="log.csv";
     _addLocals({
-        {_pName,   {H4PC_H4, _pid, nullptr}},
+        {_me,      {H4PC_H4, _pid, nullptr}},
         {"msg",    {_pid, 0, CMDNULL}},
         {"clear",  {_pid, 0, CMD(clear)}},
         {"flush",  {_pid, 0, CMD(flush)}}
     });
 }
+//
+//      our raison d'etre
+//
+void H4P_LocalLogger::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg) {
+    if(t==H4PE_FACTORY) clear();
+    else {
+        vector<string> msgparts={stringFromInt(millis()),h4pGetEventName(t),svc,msg};
+        uint32_t size=H4P_SerialCmd::write("/"+_fname,join(msgparts,",")+"\n","a");
+        if(size > _limit) flush();
+    }
+}
 
 void H4P_LocalLogger::clear(){ HAL_FS.remove(CSTR(string("/"+_fname))); }
 
 void H4P_LocalLogger::flush(){
-    show();
+#if H4P_LOG_MESSAGES
+    info();
+#endif
     clear();
 }
 
-void H4P_LocalLogger::show(){
+#if H4P_LOG_MESSAGES
+void H4P_LocalLogger::info(){
+    H4Service::info();
     uint32_t fsz=HAL_FS.open(CSTR(string("/"+_fname)),"r").size();
     reply("File /%s size=%u (%u %%full) limit=%u",CSTR(_fname),fsz,(fsz*100)/_limit,_limit);
-    h4cmd._dump(vector<string>{_fname});
+    h4p._dump(vector<string>{_fname}); // static
 }
-//
-//      our raison d'etre
-//
-void H4P_LocalLogger::_handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) {
-    if(t==H4P_EVENT_FACTORY) clear();
-    else {
-        vector<string> msgparts={stringFromInt(millis()),h4pgetEventName(t),h4pnames[pid],msg};
-        uint32_t size=h4cmd.write("/"+_fname,join(msgparts,",")+"\n","a");
-        if(size > _limit) flush();
-    }
-}
+#endif

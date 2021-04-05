@@ -27,40 +27,43 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_QueueWarn.h>
-#include<H4P_SerialCmd.h>
 
 uint32_t H4P_QueueWarn::__setLimit(uint32_t v){ return (h4._capacity()*v)/100; }
 //
 //      cmd responders
 //
-void H4P_QueueWarn::show(){
+#if H4P_LOG_MESSAGES
+void H4P_QueueWarn::info(){
     reply("Qwarn: capacity=%d warn when size > %d",h4._capacity(),limit);
     reply("Qwarn: max used=%d [%d%%]",maxq,(maxq*100)/h4._capacity());
 }
+#endif
 
 void H4P_QueueWarn::pcent(uint32_t pc){
     limit=constrain(__setLimit(pc),H4_Q_ABS_MIN,(uint32_t) h4._capacity());
-    show();
+#if H4P_LOG_MESSAGES
+    info();
+#endif
 }
 
 uint32_t H4P_QueueWarn::_qwPcent(vector<string> vs){ return _guardInt1(vs,[this](uint32_t && i){ pcent(i); }); }
 //
-H4P_QueueWarn::H4P_QueueWarn(function<void(bool)> _f,uint32_t _limit): H4Plugin(H4PID_QWRN){
+H4P_QueueWarn::H4P_QueueWarn(function<void(bool)> _f,uint32_t _limit): H4Service("qwrn"){
     _addLocals({
-        {_pName,     {H4PC_H4, _pid, nullptr}},
-        {"pcent",  {_pid,   0, CMDVS(_qwPcent)}}
-            });
+        {_me,      {H4PC_H4, _pid, nullptr}},
+        {pcentTag(),  {_pid,   0, CMDVS(_qwPcent)}}
+    });
     f=_f;  
     limit=__setLimit(_limit);
 }
 
-void H4P_QueueWarn::_run(){ // optimise a la throttle
+void H4P_QueueWarn::_run(){
     static bool warned=false;
     uint32_t qsize=h4.size();
     if(qsize > maxq) maxq=qsize;
     bool state=qsize > limit;
     if(state ^ warned){
-        PLOG("Queue Warn %d %d",state,qsize);
+        SYSWARN("Q,%d,%d",state,qsize);
         f(state);
     }
     warned=state;

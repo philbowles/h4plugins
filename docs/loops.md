@@ -4,7 +4,7 @@
 
 ## Shortname evtq
 
-Emits `H4P_EVENT_LOOPS` once per second. This gives a *very* rough estimate of the number of times per second that H4 is able to schedule its task queue.
+Emits `H4PE_LOOPS` once per second. This gives a *very* rough estimate of the number of times per second that H4 is able to schedule its task queue.
 
 In an unloaded ESP8266 clocked at 80MHz with an empty queue, this figure is typically 75000 - 85000. This allows a (*very*) rough comparison with how "busy" the current app is, and can be helpful in tracking down bugs, performance bottlenecks etc. Do not treat its absolute value nor meaning as particulalry scientific.
 
@@ -47,11 +47,11 @@ N/A
 
 # Events Listened for
 
-`H4P_EVENT_HEARTBEAT`
+`H4PE_HEARTBEAT`
 
 # Events Emitted
 
-`H4P_EVENT_LOOPS`
+`H4PE_LOOPS`
 
 # Tasks Run
 

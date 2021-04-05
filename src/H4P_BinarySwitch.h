@@ -29,42 +29,44 @@ SOFTWARE.
 */
 #pragma once
 
-#include<H4P_GPIOManager.h>
 #include<H4P_BinaryThing.h>
+#include<H4P_PinMachine.h>
 
-//class H4P_WiFi;
 class H4P_BinarySwitch: public H4P_BinaryThing{
             uint8_t         _pin;
-            H4GM_SENSE      _sense;
+            H4PM_SENSE      _sense;
             uint32_t        _initial;
     protected:
-        OutputPin*          _pp;
-        virtual void        _setState(bool b) override { 
-            H4P_BinaryThing::_setState(b);
-            _pp->logicalWrite(_state);
-        }
-        void                _hookIn() override;
+        h4pOutput*          _pp;
     public:
-        H4P_BinarySwitch(uint8_t pin,H4GM_SENSE sense, uint32_t initial,H4BS_FN_SWITCH f=nullptr,uint32_t timer=0):
+            uint8_t         _color;
+
+        H4P_BinarySwitch(uint8_t pin,H4PM_SENSE sense,uint8_t color=H4P_UILED_BI,uint32_t initial=OFF,uint32_t timer=0):
             _pin(pin),
             _sense(sense),
             _initial(initial),
-            H4P_BinaryThing(f,initial,timer){}
+            _color(color),
+            H4P_BinaryThing([=](bool b){ _pp->logicalWrite(b); },initial,timer){ require<H4P_PinMachine>(gpioTag()); }
+//
+        virtual void        _init() override;
 };
 
 class H4P_ConditionalSwitch: public H4P_BinarySwitch{
                 H4_FN_CPRED _predicate;
     protected:
                 void        _setState(bool b) override;
-                void        _hookIn() override;
+//        virtual void        _sync() override { syncCondition(); H4P_BinarySwitch::_sync(); }
     public:
-        H4P_ConditionalSwitch(uint8_t pin,H4GM_SENSE sense, uint32_t initial,H4_FN_CPRED predicate,H4BS_FN_SWITCH f=nullptr,uint32_t timer=0):
+        H4P_ConditionalSwitch(H4_FN_CPRED predicate,uint8_t pin,H4PM_SENSE sense,uint8_t color=H4P_UILED_BI,uint32_t initial=OFF,uint32_t timer=0):
             _predicate(predicate), 
-            H4P_BinarySwitch(pin,sense,initial,f,timer){}
-
-        void show() override { 
-            reply("Condition %d",_predicate(state()));
-            H4P_BinarySwitch::show();
+            H4P_BinarySwitch(pin,sense,color,initial,timer){}
+#if H4P_LOG_MESSAGES
+        void info() override { 
+            H4P_BinarySwitch::info();
+            reply(" Condition %d",_predicate());
         }
+#endif
         void syncCondition();
+//
+        virtual void        _init() override;
 };

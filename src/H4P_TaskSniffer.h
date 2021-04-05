@@ -29,9 +29,9 @@ SOFTWARE.
 */
 #pragma once
 
-#include<H4PCommon.h>
+#include<H4Service.h>
 
-class H4P_TaskSniffer: public H4Plugin{
+class H4P_TaskSniffer: public H4Service{
     protected:
 //
         uint32_t            __incexc(vector<string> vs,function<void(vector<uint32_t>)> f);
@@ -55,8 +55,7 @@ class H4P_TaskSniffer: public H4Plugin{
                 void        exclude(uint32_t i){ exclude({i}); }
                 void        exclude(initializer_list<uint32_t> i){ for(auto const& l:i) hitList.erase(l); }
                 void        exclude(vector<uint32_t> i){ for(auto const& l:i) hitList.erase(l); }
-        
-                void        show() override;
+#if H4P_LOG_MESSAGES
+                void        info() override;
+#endif
 };
-
-//extern __attribute__((weak)) H4P_TaskSniffer h4ts;

@@ -28,31 +28,20 @@ SOFTWARE.
 */
 
 #include<H4P_UPNPServer.h>
-/*
-Received 26/01/2021 at 14:39:05 (519)
+#include<H4P_SerialCmd.h>
 
-*/
+using H4P_UPNP_TAGMAP = unordered_map<string,unordered_set<string>>;
+H4P_UPNP_TAGMAP h4pUPNPMap;
 
-void H4P_UPNPServer::_handleEvent(H4PID pid,H4P_EVENT_TYPE type,const string &msg){  _pWiFi->_wipe(nameTag()); }
-
-void H4P_UPNPServer::_hookIn(){
-    _btp=h4prequire<H4P_BinaryThing>(this,H4PID_ONOF);
-    _pWiFi=h4pdepend<H4P_WiFi>(this,H4PID_WIFI);
-    string dn=string(h4Tag())+" "+deviceTag()+" ";
-    if(!_pWiFi->_getPersistentValue(nameTag(),dn)) if(_name!="") _cb[nameTag()]=_name;
-    PLOG("UPNP name %s",CSTR(_cb[nameTag()]));
-    _pWiFi->_uiAdd(H4P_UIO_NAME,"name",H4P_UI_LABEL,"",[]{ return _cb[nameTag()]; }); // cos we don't know it yet
+string H4P_UPNPServer::__makeUSN(const string& s){
+	string full=_uuid+_udn;
+	return s.size() ? full+="::"+s:full;
 }
 
-uint32_t H4P_UPNPServer::_host2(vector<string> vs){ return _guardString2(vs,[this](string a,string b){ setBothNames(a,b); return H4_CMD_OK; }); }
-
-void  H4P_UPNPServer::friendlyName(const string& name){ _pWiFi->_setPersistentValue(nameTag(),name,true); }
-
-uint32_t H4P_UPNPServer::_friendly(vector<string> vs){
-    return _guard1(vs,[this](vector<string> vs){
-        _pWiFi->_setPersistentValue(nameTag(),H4PAYLOAD,true);
-        return H4_CMD_OK;
-    });
+string H4P_UPNPServer::__upnpCommon(const string& usn){
+	h4p.gvSetstring("usn",__makeUSN(usn));
+	string rv=h4preplaceparams(_ucom);
+	return rv+"\r\n";
 }
 
 void H4P_UPNPServer::__upnpSend(uint32_t mx,const string s,IPAddress ip,uint16_t port){
@@ -60,53 +49,78 @@ void H4P_UPNPServer::__upnpSend(uint32_t mx,const string s,IPAddress ip,uint16_t
 		_udp.writeTo((uint8_t *)CSTR(s), s.size(), ip, port);
 	},nullptr,H4P_TRID_UDPS); // name this!!
 }
+/*
+uint32_t H4P_UPNPServer::_friendly(vector<string> vs){
+    return _guard1(vs,[this](vector<string> vs){
+        h4p[nameTag()]=H4PAYLOAD;
+        return H4_CMD_OK;
+    });
+}
+*/
+void H4P_UPNPServer::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg){
+    switch(t){
+        case H4PE_GV_CHANGE:
+            if(_running && svc==nameTag()){
+                svcDown(); // shut down old name, send bye bye etc
+                svcUp();
+            }
+    }
+}
+
 
 void H4P_UPNPServer::_handlePacket(string p,IPAddress ip,uint16_t port){
-    H4P_CONFIG_BLOCK uhdrs;
+    H4P_NVP_MAP uhdrs;
     vector<string> hdrs = split(p, "\r\n");
     while (hdrs.back() == "") hdrs.pop_back();
     if(hdrs.size() > 4){
         for (auto const &h :vector<string>(++hdrs.begin(), hdrs.end())) {
             vector<string> parts=split(h,":");
-            if(parts.size()){
-                string key=uppercase(parts[0]);
-                uhdrs[key]=ltrim(join(vector<string>(++parts.begin(),parts.end()),":"));
-            }
+            if(parts.size()) uhdrs[parts[0]]=ltrim(join(vector<string>(++parts.begin(),parts.end()),":"));
         }
     }
     uint32_t mx=1000 * atoi(CSTR(replaceAll(uhdrs["CACHE-CONTROL"],"max-age=","")));
-//    bool schroedingerscat=true;
-    string ST = uhdrs["ST"];
     switch(p[0]){
         case 'M':
-            if (ST==_pups[1]) { // make tag
-                string tail=((ST==_pups[1]) ? ST:"");
-                __upnpSend(mx, "HTTP/1.1 200 OK\r\nST:" + ST +"\r\n" +__upnpCommon(tail), ip,port);
-            }
-            break;
-/*
-        case 'N':
-            schroedingerscat=uhdrs["NTS"].find(aliveTag())!=string::npos;
-        case 'H': // cat always alive :)
-            for(auto const& d:_detect){
-                string tag=d.first;
-                if(uhdrs.count(tag)){
-                    if(d.second.first=="*" || uhdrs[tag].find(d.second.first)!=string::npos){ d.second.second(mx,uhdrs,schroedingerscat); }
+            {
+                string ST = uhdrs["ST"];
+                if (ST==_pups[1]) { // make tag
+                    string tail=((ST==_pups[1]) ? ST:"");
+                    __upnpSend(mx, "HTTP/1.1 200 OK\r\nST:" + ST +"\r\n" +__upnpCommon(tail), ip,port);
                 }
             }
             break;
-
-        default:
-            PLOG("unknown SSDP msg %c\n",p[0]);
+        case 'N':
+            {
+                for(auto &L:h4pUPNPMap){
+                    if(uhdrs.count(L.first)){
+                        string v=uhdrs[L.first];
+                        if(L.second.count("*") || L.second.count(v)) {
+                            h4psysevent(v,H4PE_UPNP,"%s,%s",(replaceAll(uhdrs["NTS"],"ssdp:","")==aliveTag()) ? CSTR(ip.toString()):"",CSTR(L.first));
+                        }
+                    }
+                }
+            }
             break;
-*/
     }
 }
+
+void H4P_UPNPServer::_init(){
+    _pups.push_back(_urn+"device:controllee:1");
+    _pups.push_back(_urn+"service:basicevent:1");
+
+    string dn=string(uppercase(h4Tag())+" "+deviceTag()+" ");
+
+    if(h4p[nameTag()]=="") h4p[nameTag()]=dn.append(h4p[chipTag()]);
+
+    XLOG("UPNP name %s",CSTR(h4p[nameTag()]));
+    h4puiAdd(nameTag(),H4P_UI_LABEL,"s");
+}
+
+void H4P_UPNPServer::_listenTag(const string& tag,const string& value){ h4pUPNPMap[tag].insert(value); }
 
 void H4P_UPNPServer::_listenUDP(){ 
     if(!_udp.listenMulticast(_ubIP, 1900)) return; // some kinda error?
     _udp.onPacket([this](AsyncUDPPacket packet){
-//        PLOG("pkt sz=%d from %s:%d type %c\n",packet.length(),packet.remoteIP().toString().c_str(),packet.remotePort(),packet.data()[0]);
         string pkt=stringFromBuff(packet.data(),packet.length());
         IPAddress ip=packet.remoteIP();
         uint16_t port=packet.remotePort();
@@ -114,34 +128,53 @@ void H4P_UPNPServer::_listenUDP(){
     }); 
 }
 
-string H4P_UPNPServer::__makeUSN(const string& s){
-	string full=_uuid+_cb["udn"];
-	return s.size() ? full+="::"+s:full;
+void H4P_UPNPServer::_notify(const string& phase){
+    h4Chunker<vector<string>>(_pups,[=](vector<string>::iterator i){ 
+        string NT=(*i).size() ? (*i):__makeUSN("");
+        string nfy="NOTIFY * HTTP/1.1\r\nHOST:"+string(_ubIP.toString().c_str())+":1900\r\nNTS:ssdp:"+phase+"\r\nNT:"+NT+"\r\n"+__upnpCommon((*i));
+        _broadcast(H4P_UDP_JITTER,CSTR(nfy));
+    },H4_JITTER_LO,H4_JITTER_HI,[=]{ h4p.gvErase("usn"); });
 }
 
-string H4P_UPNPServer::__upnpCommon(const string& usn){
-	_cb["usn"]=__makeUSN(usn);
-	string rv=h4preplaceparams(_ucom);
-	return rv+"\r\n";
+void H4P_UPNPServer::_upnp(AsyncWebServerRequest *request){ // redo
+    h4.queueFunction([=]() {
+        string soap=stringFromBuff((const byte*) request->_tempObject,strlen((const char*) request->_tempObject));
+       	h4p.gvSetstring("gs",(soap.find("Get")==string::npos) ? "Set":"Get"); 
+        uint32_t _set=soap.find(">1<")==string::npos ? 0:1;
+        if(h4p["gs"]=="Set") h4p.gvSetInt(stateTag(),_set); //=//XEVENT(H4PE_ONOF,"%d",_set);
+        request->send(200, "text/xml", CSTR(h4preplaceparams(_soap))); // refac
+        h4p.gvErase("gs");
+    },nullptr, H4P_TRID_SOAP);
 }
 
-void H4P_UPNPServer::_start(){
-    _cb["age"]=stringFromInt(H4P_UDP_REFRESH/1000); // fix
-    _cb["udn"]="Socket-1_0-upnp"+_cb[chipTag()];
-    _cb["updt"]=_pups[2];
-    _cb["umfr"]="Belkin International Inc.";
-    _cb["usvc"]=_pups[3];
-    _cb["usid"]=_urn+"serviceId:basicevent1";
+#if H4P_LOG_MESSAGES
+void H4P_UPNPServer::info(){ 
+    H4Service::info();
+    reply(" Name: %s UDN=%s",CSTR(h4p[nameTag()]),CSTR(_udn));
+}
+#endif
+
+void H4P_UPNPServer::svcDown(){
+    h4.cancelSingleton(H4P_TRID_NTFY);
+    _notify("byebye");
+    _udp.close(); // delay this RW?
+    H4Service::svcDown();
+}
+
+void H4P_UPNPServer::svcUp(){
+    _udn=string("Socket-1_0-upnp").append(h4p[chipTag()]);
+    h4p.gvSetstring("udn",_udn);
+    h4p.gvSetstring(ageTag(),stringFromInt(H4P_UDP_REFRESH/1000));
+    h4p.gvSetstring("updt",_pups[2]);
+    h4p.gvSetstring("umfr","Belkin International Inc.");
+    h4p.gvSetstring("usvc",_pups[3]);
+    h4p.gvSetstring("usid",_urn+"serviceId:basicevent1");
 
     _xml=replaceParamsFile("/up.xml");
     _ucom=replaceParamsFile("/ucom.txt");
     _soap=H4P_SerialCmd::read("/soap.xml");
-// erase redundant _cb?
-    _cb.erase("age");
-    _cb.erase("updt");
-    _cb.erase("umfr");
-    _cb.erase("usvc");
-    _cb.erase("usid");
+
+    h4p.gvErase({"udn",ageTag(),"updt","umfr","usvc","usid"});
 //
     _pWiFi->on("/we",HTTP_GET, [this](AsyncWebServerRequest *request){ request->send(200,"text/xml",CSTR(_xml)); });
     _pWiFi->on("/upnp", HTTP_POST,[this](AsyncWebServerRequest *request){ _upnp(request); },
@@ -154,40 +187,6 @@ void H4P_UPNPServer::_start(){
     );
     _listenUDP();
     _notify(aliveTag()); // TAG
-    h4.every(H4P_UDP_REFRESH / 2,[this](){ _notify(aliveTag()); },nullptr,H4P_TRID_NTFY,true); // TAG
-    _upHooks();
-}
-
-void H4P_UPNPServer::_upnp(AsyncWebServerRequest *request){ // redo
-  h4.queueFunction([=]() {
-        string soap=stringFromBuff((const byte*) request->_tempObject,strlen((const char*) request->_tempObject));
-        _cb["gs"]=(soap.find("Get")==string::npos) ? "Set":"Get";
-        uint32_t _set=soap.find(">1<")==string::npos ? 0:1;
-#if H4P_LOG_EVENTS
-        if(_cb["gs"]=="Set") _btp->_turn(_set,_pName);
-#else
-        if(_cb["gs"]=="Set") _btp->turn(_set);
-#endif
-        request->send(200, "text/xml", CSTR(h4preplaceparams(_soap))); // refac
-    },nullptr, H4P_TRID_SOAP);
-}
-
-void H4P_UPNPServer::_stop(){
-    h4.cancelSingleton(H4P_TRID_NTFY);
-    _notify("byebye");
-    _udp.close();
-    _downHooks();
-}
-
-void H4P_UPNPServer::_notify(const string& phase){ // h4Chunker it up
-    h4Chunker<vector<string>>(_pups,[=](vector<string>::iterator i){ 
-        string NT=(*i).size() ? (*i):__makeUSN("");
-        string nfy="NOTIFY * HTTP/1.1\r\nHOST:"+string(_ubIP.toString().c_str())+":1900\r\nNTS:ssdp:"+phase+"\r\nNT:"+NT+"\r\n"+__upnpCommon((*i));
-        _broadcast(H4P_UDP_JITTER,CSTR(nfy));
-    });
-}
-
-void H4P_UPNPServer::setBothNames(const string& hostname,const string& friendly){ 
-    _pWiFi->_setPersistentValue(nameTag(),friendly,false);
-    _pWiFi->host(hostname);
+    h4.every(H4P_UDP_REFRESH / 2,[=](){ _notify(aliveTag()); },nullptr,H4P_TRID_NTFY,true); // TAG
+    H4Service::svcUp();
 }

@@ -57,7 +57,7 @@ h4wifi.uiAddBoolean("True Bool",true);
 h4wifi.uiAddBoolean("False Bool",false);
 ```
 
-A special form of  boolean field can show the state of a GPIO pin as we have done in the example for GPIO0. You need to be familiar with [H4P_GPIOManager](h4gm.md) to understand the type number an the way that H4Plugins manages GPIO pins.
+A special form of  boolean field can show the state of a GPIO pin as we have done in the example for GPIO0. You need to be familiar with [H4P_PinMachine](h4gm.md) to understand the type number an the way that H4Plugins manages GPIO pins.
 
 ## Global "config items" shortcut
 
@@ -173,7 +173,7 @@ uint32_t uiAddInput(const string& name,const string& value="",H4P_FN_UICHANGE on
 
 ## Dropdown List
 
-The HTML `option` / `value` pairs are contained in a `H4P_CONFIG_BLOCK` data structure, which is simply an std::unordered_map<std::string,std::string>, e.g.
+The HTML `option` / `value` pairs are contained in a `H4P_NVP_MAP` data structure, which is simply an std::unordered_map<std::string,std::string>, e.g.
 
 ```cpp
 h4wifi.uiAddDropdown("Select",{

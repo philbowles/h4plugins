@@ -29,24 +29,39 @@ SOFTWARE.
 */
 #pragma once
 
-#include<H4PCommon.h>
+#include<H4Service.h>
+#if H4P_UI_HEALTH
+    #include<H4P_EmitHeap.h>
+    #include<H4P_EmitQ.h>
+    #include<H4P_EmitLoopCount.h>
+#else
+    #include<H4P_EmitTick.h>
+#endif
+#include<H4P_WiFi.h>
 
-class H4P_WiFi;
-class H4P_Heartbeat: public H4Plugin {
-        H4P_WiFi*               _pWiFi;
-        static  uint32_t        _uptime;
-
-                void        _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) override;
-                void        _hookIn() override; // autostart
+class H4P_Heartbeat: public H4Service {
+                void        _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override;
                 void        _run();
     public: 
-        H4P_Heartbeat(): H4Plugin(H4PID_BEAT,H4P_EVENT_HEARTBEAT){}
+#if H4P_UI_HEALTH
+        H4P_Heartbeat(): H4Service("beat",H4PE_HEARTBEAT | H4PE_HEAP | H4PE_LOOPS | H4PE_Q){
+            require<H4P_EmitHeap>(heapTag());
+            require<H4P_EmitQ>("Q");
+            require<H4P_EmitLoopCount>("LPS");
 
-        static string secsToTime(uint32_t sex);
+            depend<H4P_WiFi>(wifiTag());
+#else
+        H4P_Heartbeat(): H4Service("beat",H4PE_HEARTBEAT){
+            require<H4P_EmitTick>(tickTag());
+            depend<H4P_WiFi>(wifiTag());
+#endif
+        }
 
-        void show() override { reply("upSecs=%u %s\n",upSecs(),CSTR(upTime())); }
-
-        static uint32_t upSecs(){ return _uptime; }
-
-        static string upTime(){ return secsToTime(_uptime); }
+#if H4P_LOG_MESSAGES
+                void        info() override { H4Service::info(); reply(" upTime=%s",CSTR(upTime())); }
+#endif
+        static  string      secsToTime(uint32_t sex);
+        static  string      upTime(){ return h4p.gvGetstring(upTimeTag()); }
+//
+                void        _init() override; // autostart
 };

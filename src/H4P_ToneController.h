@@ -29,7 +29,7 @@ SOFTWARE.
 */
 #pragma once
 
-#include<H4PCommon.h>
+#include<H4Service.h>
 #include<map>
 
 enum H4P_SIREN {
@@ -46,7 +46,7 @@ class H4P_Voice;
 using H4P_STAVE         = pair<H4P_Voice&,const string&>;
 using H4P_TUNE          = vector<H4P_STAVE>;
 
-class H4P_ToneController: public H4Plugin {
+class H4P_ToneController: public H4Service {
         friend class H4P_Voice;
         VSCMD(_siren);
 //      dsqcmb
@@ -81,8 +81,6 @@ class H4P_Voice {
         void         play(const string& tune,int transpose=0);
         void         rest(const char duration){ play(string("R  ").append(1,duration).append(1,' ')); }
 };
-
-//extern __attribute__((weak)) H4P_ToneController h4tc;
 
 #define H4P_sirenBuzz(p,d) h4tc.siren(H4P_SIREN_BUZZ,p,d)
 #define H4P_sirenChirp(p,d) h4tc.siren(H4P_SIREN_CHIRP,p,d)

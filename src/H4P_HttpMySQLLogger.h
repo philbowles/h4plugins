@@ -50,7 +50,7 @@ SOFTWARE.
 */
 
 using H4P_FN_HTTPFAIL = function<void(int)>;
-class H4P_HttpMySQLLogger: public H4Plugin, public asyncHTTPrequest {
+class H4P_HttpMySQLLogger: public H4Service, public asyncHTTPrequest {
         string          ip;
         H4P_FN_HTTPFAIL _fail;
         bool            inflight=false;
@@ -84,7 +84,7 @@ class H4P_HttpMySQLLogger: public H4Plugin, public asyncHTTPrequest {
 
     public:
         H4P_HttpMySQLLogger(const string& ipaddress,H4P_FN_HTTPFAIL fnFail=nullptr,uint32_t filter=H4P_EVENT_ALL): 
-            _fail(fnFail),ip(ipaddress),H4Plugin(H4PID_SQLL,filter){}
+            _fail(fnFail),ip(ipaddress),H4Service(H4PID_SQLL,filter){}
             
         void _hookIn() override { // protect
             h4pdepend<H4P_WiFi>(this,H4PID_WIFI);

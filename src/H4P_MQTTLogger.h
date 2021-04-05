@@ -29,16 +29,18 @@ SOFTWARE.
 */
 #pragma once
 
-#include <H4PCommon.h>
+#include <H4Service.h>
 #include <H4P_AsyncMQTT.h>
 
-class H4P_MQTTLogger: public H4Plugin {
+class H4P_MQTTLogger: public H4Service {
         H4P_AsyncMQTT*  _pMQTT;
         string          _topic;
-        void            _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) override { _pMQTT->publishDevice(_topic,msg); }
-    protected:
-        virtual void    _hookIn() override { _pMQTT=h4pdepend<H4P_AsyncMQTT>(this,H4PID_MQTT); }
-        virtual void    _greenLight() override {} // dont autostart
+        void            _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override { _pMQTT->publishDevice(_topic,msg); }
     public:
-        H4P_MQTTLogger(const string& topic,uint32_t filter=H4P_EVENT_ALL): _topic(topic),H4Plugin("mlog",filter){}
+        H4P_MQTTLogger(const string& topic,uint32_t filter=H4PE_ALL): _topic(topic),H4Service("mlog",filter,false){
+            _pMQTT=depend<H4P_AsyncMQTT>(mqttTag());
+        }
+#if H4P_LOG_MESSAGES
+        virtual void info() override { H4Service::info(); reply(" Topic: %s",CSTR(_topic)); }
+#endif
 };

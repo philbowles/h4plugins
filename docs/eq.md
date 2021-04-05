@@ -4,7 +4,7 @@
 
 ## Shortname evtq
 
-Emits `H4P_EVENT_Q` events at a user-defined frequency. The event message contains the string representation of the size of the H4 task Queue.
+Emits `H4PE_Q` events at a user-defined frequency. The event message contains the string representation of the size of the H4 task Queue.
 
 For information on how to use this plugin, see [Event Listeners, Event Emitters and logging](events.md)
 
@@ -45,7 +45,7 @@ N/A
 
 # Events Emitted
 
-`H4P_EVENT_Q`
+`H4PE_Q`
 
 # Tasks Run
 

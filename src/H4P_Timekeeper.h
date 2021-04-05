@@ -30,7 +30,7 @@ SOFTWARE.
 */
 #pragma once
 
-#include<H4PCommon.h>
+#include<H4Service.h>
 #ifdef ARDUINO_ARCH_ESP8266
     #include "sntp.h"
 #else
@@ -39,7 +39,6 @@ SOFTWARE.
 #endif
 
 #include<H4P_WiFi.h>
-#include<H4P_BinaryThing.h>
 
 using H4P_DURATION = pair<string,string>;
 using H4P_SCHEDULE = vector<H4P_DURATION>;
@@ -53,27 +52,24 @@ H4P_SCHEDULE mySchedule={
 
 using H4_FN_DST        =function<int(uint32_t)>;
 
-class H4P_Timekeeper: public H4Plugin {
+class H4P_Timekeeper: public H4Service {
         VSCMD(_change);
         VSCMD(_tz);
                 H4_FN_DST           _fDST;
-                H4P_BinaryThing*    _btp=nullptr;
                 string              _ntp1;
                 string              _ntp2;
                 uint32_t            _mss00=0;
                 struct tm           _timeinfo;
                 int                 _tzo;
 
-                uint32_t    __alarmCore (vector<string> vs,bool daily,H4BS_FN_SWITCH);
+                uint32_t    __alarmCore (vector<string> vs,bool daily);
                 void        __HALsetTimezone(int);
                 uint32_t    _at(vector<string> vs);
                 uint32_t    _daily(vector<string> vs);
-                void        _greenLight() override {}; // no autostart
+                void        _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override;
                 void        _setupSNTP(const string& ntp1, const string& ntp2);
-                void        _start() override;
-                void        _stop() override;
+
     public:
-        H4P_Timekeeper(): H4Plugin(H4PID_TIME){} // required for dependencies
         H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzOffset=0,H4_FN_DST fDST=nullptr);
 ///
 // _tzo = Time Zone Offset in +/- minutes from UTC, not hours.
@@ -86,24 +82,24 @@ class H4P_Timekeeper: public H4Plugin {
         static  int 		DST_EU(uint32_t t);  // DST offset for t in EU (inc UK).
         static  int 		DST_USA(uint32_t t);  // DST offset for t in USA.
 ///
-                void        at(const string& when,bool onoff,H4BS_FN_SWITCH f);
-                void        atSource(const string& when,bool onoff);
+                void        at(const string& when,bool onoff);
                 void        change(const string& ntp1,const string& ntp2);
                 string 		clockTime() { return _mss00 ? strTime(msSinceMidnight()) : "0"; }
-                void        daily(const string& when,bool onoff,H4BS_FN_SWITCH f);
-                void        dailySource(const string& when,bool onoff);
+                void        daily(const string& when,bool onoff);
                 uint32_t 	msSinceMidnight() { return _mss00 + millis(); }
                 int      	parseTime(const string& ts);
                 string      minutesFromNow(uint32_t s);
-                void        setSchedule(H4P_SCHEDULE,H4BS_FN_SWITCH f);
-                void        setScheduleSource(H4P_SCHEDULE);
-                void        show() override;
+                void        setSchedule(H4P_SCHEDULE);
+#if H4P_LOG_MESSAGES
+                void        info() override;
+#endif
                 string 		strTime(uint32_t t);
                 void        sync();
                 void        tz(int tzOffset);
                 string 		upTime();
 // syscall only
-        void            _hookIn() override;
-};
+        virtual void        _init() override;
+        virtual void        svcUp() override;
+        virtual void        svcDown() override;
 
-extern __attribute__((weak)) H4P_Timekeeper h4tk;
+};

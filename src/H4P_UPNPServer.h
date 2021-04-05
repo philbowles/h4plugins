@@ -29,35 +29,24 @@ SOFTWARE.
 */
 #pragma once
 
-#include<H4PCommon.h>
+#include<H4Service.h>
 #include<H4P_WiFi.h>
-#include<H4P_BinaryThing.h>
 
 STAG(alive);
 
-/*
-using H4P_FN_TAGMATCH   =function<void(uint32_t mx,H4P_CONFIG_BLOCK,bool)>;
-using H4P_TAG_MAP       =unordered_map<string,pair<string,H4P_FN_TAGMATCH>>;
-*/
-class H4P_UPNPServer: public H4Plugin {
-        H4P_BinaryThing* _btp;
-        H4P_WiFi*       _pWiFi;
-        AsyncUDP 	    _udp;
-        IPAddress		_ubIP;
-//        H4P_TAG_MAP     _detect;
+class H4P_UPNPServer: public H4Service {
+            H4P_WiFi*           _pWiFi;
+            AsyncUDP 	        _udp;
+            IPAddress		    _ubIP=IPAddress(239,255,255,250);;
 
-                VSCMD(_friendly);
-                VSCMD(_host2);
+//                VSCMD(_friendly);
 
                 string          _uuid="uuid:";
                 string          _urn="Belkin:";
+                string          _udn;
 
-            vector<string>      _pups={
-                    "",
-                    rootTag()
-                };
+                vector<string>  _pups={"",rootTag()};
 
-                string          _name;
                 string          _soap;
                 string          _ucom;
                 string          _xml;
@@ -66,36 +55,32 @@ class H4P_UPNPServer: public H4Plugin {
                 string          __upnpCommon(const string& usn);
                 void            __upnpSend(uint32_t mx,const string s,IPAddress ip,uint16_t port);
 
-                void            _handleEvent(H4PID pid,H4P_EVENT_TYPE type,const string &msg) override;
+        virtual void            _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override;
                 void            _handlePacket(string p,IPAddress ip,uint16_t port);
                 void            _listenUDP();
                 void            _notify(const string& s);
                 void            _upnp(AsyncWebServerRequest *request);
 
-                void            _start() override;
-                void            _stop() override;
-                void            _greenLight() override {}; // dont autostart!
-
         static  string 	        replaceParamsFile(const string &f){ return h4preplaceparams(CSTR(H4P_SerialCmd::read(f))); }
     public:                
-        H4P_UPNPServer(const string& name="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr): _name(name), H4Plugin(H4PID_UPNP,H4P_EVENT_FACTORY,onC,onD){
-            _pups.push_back(_urn+"device:controllee:1");
-            _pups.push_back(_urn+"service:basicevent:1");
-            _ubIP=IPAddress(239,255,255,250);
+        H4P_UPNPServer(const string& name=""): H4Service(upnpTag(),H4PE_GV_CHANGE){
+            h4p.gvSetstring(nameTag(),name,true);
+            _pWiFi=depend<H4P_WiFi>(wifiTag());
+            /*
             _addLocals({ 
-                {_pName,    { H4PC_H4, _pid, nullptr}},
-                {"name",    {_pid, 0, CMDVS(_friendly)}},
-                {"host2",   {_pid, 0, CMDVS(_host2)}}
+                {_me,       { H4PC_H4, _pid, nullptr}},
+                {nameTag(), { _pid, 0, CMDVS(_friendly)}},
             });
+            */
         }
-
-                void           friendlyName(const string& name);
-                void           setBothNames(const string& host,const string& friendly);
-                void           show() override { reply("Name: %s",CSTR(_cb[nameTag()])); }
+                void            friendlyName(const string& name){ h4p[nameTag()]=name; }
+#if H4P_LOG_MESSAGES
+                void           info() override;
+#endif
+                void           svcUp() override;
+                void           svcDown() override;
 //          _syscall only
                 void           _broadcast(uint32_t mx,const string s){ __upnpSend(mx,s,_ubIP,1900); }
-//                void           _listenTag(const string& tag,const string& value,H4P_FN_TAGMATCH f){ _detect[tag]=make_pair(value,f); }
-                void           _hookIn() override;
+                void           _listenTag(const string& tag,const string& value);
+                void           _init() override;
 };
-
-//extern __attribute__((weak)) H4P_UPNPServer h4upnp;

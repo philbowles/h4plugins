@@ -1,6 +1,6 @@
 ![H4P Flyer](/assets/GPIOLogo.jpg) 
 
-# H4P_GPIOManager
+# H4P_PinMachine
 
 ## Shortname gpio
 
@@ -26,7 +26,7 @@ You need to have read [GPIO Handling](gpio.md) before using this plugin.
 # Usage
 
 ```cpp
-H4P_GPIOManager h4gm;
+H4P_PinMachine h4gm;
 ```
 
 This plugin is a "singleton" - there may be only one single instance of it in the app. 
@@ -43,11 +43,11 @@ N/A
 
 # Events Listened for
 
-`H4P_EVENT_HEARTBEAT`
+`H4PE_HEARTBEAT`
 
 # Events Emitted
 
-`H4P_EVENT_BACKOFF`
+`H4PE_BACKOFF`
 
 # Tasks Run
 
@@ -117,7 +117,7 @@ EncoderAutoPin*     EncoderAuto(uint8_t pA,uint8_t pB,uint8_t mode,H4GM_SENSE se
 FilteredPin*        Filtered(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint8_t filter,H4GM_FN_EVENT pinChange);//
 LatchingPin*        Latching(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_FN_EVENT pinChange);//
 LatchingPin*        LatchingSource(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs);//
-MultistagePin*      Multistage(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4GM_STAGE_MAP stageMap,H4GM_FN_EVENT pinChange);//
+MultistagePin*      Multistage(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t dbTimeMs,H4PM_STAGE_MAP stageMap,H4GM_FN_EVENT pinChange);//
 OutputPin*          Output(uint8_t p,H4GM_SENSE sense,uint8_t initial,H4GM_FN_EVENT pinChange=nullptr);// FIX ptr type
 PolledPin*          Polled(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t frequency,uint32_t isAnalog,H4GM_FN_EVENT pinChange);//
 PolledPin*          PolledSource(uint8_t p,uint8_t mode,H4GM_SENSE sense,uint32_t frequency,uint32_t isAnalog);//

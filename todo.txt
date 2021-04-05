@@ -1,3 +1,9 @@
+Fives
+ouptut multistage throttling
+ui free
+more contrast 1/0
+test bi 
+change gpio msg: n,v
 SHORTTERM
     privatise wifi signalOFF
     fix static boolean
@@ -31,3 +37,10 @@ LONGTERM
     rf bridge
     fix switch.ps1 to use soap etc (revert a la esparto)
     schedule in cheztoi - now node red :)
+
+    ‎d4 eb 8d 1b d1 9a d8 24 98 b9 23 95 ee ec a5 99 91 16 c9 ea
+
+    {0x2b,0x8f,0x1b,0x57,0x33,0x0d,0xbb,0xa2,0xd0,0x7a,0x6c,0x51,0xf7,0x0e,0xe9,0x0d,0xda,0xb9,0xad,0x8e};
+
+    ‎   2b   8f   1b   57   33   0d   bb   a2   d0   7a   6c   51   f7   0e   e9   0d   da   b9   ad   8e
+    

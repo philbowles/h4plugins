@@ -2,7 +2,7 @@
 
 # Events, Emitters and Listeners
 
-Essential background before using the events and/or logging systems
+Essential background for getting started with H4Plugins
 
 ---
 
@@ -26,90 +26,121 @@ Essential background before using the events and/or logging systems
 
 ---
 
-# Defintions
+# EVERYTHING is an event
 
-If you have used javascript, these concepts should already by familiar to you, but read on to ensure you understand H4Plugins use of the terminology. Similarly if you are familiar with MQTT, H4Plugins events are much like topics in the publish / subscribe model.
+*Everything* you are going to deal with in H4Plugins is an event. That's only 99% true, but you will learn about the other 1% as you become more expert with the framework. You should know already from reading the [H4 documentation](https://github.com/philbowles/H4) why we *need* "Event-driven programming" - and hopefully that is why you are here, but what exactly *is* an event? 
 
-You should know already from reading the [H4 documentation](https://github.com/philbowles/H4) why we need "Event-driven programming", but what exactly *is* an event?
+In its broadest sense and event is something that happens in the real world, for example:
 
-The answer may sound too vague, but an event is anything that happens in the real world - or your own code - that users or other plugins may be be interested in. The usual reason for being "interested" is that they may need to *do* something when that event occurs.
+* User presses a button on a GPIO pin
+* Alexa voice control sends a request
+* Trying to access a remote server which "times out"
 
-Let's take a simple example and assume that you want to reset your device to its "factory settings". There are several plugins that save configuration data. Each one of them needs to be told that a factory reset is in progress so they can clear up their own data. Because it is *you, the user* who chooses which plugins get loaded, H4Plugins needs a flexible system to call only those that are in use to tell them to clean up.
+These are the happenings that H4 translates into a list of tasks in a queue, but sometimes things happen so fast that waiting for the next task can be too long: for these things we have events. They are used heavily by the GPIO system for example, where things need to be dealt with very rapidly. H4Plugins can also create its own internal events - these look to your code exactly the same as any other event and there is a single common interface for dealing with all events.
 
-It does this by creating / sending or "emitting" an event - specifically `H4P_EVENT_FACTORY`. It just throws it into the air, like a red distress flare. It knows that anybody who sees the flare and recognises its significance will know there is suddenly work to do...
+Your code tells H4Plugins which specifc type of events your are interested in and what to do when one happens. H4Plugins does all the "heavy lifting" and your code will look like a big `switch` statement with short, simple sections of your own coide reacting to those events.
 
-Every plugin, when it starts up, tells H4Plugins which events it is interested in (in our analogy, what colour flare(s) it will respond to). It has some code / process associated with the event known as an "event handler" and we call this declaration of interest "registering an event". The plugin is now an "Event Listener". Anything that can send an event is an "Event Emitter" - it is perfectly possible to be both at the same time.
+## The anatomy of H4Plugins events
+
+If you have used javascript, these concepts should already by familiar to you, but read on to ensure you understand H4Plugins' use of the terminology. Similarly if you are familiar with MQTT, H4Plugins events are much like topics in the publish / subscribe model.
+
+H4Plugins events have 3 pieces of information:
+
+* The "source" of the event (where it came from / what caused it)
+* Optionally, some data attached to the event (the "message")
+* The type of event
+
+### Event sources
+
+Each plugin is a separate piece of code that runs as a "service" and has a short name associated with it, for example `wifi` or `mqtt`. For this reason it is often referred to as `svc`. You can read more about services here: [Common Command and Control: H4P_SerialCmd and Services](ccc.md). Generally speaking the source will be the short name of the plugin that caused the event. When dealing with GPIO pins, the source is the pin number. During startup before any plugins are running, it will be `h4p`.
+
+### Event messages
+
+The message part of the event can contain any data, depending on the type of message. For example with GPIO it is the new value of the GPIO pin. Even though many events may send numeric values, the message type is always `std::string`. It is easy to call `atoi` to get an integer value if required. Where an event has nothing useful to add, the message will be an empty string, e.g. `msg==""` and `msg.size()==0` are both `true`
+
+### Event types
+
+| Event Name | Meaning | Msg contains | Note |
+| :--- | :--- | :--- | :---: |
+|H4PE_BOOT|System Start||1|
+|H4PE_STAGE2|Sytem Start 2||1|
+|H4PE_SERVICE|'svc' goes up/down|1=up, 0=down|1|
+|H4PE_REBOOT|About to reboot||2|
+|H4PE_FACTORY|About to factory reset||2|
+|H4PE_SYSINFO|Important information|Arbitrary message||
+|H4PE_SYSWARN|Possible problem - fix it|Arbitrary message||
+|H4PE_SYSFATAL|System cannot continue|Arbitrary message|3|
+|H4PE_HEAP|Heap has been measured|current size|4|
+|H4PE_LOOPS|Loops/sec measured|current count|4|
+|H4PE_Q|Q length has been measured|current size|4|
+|H4PE_CMD|A command was received|The command||
+|H4PE_UIADD|Add web UI item|item parameters|1|
+|H4PE_UISYNC|Update web UI|item name|1|
+|H4PE_PD_ENTER|A device has joined the network|device ID||
+|H4PE_PD_LEAVE|A device has left the network|device ID||
+|H4PE_HEARTBEAT|1-second "tick"|formatted uptime||
+|H4PE_MSG|Log a message|arbitrary text||
+|H4PE_SIGNAL|Flash pattern|timebase,pattern|5|
+|H4PE_VIEWERS|Number of actual web users|0=no viewers,1=at least 1||
+|H4PE_GPIO|Pin activity|depends on pin||
+|H4PE_GV_CHANGE|A global variable has changed|new value||
+
+Notes:
+1. Internal use, for information only. Do not emit, listen out for etc...
+2. Monitor these if you have resources to cleardown / erase
+3. This is a radical "fail-safe" state: system will loop indefintely to prevent any GPIO activity.
+4. For diagnostic / tuning purposes only
+5. See [H4P_Signaller](h4fc.md)
+
+As you can see, many of the evnts are for internal use only and you only need to be aware of them if you are writing your own plugin or doing some of the things discussed in [Advanced Topics](docs/advanced.md). Most users wil only need to react to:
+
+* H4PE_GPIO
+* H4PE_GV_CHANGE
+
+GPIO messages and the whole GPIO susbsytem are discussed in: [GPIO Handling and "NODE-PINK"](gpio.md). Global variables are discussed in:  [Global Variables and persistent storage](globals.md)
 
 ---
 
-# Anatomy of an Event Handler
+# Event Listeners
 
 Technically speaking, an Event Listener is *any* piece of code that registers a handler for a known event and provides a callback function of the form:
 
 ```cpp
-void MyVeryOwnEventHandler(H4PID pid,H4P_EVENT_TYPE t,const string& msg){ ... do some interesting stuff }
+void MyVeryOwnEventHandler(const string& svc,H4PE_TYPE t,const string& msg){ ... do some interesting stuff }
 ```
 
-All plugins do this automatically, so all plugins are - by definition - Event Listeners. Whether they actually choose to listen / react is another matter: many don't take advantage of the feature as they don't have any need / interest in any of the events.
-
-* `pid` is the plugin ID of the plugin that sent or "emitted" this event. Most of the time it doesn't matter *who* caused the event, but it can be useful when trying to track down bugs.
-* `t` is the type of event. See the table below
-
-* `msg` is optional information about that event. It is different for every event type
-
-## Events
-
-| Event Name | Meaning | Msg contains | Note |
-| :--- | :--- | :--- | :---: |
-|H4P_EVENT_NOOP|Nothing||1|
-|H4P_EVENT_MSG|Arbitrary message|user-defined|2|
-|H4P_EVENT_SVC_UP|Plugin service up|shortname|3|
-|H4P_EVENT_SVC_DOWN|Plugin service down|shortname|3|
-|H4P_EVENT_CMD|A command was entered|The command|3|
-|H4P_EVENT_USER|User event|user-defined||
-|H4P_EVENT_HEAP|Heap has been measured|current size||
-|H4P_EVENT_Q|Q length has been measured|current size||
-|H4P_EVENT_LOOPS|Loops/sec measured|current count||
-|H4P_EVENT_PD_ENTER|A device has joined the network|device ID|3|
-|H4P_EVENT_PD_LEAVE|A device has left the network|device ID|3|
-|H4P_EVENT_MQTT_ERROR|PangolinMQTT internal error|error code|3|
-|H4P_EVENT_REBOOT|About to reboot|||
-|H4P_EVENT_FACTORY|About to factory reset|||
-|H4P_EVENT_CMDREPLY|Result of H4P_EVENT_CMD|Error code 0=OK||
-|H4P_EVENT_DLL|Plugin dynamically loaded|shortname|3|
-|H4P_EVENT_ON|`h4onof` went ON||3|
-|H4P_EVENT_OFF|`h4onof` went OFF||3|
-|H4P_EVENT_BACKOFF|webUI Q buffer exceeded||3,4|
-|H4P_EVENT_HEARTBEAT|One second has passed|N seconds uptime|3|
-|H4P_EVENT_ALL|Include ALL events||5|
-
-Notes:
-1. Useful for testing / debugging. If *anything* happens when this is sent, you have a problem!
-2. This is the most common type used by loggers
-3. Internal use, information only. Do not emit.
-4. This is due to the terrible design of AsyncWebserver library: It cannot keep up with the rte of messages being sent, and is almsot certain to crsh uness you stop sending *immediately*
-5. Except `H4P_EVENT_HEARTBEAT` - those get really annoying really quickly :smile: . If you *really* want "all" (and you don't) use 0xffffffff
+All plugins do this automatically, so all plugins are - by definition - Event Listeners.
 
 ## Handling your own events
 
-If you are interested in a single event, there is a simple function you can call:
+***IMPORTANT CAVEAT:***
+
+One of the "gotchas" that newcomers to ESP8266 / ESP32 suffer especially if they are moving from say PIC or Arduino or STM32 programming is that *yours is not the only code running*. That's the whole reason you are here, because to get muliple things happening at the same time you have to cope with that and thats why H4 and H4Plugins were written, to make that easy for you.
+
+BUT..."easy" doesn't mean "invisible": you still have to be aware that there is a lot of other code running and it too emits and listens for events. This raises a very a important point:
+
+***All handlers, incuding the ones you write get called for ALL events of that type, whether you sent them or not***. 
+(All events are "global" in effect)
+
+This means that you may well have to exmine both the `svc` and/or `msg` fields to decide if it's "one of yours" before acting on any particular event.
+
+With this in mind, if you are interested in a single event, there is a simple function you can call:
 
 ```cpp
-void h4pOnEvent(H4P_EVENT_TYPE t,H4P_FN_USEREVENT f);
+void h4pOnEvent(H4PE_TYPE t,H4P_FN_USEREVENT f);
 ```
 
-Names a function `f` (or defines a lambda) to handle the specific event type `t`. For example:
+Names a function `f` (or defines a lambda) of type `H4P_FN_USEREVENT` (whcih just means its a void function with a string parameter) to handle the specific event type `t`. For example:
 
 ```cpp
 ...
-void sayGoodbye(const string& msg){ // msg is unused in H4P_EVENT_FACTORY
-    Serial.println("Morituri te salutant*");
+void sayGoodbye(const string& msg){ // msg is unused in H4PE_FACTORY
+    Serial.println("Morituri te salutant"); // Latin for *"We who are about to die, salute you"*
+
 }
 ...
-h4pOnEvent(H4P_EVENT_FACTORY,sayGoodbye);
+h4pOnEvent(H4PE_FACTORY,sayGoodbye);
 ```
-
-*Latin for *"We who are about to die, salute you"*
 
 If more than one event type needs to be monitored, you need an [H4P_EventListener](ears.md), but before that you need to know how to combine events.
 
@@ -117,24 +148,21 @@ If more than one event type needs to be monitored, you need an [H4P_EventListene
 
 ### Combining Events
 
-Multiple Events types are specified at the same time by packing them all into bit-mask. Naming several events then uses the C/C++ language biwise-or operator: `|` (vertical bar)
+Multiple Events types are specified at the same time by packing them all into a bit-mask. Naming several events then uses the C/C++ language bitwise-or operator: `|` (vertical bar)
 
 ```cpp
-uint32_t myMultipleEventBitmask = H4P_EVENT_REBOOT | H4P_EVENT_FACTORY;
+uint32_t myMultipleEventBitmask = H4PE_REBOOT | H4PE_FACTORY;
 ...
-// myEventHandler will get called if either H4P_EVENT_REBOOT OR H4P_EVENT_FACTORY occurs
-H4P_EventListener ears1(myMultipleEventBitmask,myEventHandler); 
+// myEventHandler will get called if either H4PE_REBOOT OR H4PE_FACTORY occurs
+H4P_EventListener ears1(myMultipleEventBitmask,MyVeryOwnEventHandler); 
 ```
 
 ### Excluding Events
 
 Again using standard C/C++ language bitwise logic operators, this time `&` and `~` (complement) we can exclude certain events. 
-Saying `H4P_EVENT_ALL &~ H4P_EVENT_HEARTBEAT` will handle everything *except* `H4P_EVENT_HEARTBEAT`. The `&~` should be read as "and not"
+Saying `H4PE_ALL &~ H4PE_HEARTBEAT` will handle everything *except* `H4PE_HEARTBEAT`. The `&~` should be read as "and not"
 
 ---
-
-# Event Listeners
-
 ## Logging
 
 A Logger is simply a plugin that listens for some event type(s) and then does something useful with them, usually showing, saving, relaying, sending them somewhere.
@@ -155,62 +183,68 @@ Writing your own logger is extremely easy. As mentioned above, all you need to d
 First is the custom logger class. We name it "lumberjack" for a bit of fun:
 
 ```cpp
-class myLogger: public H4Plugin {
-        void _handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg) override {
+class myLogger: public H4Service {
+        void _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override {
             uint32_t msgvalue=atoi(msg.c_str());
-            if(msgvalue%2) Serial.printf("That's odd! Type=%s from %s msg=%s\n",h4pgetEventName(t).c_str(),h4pnames[pid].c_str(),msg.c_str());
+            if(msgvalue%2) Serial.printf("That's odd! Type=%s from %s msg=%s\n",h4pGetEventName(t).c_str(),svc.c_str(),msg.c_str());
         }
     public:
-        myLogger(uint32_t filter=H4P_EVENT_ALL): H4Plugin("lumberjack",filter){}
+        myLogger(uint32_t filter=H4PE_ALL): H4Service("lumberjack",filter){}
 };
 ```
 
-You could omit the filter parameter and "hard-code" a type or types that you register with the underlying H4Plugin like this:
+You could omit the filter parameter and "hard-code" a type or types that you register with the underlying H4Service like this:
 
 ```cpp
     public:
-        myLogger(): H4Plugin("lumberjack",H4P_EVENT_USER | H4P_EVENT_MSG){}
+        myLogger(): H4Service("lumberjack",H4PE_USER | H4PE_MSG){}
 ```
 
-But its far more flexible to just pass through whatever the user decides when they instantiate your logger:
+But its far more flexible to just pass through whatever the user decides when they instantiate your logger
 
-
-```cpp
-myLogger im_a_lumberjack_and_im_ok(H4P_EVENT_USER);
-```
-
-The event handler is very simple (but unusual and not very useful!). It expects the message to contain an integer value and it ignores everything except the odd values.
+The event handler is very simple (as well as unusual and not very useful!). It expects the message to contain an integer value and it ignores everything except the odd values.
 
 This means that unless you can guarantee that any event you listen to contains a single integer in its message - which usually you can't - then you need to be very careful!
 
-If we restrict ourselves in the app to emitting H4P_EVENT_USER messages with an integer in the message, then our example will work.
+If we restrict ourselves in the app to emitting H4PE_MSG messages with an integer in the message, then our example will work, but only as long as no other code sends H4PE_MSG with text values.
 
 ## A generic Listener
 
-While the above information is good to know, there's a shortcut which does 90% of it for you, the [H4P_EventListener](ears.md) plugin. All you need to do is slot in the actual "meat" of the function to be called whenever any registered event occurs 
+While the above information is good to know, there's a shortcut which does 90% of it for you, the [H4P_EventListener](ears.md) plugin. All you need to do is slot in the actual "meat" of the function to be called whenever any registered event(s) occur(s) 
 
 ```cpp
-void myHandler(H4PID pid,H4P_EVENT_TYPE t,const string& msg){ ...do something wonderful...};
+void myHandler(const string& svc,H4PE_TYPE t,const string& msg){ ...do something wonderful...};
 ...
 H4P_EventListener bigBrother( ...events you want ... ,myHandler);
+```
+
+The simplest of example of this is the predefined [H4P_SerialLogger](slog.md) where the "...do something wonderful..." code simply prints the message with `Serial.printf`
+
+## h4pGlobalEventHandler: The Global Listener
+
+Usually most helpful during testing and development (and pretty intrusive and annoying at all other times), you may provide a function called `h4pGlobalEventHandler`. If you do then *every single event* emitted by any code in the system will arrive here, so be prepared. There is no filter, it's *global*, hence the name. You get *everything* whether you want it or not. Probably mostly "not".
+
+```cpp
+void h4pGlobalEventHandler(const std::string& svc,H4PE_TYPE t,const std::string& msg){
+  Serial.printf("Big Brother sees EVERYTHING %s %s %s\n",svc.c_str(),h4pGetEventName(t).c_str(),msg.c_str());
+}
 ```
 
 ---
 # Event Emitters
 
-So far everything has been about Listening for events, but how do we actually make them happen? Before we continue, it has to be stressed that ***unless you have declared a listener...*** of some kind before doing any of what follows, ***...you will see nothing***! As a minimum, the [H4P_SerialLogger](slog.md) is suggested, which will send all its output to the serial monitor.
+So far everything has been about Listening for events, but how do we actually make them happen ourselves? Before we continue, it has to be stressed that ***unless you have declared a listener...*** of some kind before doing any of what follows, ***...you will see nothing***! As a minimum, the [H4P_SerialLogger](slog.md) is suggested.
 
 The most fundamental method is to call:
 
-
 ```cpp
-void h4psysevent(H4PID pid,H4P_EVENT_TYPE t,const std::string& fmt, Args... args);
+void h4psysevent(const string& svc,H4PE_TYPE t,const std::string& fmt, Args... args);
 ```
 
 But this requires you to know...
 
-* A valid `pid` value
-* The content and format (if any) of the message expected by the specific H4P_EVENT_TYPE
+* A valid `svc` name or value
+* The content and format (if any) of the message expected by the specific H4PE_TYPE
   
 ... so there are some shortcuts and easier ways
 
@@ -222,44 +256,31 @@ First there is
 void h4pUserEvent(const char* format,...);
 ```
 
-Which emits an event of type `H4P_EVENT_USER` with a message made up from `printf`-style format string and optional list of parameters, e.g. `h4pUserEvent("Something %s interesting happened","mildly");` - basically anything you want.
+Which emits an event of type `H4PE_MSG` with a message made up from `printf`-style format string and optional list of parameters, e.g. `h4pUserEvent("Something %s interesting happened","mildly");` - basically anything you want.
 
-Then there is the even easier `PLOG` macro:
+More importantly it can be "compiled out"
 
-```cpp
-PLOG("My sensor value from GPIO %d = %d",myPin,666);
-```
-
-The difference between this and `h4pUserEvent` is that `PLOG` emits `H4P_EVENT_MSG` events, which is the "standard" for anything that logs "useful information" re progress / performance / diagnostics etc. More improtanty it can be "compiled out"
-
-If you edit [config.h](../src/config.h) and set:
+If you edit [plugins_config.h](../src/plugins_config.h) and set:
 
 ```cpp
 #define H4P_LOG_EVENTS      0
 ```
 
-The all `PLOG` calls in your code effecitvely disappear, making you code leaner, meaner and a lot less chatty. This is great for "production" but not very helpful while testing and/or ebugging, so until you are 100% happy with your code, leave it set to 1.
+Then all `h4pUserEvent` calls in your code effecitvely disappear, making you code leaner, meaner and a lot less chatty. This is great for "production" but not very helpful while testing and/or debugging, so until you are 100% happy with your code, leave it set to 1.
 
 ## Simple event emitting
 
-You should restrict your emissions to `H4P_EVENT_USER` and `H4P_EVENT_MSG` since these two can (usually) do no harm. Emitting any other event can cause bad things to happen if you do it at the wrong time or get the message contents wrong. But if you feel you *must* then use the `PEVENT` macro, e.g.
-
-```cpp
-PEVENT(H4P_EVENT_REBOOT,"Because my counter reached %d",666);
-```
-
-Because events usually affect processing and/or lifecycle, unlike `PLOG`, `PEVENT` cannot be "compiled out".
-
+You should restrict your emissions to `H4PE_MSG` since this can (usually) do no harm. Emitting any other event can cause bad things to happen if you do it at the wrong time or get the message contents wrong.
 ## "Standard" emitters
 
 H4Plugins comes with some pre-defined event emitters which are useful during testing or debugging:
 
 | Plugin | Event | Msg |Note|
 | :--- | :--- | :--- | :---: |
-|[H4P_EmitHeap](heap.md)|H4P_EVENT_HEAP|amount of free heap||
-|[H4P_EmitLoopCount](loops)|H4P_EVENT_LOOPS|Loops per second|1|
-|[H4P_EmitQ](eq.md)|H4P_EVENT_Q|Length of H4 Queue||
-|[H4P_EmitTick](tick.md)|H4P_EVENT_HEARTBEAT|Integer number of seconds uptime||
+|[H4P_EmitHeap](heap.md)|H4PE_HEAP|amount of free heap||
+|[H4P_EmitLoopCount](loops)|H4PE_LOOPS|Loops per second|1|
+|[H4P_EmitQ](eq.md)|H4PE_Q|Length of H4 Queue||
+|[H4P_EmitTick](tick.md)|H4PE_HEARTBEAT|Integer number of seconds uptime||
 
 Notes:
 1. Requires reconfiguration of H4 config

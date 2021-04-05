@@ -29,8 +29,7 @@ SOFTWARE.
 */
 #pragma once
 
-#include<H4PCommon.h>
-#include<H4P_VerboseMessages.h>
+#include<H4Service.h>
 
 enum H4P_SVC_CONTROL {
     H4PSVC_RESTART,
@@ -38,44 +37,76 @@ enum H4P_SVC_CONTROL {
     H4PSVC_START,
     H4PSVC_STOP
 };
-class H4P_SerialCmd: public H4Plugin {        
-        VSCMD(_event);
-        VSCMD(_svcRestart);
-        VSCMD(_svcInfo);
-        VSCMD(_svcStart);
-        VSCMD(_svcStop);
 
-                H4_CMD_MAP_I    __exactMatch(const string& cmd,uint32_t owner);
+class H4P_SerialCmd: public H4Service {        
+        static  string          _fname; // cos rd/w are static :)
+
+                VSCMD(_config);
+                VSCMD(_get);
+                VSCMD(_svcRestart);
+                VSCMD(_svcInfo);
+                VSCMD(_svcStart);
+                VSCMD(_svcStop);
+
+                H4P_CMDMAP_I    __exactMatch(const string& cmd,uint32_t owner);
                 void            __flatten(function<void(string)> fn);
 
+                void            _adjust(const string& name,int value);
+                void            _createProxy(const string& name,bool save=false);
                 uint32_t        _dispatch(vector<string> vs,uint32_t owner);
                 void            _flattenCmds(function<void(string)> fn,string cmd="",string prefix="",uint32_t owner=0);
-                void            _hookIn() override;
-                void            _run();        
-                void            _start() override { h4._hookLoop([this](){ _run(); },_pid); H4Plugin::_start(); }
-                void            _stop() override { h4._unHook(_pid); H4Plugin::_stop(); }
+                void            _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override;
+                void            _run();
+                void            _showItem(const string& name){ reply("  %s %s=%s",(h4pGlobal[name]._save) ? "P":" ",CSTR(name),CSTR(h4pGlobal[name])); }
                 uint32_t        _svcControl(H4P_SVC_CONTROL svc,vector<string> vs);
+    protected:
+                void            svcUp() override;
+                void            svcDown() override;
     public:
         VSCMD(_dump);   // public so logger can use it
         static  string          _dumpTask(task*);
 
         H4P_SerialCmd(bool autoStop=false);
-        
+
+                h4proxy&        operator[](const string& name) {
+                    _createProxy(name);
+                    return h4pGlobal[name];
+                }
+
+                void            gvDec(const string& name);
+                void            gvErase(const string& name){ gvErase({CSTR(name)}); }
+                void            gvErase(initializer_list<const char*> nil);
+                bool            gvExists(const string& name){ return h4pGlobal.count(name); }
+                int             gvGetInt(const string& name);
+                string          gvGetstring(const string& name);
+                void            gvInc(const string& name);
+                void            gvSave(const string& name){ gvSave({CSTR(name)}); }
+                void            gvSave(initializer_list<const char*> sav);
+                void            gvSetInt(const string& name,int value,bool save=false);
+                void            gvSetstring(const string& name,const string& value,bool save=false);
+//
                 void            addCmd(const string& name,uint32_t owner, uint32_t levID,H4_FN_MSG f=nullptr);
-                void            all();
-                void            config(){ for(auto const& c:_cb) reply("%s=%s",CSTR(c.first),CSTR(c.second)); }        
-                void            heap(){ reply("Heap=%u",ESP.getFreeHeap()); }        
+                void            clear();
                 void            help();
-                uint32_t        invokeCmd(string,string="",const char* src=userTag());
-                uint32_t        invokeCmd(string,uint32_t,const char* src=userTag()); 
+
+#if H4P_LOG_MESSAGES
+                void            all();
+                void            heap(){ reply("Heap=%u",HAL_getFreeHeap()); } // NEEDS TO BE HAL'd
+                void            info() override;
                 void            plugins();
-        static  string          read(const string& fn);
-                void            removeCmd(const string& name,uint32_t _pid=0);
                 void            showFS();
                 void            showQ();
+#endif
+                uint32_t        invokeCmd(string,string="",const char* src=userTag());
+                uint32_t        invokeCmd(string,uint32_t,const char* src=userTag()); 
+        static  string          read(const string& fn);
+                void            removeCmd(const string& name,uint32_t pid=0);
         static  uint32_t        write(const string& fn,const string& data,const char* mode="w");
 //      syscall only
                 uint32_t        _executeCmd(string topic, string pload);
+                void            _init() override;
+        static  void            _persist();
                 uint32_t        _simulatePayload(string flat,const char* src=cmdTag());
 };
-extern __attribute__((weak)) H4P_SerialCmd h4cmd;
+
+extern H4P_SerialCmd h4p;

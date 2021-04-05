@@ -64,7 +64,7 @@ Any, depends on filter parameter: see constructor
 `t` is the type of event.
 `msg` is optional information about that event.
 */
-void handleEvent(H4PID pid,H4P_EVENT_TYPE t,const string& msg);
+void handleEvent(const string& svc,H4PE_TYPE t,const string& msg);
 ```
 
 ---

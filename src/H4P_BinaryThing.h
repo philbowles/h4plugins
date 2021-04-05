@@ -29,82 +29,72 @@ SOFTWARE.
 */
 #pragma once
 
-#include<H4PCommon.h>
-
-class H4P_WiFi;
-class H4P_AsyncMQTT;
+#include<H4Service.h>
+#include<H4P_SerialCmd.h>
 
 STAG(condition);
 
-class H4P_BinaryThing: public H4Plugin{
-            uint32_t                _timeout;
-            unordered_set<string>   _slaves;
+class H4P_BinaryThing: public H4Service{
+        function<void(bool)>        _thing;
+                void                _onChange(bool b);
     protected:
-            H4P_WiFi*               _pWiFi;
-            H4P_AsyncMQTT*          _pMQTT;
-            H4BS_FN_SWITCH  _f;
-
                 uint32_t            _autoOff(vector<string> vs){ return _guardInt1(vs,[this](uint32_t t){ autoOff(t); }); }
-
-        virtual void                _greenLight() override ;
-                void                _publish(bool b);
-                void                _setSlaves(bool b);
+        virtual void                _handleEvent(const string& svc,H4PE_TYPE t,const string& msg);
         virtual void                _setState(bool b);
-                uint32_t            _slave(vector<string> vs);
-                void                _start() override;
                 uint32_t            _switch(vector<string> vs){ return _guardInt1(vs,[this](bool b){ turn(b); }); }
+
     public:
-            bool            _state=false;
-        H4P_BinaryThing(H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): _f(f),_state(initial),_timeout(timer), H4Plugin(H4PID_ONOF) {
-            autoOff(timer);
+        H4P_BinaryThing(function<void(bool)> thingFunction,bool initial=OFF,uint32_t timer=0): _thing(thingFunction),H4Service(onofTag(),H4PE_GV_CHANGE) {
+            h4p.gvSetInt(stateTag(),initial,false);
+            h4p.gvSetInt(autoOffTag(),timer,true);
             _addLocals({
-                {autoTag(),{H4PC_H4, 0, CMDVS(_autoOff)}},
-                {"on",     {H4PC_H4, 0, CMD(turnOn)}},
-                {"off",    {H4PC_H4, 0, CMD(turnOff)}},
-                {"state",  {H4PC_H4, 0, CMD(show)}},
-                {"switch", {H4PC_H4, 0, CMDVS(_switch)}},
-                {"toggle", {H4PC_H4, 0, CMD(toggle)}}
+                {"auto",    {H4PC_H4, 0, CMDVS(_autoOff)}},
+                {"on",      {H4PC_H4, 0, CMD(turnOn)}},
+                {"off",     {H4PC_H4, 0, CMD(turnOff)}},
+#if H4P_LOG_MESSAGES
+                {stateTag(),{H4PC_H4, 0, CMD(info)}},
+#endif
+                {"switch",  {H4PC_H4, 0, CMDVS(_switch)}},
+                {"toggle",  {H4PC_H4, 0, CMD(toggle)}}
             });
         }
-
-        virtual void show() override { 
-                reply("State:%d, auto:%d",_state,_timeout);
-                for(auto s:_slaves) reply("slave: %s",CSTR(s));
-            }
-
-                void        autoOff(uint32_t T){ 
-                    _timeout=T;
-                    _cb[autoTag()]=stringFromInt(T);
-                }
-                uint32_t    getAutoOff(){ return _timeout; }
-                void        slave(const string& otherh4,bool inout=true){ 
-                    if(inout) _slaves.insert(otherh4);
-                    else _slaves.erase(otherh4);
-                    }
-                bool        state() { return _state; }
-                void        turnOff(){ turn(false); }
-                void        turnOn(){ turn(true); }
-                void        toggle(){ turn(!_state); }
-                void        turn(bool b);
-#if H4P_LOG_EVENTS
-                void        _turn(bool b,const string& src);
+        
+#if H4P_LOG_MESSAGES
+        virtual void info() override {
+                    H4Service::info();
+                    reply(" State:%d, AutoOff:%d",h4p.gvGetInt(stateTag()),h4p.gvGetInt(autoOffTag()));
+                }   
 #endif
+                void        autoOff(uint32_t T);
+                uint32_t    getAutoOff(){ return h4p.gvGetInt(autoOffTag()); }
+                bool        state() { return h4p.gvGetInt(stateTag()); }
+                void        turnOff(){ turn(OFF); }
+                void        turnOn(){ turn(ON); }
+                void        toggle(){ turn(!h4p.gvGetInt(stateTag())); }
+                void        turn(bool b){ _setState(b); }
+//
+        virtual void        svcDown() override;
+//      syscall
+        virtual void        _init();
 };
-using H4_FN_CPRED      = function<uint32_t(bool)>;
+
+using H4_FN_CPRED      = function<bool()>;
 
 class H4P_ConditionalThing: public H4P_BinaryThing{
                 H4_FN_CPRED _predicate;
     protected:
-                void        _greenLight() override;
                 void        _setState(bool b) override;
     public:
-        H4P_ConditionalThing(H4_FN_CPRED predicate,H4BS_FN_SWITCH f=nullptr,bool initial=OFF,uint32_t timer=0): 
+        H4P_ConditionalThing(function<void(bool)> thingFunction,H4_FN_CPRED predicate,bool initial=OFF,uint32_t timer=0): 
             _predicate(predicate),
-            H4P_BinaryThing(f,initial,timer) {}
-
-                void        show() override { 
-                    reply("Condition: %d",_predicate(_state));
-                    H4P_BinaryThing::show();
+            H4P_BinaryThing(thingFunction,initial,timer) {}
+#if H4P_LOG_MESSAGES
+                void        info() override { 
+                    H4P_BinaryThing::info();
+                    reply("Condition: %d",_predicate());
                 }
+#endif
                 void        syncCondition();
+//
+        virtual void        _init() override;
 };

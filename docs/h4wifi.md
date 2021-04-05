@@ -31,8 +31,8 @@ It may be instantiated as any name the user chooses, prefix all API calls below 
 
 # Dependencies
 
-[H4P_GPIOManager](h4gm.md)
-[H4P_FlasherController](h4gm.md)
+[H4P_PinMachine](h4gm.md)
+[H4P_Signaller](h4gm.md)
 
 * You must copy the `data` sub-folder to your sketch folder and upload to LittleFS (ESP8266) or SPIFFS (ESP32). To do this you will need to intall either the [LittleFS upload tool](https://github.com/earlephilhower/arduino-esp8266littlefs-plugin) or the [ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin) (or both).
 
@@ -44,11 +44,11 @@ It may be instantiated as any name the user chooses, prefix all API calls below 
 
 # Events Listened for
 
-`H4P_EVENT_FACTORY`
+`H4PE_FACTORY`
 
 # Events Emitted
 
-`H4P_EVENT_BACKOFF`
+`H4PE_BACKOFF`
 
 # Tasks Run
 
@@ -122,7 +122,7 @@ void uiAddGPIO(); //  Add ALL managed GPIO pins as red/green booleans (page refr
 uint32_t uiAddGPIO(uint8_t pin); //  Add specific GPIO pin as red/green boolean (page refresh needed)
 uint32_t uiAddBoolean(const string& name,const boolean tf); // fixed red/green boolean as tf=true or false
 uint32_t uiAddBoolean(const string& name,H4P_FN_UIBOOL f,H4P_FN_UICHANGE onChange=nullptr,bool repeat=false); // clickable red/green boolean
-uint32_t uiAddDropdown(const string& name,H4P_CONFIG_BLOCK options,H4P_FN_UICHANGE onChange=nullptr); // dropdown box from maps of options
+uint32_t uiAddDropdown(const string& name,H4P_NVP_MAP options,H4P_FN_UICHANGE onChange=nullptr); // dropdown box from maps of options
 uint32_t uiAddInput(const string& name,const string& value="",H4P_FN_UICHANGE onChange=nullptr); // simple text input
 void uiSetInput(uint32_t ui,const string& value); // forcibly change value of input field
 void uiSetBoolean(uint32_t ui,const bool b); // change value of red/green bool

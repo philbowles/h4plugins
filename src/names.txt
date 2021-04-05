@@ -1,0 +1,144 @@
+void h4pregisterhandler(const string& svc,uint32_t t,H4P_FN_EVENTHANDLER f);
+void h4pevent(const string& svc,H4PE_TYPE t,const string& msg="");
+void h4pOnEvent(H4PE_TYPE t,H4P_FN_USEREVENT f);
+extern string h4pGetErrorMessage(uint32_t e);
+extern string h4pGetEventName   (H4PE_TYPE e);
+extern string h4pGetTaskType    (uint32_t e);
+extern string h4pGetTaskName    (uint32_t e);
+extern void   h4pClearEvent     (H4PE_TYPE e);
+extern long   HAL_getFreeHeap();
+void h4pFactoryReset(const string& src=userTag());
+void h4pReboot(const string& src=userTag());
+string h4pGetConfig(const string& c);
+int    h4pGetConfigInt(const string& c);
+void   h4pSetConfig(const string& c,const string& v);
+void   h4pSetConfig(const string& c,const int v);
+string h4preplaceparams(const string& s);
+T* h4puncheckedcall(const string& svc){ return h4pmap.count(svc) ? static_cast<T*>(h4pmap[svc]):nullptr; }
+void h4pSafeCall(const string& who, F f,Args... args) {
+void h4psysevent(const string& svc,H4PE_TYPE t,const string& fmt, Args... args){
+        virtual void                info(){ reply("PID=%d %sRunning",_pid,_running ? "":"Not "); }
+        virtual void                svcDown(){ YEVENT(H4PE_SERVICE,CSTR(stringFromInt(_running=false))); }
+        virtual void                svcUp(){ YEVENT(H4PE_SERVICE,CSTR(stringFromInt(_running=true))); }
+      h4pGPIOHandler(STOI(svc),STOI(msg)); \
+extern const char* giveTaskName(uint32_t id);
+                void            change(string ssid,string psk);
+                void            host(const string& host){ _setPersistentValue(deviceTag(),host,true); }
+                void            info() override;
+        virtual void            svcDown() override;
+        virtual void            svcUp() override;
+                uint32_t        uiAddLabel(const string& name){ return _uiAdd(_seq++,name,H4P_UI_LABEL,h4pGlobal[name]); }
+                uint32_t        uiAddLabel(const string& name,const string& v){ return _uiAdd(_seq++,name,H4P_UI_LABEL,v); }
+                uint32_t        uiAddLabel(const string& name,const int v){ return _uiAdd(_seq++,name,H4P_UI_LABEL,stringFromInt(v)); }
+                uint32_t        uiAddLabel(const string& name,H4P_FN_UITXT f,bool repeat=false){ return _uiAdd(_seq++,name,H4P_UI_LABEL,"",f,nullptr,repeat); }
+                uint32_t        uiAddLabel(const string& name,H4P_FN_UINUM f,bool repeat=false){ return _uiAdd(_seq++,name,H4P_UI_LABEL,"",[f]{ return stringFromInt(f()); },nullptr,repeat); }
+                void            uiAddGPIOAll();
+                uint32_t        uiAddGPIO(uint8_t pin);
+                uint32_t        uiAddBoolean(const string& name,const boolean tf){ return _uiAdd(_seq++,name,H4P_UI_BOOL,"",[tf]{ return tf ? "1":"0"; }); }
+                uint32_t        uiAddBoolean(const string& name,H4P_FN_UIBOOL f,H4P_FN_UICHANGE a=nullptr,bool repeat=false){ return _uiAdd(_seq++,name,H4P_UI_BOOL,"",[f]{ return f() ? "1":"0"; },a,repeat); }
+                uint32_t        uiAddDropdown(const string& name,H4P_NVP_MAP options,H4P_FN_UICHANGE onChange=nullptr);
+                uint32_t        uiAddInput(const string& name,const string& value="",H4P_FN_UICHANGE onChange=nullptr);
+                void            uiSetInput(uint32_t ui,const string& value){ _sendChangedSSE(ui,CSTR(value)); }
+                void            uiSetBoolean(uint32_t ui,const bool b){ _sendChangedSSE(ui,CSTR(stringFromInt(b))); }
+                void            uiSetLabel(uint32_t ui,const int f){ _sendChangedSSE(ui,CSTR(stringFromInt(f))); }
+                void            uiSetLabel(uint32_t ui,const string& value){ _sendChangedSSE(ui,CSTR(value)); }
+                void            uiSync();
+                void            uiSync(uint32_t ui);
+//
+                template<typename... Args>
+                void            uiMessage(const string& msg, Args... args){ // variadic T<>
+                void           friendlyName(const string& name);
+                void           info() override { H4Service::info(); reply("Name: %s",CSTR(h4pGlobal[nameTag()])); }
+                void           setBothNames(const string& host,const string& friendly);
+                void           svcUp() override;
+                void           svcDown() override;
+                void        flashPattern();
+                void        PWM();
+                void        stop();
+                void        throb();
+            void 			flashMorse(const char *pattern, uint32_t timebase, uint8_t pin,H4GM_SENSE active=ACTIVE_HIGH,uint8_t col=H4P_ASSUMED_COLOR);	
+            void 			flashMorse(const char *pattern, uint32_t timebase,h4pOutput*);	
+#ifdef H4FC_MORSE_SUPPORT
+            static std::unordered_map<char,string> _morse; // tidy
+            void 	        flashMorseText(const char * pattern,uint32_t timebase,uint8_t pin,H4GM_SENSE active=ACTIVE_HIGH,uint8_t col=H4P_ASSUMED_COLOR);
+            void 	        flashMorseText(const char * pattern,uint32_t timebase,h4pOutput*);
+#endif
+            void 			flashPattern(const char * pattern,uint32_t timebase,uint8_t pin,H4GM_SENSE active=ACTIVE_HIGH,uint8_t col=H4P_ASSUMED_COLOR);
+            void 			flashPattern(const char * pattern,uint32_t timebase,h4pOutput*);
+            void 			flashPin(uint32_t rate, uint8_t pin,H4GM_SENSE active=ACTIVE_HIGH,uint8_t col=H4P_ASSUMED_COLOR);
+            void 			flashPin(uint32_t rate,h4pOutput*);
+            void 			flashPWM(uint32_t period,uint8_t duty,uint8_t pin,H4GM_SENSE active=ACTIVE_HIGH,uint8_t col=H4P_ASSUMED_COLOR);	
+            void 			flashPWM(uint32_t period,uint8_t duty,h4pOutput*);	
+            void            info() override;
+            bool 			isFlashing(uint8_t pin);
+            void 			pulsePin(uint32_t period,uint8_t pin,H4GM_SENSE active=ACTIVE_HIGH,uint8_t col=H4P_ASSUMED_COLOR);
+            void 			pulsePin(uint32_t period,h4pOutput*);
+            void            stopAll();
+            void            stopPin(uint8_t pin);
+            void            stopPin(h4pOutput*);
+            void 			throbPin(uint32_t rate, uint32_t valley, uint8_t pin,H4GM_SENSE active=ACTIVE_HIGH,uint8_t col=H4P_ASSUMED_COLOR);
+            void 			throbPin(uint32_t rate, uint32_t valley,h4pOutput*);
+                void            addCmd(const string& name,uint32_t owner, uint32_t levID,H4_FN_MSG f=nullptr);
+                void            all();
+                void            config(){ for(auto const& c:h4pGlobal) reply("%s=%s",CSTR(c.first),CSTR(c.second)); }        
+                void            heap(){ reply("Heap=%u",ESP.getFreeHeap()); } // NEEDS TO BE HAL'd
+                void            help();
+                uint32_t        invokeCmd(string,string="",const char* src=userTag());
+                uint32_t        invokeCmd(string,uint32_t,const char* src=userTag()); 
+                void            plugins();
+        static  string          read(const string& fn);
+                void            removeCmd(const string& name,uint32_t pid=0);
+                void            showFS();
+                void            showQ();
+        static  uint32_t        write(const string& fn,const string& data,const char* mode="w");
+                void        both(){ _entropise([this]{ _updateFromUrl(false,false); }); fw(); }
+                void        info() override { H4Service::info(); reply("url: %s",CSTR(h4pGlobal[rupdTag()])); }
+                void        fs(){ _entropise([this]{ _updateFromUrl(false,true); }); }
+                void        fw(){ _entropise([this]{ _updateFromUrl(true,true); }); }
+//
+        void        pcent(uint32_t pc);
+                msg                 dump();
+                msg                 getEvent(){ return _prev; }
+                int                 getValue(){ return _prev.load; }
+                msg                 inject(uint32_t metal,bool timer=false);
+        virtual bool                isAnalog(){ return HAL_isAnalog(_p); }
+        virtual bool                isOutput(){ return false; }
+                uint8_t             logicalRead(){ return _normalise(_r); }
+                uint8_t             pin(){ return _p; }
+                msg                 runFlow(msg seed);
+        static  void            all(bool b);
+        static  msg             dump(uint8_t p);
+        static  uint8_t         logicalRead(uint8_t p);
+        static  msg             getEvent(uint8_t p);
+        static  uint32_t        getValue(uint8_t p);
+        static  msg             inject(uint8_t p,uint32_t metal,bool timer=false);
+        static  bool            isAnalog(uint8_t p);
+        static  h4pGPIO*        isManaged(uint8_t p){ return h4pPinMap.count(p) ? h4pPinMap[p]:nullptr; }
+        static  bool            isOutput(uint8_t p);
+        static  H4_TIMER        periodicRead(uint8_t p,uint32_t f);
+        static  msg             runFlow(uint8_t p,msg);
+                void        clear();
+                void        flush();
+                void        info() override;
+        virtual void        info() override { H4Service::info(); for(auto s:_slaves) reply("Slave: %s",CSTR(s)); };
+                void        slave(const string& otherh4,bool inout=true);
+        static uint32_t     length(const string& tune);
+        static void         metronome(uint32_t tempo);
+        static void         multiVox(H4P_TUNE tune,uint32_t tempo,int transpose=0);
+        static string       setVolume(const string& s,uint8_t volume);
+        static void         siren(H4P_SIREN S,uint8_t pin,uint32_t duration);
+        static void         tone(uint8_t pin,uint32_t freq,uint32_t duration=0,uint8_t volume=8);
+        void         chromaticRun(const string& nStart,const string& nFinish,const char duration);
+        void         play(const string& tune,int transpose=0);
+        void         rest(const char duration){ play(string("R  ").append(1,duration).append(1,' ')); }
+                        void        include(vector<uint32_t> i){ for(auto const& l:i)include(l); }
+                void        exclude(uint32_t i){ exclude({i}); }
+            void          clear();
+            void          gvDec(const string& name){ if(stringIsNumeric(h4pGlobal[name])) setint(name,getint(name)-1); }
+            bool          gvExists(const string& name){ return h4pGlobal.count(name); }
+            string        getstring(const string& name){ return h4pGlobal[name]; }
+            int           getint(const string& name){ return atoi(CSTR(h4pGlobal[name])); }
+            void          gvInc(const string& name){ if(stringIsNumeric(h4pGlobal[name])) setint(name,getint(name)+1); }
+            void          setstring(const string& name,const string& value);
+            void          setint(const string& name,int value){ setstring(name,stringFromInt(value)); }
+        
