@@ -78,7 +78,10 @@ class H4P_RemoteUpdate: public H4Service, public HTTPUpdate {
 
                 void        both(){ _entropise([this]{ _updateFromUrl(false,false); }); fw(); }
 #if H4P_LOG_MESSAGES
-                void        info() override { H4Service::info(); reply("url: %s",CSTR(h4p[rupdTag()])); }
+                void        info() override { H4Service::info(); 
+                    string endpoint=string(httpTag()).append(h4p[rupdTag()]).append("/").append(h4p[deviceTag()]).append("/").append(h4p[binTag()]);
+                    reply(" endpoint: %s",CSTR(endpoint));
+                }
 #endif
                 void        fs(){ _entropise([this]{ _updateFromUrl(false,true); }); }
                 void        fw(){ _entropise([this]{ _updateFromUrl(true,true); }); }

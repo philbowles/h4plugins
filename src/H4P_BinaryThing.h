@@ -31,6 +31,7 @@ SOFTWARE.
 
 #include<H4Service.h>
 #include<H4P_SerialCmd.h>
+#include<H4P_WiFi.h>
 
 STAG(condition);
 
@@ -46,6 +47,7 @@ class H4P_BinaryThing: public H4Service{
     public:
         H4P_BinaryThing(function<void(bool)> thingFunction,bool initial=OFF,uint32_t timer=0): _thing(thingFunction),H4Service(onofTag(),H4PE_GV_CHANGE) {
             h4p.gvSetInt(stateTag(),initial,false);
+//            h4p.gvSetInt(onofTag(),initial,false);
             h4p.gvSetInt(autoOffTag(),timer,true);
             _addLocals({
                 {"auto",    {H4PC_H4, 0, CMDVS(_autoOff)}},

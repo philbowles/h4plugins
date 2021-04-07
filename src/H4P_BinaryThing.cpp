@@ -30,7 +30,7 @@ SOFTWARE.
 #include<H4P_BinaryThing.h>
 
 void H4P_BinaryThing::_onChange(bool b){
-    h4puiSync(onofTag(),CSTR(stringFromInt(b)));
+    h4puiSync(stateTag(),CSTR(stringFromInt(b)));
     h4.queueFunction([=](){ _thing(b); });
     auto off=h4p.gvGetInt(autoOffTag());
     if(off) h4.once(off,[=]{ _setState(OFF); });
@@ -39,8 +39,14 @@ void H4P_BinaryThing::_onChange(bool b){
 void H4P_BinaryThing::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg){ if(_running && svc==stateTag()) _onChange(STOI(msg)); }
 
 void H4P_BinaryThing::_init(){
-    h4puiAdd(onofTag(),H4P_UI_ONOF,"o");
+#if H4P_USE_WIFI_AP
+    Serial.printf("H4P_BinaryThing::_init can see H4P_USE_WIFI_AP wfmode=%d\n",WiFi.getMode());
+    if(WiFi.getMode()==WIFI_AP) return;
+#else
+    Serial.printf("H4P_BinaryThing::_init CANNOT see H4P_USE_WIFI_AP wfmode=%d\n",WiFi.getMode());
     h4puiAdd(autoOffTag(),H4P_UI_INPUT,"o");
+    h4puiAdd(stateTag(),H4P_UI_IMGBTN,"o");
+#endif
 }
 
 void H4P_BinaryThing::_setState(bool b) { h4p.gvSetInt(stateTag(),b); }
@@ -55,6 +61,9 @@ void H4P_BinaryThing::svcDown() {
 //      H4P_ConditionalThing
 //
 void H4P_ConditionalThing::_init() {
+#if H4P_USE_WIFI_AP
+    if(WiFi.getMode()==WIFI_AP) return;
+#endif
     h4puiAdd(conditionTag(),H4P_UI_BOOL,"o","",H4P_UILED_BI);
     H4P_BinaryThing::_init();
 }

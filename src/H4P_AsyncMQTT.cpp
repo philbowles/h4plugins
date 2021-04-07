@@ -38,9 +38,7 @@ uint32_t H4P_AsyncMQTT::_change(vector<string> vs){  // broker,uname,pword,port
         return H4_CMD_OK;
     });
 }
-/*
-            [this](const string& b){ 
-*/
+
 void H4P_AsyncMQTT::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg){ 
     switch(t){
         case H4PE_GV_CHANGE:
@@ -54,22 +52,18 @@ void H4P_AsyncMQTT::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg
                 publishDevice(stateTag(),msg);
                 break;
             }
-//        default:
-//            Serial.printf("%s CATASTROPHE %s %s %s\n",CSTR(_me),CSTR(svc),CSTR(h4pGetEventName(t)),CSTR(msg));
     }
 }
 
 void H4P_AsyncMQTT::_init() {
+/*
 #if H4P_USE_WIFI_AP
-    if(h4p.gvExists(mqconfTag())){
-        vector<string> mqconf=split(h4p[mqconfTag()],",");
-        h4p[brokerTag()]=mqconf[0];
-        h4p[portTag()]=mqconf[1];
-        h4p[mQuserTag()]=mqconf.size() > 2 ? mqconf[2]:"";
-        h4p[mQpassTag()]=mqconf.size() > 3 ? mqconf[3]:"";
-    }
-//    h4p.erase(mqconfTag());
+    h4puiAdd(brokerTag(),H4P_UI_INPUT,"m");
+    h4puiAdd(portTag(),H4P_UI_INPUT,"m");
+    h4puiAdd(mQuserTag(),H4P_UI_INPUT,"m");
+    h4puiAdd(mQpassTag(),H4P_UI_INPUT,"m");
 #endif
+*/
     h4p.gvSetInt(_me,0,false);
 
     onError([=](uint8_t && e,int && info){ XEVENT(H4PE_SYSWARN,"%d,%d",e,info); });
@@ -93,8 +87,6 @@ void H4P_AsyncMQTT::_init() {
         h4.queueFunction([this](){
             _signalOff();
             h4.cancelSingleton(H4P_TRID_MQRC);
-//            Serial.printf("T=%u KILL MQRC\n",millis());
-//            h4p.showQ();
             _discoDone=false;
             subscribe(CSTR(string(allTag()).append(cmdhash())),0);
             subscribe(CSTR(string(device+cmdhash())),0);
@@ -116,21 +108,35 @@ void H4P_AsyncMQTT::_init() {
                 h4p.gvInc(nDCXTag());
                 SYSINFO("DCX %d",reason);
                 H4Service::svcDown();
-                if(autorestart && WiFi.status()==WL_CONNECTED) {
-                    Serial.printf("T=%u KICK OFF MQRC\n",millis()); 
-                    h4.every(H4MQ_RETRY,[this](){ connect(); },nullptr,H4P_TRID_MQRC,true); // MUST be > 18sec due to shit lib ESpAsynTCP
-                }
+                if(autorestart && WiFi.status()==WL_CONNECTED) { h4.every(H4MQ_RETRY,[this](){ connect(); },nullptr,H4P_TRID_MQRC,true); }// MUST be > 18sec due to shit lib ESpAsynTCP
             });
         }
     });
 
-    if(WiFi.getMode()==WIFI_STA){
-        h4puiAdd(_me,H4P_UI_BOOL,"m","",H4P_UILED_BI);
-        h4puiAdd("Pangolin",H4P_UI_LABEL,"m",h4p[pmvTag()]); // mhang!
-        h4puiAdd(brokerTag(),H4P_UI_LABEL,"m"); // cos we don't know it yet
-        h4puiAdd(portTag(),H4P_UI_LABEL,"m"); // cos we don't know it yet
-        h4puiAdd(nDCXTag(),H4P_UI_LABEL,"m"); // cos we don't know it yet
+
+#if H4P_USE_WIFI_AP
+    Serial.printf("MQTT H4P_USE_WIFI_AP wfmode=%d\n",WiFi.getMode()); 
+    if(WiFi.getMode()==WIFI_AP){
+        h4puiAdd(brokerTag(),H4P_UI_INPUT,"m");
+        h4puiAdd(portTag(),H4P_UI_INPUT,"m");
+        h4puiAdd(mQuserTag(),H4P_UI_INPUT,"m");
+        h4puiAdd(mQpassTag(),H4P_UI_INPUT,"m");
     }
+    else {
+        h4puiAdd("Pangolin",H4P_UI_TEXT,"m",h4p[pmvTag()]); // mhang!
+        h4puiAdd(_me,H4P_UI_BOOL,"m","",H4P_UILED_BI);
+        h4puiAdd("Pangolin",H4P_UI_TEXT,"m",h4p[pmvTag()]); // mhang!
+        h4puiAdd(brokerTag(),H4P_UI_TEXT,"m");
+        h4puiAdd(portTag(),H4P_UI_TEXT,"m");
+        h4puiAdd(nDCXTag(),H4P_UI_TEXT,"m"); // cos we don't know it yet
+    }
+#else
+    h4puiAdd("Pangolin",H4P_UI_TEXT,"m",h4p[pmvTag()]); // mhang!
+    h4puiAdd(_me,H4P_UI_BOOL,"m","",H4P_UILED_BI);
+    h4puiAdd(brokerTag(),H4P_UI_TEXT,"m");
+    h4puiAdd(portTag(),H4P_UI_TEXT,"m");
+    h4puiAdd(nDCXTag(),H4P_UI_TEXT,"m"); // cos we don't know it yet
+#endif
 }
 
 void H4P_AsyncMQTT::_setup(){ // allow for TLS
@@ -150,7 +156,6 @@ void H4P_AsyncMQTT::_setup(){ // allow for TLS
 
 void H4P_AsyncMQTT::change(const string& broker,const string& user,const string& passwd,uint16_t port){ // add creds
     XLOG("MQTT change to %s:%d user=%s",CSTR(broker),port,CSTR(user));
-//   H4Service::svcDown();
     h4p[portTag()]=stringFromInt(port);
     h4p[mQuserTag()]=user;
     h4p[mQpassTag()]=passwd;
@@ -195,14 +200,13 @@ void H4P_AsyncMQTT::subscribeDevice(string topic,H4_FN_MSG f,H4PC_CMD_ID root){
 }
 
 void H4P_AsyncMQTT::svcUp(){
-//    Serial.printf("H4P_AsyncMQTT::svcUp\n");
-    if(WiFi.getMode()==WIFI_STA) {
-        _signalBad();
-        _setup();
-        autorestart=true;
-//        Serial.printf("CCCCCCCCCCCCCCCCCCCCC THIS IS ONLY ONE OF TWO....\n");
-        connect();
-    }
+#if H4P_USE_WIFI_AP
+    if(WiFi.getMode()==WIFI_AP) return;
+#endif    
+    _signalBad();
+    _setup();
+    autorestart=true;
+    connect();
 }
 
 void H4P_AsyncMQTT::svcDown(){

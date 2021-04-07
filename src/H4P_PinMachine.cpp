@@ -105,7 +105,11 @@ h4pGPIO::h4pGPIO(uint8_t p,uint8_t m,H4PM_SENSE s,npFLOW flow): _p(p),_s(s),_pip
 void h4pGPIO::_announce(){
 //    Serial.printf("ANNOUNCE Pin %02d\n",_p);
     _prev=(*npPublishValue)(_prev);
+#if H4P_USE_WIFI_AP
+    Serial.printf("H4P_WiFi::svcUp H4P_USE_WIFI_AP: DONT ADD GPIO TO UI\n");
+#else
     h4puiAdd(stringFromInt(_p,"%02d"),H4P_UI_GPIO,"g","",_c);
+#endif
 }
 
 msg h4pGPIO::dump(){

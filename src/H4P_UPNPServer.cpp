@@ -49,14 +49,7 @@ void H4P_UPNPServer::__upnpSend(uint32_t mx,const string s,IPAddress ip,uint16_t
 		_udp.writeTo((uint8_t *)CSTR(s), s.size(), ip, port);
 	},nullptr,H4P_TRID_UDPS); // name this!!
 }
-/*
-uint32_t H4P_UPNPServer::_friendly(vector<string> vs){
-    return _guard1(vs,[this](vector<string> vs){
-        h4p[nameTag()]=H4PAYLOAD;
-        return H4_CMD_OK;
-    });
-}
-*/
+
 void H4P_UPNPServer::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg){
     switch(t){
         case H4PE_GV_CHANGE:
@@ -113,7 +106,12 @@ void H4P_UPNPServer::_init(){
     if(h4p[nameTag()]=="") h4p[nameTag()]=dn.append(h4p[chipTag()]);
 
     XLOG("UPNP name %s",CSTR(h4p[nameTag()]));
-    h4puiAdd(nameTag(),H4P_UI_LABEL,"s");
+#if H4P_USE_WIFI_AP
+    if(WiFi.getMode()==WIFI_AP) h4puiAdd(nameTag(),H4P_UI_INPUT,"s");
+    else h4puiAdd(nameTag(),H4P_UI_TEXT,"s");
+#else
+    h4puiAdd(nameTag(),H4P_UI_TEXT,"s");
+#endif
 }
 
 void H4P_UPNPServer::_listenTag(const string& tag,const string& value){ h4pUPNPMap[tag].insert(value); }
@@ -162,6 +160,9 @@ void H4P_UPNPServer::svcDown(){
 }
 
 void H4P_UPNPServer::svcUp(){
+#if H4P_USE_WIFI_AP
+    if(WiFi.getMode()==WIFI_AP) return;
+#endif
     _udn=string("Socket-1_0-upnp").append(h4p[chipTag()]);
     h4p.gvSetstring("udn",_udn);
     h4p.gvSetstring(ageTag(),stringFromInt(H4P_UDP_REFRESH/1000));

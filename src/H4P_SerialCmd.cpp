@@ -94,7 +94,10 @@ uint32_t H4P_SerialCmd::_config(vector<string> vs){
             if(!h4p.gvExists(parts[0])) return H4_CMD_NAME_UNKNOWN;
             pending[parts[0]]=parts.size() >1 ? parts[1]:"";
         }
-        for(auto const& p:pending) h4p[p.first]=p.second;
+        for(auto const& p:pending) {
+            h4p[p.first]=p.second;
+            reply("CONFIG: %s now=%s\n",CSTR(p.first),CSTR(p.second));
+        }
         return H4_CMD_OK;
     });
 }

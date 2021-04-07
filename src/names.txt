@@ -27,11 +27,11 @@ extern const char* giveTaskName(uint32_t id);
                 void            info() override;
         virtual void            svcDown() override;
         virtual void            svcUp() override;
-                uint32_t        uiAddLabel(const string& name){ return _uiAdd(_seq++,name,H4P_UI_LABEL,h4pGlobal[name]); }
-                uint32_t        uiAddLabel(const string& name,const string& v){ return _uiAdd(_seq++,name,H4P_UI_LABEL,v); }
-                uint32_t        uiAddLabel(const string& name,const int v){ return _uiAdd(_seq++,name,H4P_UI_LABEL,stringFromInt(v)); }
-                uint32_t        uiAddLabel(const string& name,H4P_FN_UITXT f,bool repeat=false){ return _uiAdd(_seq++,name,H4P_UI_LABEL,"",f,nullptr,repeat); }
-                uint32_t        uiAddLabel(const string& name,H4P_FN_UINUM f,bool repeat=false){ return _uiAdd(_seq++,name,H4P_UI_LABEL,"",[f]{ return stringFromInt(f()); },nullptr,repeat); }
+                uint32_t        uiAddLabel(const string& name){ return _uiAdd(_seq++,name,H4P_UI_TEXT,h4pGlobal[name]); }
+                uint32_t        uiAddLabel(const string& name,const string& v){ return _uiAdd(_seq++,name,H4P_UI_TEXT,v); }
+                uint32_t        uiAddLabel(const string& name,const int v){ return _uiAdd(_seq++,name,H4P_UI_TEXT,stringFromInt(v)); }
+                uint32_t        uiAddLabel(const string& name,H4P_FN_UITXT f,bool repeat=false){ return _uiAdd(_seq++,name,H4P_UI_TEXT,"",f,nullptr,repeat); }
+                uint32_t        uiAddLabel(const string& name,H4P_FN_UINUM f,bool repeat=false){ return _uiAdd(_seq++,name,H4P_UI_TEXT,"",[f]{ return stringFromInt(f()); },nullptr,repeat); }
                 void            uiAddGPIOAll();
                 uint32_t        uiAddGPIO(uint8_t pin);
                 uint32_t        uiAddBoolean(const string& name,const boolean tf){ return _uiAdd(_seq++,name,H4P_UI_BOOL,"",[tf]{ return tf ? "1":"0"; }); }

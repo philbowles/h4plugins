@@ -1,36 +1,15 @@
-Fives
-ouptut multistage throttling
-ui free
-more contrast 1/0
-test bi 
-change gpio msg: n,v
 SHORTTERM
-    privatise wifi signalOFF
-    fix static boolean
     fix dump / localloger to avoid large file crash
     fix HTTP logger database
-    rework time stuff!!! epscially TZ etc
-    rework PD for UPNP etc
-    upndp out gangmaster in
-    remove redun this param on require , depend
-    H4_TIMER from at,daily
     adv docs + / example creating your own commands
-    retval on ps inc/dec
-    ps discard(x)
 MEDIUMTERM
-    EVENT types for warnings e.g. low heap / high Q etc?
-    +/- disasteraverter "" "" ?
     js - type = password if n includes "pass"
     js - arrowfunctions
-    total event / reaction cmd model - major update
     passthru ap config params in ctor
-    dynamic cmds flash / siren etc
-    commands to e.g. throttle pins at run-time    
     remote client get
     ESp32 MDNS detector
     ESp32 tonecontroller
 LONGTERM
-    autoOff -> cb
     upnp analyser device
     dynamic add gpio / thing etc
     ESP32 bluetooth PD

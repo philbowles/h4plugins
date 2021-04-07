@@ -61,6 +61,21 @@ void h4pGlobalEventHandler(const string& svc,H4PE_TYPE t,const string& msg){
     case H4PE_VIEWERS:
       Serial.printf("Web UI has 'msg' number of viewers. When 1, set up any resources, when 0 clear / reset them\n");
       break;
+    case H4PE_UISYNC:
+      Serial.printf("Keep UI in sync - user should call h4puiSync\n");
+      break;
+    case H4PE_RTC:
+      Serial.printf("NTP 'clock' time is now valid\n");
+      break;
+    case H4PE_ALARM:
+      Serial.printf("clock time alarm has fired msg=1/0 on/off\n");
+      break;
+    case H4PE_GRID:
+      Serial.printf("Used internally by presence detection: another h4 device joined the network\n");
+      break;
+    case H4PE_UPNP:
+      Serial.printf("Used internally by presence detection\n");
+      break;
     case H4PE_HEARTBEAT:
       Serial.printf("H4 has sent a synchronous 1-second, on-the-second 'ping'\n");
       break;

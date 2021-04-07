@@ -180,7 +180,6 @@ void H4P_WiFi::_gotIP(){
     SYSINFO("IP=%s",CSTR(h4p[ipTag()]));
     _startWebserver();
     H4Service::svcUp();
-//    } //else Serial.printf("*************** HOW THE ACTUAL FUCK??? _gotIP when SVC already=%d\n",_running);
 }
 
 void H4P_WiFi::__uiAdd(const string& msg) {
@@ -194,7 +193,6 @@ void H4P_WiFi::_commonStartup(){
     require<H4P_PinMachine>(gpioTag());
     require<H4P_Signaller>(winkTag());
 #endif
-//    Serial.printf("H4P_WiFi::_commonStartup on %s PID=%d\n",CSTR(_me),_pid);
     _addLocals({
         {_me,           { H4PC_H4, _pid, nullptr}},
         {changeTag(),   { _pid, 0, CMDVS(_change)}},
@@ -212,8 +210,20 @@ void H4P_WiFi::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg) {
             break;
         default:
             if(!_running) break;
+#if H4P_USE_WIFI_AP
+            if(svc == deviceTag()){
+                if(WiFi.getMode()==WIFI_STA) h4pevent(h4pSrc,H4PE_REBOOT,svc);
+                else Serial.printf("H4P_USE_WIFI_AP DEVICE NAME CHANGED\n");
+                break;
+            }
+            if(svc == goTag()) {
+                Serial.printf("DO NOT COLLECT £200 *%s*\n",CSTR(msg));
+//                h4pevent(h4pSrc,H4PE_REBOOT,svc); // tagify
+            }
+#else
             if(svc == deviceTag()) h4pevent(h4pSrc,H4PE_REBOOT,svc);
-            else if(h4pUserItems.count(svc)) _sendSSE(svc,msg);
+#endif
+//            else if(h4pUserItems.count(svc)) _sendSSE(svc,msg);
             break;
     }
 }
@@ -233,19 +243,19 @@ void H4P_WiFi::_init(){
     WiFi.onEvent(_wifiEvent);
 
     h4p.gvSetstring(ipTag(),"",false);
-    _uiAdd(deviceTag(),H4P_UI_LABEL,"s");
-    _uiAdd(boardTag(),H4P_UI_LABEL,"s");
-    _uiAdd(chipTag(),H4P_UI_LABEL,"s");
-    _uiAdd(h4Tag(),H4P_UI_LABEL,"s",H4_VERSION);
-    _uiAdd(H4PTag(),H4P_UI_LABEL,"s");
-    _uiAdd(h4UITag(),H4P_UI_LABEL,"s");
-    _uiAdd(NBootsTag(),H4P_UI_LABEL,"s");
-    _uiAdd(ipTag(),H4P_UI_LABEL,"s"); // cos we don't know it yet
-/*
+    _uiAdd(chipTag(),H4P_UI_TEXT,"s");
 #if H4P_USE_WIFI_AP
-    h4p.gvSetstring(h4UITag(),h4p[h4UITag()]+"ap",false);
-#endif
-*/
+    if(WiFi.getMode()==WIFI_AP) _uiAdd(deviceTag(),H4P_UI_INPUT,"s");
+    else _uiAdd(deviceTag(),H4P_UI_TEXT,"s");
+#else
+    _uiAdd(deviceTag(),H4P_UI_TEXT,"s");
+    _uiAdd(boardTag(),H4P_UI_TEXT,"s");
+    _uiAdd(h4Tag(),H4P_UI_TEXT,"s",H4_VERSION);
+    _uiAdd(H4PTag(),H4P_UI_TEXT,"s");
+    _uiAdd(h4UITag(),H4P_UI_TEXT,"s");
+    _uiAdd(NBootsTag(),H4P_UI_TEXT,"s");
+    _uiAdd(ipTag(),H4P_UI_TEXT,"s"); // cos we don't know it yet
+#endif    
     h4p.gvSave(deviceTag());
 }
 
@@ -319,7 +329,9 @@ void H4P_WiFi::_startWebserver(){
                 if(_evts->count()==1) XEVENT(H4PE_VIEWERS,"%d",_evts->count()); //if(_onC) _onC(); // first time only R WE SURE?
                 for(auto const& ui:h4pUIorder){
                     auto i=h4pUserItems[ui];
-                    _sendSSE("ui",CSTR(string(ui+","+stringFromInt(i.type)+","+i.f()+",1,"+stringFromInt(i.color)+","+i.h)));
+//                    _sendSSE("ui",CSTR(string(ui+","+stringFromInt(i.type)+","+i.f()+",1,"+stringFromInt(i.color)+","+i.h)));
+//                    Serial.printf("UI %s\n",CSTR(string(ui+","+stringFromInt(i.type)+","+i.h+",0,"+stringFromInt(i.color)+","+i.f())));
+                    _sendSSE("ui",CSTR(string(ui+","+stringFromInt(i.type)+","+i.h+",0,"+stringFromInt(i.color)+","+i.f())));
                 }
 
                 h4.repeatWhile([this]{ return _evts->count(); },
@@ -351,7 +363,7 @@ void H4P_WiFi::_stopWebserver(){
     svcDown();
 }
 
-void H4P_WiFi::_uiAdd(const string& name,H4P_UI_TYPE t,string h,const string& value,uint8_t color){
+void H4P_WiFi::_uiAdd(const string& name,H4P_UI_TYPE t,const string& h,const string& value,uint8_t color){
     function<string(void)>  f;
     string v=value;
     switch(t){
@@ -363,8 +375,14 @@ void H4P_WiFi::_uiAdd(const string& name,H4P_UI_TYPE t,string h,const string& va
             f=[=]{ return value; };
             break;
         default:
-            if(!h4p.gvExists(name)) h4p.gvSetstring(name,value);
-            f=[=](){ return h4p[name]; }; 
+//            Serial.printf("DEF UIA %s t=%d h=%s c=%d v=*%s* (%d)\n",CSTR(name),t,CSTR(h),color,CSTR(value),value.size());
+            if(v.size()) f=[=](){ return v; };
+            else {
+//                Serial.printf("NOVALU %s GLOB=%d\n",CSTR(name),h4p.gvExists(name));
+                if(!h4p.gvExists(name)) h4p.gvSetstring(name,value,false);
+//                Serial.printf("VALU %s=%s\n",CSTR(name),CSTR(h4p[name]));
+                f=[=](){ return h4p[name]; };
+            }
     }
     h4pUIorder.push_back(name);
     h4pUserItems[name]={t,f,color,h};

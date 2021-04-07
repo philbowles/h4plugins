@@ -26,47 +26,41 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#include<H4Service.h>
+#include<H4P_WiFi.h>
 
-#include<H4P_Grid.h>
+#if H4P_USE_WIFI_AP
+void H4P_WiFi::_startAP(){
 
-using H4P_GRID_MAP   = std::unordered_map<string,string>;
-H4P_GRID_MAP        h4pGrid;
+    YEVENT(H4PE_SIGNAL,"250,.  "); 
+    string opts=string(" Select SSID...").append(UNIT_SEPARATOR).append("dummy").append(RECORD_SEPARATOR);
+    _dns53=new DNSServer;
 
-constexpr const char* xh4Tag(){ return "X-H4-Device"; }
+    HAL_WIFI_disconnect();
 
-void H4P_Grid::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg){
-    switch(t){
-        case H4PE_UPNP:
-            auto vs=split(msg,",");
-            if(vs[1]==xh4Tag()){
-                string ip=vs[0];
-//                Serial.printf("H4PE_GRID MOVEMENT %s %s\n",CSTR(svc),CSTR(ip));
-//                for(auto const& g:h4pGrid) reply("  %s %s",CSTR(g.first),CSTR(g.second));
-                bool news=ip.size();
-                bool known=h4pGrid.count(svc);
-//                Serial.printf("H4PE_GRID MOVEMENT %d %d XOR %d\n",news,known,news^known);
-                if(news) { if(!known) h4pGrid[svc]=ip; }
-                else { if(known) h4pGrid.erase(svc); }
-                if(news ^ known) {
-                    h4psysevent(svc,H4PE_GRID,"%s",CSTR(ip));
-//                    h4p["grid"]=flattenMap(h4pGrid);
-                }
-            }
-            break;
+    int n=WiFi.scanNetworks();
+    if(n>0){
+        for (uint8_t i = 0; i < n; i++){
+            string ss=CSTR(WiFi.SSID(i));
+            opts+=ss+UNIT_SEPARATOR+ss+RECORD_SEPARATOR;
+        }
+        opts.pop_back();
     }
-}
+    WiFi.scanDelete();
+    Serial.printf("OPTS=%s \n",CSTR(opts));
+    _uiAdd(ssidTag(),H4P_UI_DROPDOWN,"s",opts);
+    _uiAdd(pskTag(),H4P_UI_INPUT,"s");
+    _uiAdd(deviceTag(),H4P_UI_INPUT,"s");
+    _uiAdd(goTag(),H4P_UI_IMGBTN,"o");
 
-void H4P_Grid::_init(){ 
-    _pUPNP->_listenTag(xh4Tag(),"*");
-//    h4puiAdd("grid",H4P_UI_DROPDOWN,"s","Grid=H4");
-}
+    WiFi.mode(WIFI_AP);
+    XLOG("ENTER AP MODE %s MAC=%s",CSTR(h4p[deviceTag()]),CSTR(WiFi.softAPmacAddress()));
 
-#if H4P_LOG_MESSAGES
-void H4P_Grid::info(){ 
-    H4Service::info();
-    if(h4pGrid.size()){
-        reply(" H4 Grid:");
-        for(auto const& g:h4pGrid) reply("  %s %s",CSTR(g.first),CSTR(g.second));
-    }
+    WiFi.softAP(CSTR(h4p[deviceTag()]));
+    h4p[ipTag()]=CSTR(WiFi.softAPIP().toString());//.c_str();
+    _dns53->start(53, "*", WiFi.softAPIP());
+    h4.every(H4WF_AP_RATE,[=](){ _dns53->processNextRequest(); });
+
+    _startWebserver();
 }
 #endif

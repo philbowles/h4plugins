@@ -49,6 +49,9 @@ SOFTWARE.
 #include<H4P_Signaller.h>
 #include<ESPAsyncWebServer.h>
 //
+#if H4P_USE_WIFI_AP
+constexpr const char* goTag(){ return "go"; }
+#endif
 
 struct H4P_UI_ITEM { // add title and/or props?
     H4P_UI_TYPE     type;
@@ -100,8 +103,6 @@ class H4P_WiFi: public H4Service, public AsyncWebServer {
 //          included here against better wishes due to compiler bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89605
 #if H4P_USE_WIFI_AP
                 void            _startAP();
-                void            _save(const string& s){ H4P_SerialCmd::write("/"+s,h4p[s]); }
-
         H4P_WiFi(): 
             H4Service(wifiTag(),H4PE_FACTORY | H4PE_GPIO | H4PE_GV_CHANGE | H4PE_UIADD | H4PE_UISYNC),
             AsyncWebServer(H4P_WEBSERVER_PORT){
@@ -127,9 +128,12 @@ class H4P_WiFi: public H4Service, public AsyncWebServer {
         virtual void            svcDown() override;
         virtual void            svcUp() override;
 //
-                void            uiAddLabel(const string& name,const string& section="u"){ _uiAdd(name,H4P_UI_LABEL,section); }
-                void            uiAddLabel(const string& name,const string& v,string section="u"){ _uiAdd(name,H4P_UI_LABEL,section,v); }
-                void            uiAddLabel(const string& name,const int v,const string& section="u"){ _uiAdd(name,H4P_UI_LABEL,section,stringFromInt(v)); }
+                void            uiAddText(const string& name,const string& v,const string& section="u"){ _uiAdd(name,H4P_UI_TEXT,section,v); }
+                void            uiAddText(const string& name,int v,const string& section="u"){ _uiAdd(name,H4P_UI_TEXT,section,stringFromInt(v)); }
+
+                void            uiAddLabel(const string& name,const string& section="u"){ _uiAdd(name,H4P_UI_TEXT,section); }
+                void            uiAddLabel(const string& name,const string& v,const string& section="u"){ _uiAdd(name,H4P_UI_TEXT,section,v); }
+                void            uiAddLabel(const string& name,const int v,const string& section="u"){ _uiAdd(name,H4P_UI_TEXT,section,stringFromInt(v)); }
                 void            uiAddBoolean(const string& name,const string& section="u"){ _uiAdd(name,H4P_UI_BOOL,section); }
                 void            uiAddDropdown(const string& name,H4P_NVP_MAP options,const string& section="u");
                 void            uiAddInput(const string& name,const string& section="u");
@@ -150,5 +154,5 @@ class H4P_WiFi: public H4Service, public AsyncWebServer {
                 void            _reply(string msg) override { _lines.push_back(msg); }
                 void            _sendSSE(const string& name,const string& msg);
                 void            _signalOff(){ YEVENT(H4PE_SIGNAL,""); }
-                void            _uiAdd(const string& name,H4P_UI_TYPE t,string h="u",const string& v="",uint8_t c=H4P_UILED_BI);
+                void            _uiAdd(const string& name,H4P_UI_TYPE t,const string& h="u",const string& v="",uint8_t c=H4P_UILED_BI);
 };

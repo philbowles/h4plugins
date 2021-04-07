@@ -124,11 +124,11 @@ void H4P_Timekeeper::_handleEvent(const string& svc,H4PE_TYPE t,const string& ms
 
 void H4P_Timekeeper::_init(){
     if(WiFi.getMode()==WIFI_STA){
-        h4puiAdd("NTP1",H4P_UI_LABEL,"t",_ntp1); // cos we don't know it yet
-        h4puiAdd("NTP2",H4P_UI_LABEL,"t",_ntp2);
-        h4puiAdd("TZ",H4P_UI_LABEL,"t",stringFromInt(_tzo));
-        h4puiAdd(timeTag(),H4P_UI_LABEL,"t"); // cos we don't know it yet
-        h4puiAdd(upTimeTag(),H4P_UI_LABEL,"t");
+        h4puiAdd("NTP1",H4P_UI_TEXT,"t",_ntp1); // cos we don't know it yet
+        h4puiAdd("NTP2",H4P_UI_TEXT,"t",_ntp2);
+        h4puiAdd("TZ",H4P_UI_TEXT,"t",stringFromInt(_tzo));
+        h4puiAdd(timeTag(),H4P_UI_TEXT,"t"); // cos we don't know it yet
+        h4puiAdd(upTimeTag(),H4P_UI_TEXT,"t");
     }
 }
 

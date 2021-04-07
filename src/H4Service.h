@@ -129,12 +129,11 @@ enum H4PE_TYPE:uint32_t {
 };
 
 enum H4P_UI_TYPE {
-    H4P_UI_LABEL,
     H4P_UI_TEXT,
-    H4P_UI_BOOL,
     H4P_UI_GPIO,
-    H4P_UI_ONOF,
+    H4P_UI_BOOL,
     H4P_UI_INPUT,
+    H4P_UI_IMGBTN,
     H4P_UI_DROPDOWN
 };
 
@@ -148,7 +147,7 @@ using H4P_EVENT_LISTENERS   = vector<H4P_EVENT_LISTENER>;
 using H4P_EVENT_HANDLERS    = std::map<uint32_t,H4P_EVENT_LISTENERS>;
 using H4P_FN_USEREVENT      = function<void(const string &msg)>;
 
-using H4P_FN_UIGET      = function<string(void)>;
+using H4P_FN_UIGET          = function<string(void)>;
 
 void h4pregisterhandler(const string& svc,uint32_t t,H4P_FN_EVENTHANDLER f);
 void h4pevent(const string& svc,H4PE_TYPE t,const string& msg="");
@@ -170,7 +169,7 @@ extern long   HAL_getFreeHeap();
 void    h4pFactoryReset();
 void    h4pReboot();
 
-string flattenMap(const H4P_NVP_MAP& m,const string& fs="=",const string& rs=",");
+string flattenMap(const H4P_NVP_MAP& m,const string& fs=UNIT_SEPARATOR,const string& rs=RECORD_SEPARATOR);
 
 string  h4preplaceparams(const string& s);
 

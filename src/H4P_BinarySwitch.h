@@ -55,7 +55,6 @@ class H4P_ConditionalSwitch: public H4P_BinarySwitch{
                 H4_FN_CPRED _predicate;
     protected:
                 void        _setState(bool b) override;
-//        virtual void        _sync() override { syncCondition(); H4P_BinarySwitch::_sync(); }
     public:
         H4P_ConditionalSwitch(H4_FN_CPRED predicate,uint8_t pin,H4PM_SENSE sense,uint8_t color=H4P_UILED_BI,uint32_t initial=OFF,uint32_t timer=0):
             _predicate(predicate), 
