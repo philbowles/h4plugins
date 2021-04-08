@@ -38,7 +38,7 @@ void H4P_BinaryThing::_onChange(bool b){
 
 void H4P_BinaryThing::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg){ if(_running && svc==stateTag()) _onChange(STOI(msg)); }
 
-void H4P_BinaryThing::_init(){
+void H4P_BinaryThing::_sync(){
 #if H4P_USE_WIFI_AP
     Serial.printf("H4P_BinaryThing::_init can see H4P_USE_WIFI_AP wfmode=%d\n",WiFi.getMode());
     if(WiFi.getMode()==WIFI_AP) return;
@@ -60,12 +60,12 @@ void H4P_BinaryThing::svcDown() {
 //
 //      H4P_ConditionalThing
 //
-void H4P_ConditionalThing::_init() {
+void H4P_ConditionalThing::_sync() {
 #if H4P_USE_WIFI_AP
     if(WiFi.getMode()==WIFI_AP) return;
 #endif
     h4puiAdd(conditionTag(),H4P_UI_BOOL,"o","",H4P_UILED_BI);
-    H4P_BinaryThing::_init();
+    H4P_BinaryThing::_sync();
 }
 
 void H4P_ConditionalThing::_setState(bool b) { if(_predicate()) H4P_BinaryThing::_setState(b); }

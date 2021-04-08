@@ -31,7 +31,7 @@ SOFTWARE.
 
 #if H4P_USE_WIFI_AP
 void H4P_WiFi::_startAP(){
-
+    Serial.printf("AP MODE!!!!!!!!!!!!!!!!!!! H4P_WiFi::_startAP()\n");
     YEVENT(H4PE_SIGNAL,"250,.  "); 
     string opts=string(" Select SSID...").append(UNIT_SEPARATOR).append("dummy").append(RECORD_SEPARATOR);
     _dns53=new DNSServer;
@@ -54,7 +54,7 @@ void H4P_WiFi::_startAP(){
     _uiAdd(goTag(),H4P_UI_IMGBTN,"o");
 
     WiFi.mode(WIFI_AP);
-    XLOG("ENTER AP MODE %s MAC=%s",CSTR(h4p[deviceTag()]),CSTR(WiFi.softAPmacAddress()));
+    Serial.printf("ENTER AP MODE %s MAC=%s",CSTR(h4p[deviceTag()]),CSTR(WiFi.softAPmacAddress()));
 
     WiFi.softAP(CSTR(h4p[deviceTag()]));
     h4p[ipTag()]=CSTR(WiFi.softAPIP().toString());//.c_str();

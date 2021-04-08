@@ -104,8 +104,11 @@ void H4P_UPNPServer::_init(){
     string dn=string(uppercase(h4Tag())+" "+deviceTag()+" ");
 
     if(h4p[nameTag()]=="") h4p[nameTag()]=dn.append(h4p[chipTag()]);
-
+    h4p.gvSave(nameTag());
     XLOG("UPNP name %s",CSTR(h4p[nameTag()]));
+}
+
+void H4P_UPNPServer::_sync(){
 #if H4P_USE_WIFI_AP
     if(WiFi.getMode()==WIFI_AP) h4puiAdd(nameTag(),H4P_UI_INPUT,"s");
     else h4puiAdd(nameTag(),H4P_UI_TEXT,"s");

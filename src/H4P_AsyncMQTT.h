@@ -69,9 +69,7 @@ class H4P_AsyncMQTT: public H4Service, public PangolinMQTT{
         virtual void        _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override;
     public:
 #if H4P_USE_WIFI_AP
-        H4P_AsyncMQTT(H4P_LWT lwt={"","",0,false}):
-            _lwt(lwt), H4Service(mqttTag(),H4PE_GV_CHANGE)
-        {
+        H4P_AsyncMQTT(H4P_LWT lwt={"","",0,false}): _lwt(lwt), H4Service(mqttTag(),H4PE_GV_CHANGE){
 #else
         explicit H4P_AsyncMQTT(): _lwt{"","",0,false},H4Service(mqttTag(),H4PE_GV_CHANGE){
             h4p.gvSetstring(brokerTag(),"",true);
@@ -109,4 +107,5 @@ class H4P_AsyncMQTT: public H4Service, public PangolinMQTT{
 //          syscall only
         virtual void        _init() override;
                 void        _reply(string msg) override { publishDevice("reply",msg); }
+        virtual void        _sync() override;
 };

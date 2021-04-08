@@ -30,18 +30,15 @@ SOFTWARE.
 
 void H4P_BinarySwitch::_init() {
     _pp=new h4pOutput(_pin,_sense,_initial, _color);
-#if H4P_USE_WIFI_AP
-    if(WiFi.getMode()==WIFI_AP) return;
-#endif
     H4P_BinaryThing::_init();
 }
 
-void H4P_ConditionalSwitch::_init() {
+void H4P_ConditionalSwitch::_sync() {
 #if H4P_USE_WIFI_AP
     if(WiFi.getMode()==WIFI_AP) return;
 #endif
     h4puiAdd(conditionTag(),H4P_UI_BOOL,"o","",H4P_UILED_BI);
-    H4P_BinarySwitch::_init();
+    H4P_BinarySwitch::_sync();
 }
 
 void H4P_ConditionalSwitch::_setState(bool b) { if(_predicate()) H4P_BinarySwitch::_setState(b); }

@@ -67,9 +67,9 @@ using H4PM_COMPARE=function<bool(uint32_t,uint32_t)>;
 
 class h4pGPIO {
     friend  class H4P_PinMachine;
+        virtual void                _handleEvent(const string& s,H4PE_TYPE t,const string& msg);
     protected:
                 uint32_t            _r; // to cope with analog values
-
 //
         virtual void                _announce();
                 uint32_t inline     _normalise(uint32_t x){ return isAnalog() ? x:!(x^_s); }

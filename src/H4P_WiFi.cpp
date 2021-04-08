@@ -129,6 +129,7 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
 void H4P_WiFi::_coreStart(){
 //    WiFi.printDiag(Serial); 
 #if H4P_USE_WIFI_AP
+    Serial.printf("AP MODE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
     if(!_dns53){
         if(_cannotConnectSTA()) _startAP();
         else if(WiFi.getMode()==WIFI_OFF) h4puncheckedcall<H4P_WiFi>(wifiTag())->HAL_WIFI_startSTA();
@@ -187,6 +188,12 @@ void H4P_WiFi::__uiAdd(const string& msg) {
     _uiAdd(m[0],static_cast<H4P_UI_TYPE>(STOI(m[1])),m[3],m[2],STOI(m[4]));    
 }
 
+void H4P_WiFi::_clearUI(){ 
+    h4pUserItems.clear();
+    h4pUIorder.clear();
+    h4pUIorder.shrink_to_fit();
+}
+
 void H4P_WiFi::_commonStartup(){
 #ifdef LED_BUILTIN
     new h4pOutput(LED_BUILTIN,H4P_ASSUMED_SENSE,OFF,H4P_ASSUMED_COLOR);
@@ -208,6 +215,13 @@ void H4P_WiFi::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg) {
         case H4PE_UIADD:
             __uiAdd(msg);
             break;
+        case H4PE_GPIO:
+        case H4PE_UISYNC:
+            if(h4pUserItems.count(svc)) {
+                string sync=h4pUserItems[svc].type==H4P_UI_DROPDOWN ? h4pUserItems[svc].f():msg;
+                _sendSSE(svc,sync);
+            }
+            break;
         default:
             if(!_running) break;
 #if H4P_USE_WIFI_AP
@@ -218,18 +232,22 @@ void H4P_WiFi::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg) {
             }
             if(svc == goTag()) {
                 Serial.printf("DO NOT COLLECT £200 *%s*\n",CSTR(msg));
-//                h4pevent(h4pSrc,H4PE_REBOOT,svc); // tagify
+                HAL_WIFI_startSTA();
+                h4.once(1000,[]{ h4pevent(h4pSrc,H4PE_REBOOT,goTag()); });
+                Serial.printf("YOU'RE GOIN' DAAAAAAAAAAAAAAAAAHN\n");
+                return;
             }
 #else
             if(svc == deviceTag()) h4pevent(h4pSrc,H4PE_REBOOT,svc);
 #endif
-//            else if(h4pUserItems.count(svc)) _sendSSE(svc,msg);
-            break;
     }
 }
 
 void H4P_WiFi::_init(){
-//    Serial.printf("********************* H4P_WiFi::_init ********** prevent double dip\n");
+    Serial.printf("********************* H4P_WiFi::_init ********** prevent double dip\n");
+    WiFi.persistent(true);
+    WiFi.onEvent(_wifiEvent);
+    
     h4p.gvSetstring(chipTag(),HAL_WIFI_chipID());
     h4p.gvSetstring(boardTag(),replaceAll(H4_BOARD,"ESP8266_",""));
 
@@ -239,23 +257,7 @@ void H4P_WiFi::_init(){
     if(h4p[h4UITag()]=="") SYSWARN("NO FS: webUI will not start","");
     SYSINFO("Device: %s Chip: %s UI v%s",CSTR(h4p[deviceTag()]),CSTR(h4p[chipTag()]),CSTR(h4p[h4UITag()]));
 
-    WiFi.persistent(true);
-    WiFi.onEvent(_wifiEvent);
-
     h4p.gvSetstring(ipTag(),"",false);
-    _uiAdd(chipTag(),H4P_UI_TEXT,"s");
-#if H4P_USE_WIFI_AP
-    if(WiFi.getMode()==WIFI_AP) _uiAdd(deviceTag(),H4P_UI_INPUT,"s");
-    else _uiAdd(deviceTag(),H4P_UI_TEXT,"s");
-#else
-    _uiAdd(deviceTag(),H4P_UI_TEXT,"s");
-    _uiAdd(boardTag(),H4P_UI_TEXT,"s");
-    _uiAdd(h4Tag(),H4P_UI_TEXT,"s",H4_VERSION);
-    _uiAdd(H4PTag(),H4P_UI_TEXT,"s");
-    _uiAdd(h4UITag(),H4P_UI_TEXT,"s");
-    _uiAdd(NBootsTag(),H4P_UI_TEXT,"s");
-    _uiAdd(ipTag(),H4P_UI_TEXT,"s"); // cos we don't know it yet
-#endif    
     h4p.gvSave(deviceTag());
 }
 
@@ -320,24 +322,46 @@ void H4P_WiFi::_sendSSE(const string& name,const string& msg){
 
 void H4P_WiFi::_startWebserver(){
 	reset();
-    h4pUIorder.shrink_to_fit();
     _evts=new AsyncEventSource("/evt");
     _evts->onConnect([this](AsyncEventSourceClient *client){
         if(client->lastId() > _evtID) client->close();
         else {
             h4.queueFunction([this,client](){
-                if(_evts->count()==1) XEVENT(H4PE_VIEWERS,"%d",_evts->count()); //if(_onC) _onC(); // first time only R WE SURE?
+                if(_evts->count()==1) {
+                    _clearUI();
+//                    XEVENT(H4PE_VIEWERS,"%d",_evts->count()); //if(_onC) _onC(); // first time only R WE SURE?
+                    h4psysevent("viewers",H4PE_VIEWERS,"%d",WiFi.getMode());
+                    _uiAdd(chipTag(),H4P_UI_TEXT,"s");
+                #if H4P_USE_WIFI_AP
+                    if(WiFi.getMode()==WIFI_AP) {
+                        _uiAdd(deviceTag(),H4P_UI_INPUT,"s");
+                        Serial.printf("AP AP AP AP AP AP AP AP AP AP AP AP H4P_WiFi::_init AP AP AP AP\n");
+                    }
+                    else _uiAdd(deviceTag(),H4P_UI_TEXT,"s");
+                #else
+                    _uiAdd(deviceTag(),H4P_UI_TEXT,"s");
+                    _uiAdd(boardTag(),H4P_UI_TEXT,"s");
+                    _uiAdd(h4Tag(),H4P_UI_TEXT,"s",H4_VERSION);
+                    _uiAdd(H4PTag(),H4P_UI_TEXT,"s");
+                    _uiAdd(h4UITag(),H4P_UI_TEXT,"s");
+                    _uiAdd(NBootsTag(),H4P_UI_TEXT,"s");
+                    _uiAdd(ipTag(),H4P_UI_TEXT,"s"); // cos we don't know it yet
+                #endif
+//                    Serial.printf("****************** SWS Got %d ui\n",h4pUserItems.size());
+                    for(auto const& s:h4pmap) s.second->_sync();
+//                    Serial.printf("****************** SWS Got %d ui\n",h4pUserItems.size());
+                    h4pUIorder.shrink_to_fit();
+                }
                 for(auto const& ui:h4pUIorder){
                     auto i=h4pUserItems[ui];
 //                    _sendSSE("ui",CSTR(string(ui+","+stringFromInt(i.type)+","+i.f()+",1,"+stringFromInt(i.color)+","+i.h)));
 //                    Serial.printf("UI %s\n",CSTR(string(ui+","+stringFromInt(i.type)+","+i.h+",0,"+stringFromInt(i.color)+","+i.f())));
                     _sendSSE("ui",CSTR(string(ui+","+stringFromInt(i.type)+","+i.h+",0,"+stringFromInt(i.color)+","+i.f())));
                 }
-
                 h4.repeatWhile([this]{ return _evts->count(); },
                     ((H4WF_EVT_TIMEOUT*3)/4),
                     [this]{ },
-                    [this]{ YEVENT(H4PE_VIEWERS,"0"); },
+                    [this]{ h4psysevent("viewers",H4PE_VIEWERS,"%d",0); },
                     H4P_TRID_SSET,true
                 );
             });
@@ -360,6 +384,7 @@ void H4P_WiFi::_stopWebserver(){
     end();
     _discoDone=true;
     _signalBad();
+    _clearUI();
     svcDown();
 }
 

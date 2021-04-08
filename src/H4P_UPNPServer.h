@@ -66,12 +66,6 @@ class H4P_UPNPServer: public H4Service {
         H4P_UPNPServer(const string& name=""): H4Service(upnpTag(),H4PE_GV_CHANGE){
             h4p.gvSetstring(nameTag(),name,true);
             _pWiFi=depend<H4P_WiFi>(wifiTag());
-            /*
-            _addLocals({ 
-                {_me,       { H4PC_H4, _pid, nullptr}},
-                {nameTag(), { _pid, 0, CMDVS(_friendly)}},
-            });
-            */
         }
                 void            friendlyName(const string& name){ h4p[nameTag()]=name; }
 #if H4P_LOG_MESSAGES
@@ -83,4 +77,5 @@ class H4P_UPNPServer: public H4Service {
                 void           _broadcast(uint32_t mx,const string s){ __upnpSend(mx,s,_ubIP,1900); }
                 void           _listenTag(const string& tag,const string& value);
                 void           _init() override;
+        virtual void           _sync() override;
 };

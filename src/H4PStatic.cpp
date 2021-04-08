@@ -42,6 +42,23 @@ void h4pregisterhandler(const string& svc,uint32_t t,H4P_FN_EVENTHANDLER f){
         if(t & inst) if(h4pGetEventName(static_cast<H4PE_TYPE>(inst))!="") h4pevt[inst].push_back(make_pair(svc,f)); // fix this
     }
 }
+/*
+using H4P_FN_EVENTHANDLER   = function<void(const string& svc,H4PE_TYPE t,const string& msg)>;
+using H4P_EVENT_LISTENER    = pair<string,H4P_FN_EVENTHANDLER>;
+using H4P_EVENT_LISTENERS   = vector<H4P_EVENT_LISTENER>;
+using H4P_EVENT_HANDLERS    = std::map<uint32_t,H4P_EVENT_LISTENERS>;
+using H4P_FN_USEREVENT      = function<void(const string &msg)>;
+
+*/
+void h4punregisterhandler(const string& svc,uint32_t t){
+    Serial.printf("UNREGISTER type 0x%08x for %s...start count=%d\n",t,CSTR(svc),h4pevt[t].size());
+    h4pevt[t].erase(remove_if(h4pevt[t].begin(), h4pevt[t].end(), [=](H4P_EVENT_LISTENER el){
+        Serial.printf("UNREGISTER type 0x%08x for %s...checking %s\n",t,CSTR(svc),CSTR(el.first));
+        return el.first == svc; 
+    }), h4pevt[t].end());
+    Serial.printf("UNREGISTER type 0x%08x for %s...end count=%d\n",t,CSTR(svc),h4pevt[t].size());
+    h4pevt[t].shrink_to_fit();
+}
 
 void h4pevent(const string& svc,H4PE_TYPE t,const string& msg){
     if(h4pevt.count(t)) for(auto const& e:h4pevt[t]) e.second(svc,t,msg);
@@ -84,7 +101,7 @@ void h4StartPlugins(){
     reverse(h4pevt[H4PE_REBOOT].begin(),h4pevt[H4PE_REBOOT].end());
     reverse(h4pevt[H4PE_FACTORY].begin(),h4pevt[H4PE_FACTORY].end());
 //
-/*
+
 #if SANITY
     for(auto const& s:h4pmap){
         auto ps=s.second;
@@ -97,7 +114,6 @@ void h4StartPlugins(){
         }
     }
 #endif
-*/
 //
 //    reclaim some junk:
 //      unfilters all services from boot/stage2 to prevent any chance of "double-dip"

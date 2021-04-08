@@ -150,6 +150,7 @@ using H4P_FN_USEREVENT      = function<void(const string &msg)>;
 using H4P_FN_UIGET          = function<string(void)>;
 
 void h4pregisterhandler(const string& svc,uint32_t t,H4P_FN_EVENTHANDLER f);
+void h4punregisterhandler(const string& svc,uint32_t t);
 void h4pevent(const string& svc,H4PE_TYPE t,const string& msg="");
 void h4pOnEvent(H4PE_TYPE t,H4P_FN_USEREVENT f);
 
@@ -237,13 +238,7 @@ extern std::unordered_map<string,H4Service*> h4pmap;
 
 template <typename T>
 T* h4puncheckedcall(const string& svc){ return h4pmap.count(svc) ? static_cast<T*>(h4pmap[svc]):nullptr; }
-/*
-template <typename T,typename F, typename... Args>
-void h4pSafeCall(const string& who, F f,Args... args) {
-  auto p = h4puncheckedcall<T>(who);
-  if (p)(p->*f)(args...);
-}
-*/
+
 template<typename... Args>
 void h4psysevent(const string& svc,H4PE_TYPE t,const string& fmt, Args... args){
     char* buff=static_cast<char*>(malloc(H4PE_BUFFER+1));
@@ -327,7 +322,6 @@ class H4Service {
                 uint32_t            _guard1(vector<string> vs,H4_FN_MSG f);
         virtual void                _handleEvent(const string& svc,H4PE_TYPE t,const string& msg){}
         virtual void                _reply(string msg) { Serial.println(CSTR(msg)); }
-        virtual void                _sync(string msg) {}
 
         template<typename T>
         T* depend(const string& svc){
@@ -369,6 +363,7 @@ class H4Service {
 #endif
 //      syscall only
         virtual void                _init(){}
+        virtual void                _sync(){}
         virtual void                svcDown(){ YEVENT(H4PE_SERVICE,CSTR(stringFromInt(_running=false))); }
         virtual void                svcUp(){ YEVENT(H4PE_SERVICE,CSTR(stringFromInt(_running=true))); }
 };

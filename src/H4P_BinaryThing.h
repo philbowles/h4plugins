@@ -47,7 +47,6 @@ class H4P_BinaryThing: public H4Service{
     public:
         H4P_BinaryThing(function<void(bool)> thingFunction,bool initial=OFF,uint32_t timer=0): _thing(thingFunction),H4Service(onofTag(),H4PE_GV_CHANGE) {
             h4p.gvSetInt(stateTag(),initial,false);
-//            h4p.gvSetInt(onofTag(),initial,false);
             h4p.gvSetInt(autoOffTag(),timer,true);
             _addLocals({
                 {"auto",    {H4PC_H4, 0, CMDVS(_autoOff)}},
@@ -77,7 +76,7 @@ class H4P_BinaryThing: public H4Service{
 //
         virtual void        svcDown() override;
 //      syscall
-        virtual void        _init();
+        virtual void        _sync();
 };
 
 using H4_FN_CPRED      = function<bool()>;
@@ -98,5 +97,5 @@ class H4P_ConditionalThing: public H4P_BinaryThing{
 #endif
                 void        syncCondition();
 //
-        virtual void        _init() override;
+        virtual void        _sync() override;
 };

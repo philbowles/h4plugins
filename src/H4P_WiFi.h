@@ -82,8 +82,9 @@ class H4P_WiFi: public H4Service, public AsyncWebServer {
 
         static  String          _aswsReplace(const String& var);
                 void            _clear();
+                void            _clearUI();
                 bool            _cannotConnectSTA(){ 
-//                    Serial.printf("_cannotConnectSTA() ssid=%s psk=%s can/not=%d\n",CSTR(WiFi.SSID()),CSTR(WiFi.psk()),WiFi.SSID()==h4Tag() || WiFi.psk()==""); 
+                    Serial.printf("_cannotConnectSTA() ssid=%s psk=%s can/not=%d\n",CSTR(WiFi.SSID()),CSTR(WiFi.psk()),WiFi.SSID()==h4Tag() || WiFi.psk()==""); 
                     return WiFi.SSID()==h4Tag() || WiFi.psk()=="";
                 }
                 void            _commonStartup();
@@ -106,6 +107,7 @@ class H4P_WiFi: public H4Service, public AsyncWebServer {
         H4P_WiFi(): 
             H4Service(wifiTag(),H4PE_FACTORY | H4PE_GPIO | H4PE_GV_CHANGE | H4PE_UIADD | H4PE_UISYNC),
             AsyncWebServer(H4P_WEBSERVER_PORT){
+                h4p.gvSetInt(goTag(),0,false);
                 h4p[ssidTag()]=h4Tag();
                 h4p[pskTag()]=h4Tag();
 #else

@@ -68,4 +68,5 @@ class H4P_ConditionalSwitch: public H4P_BinarySwitch{
         void syncCondition();
 //
         virtual void        _init() override;
+        virtual void        _sync() override;
 };

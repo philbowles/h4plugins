@@ -140,13 +140,13 @@ H4P_ROAMER_MAP      h4pRoamers;
     string h4pGetEventName   (H4PE_TYPE e){ return eventTypes.count(e) ? eventTypes[e]:""; }
     string h4pGetTaskType    (uint32_t e){ return taskTypes.count(e) ? taskTypes[e]:stringFromInt(e,"?%02d?"); }
     string h4pGetTaskName    (uint32_t e){ return taskNames.count(e) ? taskNames[e]:giveTaskName(e); }
-    void   h4pClearEvent(H4PE_TYPE e){ eventTypes.erase(e); }
+    void   h4pClearEvent     (H4PE_TYPE e){ eventTypes.erase(e); }
 #else
     string h4pGetErrorMessage(uint32_t e){ return string("Err:"+stringFromInt(e)); }
     string h4pGetEventName   (H4PE_TYPE e){ return stringFromInt(e,"0x%08x"); }
     string h4pGetTaskType    (uint32_t e){ return stringFromInt(e,"%04d"); }
     string h4pGetTaskName    (uint32_t e){ return stringFromInt(e,"%04d"); }
-    void   h4pClearEvent(H4PE_TYPE e){}
+    void   h4pClearEvent     (H4PE_TYPE e){}
 #endif
 #ifdef  ARDUINO_ARCH_ESP8266
     long HAL_getFreeHeap(){ return ESP.getFreeHeap(); }

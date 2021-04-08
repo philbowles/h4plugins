@@ -56,14 +56,6 @@ void H4P_AsyncMQTT::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg
 }
 
 void H4P_AsyncMQTT::_init() {
-/*
-#if H4P_USE_WIFI_AP
-    h4puiAdd(brokerTag(),H4P_UI_INPUT,"m");
-    h4puiAdd(portTag(),H4P_UI_INPUT,"m");
-    h4puiAdd(mQuserTag(),H4P_UI_INPUT,"m");
-    h4puiAdd(mQpassTag(),H4P_UI_INPUT,"m");
-#endif
-*/
     h4p.gvSetInt(_me,0,false);
 
     onError([=](uint8_t && e,int && info){ XEVENT(H4PE_SYSWARN,"%d,%d",e,info); });
@@ -113,7 +105,7 @@ void H4P_AsyncMQTT::_init() {
         }
     });
 
-
+/*
 #if H4P_USE_WIFI_AP
     Serial.printf("MQTT H4P_USE_WIFI_AP wfmode=%d\n",WiFi.getMode()); 
     if(WiFi.getMode()==WIFI_AP){
@@ -125,7 +117,6 @@ void H4P_AsyncMQTT::_init() {
     else {
         h4puiAdd("Pangolin",H4P_UI_TEXT,"m",h4p[pmvTag()]); // mhang!
         h4puiAdd(_me,H4P_UI_BOOL,"m","",H4P_UILED_BI);
-        h4puiAdd("Pangolin",H4P_UI_TEXT,"m",h4p[pmvTag()]); // mhang!
         h4puiAdd(brokerTag(),H4P_UI_TEXT,"m");
         h4puiAdd(portTag(),H4P_UI_TEXT,"m");
         h4puiAdd(nDCXTag(),H4P_UI_TEXT,"m"); // cos we don't know it yet
@@ -137,6 +128,7 @@ void H4P_AsyncMQTT::_init() {
     h4puiAdd(portTag(),H4P_UI_TEXT,"m");
     h4puiAdd(nDCXTag(),H4P_UI_TEXT,"m"); // cos we don't know it yet
 #endif
+*/
 }
 
 void H4P_AsyncMQTT::_setup(){ // allow for TLS
@@ -154,15 +146,37 @@ void H4P_AsyncMQTT::_setup(){ // allow for TLS
     if(h4p[mQuserTag()]!="") setCredentials(CSTR(h4p[mQuserTag()]),CSTR(h4p[mQpassTag()])); // optimise tag()
 }
 
+void H4P_AsyncMQTT::_sync(){
+    Serial.printf("I'M SINKING!!! MQTT H4P_USE_WIFI_AP wfmode=%d\n",WiFi.getMode()); 
+#if H4P_USE_WIFI_AP
+    if(WiFi.getMode()==WIFI_AP){
+        h4puiAdd(brokerTag(),H4P_UI_INPUT,"m");
+        h4puiAdd(portTag(),H4P_UI_INPUT,"m");
+        h4puiAdd(mQuserTag(),H4P_UI_INPUT,"m");
+        h4puiAdd(mQpassTag(),H4P_UI_INPUT,"m");
+    }
+    else {
+        h4puiAdd("Pangolin",H4P_UI_TEXT,"m",h4p[pmvTag()]); // mhang!
+        h4puiAdd(_me,H4P_UI_BOOL,"m","",H4P_UILED_BI);
+        h4puiAdd(brokerTag(),H4P_UI_TEXT,"m");
+        h4puiAdd(portTag(),H4P_UI_TEXT,"m");
+        h4puiAdd(nDCXTag(),H4P_UI_TEXT,"m"); // cos we don't know it yet
+    }
+#else
+    h4puiAdd("Pangolin",H4P_UI_TEXT,"m",h4p[pmvTag()]); // mhang!
+    h4puiAdd(_me,H4P_UI_BOOL,"m","",H4P_UILED_BI);
+    h4puiAdd(brokerTag(),H4P_UI_TEXT,"m");
+    h4puiAdd(portTag(),H4P_UI_TEXT,"m");
+    h4puiAdd(nDCXTag(),H4P_UI_TEXT,"m"); // cos we don't know it yet
+#endif
+}
+
 void H4P_AsyncMQTT::change(const string& broker,const string& user,const string& passwd,uint16_t port){ // add creds
     XLOG("MQTT change to %s:%d user=%s",CSTR(broker),port,CSTR(user));
     h4p[portTag()]=stringFromInt(port);
     h4p[mQuserTag()]=user;
     h4p[mQpassTag()]=passwd;
     h4p[brokerTag()]=broker; // use thgis to trigger change
-#if H4P_USE_WIFI_AP
-//    h4p[mqconfTag()]=h4p[brokerTag()].append(",").append(h4p[portTag()]),append(",").append(h4p[mQuserTag()]).append(",").append(h4p[mQpassTag()]);;
-#endif
     restart();
 }
 
