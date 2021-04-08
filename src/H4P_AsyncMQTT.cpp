@@ -41,7 +41,35 @@ uint32_t H4P_AsyncMQTT::_change(vector<string> vs){  // broker,uname,pword,port
 
 void H4P_AsyncMQTT::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg){ 
     switch(t){
-        case H4PE_GV_CHANGE:
+        case H4PE_VIEWERS:
+            {
+                uint32_t mode=STOI(msg);
+                if(mode) {
+                #if H4P_USE_WIFI_AP
+                    if(WiFi.getMode()==WIFI_AP){
+                        h4puiAdd(brokerTag(),H4P_UI_INPUT,"m");
+                        h4puiAdd(portTag(),H4P_UI_INPUT,"m");
+                        h4puiAdd(mQuserTag(),H4P_UI_INPUT,"m");
+                        h4puiAdd(mQpassTag(),H4P_UI_INPUT,"m");
+                    }
+                    else {
+                        h4puiAdd("Pangolin",H4P_UI_TEXT,"m",h4p[pmvTag()]); // mhang!
+                        h4puiAdd(_me,H4P_UI_BOOL,"m","",H4P_UILED_BI);
+                        h4puiAdd(brokerTag(),H4P_UI_TEXT,"m");
+                        h4puiAdd(portTag(),H4P_UI_TEXT,"m");
+                        h4puiAdd(nDCXTag(),H4P_UI_TEXT,"m"); // cos we don't know it yet
+                    }
+                #else
+                    h4puiAdd("Pangolin",H4P_UI_TEXT,"m",h4p[pmvTag()]); // mhang!
+                    h4puiAdd(_me,H4P_UI_BOOL,"m","",H4P_UILED_BI);
+                    h4puiAdd(brokerTag(),H4P_UI_TEXT,"m");
+                    h4puiAdd(portTag(),H4P_UI_TEXT,"m");
+                    h4puiAdd(nDCXTag(),H4P_UI_TEXT,"m"); // cos we don't know it yet
+                #endif
+                }
+            }
+            break;
+        case H4PE_GVCHANGE:
             /*
             if(svc==brokerTag()) {
                 restart();
@@ -104,31 +132,6 @@ void H4P_AsyncMQTT::_init() {
             });
         }
     });
-
-/*
-#if H4P_USE_WIFI_AP
-    Serial.printf("MQTT H4P_USE_WIFI_AP wfmode=%d\n",WiFi.getMode()); 
-    if(WiFi.getMode()==WIFI_AP){
-        h4puiAdd(brokerTag(),H4P_UI_INPUT,"m");
-        h4puiAdd(portTag(),H4P_UI_INPUT,"m");
-        h4puiAdd(mQuserTag(),H4P_UI_INPUT,"m");
-        h4puiAdd(mQpassTag(),H4P_UI_INPUT,"m");
-    }
-    else {
-        h4puiAdd("Pangolin",H4P_UI_TEXT,"m",h4p[pmvTag()]); // mhang!
-        h4puiAdd(_me,H4P_UI_BOOL,"m","",H4P_UILED_BI);
-        h4puiAdd(brokerTag(),H4P_UI_TEXT,"m");
-        h4puiAdd(portTag(),H4P_UI_TEXT,"m");
-        h4puiAdd(nDCXTag(),H4P_UI_TEXT,"m"); // cos we don't know it yet
-    }
-#else
-    h4puiAdd("Pangolin",H4P_UI_TEXT,"m",h4p[pmvTag()]); // mhang!
-    h4puiAdd(_me,H4P_UI_BOOL,"m","",H4P_UILED_BI);
-    h4puiAdd(brokerTag(),H4P_UI_TEXT,"m");
-    h4puiAdd(portTag(),H4P_UI_TEXT,"m");
-    h4puiAdd(nDCXTag(),H4P_UI_TEXT,"m"); // cos we don't know it yet
-#endif
-*/
 }
 
 void H4P_AsyncMQTT::_setup(){ // allow for TLS
@@ -144,31 +147,6 @@ void H4P_AsyncMQTT::_setup(){ // allow for TLS
 
     setServer(CSTR(h4p[brokerTag()]),h4p.gvGetInt(portTag()));
     if(h4p[mQuserTag()]!="") setCredentials(CSTR(h4p[mQuserTag()]),CSTR(h4p[mQpassTag()])); // optimise tag()
-}
-
-void H4P_AsyncMQTT::_sync(){
-    Serial.printf("I'M SINKING!!! MQTT H4P_USE_WIFI_AP wfmode=%d\n",WiFi.getMode()); 
-#if H4P_USE_WIFI_AP
-    if(WiFi.getMode()==WIFI_AP){
-        h4puiAdd(brokerTag(),H4P_UI_INPUT,"m");
-        h4puiAdd(portTag(),H4P_UI_INPUT,"m");
-        h4puiAdd(mQuserTag(),H4P_UI_INPUT,"m");
-        h4puiAdd(mQpassTag(),H4P_UI_INPUT,"m");
-    }
-    else {
-        h4puiAdd("Pangolin",H4P_UI_TEXT,"m",h4p[pmvTag()]); // mhang!
-        h4puiAdd(_me,H4P_UI_BOOL,"m","",H4P_UILED_BI);
-        h4puiAdd(brokerTag(),H4P_UI_TEXT,"m");
-        h4puiAdd(portTag(),H4P_UI_TEXT,"m");
-        h4puiAdd(nDCXTag(),H4P_UI_TEXT,"m"); // cos we don't know it yet
-    }
-#else
-    h4puiAdd("Pangolin",H4P_UI_TEXT,"m",h4p[pmvTag()]); // mhang!
-    h4puiAdd(_me,H4P_UI_BOOL,"m","",H4P_UILED_BI);
-    h4puiAdd(brokerTag(),H4P_UI_TEXT,"m");
-    h4puiAdd(portTag(),H4P_UI_TEXT,"m");
-    h4puiAdd(nDCXTag(),H4P_UI_TEXT,"m"); // cos we don't know it yet
-#endif
 }
 
 void H4P_AsyncMQTT::change(const string& broker,const string& user,const string& passwd,uint16_t port){ // add creds

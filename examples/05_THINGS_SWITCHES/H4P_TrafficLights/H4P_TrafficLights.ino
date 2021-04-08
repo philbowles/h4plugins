@@ -36,7 +36,7 @@ void h4pGlobalEventHandler(const string& svc,H4PE_TYPE t,const string& msg){
 #define AMBER_LIGHT  D7
 #define GREEN_LIGHT  D8
 
-H4P_SerialLogger slog(H4PE_ALMOST_ALL &~H4PE_GV_CHANGE&~H4PE_GPIO);
+H4P_SerialLogger slog(H4PE_ALMOST_ALL &~H4PE_GVCHANGE&~H4PE_GPIO);
 H4P_PinMachine pm;
 
 int T1=5000; // see the phasing.xls spreadsheet for choosing these numbers

@@ -32,11 +32,11 @@ Globals are saved in a file in the program Flash partition. This has a finite nu
 
 In order not to lose any persistent values if there is a crash, the globals file is written every time any value in it changes, so makes sure to only change you globals when you cannot avoid it and ony when they are absolutely funamental to the functioning of your app across reboots.
 
-## Notification of changed values: the H4PE_GV_CHANGE event
+## Notification of changed values: the H4PE_GVCHANGE event
 
 **N.B.** Do not proceed unless you have already read and understood [Everything is an event: Listeners, Emitters and Handlers](events.md)
 
-When *any* change is made to a global, no matter where / how / by whom, an `H4PE_GV_CHANGE` event is emiited with the `svc` field set to the name of the variable and the `msg` field set to is new value.
+When *any* change is made to a global, no matter where / how / by whom, an `H4PE_GVCHANGE` event is emiited with the `svc` field set to the name of the variable and the `msg` field set to is new value.
 
 ## Choosing between int and string
 
@@ -101,7 +101,7 @@ void gvInc(const string& name); // increment
 h4p.gvInc("MyCounter"); // mycount now = 667
 ```
 
-The whole point of any of these is that when they happen, an `H4PE_GV_CHANGE` event is emiited with the `svc` field set to the name of the variable and the `msg` field set to is new value. See below for a quick example of handling the event.
+The whole point of any of these is that when they happen, an `H4PE_GVCHANGE` event is emiited with the `svc` field set to the name of the variable and the `msg` field set to is new value. See below for a quick example of handling the event.
 
 ## Deletion
 
@@ -116,16 +116,16 @@ h4p.gvErase({"MyCounter","MOTD"}); // 2x for the price of one
 
 ---
 
-# Handling H4PE_GV_CHANGE events
+# Handling H4PE_GVCHANGE events
 
 Before we dive in, a reminder of the important caveat in [Everything is an event: Listeners, Emitters and Handlers](events.md#handling-your-own-events) which is worth repeating here because this is exactly where it will "bite" you (hard) if you ignore it:
 
-Your handler will get ***ALL H4PE_GV_CHANGE events whether they relate to your variables or not***
+Your handler will get ***ALL H4PE_GVCHANGE events whether they relate to your variables or not***
 
 This means you will have to "filter out" your own before acting on anything. This is not big deal since your own code was going to have to have separate sections to handle the change of each variable anyway...
 
 ```cpp
-H4P_EventListener myglobals(H4PE_GV_CHANGE,[](const string& svc,H4PE_TYPE t,const string& msg){
+H4P_EventListener myglobals(H4PE_GVCHANGE,[](const string& svc,H4PE_TYPE t,const string& msg){
     if(svc=="MyCount"){
         // do some stuff with new count
         if(atoi(msg.c_str)) > 1000) ... etc
@@ -143,7 +143,7 @@ H4P_EventListener myglobals(H4PE_GV_CHANGE,[](const string& svc,H4PE_TYPE t,cons
 Imagine instead that - like me - you are lazy and think: "I only have one global, I know its name - obviously - so no need to check it, just react to the event" and you then write something like this:
 
 ```cpp
-H4P_EventListener myglobals(H4PE_GV_CHANGE,[](const string& svc,H4PE_TYPE t,const string& msg){
+H4P_EventListener myglobals(H4PE_GVCHANGE,[](const string& svc,H4PE_TYPE t,const string& msg){
     if(atoi(msg.c_str)) == 0) Serial.printf("Blast Off!\n");
 });
 ```

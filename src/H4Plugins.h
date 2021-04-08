@@ -44,6 +44,7 @@ class H4Service;
     };
 
 std::unordered_map<std::string,H4Service*> h4pmap;
+bool                h4punlocked=false;
 
 H4P_CMDMAP          h4pCmdMap;
 H4P_FLASHMAP        h4pFlashMap;
@@ -121,7 +122,7 @@ H4P_ROAMER_MAP      h4pRoamers;
         {H4PE_Q,"Q"},
         {H4PE_LOOPS,"LOOPS"},
         {H4PE_PRESENCE,"PRESENCE"},
-        {H4PE_GV_CHANGE,"GVCHG"},
+        {H4PE_GVCHANGE,"GVCHG"},
         {H4PE_UISYNC,"UISYNC"},
         {H4PE_STAGE2,"STAGE2"},
         {H4PE_GPIO,"GPIO"},
@@ -131,6 +132,7 @@ H4P_ROAMER_MAP      h4pRoamers;
         {H4PE_ALARM,"ALARM"},
         {H4PE_GRID,"GRID"},
         {H4PE_UPNP,"UPNP"},
+        {H4PE_UIMSG,"UIMSG"},
         {H4PE_HEARTBEAT,"PING"}
     };
 

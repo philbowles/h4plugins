@@ -39,7 +39,7 @@ class H4P_LinkMaster: public H4Service{
     protected:
         virtual void                _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override;
     public:
-        H4P_LinkMaster(unordered_set<string> slaved={}): _slaves(slaved),H4Service("link",H4PE_GV_CHANGE,false) {
+        H4P_LinkMaster(unordered_set<string> slaved={}): _slaves(slaved),H4Service("link",H4PE_GVCHANGE,false) {
             _pMQTT=depend<H4P_AsyncMQTT>(mqttTag());
             _addLocals({
                 {"slave",    { H4PC_H4,   0 , CMDVS(_slave)}}

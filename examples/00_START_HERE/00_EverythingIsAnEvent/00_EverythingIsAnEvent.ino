@@ -49,7 +49,7 @@ void h4pGlobalEventHandler(const string& svc,H4PE_TYPE t,const string& msg){
     case H4PE_PRESENCE:
       Serial.printf("A device has %s the network\n",STOI(msg) ? "joined":"left");
       break;
-    case H4PE_GV_CHANGE:
+    case H4PE_GVCHANGE:
       Serial.printf("A persistent storage variable %s has changed its value to %s\n",CSTR(svc),CSTR(msg));
       break;
     case H4PE_GPIO:

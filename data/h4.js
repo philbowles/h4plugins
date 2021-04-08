@@ -4,6 +4,10 @@ const RECORD_SEPARATOR="|"
 const UNIT_SEPARATOR="~"
 
 function toaster(t){
+    if(t.startsWith("CONFIG: ")){
+        let i=t.indexOf(" now=",8)
+        document.getElementById(t.slice(8,i)).classList.remove("edit")
+    }
     msg.innerHTML=t;
     setTimeout(function () { msg.innerHTML="&nbsp;"; },30000);
 }
@@ -22,15 +26,7 @@ function ajax(url,decode=true){
             r.style.color="#ffffff" // css
             var j=JSON.parse(e.currentTarget.responseText);
             if(j.res) toaster("Error: "+j.res+" "+j.msg)
-            else {
-                if(j.lines.length) {
-                    if(j.lines[0].startsWith("CONFIG: ")){
-                        let i=j.lines[0].indexOf(" now=",8)
-                        document.getElementById(j.lines[0].slice(8,i)).classList.remove("edit")
-                    }
-                }
-                j.lines.forEach(function(l){ r.innerHTML+=l+'\n'})
-            }
+            else j.lines.forEach(function(l){ r.innerHTML+=l+'\n'})
         }
     })
     http.send();
@@ -152,7 +148,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     source.addEventListener('ui', function(e){ ui2(e.data) });
     source.onmessage=function(e){ toaster(e.data) }
-    source.onerror=function(e){ document.querySelectorAll('div.uv').forEach(function(d){ d.style.background="#ff0000" })}
+    source.onerror=function(e){ document.querySelectorAll('div.hanger').forEach((d) => d.style.background="#ff0000") }
 
     toaster("Thank you for using H4/Plugins - please support me on Patreon, see link below");
         

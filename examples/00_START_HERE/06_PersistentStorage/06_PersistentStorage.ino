@@ -3,7 +3,7 @@
 H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 
 /* Uncomment this to see what's happening "under the hood"
-H4P_EventListener chchchanges(H4PE_GV_CHANGE,[](const string& svc,H4PE_TYPE t,const string& msg){ 
+H4P_EventListener chchchanges(H4PE_GVCHANGE,[](const string& svc,H4PE_TYPE t,const string& msg){ 
   Serial.printf("USER %s=%s\n",CSTR(svc),CSTR(msg)); 
 });
 */

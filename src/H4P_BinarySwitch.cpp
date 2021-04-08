@@ -33,14 +33,20 @@ void H4P_BinarySwitch::_init() {
     H4P_BinaryThing::_init();
 }
 
-void H4P_ConditionalSwitch::_sync() {
-#if H4P_USE_WIFI_AP
-    if(WiFi.getMode()==WIFI_AP) return;
-#endif
-    h4puiAdd(conditionTag(),H4P_UI_BOOL,"o","",H4P_UILED_BI);
-    H4P_BinarySwitch::_sync();
+void H4P_ConditionalSwitch::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg){
+    switch(t){
+        case H4PE_VIEWERS:
+            {
+                uint32_t mode=STOI(msg);
+                if(mode) {
+                #if H4P_USE_WIFI_AP
+                    if(mode==WIFI_AP) return;
+                #endif
+                    h4puiAdd(conditionTag(),H4P_UI_BOOL,"o",stringFromInt(_predicate()),H4P_UILED_BI);
+                }
+            }
+    }
+    H4P_BinarySwitch::_handleEvent(svc,t,msg);
 }
 
-void H4P_ConditionalSwitch::_setState(bool b) { if(_predicate()) H4P_BinarySwitch::_setState(b); }
-
-void H4P_ConditionalSwitch::syncCondition(){ h4puiSync(conditionTag(),CSTR(stringFromInt(_predicate()))); }
+void H4P_ConditionalSwitch::syncCondition(){ h4puiSync(conditionTag(),CSTR(stringFromInt(h4punlocked=_predicate()))); }

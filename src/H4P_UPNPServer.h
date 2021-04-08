@@ -63,7 +63,7 @@ class H4P_UPNPServer: public H4Service {
 
         static  string 	        replaceParamsFile(const string &f){ return h4preplaceparams(CSTR(H4P_SerialCmd::read(f))); }
     public:                
-        H4P_UPNPServer(const string& name=""): H4Service(upnpTag(),H4PE_GV_CHANGE){
+        H4P_UPNPServer(const string& name=""): H4Service(upnpTag(),H4PE_GVCHANGE|H4PE_VIEWERS){
             h4p.gvSetstring(nameTag(),name,true);
             _pWiFi=depend<H4P_WiFi>(wifiTag());
         }
@@ -77,5 +77,4 @@ class H4P_UPNPServer: public H4Service {
                 void           _broadcast(uint32_t mx,const string s){ __upnpSend(mx,s,_ubIP,1900); }
                 void           _listenTag(const string& tag,const string& value);
                 void           _init() override;
-        virtual void           _sync() override;
 };

@@ -32,7 +32,7 @@ SOFTWARE.
 
 // Make sure you read the documentation and have arrangements in place for using AP mode :)
 // If you don't have the H4P_WiFiAP.cpp file, the linker will fail.
-#define H4P_USE_WIFI_AP          0
+#define H4P_USE_WIFI_AP         1
 /*
         DIAGNOSTICS
         comment out H4P_LOG_MESSAGES to prevent any Serial output of  H4PE_MSG EVENTs
@@ -52,10 +52,10 @@ SOFTWARE.
 
         H4P_UI_HEALTH = 1 adds Heap,Q,nLoops to UI
 */
-#define SANITY                1
-#define H4P_LOG_MESSAGES      1
-#define H4P_SYS_LEVEL         2
-#define H4P_UI_HEALTH         0
+#define SANITY                  1
+#define H4P_LOG_MESSAGES        1
+#define H4P_SYS_LEVEL           2
+#define H4P_UI_HEALTH           0
 /*
         HARDWARE ASSUMPTIONS
 

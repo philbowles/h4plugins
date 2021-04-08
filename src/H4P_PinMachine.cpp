@@ -111,10 +111,15 @@ void h4pGPIO::_announce(){
 void h4pGPIO::_handleEvent(const string& s,H4PE_TYPE t,const string& msg){
     switch(t){
         case H4PE_VIEWERS:
-            if(STOI(msg)) {
-                Serial.printf("ADDING GPIO %d\n",_p);
+        {
+            uint32_t mode=STOI(msg);
+            if(mode) {
+            #if H4P_USE_WIFI_AP
+                if(mode==WIFI_AP) return;
+            #endif
                 h4puiAdd(stringFromInt(_p,"%02d"),H4P_UI_GPIO,"g","",_c);
             }
+        }
     }
 }
 

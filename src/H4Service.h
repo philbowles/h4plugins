@@ -113,7 +113,7 @@ enum H4PE_TYPE:uint32_t {
     H4PE_Q         = 1 << 11,
     H4PE_LOOPS     = 1 << 12,
     H4PE_PRESENCE  = 1 << 13,
-    H4PE_GV_CHANGE = 1 << 14,
+    H4PE_GVCHANGE  = 1 << 14,
     H4PE_UISYNC    = 1 << 15,
     H4PE_STAGE2    = 1 << 16,
     H4PE_GPIO      = 1 << 17,
@@ -123,6 +123,7 @@ enum H4PE_TYPE:uint32_t {
     H4PE_ALARM     = 1 << 21,
     H4PE_GRID      = 1 << 22,
     H4PE_UPNP      = 1 << 23,
+    H4PE_UIMSG     = 1 << 24,
     H4PE_HEARTBEAT = 0x80000000,
     H4PE_ALL       = 0xffffffff,
     H4PE_ALMOST_ALL= H4PE_ALL &~ H4PE_HEARTBEAT
@@ -273,6 +274,7 @@ void h4puiSync(const string& n,const string& v="");
     #define XLOG(f,...) h4psysevent(_me,H4PE_MSG,f,__VA_ARGS__)
     #define SLOG(f,...) h4psysevent(h4pTag(),H4PE_MSG,f,__VA_ARGS__)
     #define h4pUserEvent(f,...) h4psysevent(userTag(),H4PE_MSG,f,__VA_ARGS__)
+    #define h4pUIMessage(f,...) h4psysevent(userTag(),H4PE_UIMSG,f,__VA_ARGS__)
 #else
     #define QLOG(f)
     #define XLOG(f,...)
@@ -363,7 +365,6 @@ class H4Service {
 #endif
 //      syscall only
         virtual void                _init(){}
-        virtual void                _sync(){}
         virtual void                svcDown(){ YEVENT(H4PE_SERVICE,CSTR(stringFromInt(_running=false))); }
         virtual void                svcUp(){ YEVENT(H4PE_SERVICE,CSTR(stringFromInt(_running=true))); }
 };
@@ -416,3 +417,22 @@ case H4PE_SYSINFO: \
 #define H4P_FUNCTION_ADAPTER_VOID(e) case H4PEVENTNAME(e): \
     H4PGLUE2(on,e)(); \
     break;
+
+#define H4P_TACT_BUTTON_HANDLER(x) if(svc==#x){ \
+    if(STOI(msg)){\
+        h4puiSync(#x,"1");\
+        H4PGLUE3(on,x,Button()); \
+        h4.once(175,[]{ \
+            h4p.gvSetInt(#x,0);\
+            h4puiSync(#x,"0");\
+        });\
+    }\
+}
+
+#define H4P_LATCH_BUTTON_HANDLER(x) if(svc==#x){ \
+    if(svc==#x){\
+    bool b=STOI(msg);\
+    H4PGLUE3(on,x,Button(b)); \
+    h4puiSync(#x,msg);\
+    }\
+}

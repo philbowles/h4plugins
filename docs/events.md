@@ -83,7 +83,7 @@ The message part of the event can contain any data, depending on the type of mes
 |H4PE_SIGNAL|Flash pattern|timebase,pattern|5|
 |H4PE_VIEWERS|Number of actual web users|0=no viewers,1=at least 1||
 |H4PE_GPIO|Pin activity|depends on pin||
-|H4PE_GV_CHANGE|A global variable has changed|new value||
+|H4PE_GVCHANGE|A global variable has changed|new value||
 
 Notes:
 1. Internal use, for information only. Do not emit, listen out for etc...
@@ -95,7 +95,7 @@ Notes:
 As you can see, many of the evnts are for internal use only and you only need to be aware of them if you are writing your own plugin or doing some of the things discussed in [Advanced Topics](docs/advanced.md). Most users wil only need to react to:
 
 * H4PE_GPIO
-* H4PE_GV_CHANGE
+* H4PE_GVCHANGE
 
 GPIO messages and the whole GPIO susbsytem are discussed in: [GPIO Handling and "NODE-PINK"](gpio.md). Global variables are discussed in:  [Global Variables and persistent storage](globals.md)
 

@@ -31,6 +31,7 @@ SOFTWARE.
 string                   H4P_SerialCmd::_fname="/";
 
 extern std::unordered_map<string,H4Service*> h4pmap;
+extern bool h4punlocked;
 
 const char* __attribute__((weak)) giveTaskName(uint32_t id){ return "ANON"; }
 
@@ -92,11 +93,12 @@ uint32_t H4P_SerialCmd::_config(vector<string> vs){
             vector<string> parts=split(c,"=");
             if(parts.size()>2) return H4_CMD_PAYLOAD_FORMAT;
             if(!h4p.gvExists(parts[0])) return H4_CMD_NAME_UNKNOWN;
+            if(parts[0]==stateTag() && !h4punlocked) return H4_CMD_NOT_NOW; // dont like it but waaaaaaaay smaller / faster
             pending[parts[0]]=parts.size() >1 ? parts[1]:"";
         }
         for(auto const& p:pending) {
             h4p[p.first]=p.second;
-            reply("CONFIG: %s now=%s\n",CSTR(p.first),CSTR(p.second));
+            h4psysevent(_me,H4PE_UIMSG,"CONFIG: %s now=%s\n",CSTR(p.first),CSTR(p.second));
         }
         return H4_CMD_OK;
     });
@@ -338,10 +340,7 @@ void H4P_SerialCmd::gvErase(initializer_list<const char*> nil){
         anypersistent|=mts._save;
         h4pGlobal.erase(n);
     }
-    if(anypersistent) {
-//        Serial.printf("At least one persistent removal\n");
-        _persist();
-    }
+    if(anypersistent) _persist();
 }
 
 string H4P_SerialCmd::gvGetstring(const string& name){ 
@@ -454,7 +453,7 @@ h4proxy& h4proxy::_set(const string& s){
     if(_v!=s){
         _v=s;
         if(_save) H4P_SerialCmd::_persist();
-        h4psysevent(CSTR(_id),H4PE_GV_CHANGE,"%s",CSTR(_v));
+        h4psysevent(CSTR(_id),H4PE_GVCHANGE,"%s",CSTR(_v));
     }// else Serial.printf("** %s **NO CHANGE %s\n",CSTR(_id),CSTR(_v));
     return *this;
 }

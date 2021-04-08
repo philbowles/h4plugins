@@ -105,7 +105,7 @@ class H4P_WiFi: public H4Service, public AsyncWebServer {
 #if H4P_USE_WIFI_AP
                 void            _startAP();
         H4P_WiFi(): 
-            H4Service(wifiTag(),H4PE_FACTORY | H4PE_GPIO | H4PE_GV_CHANGE | H4PE_UIADD | H4PE_UISYNC),
+            H4Service(wifiTag(),H4PE_FACTORY | H4PE_GPIO | H4PE_GVCHANGE | H4PE_UIADD | H4PE_UISYNC | H4PE_UIMSG),
             AsyncWebServer(H4P_WEBSERVER_PORT){
                 h4p.gvSetInt(goTag(),0,false);
                 h4p[ssidTag()]=h4Tag();
@@ -114,7 +114,7 @@ class H4P_WiFi: public H4Service, public AsyncWebServer {
         explicit H4P_WiFi(): H4Service(wifiTag()),AsyncWebServer(H4P_WEBSERVER_PORT){}
 
         H4P_WiFi(string ssid,string psk,string device=""):
-            H4Service(wifiTag(),H4PE_FACTORY | H4PE_GPIO | H4PE_GV_CHANGE | H4PE_UIADD | H4PE_UISYNC),
+            H4Service(wifiTag(),H4PE_FACTORY | H4PE_GPIO | H4PE_GVCHANGE | H4PE_UIADD | H4PE_UISYNC | H4PE_UIMSG),
             AsyncWebServer(H4P_WEBSERVER_PORT){
                 h4p.gvSetstring(ssidTag(),ssid,true);
                 h4p.gvSetstring(pskTag(),psk,true);
@@ -130,19 +130,16 @@ class H4P_WiFi: public H4Service, public AsyncWebServer {
         virtual void            svcDown() override;
         virtual void            svcUp() override;
 //
+                void            uiAddBoolean(const string& name,const string& section="u"){ _uiAdd(name,H4P_UI_BOOL,section); }
+                void            uiAddDropdown(const string& name,H4P_NVP_MAP options,const string& section="u");
+                void            uiAddGlobal(const string& name,const string& section="u"){ _uiAdd(name,H4P_UI_TEXT,section); }
+                void            uiAddInput(const string& name,const string& section="u");
                 void            uiAddText(const string& name,const string& v,const string& section="u"){ _uiAdd(name,H4P_UI_TEXT,section,v); }
                 void            uiAddText(const string& name,int v,const string& section="u"){ _uiAdd(name,H4P_UI_TEXT,section,stringFromInt(v)); }
 
-                void            uiAddLabel(const string& name,const string& section="u"){ _uiAdd(name,H4P_UI_TEXT,section); }
-                void            uiAddLabel(const string& name,const string& v,const string& section="u"){ _uiAdd(name,H4P_UI_TEXT,section,v); }
-                void            uiAddLabel(const string& name,const int v,const string& section="u"){ _uiAdd(name,H4P_UI_TEXT,section,stringFromInt(v)); }
-                void            uiAddBoolean(const string& name,const string& section="u"){ _uiAdd(name,H4P_UI_BOOL,section); }
-                void            uiAddDropdown(const string& name,H4P_NVP_MAP options,const string& section="u");
-                void            uiAddInput(const string& name,const string& section="u");
-                void            uiSetInput(const string& ui,const string& value){ _sendSSE(ui,CSTR(value)); }
                 void            uiSetBoolean(const string& ui,const bool b){ _sendSSE(ui,CSTR(stringFromInt(b))); }
-                void            uiSetLabel(const string& ui,const int f){ _sendSSE(ui,CSTR(stringFromInt(f))); }
-                void            uiSetLabel(const string& ui,const string& value){ _sendSSE(ui,CSTR(value)); }
+                void            uiSetValue(const string& ui,const int f){ _sendSSE(ui,CSTR(stringFromInt(f))); }
+                void            uiSetValue(const string& ui,const string& value){ _sendSSE(ui,CSTR(value)); }
 //
                 template<typename... Args>
                 void            uiMessage(const string& msg, Args... args){ // variadic T<>

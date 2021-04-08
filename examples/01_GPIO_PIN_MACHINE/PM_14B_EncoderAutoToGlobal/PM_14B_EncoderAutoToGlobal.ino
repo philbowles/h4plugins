@@ -8,7 +8,7 @@ H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false)
 h4pEncoderAuto rotary(D1,D2,INPUT,ACTIVE_HIGH,-10,10,1,50,true,new npUPDATEGLOBAL{"eaValue"});
 h4pTactless centerbutton(USER_BTN,INPUT,UB_ACTIVE,UB_MS); // 15 ms debounce time
 
-H4P_EventListener gpio(H4PE_GPIO | H4PE_GV_CHANGE,[](const string& svc,H4PE_TYPE t,const string& msg){
+H4P_EventListener gpio(H4PE_GPIO | H4PE_GVCHANGE,[](const string& svc,H4PE_TYPE t,const string& msg){
   int p=atoi(svc.c_str());
   switch(t){
     case H4PE_GPIO:
@@ -18,7 +18,7 @@ H4P_EventListener gpio(H4PE_GPIO | H4PE_GV_CHANGE,[](const string& svc,H4PE_TYPE
             break;
         }
       break;
-    case H4PE_GV_CHANGE:
+    case H4PE_GVCHANGE:
       if(svc=="eaValue") Serial.printf("eaValue now=%s\n",CSTR(msg));    
       break;
   }

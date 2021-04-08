@@ -30,7 +30,7 @@ H4P_Heartbeat h4hb;
 H4P_ConditionalSwitch sw1([](){ return condition; },BUILTIN_LED,H4P_ASSUMED_SENSE,H4P_UILED_GREEN);
 H4P_UPNPServer h4upnp("UI Input Tester");
 
-H4P_EventListener allexceptmsg(H4PE_VIEWERS | H4PE_GV_CHANGE,[](const string& svc,H4PE_TYPE t,const string& msg){
+H4P_EventListener allexceptmsg(H4PE_VIEWERS | H4PE_GVCHANGE,[](const string& svc,H4PE_TYPE t,const string& msg){
   switch(t){
     case H4PE_VIEWERS:
       if(STOI(msg)){
@@ -43,7 +43,7 @@ H4P_EventListener allexceptmsg(H4PE_VIEWERS | H4PE_GV_CHANGE,[](const string& sv
       }
       else h4.cancel({ui,cond}); 
       break;
-    case H4PE_GV_CHANGE:
+    case H4PE_GVCHANGE:
       if(svc=="Select"){
         h4wifi.uiMessage("You chose %s\n",CSTR(msg));
         if(msg=="llll") h4wifi.uiSetLabel(myText,lowercase(usertext)); 

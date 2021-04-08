@@ -35,9 +35,11 @@ SOFTWARE.
 class H4P_BinarySwitch: public H4P_BinaryThing{
             uint8_t         _pin;
             H4PM_SENSE      _sense;
-            uint32_t        _initial;
+            uint32_t        _initial;      
     protected:
         h4pOutput*          _pp;
+
+//        virtual void         _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override { Serial.printf("H4P_BinarySwitch HEVT\n"); H4P_BinaryThing::_handleEvent(svc,t,msg); };
     public:
             uint8_t         _color;
 
@@ -54,11 +56,11 @@ class H4P_BinarySwitch: public H4P_BinaryThing{
 class H4P_ConditionalSwitch: public H4P_BinarySwitch{
                 H4_FN_CPRED _predicate;
     protected:
-                void        _setState(bool b) override;
+        virtual void        _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override;
     public:
         H4P_ConditionalSwitch(H4_FN_CPRED predicate,uint8_t pin,H4PM_SENSE sense,uint8_t color=H4P_UILED_BI,uint32_t initial=OFF,uint32_t timer=0):
             _predicate(predicate), 
-            H4P_BinarySwitch(pin,sense,color,initial,timer){}
+            H4P_BinarySwitch(pin,sense,color,initial,timer){ syncCondition(); }
 #if H4P_LOG_MESSAGES
         void info() override { 
             H4P_BinarySwitch::info();
@@ -66,7 +68,4 @@ class H4P_ConditionalSwitch: public H4P_BinarySwitch{
         }
 #endif
         void syncCondition();
-//
-        virtual void        _init() override;
-        virtual void        _sync() override;
 };

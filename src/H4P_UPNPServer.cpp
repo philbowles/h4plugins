@@ -52,14 +52,26 @@ void H4P_UPNPServer::__upnpSend(uint32_t mx,const string s,IPAddress ip,uint16_t
 
 void H4P_UPNPServer::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg){
     switch(t){
-        case H4PE_GV_CHANGE:
+        case H4PE_VIEWERS:
+            {
+                uint32_t mode=STOI(msg);
+                if(mode) {
+                #if H4P_USE_WIFI_AP
+                    if(mode==WIFI_AP) h4puiAdd(nameTag(),H4P_UI_INPUT,"s");
+                    else h4puiAdd(nameTag(),H4P_UI_TEXT,"s");
+                #else
+                    h4puiAdd(nameTag(),H4P_UI_TEXT,"s");
+                #endif
+                }
+            }
+            break;
+        case H4PE_GVCHANGE:
             if(_running && svc==nameTag()){
                 svcDown(); // shut down old name, send bye bye etc
                 svcUp();
             }
     }
 }
-
 
 void H4P_UPNPServer::_handlePacket(string p,IPAddress ip,uint16_t port){
     H4P_NVP_MAP uhdrs;
@@ -83,17 +95,14 @@ void H4P_UPNPServer::_handlePacket(string p,IPAddress ip,uint16_t port){
             }
             break;
         case 'N':
-            {
-                for(auto &L:h4pUPNPMap){
-                    if(uhdrs.count(L.first)){
-                        string v=uhdrs[L.first];
-                        if(L.second.count("*") || L.second.count(v)) {
-                            h4psysevent(v,H4PE_UPNP,"%s,%s",(replaceAll(uhdrs["NTS"],"ssdp:","")==aliveTag()) ? CSTR(ip.toString()):"",CSTR(L.first));
-                        }
+            for(auto &L:h4pUPNPMap){
+                if(uhdrs.count(L.first)){
+                    string v=uhdrs[L.first];
+                    if(L.second.count("*") || L.second.count(v)) {
+                        h4psysevent(v,H4PE_UPNP,"%s,%s",(replaceAll(uhdrs["NTS"],"ssdp:","")==aliveTag()) ? CSTR(ip.toString()):"",CSTR(L.first));
                     }
                 }
             }
-            break;
     }
 }
 
@@ -106,15 +115,6 @@ void H4P_UPNPServer::_init(){
     if(h4p[nameTag()]=="") h4p[nameTag()]=dn.append(h4p[chipTag()]);
     h4p.gvSave(nameTag());
     XLOG("UPNP name %s",CSTR(h4p[nameTag()]));
-}
-
-void H4P_UPNPServer::_sync(){
-#if H4P_USE_WIFI_AP
-    if(WiFi.getMode()==WIFI_AP) h4puiAdd(nameTag(),H4P_UI_INPUT,"s");
-    else h4puiAdd(nameTag(),H4P_UI_TEXT,"s");
-#else
-    h4puiAdd(nameTag(),H4P_UI_TEXT,"s");
-#endif
 }
 
 void H4P_UPNPServer::_listenTag(const string& tag,const string& value){ h4pUPNPMap[tag].insert(value); }

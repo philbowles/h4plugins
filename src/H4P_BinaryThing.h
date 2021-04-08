@@ -35,17 +35,18 @@ SOFTWARE.
 
 STAG(condition);
 
+extern bool h4punlocked;
+
 class H4P_BinaryThing: public H4Service{
         function<void(bool)>        _thing;
                 void                _onChange(bool b);
     protected:
                 uint32_t            _autoOff(vector<string> vs){ return _guardInt1(vs,[this](uint32_t t){ autoOff(t); }); }
-        virtual void                _handleEvent(const string& svc,H4PE_TYPE t,const string& msg);
-        virtual void                _setState(bool b);
+        virtual void                _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override;
                 uint32_t            _switch(vector<string> vs){ return _guardInt1(vs,[this](bool b){ turn(b); }); }
 
     public:
-        H4P_BinaryThing(function<void(bool)> thingFunction,bool initial=OFF,uint32_t timer=0): _thing(thingFunction),H4Service(onofTag(),H4PE_GV_CHANGE) {
+        H4P_BinaryThing(function<void(bool)> thingFunction,bool initial=OFF,uint32_t timer=0): _thing(thingFunction),H4Service(onofTag(),H4PE_GVCHANGE|H4PE_VIEWERS) {
             h4p.gvSetInt(stateTag(),initial,false);
             h4p.gvSetInt(autoOffTag(),timer,true);
             _addLocals({
@@ -72,11 +73,9 @@ class H4P_BinaryThing: public H4Service{
                 void        turnOff(){ turn(OFF); }
                 void        turnOn(){ turn(ON); }
                 void        toggle(){ turn(!h4p.gvGetInt(stateTag())); }
-                void        turn(bool b){ _setState(b); }
+                void        turn(bool b){ h4p.gvSetInt(stateTag(),b); }
 //
         virtual void        svcDown() override;
-//      syscall
-        virtual void        _sync();
 };
 
 using H4_FN_CPRED      = function<bool()>;
@@ -84,11 +83,11 @@ using H4_FN_CPRED      = function<bool()>;
 class H4P_ConditionalThing: public H4P_BinaryThing{
                 H4_FN_CPRED _predicate;
     protected:
-                void        _setState(bool b) override;
+        virtual void        _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override;
     public:
         H4P_ConditionalThing(function<void(bool)> thingFunction,H4_FN_CPRED predicate,bool initial=OFF,uint32_t timer=0): 
             _predicate(predicate),
-            H4P_BinaryThing(thingFunction,initial,timer) {}
+            H4P_BinaryThing(thingFunction,initial,timer) { syncCondition(); }
 #if H4P_LOG_MESSAGES
                 void        info() override { 
                     H4P_BinaryThing::info();
@@ -96,6 +95,4 @@ class H4P_ConditionalThing: public H4P_BinaryThing{
                 }
 #endif
                 void        syncCondition();
-//
-        virtual void        _sync() override;
 };

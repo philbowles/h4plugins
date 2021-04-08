@@ -209,6 +209,9 @@ void H4P_WiFi::_commonStartup(){
 
 void H4P_WiFi::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg) {
     switch(t){
+        case H4PE_UIMSG:
+            uiMessage("%s says: %s\n",CSTR(svc),CSTR(msg));
+            break;
         case H4PE_FACTORY:
             _clear();
             break;
@@ -329,15 +332,19 @@ void H4P_WiFi::_startWebserver(){
             h4.queueFunction([this,client](){
                 if(_evts->count()==1) {
                     _clearUI();
-//                    XEVENT(H4PE_VIEWERS,"%d",_evts->count()); //if(_onC) _onC(); // first time only R WE SURE?
                     h4psysevent("viewers",H4PE_VIEWERS,"%d",WiFi.getMode());
                     _uiAdd(chipTag(),H4P_UI_TEXT,"s");
                 #if H4P_USE_WIFI_AP
-                    if(WiFi.getMode()==WIFI_AP) {
-                        _uiAdd(deviceTag(),H4P_UI_INPUT,"s");
-                        Serial.printf("AP AP AP AP AP AP AP AP AP AP AP AP H4P_WiFi::_init AP AP AP AP\n");
+                    if(WiFi.getMode()==WIFI_AP) _uiAdd(deviceTag(),H4P_UI_INPUT,"s");
+                    else {
+                        _uiAdd(deviceTag(),H4P_UI_TEXT,"s");
+                        _uiAdd(boardTag(),H4P_UI_TEXT,"s");
+                        _uiAdd(h4Tag(),H4P_UI_TEXT,"s",H4_VERSION);
+                        _uiAdd(H4PTag(),H4P_UI_TEXT,"s");
+                        _uiAdd(h4UITag(),H4P_UI_TEXT,"s");
+                        _uiAdd(NBootsTag(),H4P_UI_TEXT,"s");
+                        _uiAdd(ipTag(),H4P_UI_TEXT,"s"); // cos we don't know it yet
                     }
-                    else _uiAdd(deviceTag(),H4P_UI_TEXT,"s");
                 #else
                     _uiAdd(deviceTag(),H4P_UI_TEXT,"s");
                     _uiAdd(boardTag(),H4P_UI_TEXT,"s");
@@ -347,15 +354,11 @@ void H4P_WiFi::_startWebserver(){
                     _uiAdd(NBootsTag(),H4P_UI_TEXT,"s");
                     _uiAdd(ipTag(),H4P_UI_TEXT,"s"); // cos we don't know it yet
                 #endif
-//                    Serial.printf("****************** SWS Got %d ui\n",h4pUserItems.size());
-                    for(auto const& s:h4pmap) s.second->_sync();
-//                    Serial.printf("****************** SWS Got %d ui\n",h4pUserItems.size());
                     h4pUIorder.shrink_to_fit();
                 }
                 for(auto const& ui:h4pUIorder){
                     auto i=h4pUserItems[ui];
 //                    _sendSSE("ui",CSTR(string(ui+","+stringFromInt(i.type)+","+i.f()+",1,"+stringFromInt(i.color)+","+i.h)));
-//                    Serial.printf("UI %s\n",CSTR(string(ui+","+stringFromInt(i.type)+","+i.h+",0,"+stringFromInt(i.color)+","+i.f())));
                     _sendSSE("ui",CSTR(string(ui+","+stringFromInt(i.type)+","+i.h+",0,"+stringFromInt(i.color)+","+i.f())));
                 }
                 h4.repeatWhile([this]{ return _evts->count(); },
