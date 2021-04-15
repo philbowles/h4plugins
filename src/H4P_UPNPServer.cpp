@@ -67,6 +67,7 @@ void H4P_UPNPServer::_handleEvent(const string& svc,H4PE_TYPE t,const string& ms
             break;
         case H4PE_GVCHANGE:
             if(_running && svc==nameTag()){
+//                h4puiSync(nameTag(),msg);
                 svcDown(); // shut down old name, send bye bye etc
                 svcUp();
             }

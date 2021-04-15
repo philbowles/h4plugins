@@ -48,7 +48,7 @@ void H4P_PinMachine::all(bool b){ for(auto const& p:h4pPinMap) if(isOutput(p.fir
 #if H4P_LOG_MESSAGES
 void H4P_PinMachine::info(){
     H4Service::info();
-    for(auto const& p:h4pPinMap) p.second->dump();
+    for(auto const& p:h4pPinMap) reply("%s",CSTR(p.second->dump()));
 }
 #endif
 
@@ -63,7 +63,7 @@ void H4P_PinMachine::svcDown(){
     H4Service::svcDown();
 }
 
-msg         H4P_PinMachine::dump        (uint8_t p)                     { return delegate<msg>     (p,&h4pGPIO::dump); }
+//string      H4P_PinMachine::dump        (uint8_t p)                     { return delegate<msg>     (p,&h4pGPIO::dump); }
 uint8_t     H4P_PinMachine::logicalRead (uint8_t p)                     { return delegate<uint8_t> (p,&h4pGPIO::logicalRead); }
 msg         H4P_PinMachine::getEvent    (uint8_t p)                     { return delegate<msg>     (p,&h4pGPIO::getEvent); }
 uint32_t    H4P_PinMachine::getValue    (uint8_t p)                     { return delegate<uint32_t>(p,&h4pGPIO::getValue); }
@@ -123,9 +123,12 @@ void h4pGPIO::_handleEvent(const string& s,H4PE_TYPE t,const string& msg){
     }
 }
 
-msg h4pGPIO::dump(){
-    Serial.printf("  Pin %02d ACTIVE_%s _r=%d L=%u metal=%d\n",_p,_s ? "HIGH":"LOW",_r,logicalRead(),digitalRead(_p));
-    return (*npShow)(_prev);
+string h4pGPIO::dump(){
+    char* buff=static_cast<char*>(malloc(H4P_REPLY_BUFFER+1));
+    snprintf(buff,H4P_REPLY_BUFFER," P%02d S=%d P=%d L=%d C=%d V=%d O=%d A=%d",_p,_s,digitalRead(_p),logicalRead(),_c,getValue(),isOutput(),isAnalog());
+    string rv(buff);
+    free(buff);
+    return rv;
 }
 
 msg h4pGPIO::inject(uint32_t metal,bool timer){ // P is so we can fake it e.f. for encoders

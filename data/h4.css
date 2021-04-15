@@ -93,6 +93,7 @@ input[type="image"]{ outline:none; }
     border-style: none;   
     height: 19px;
     padding-left: 8px;
+    text-align: left;
 }
 #qh{
     background-color:#17a1a5;

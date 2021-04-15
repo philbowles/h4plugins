@@ -50,7 +50,7 @@ SOFTWARE.
 #include<ESPAsyncWebServer.h>
 //
 #if H4P_USE_WIFI_AP
-constexpr const char* goTag(){ return "go"; }
+constexpr const char* GoTag(){ return "Go"; }
 #endif
 
 struct H4P_UI_ITEM { // add title and/or props?
@@ -89,6 +89,7 @@ class H4P_WiFi: public H4Service, public AsyncWebServer {
                 }
                 void            _commonStartup();
                 void            _coreStart();
+                void            _defaultSync(const string& svc,const string& msg);
                 void            _gotIP();
                 void            _lostIP();
                 void            _rest(AsyncWebServerRequest *request);
@@ -96,7 +97,7 @@ class H4P_WiFi: public H4Service, public AsyncWebServer {
                 void            _startWebserver();
                 void            _stopWebserver();
         static  void            _wifiEvent(WiFiEvent_t event);
-        //      service essentials
+//      service essentials
     protected:
         virtual void            _handleEvent(const string& s,H4PE_TYPE t,const string& msg) override;
     public:
@@ -104,14 +105,18 @@ class H4P_WiFi: public H4Service, public AsyncWebServer {
 //          included here against better wishes due to compiler bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89605
 #if H4P_USE_WIFI_AP
                 void            _startAP();
+#endif
         H4P_WiFi(): 
             H4Service(wifiTag(),H4PE_FACTORY | H4PE_GPIO | H4PE_GVCHANGE | H4PE_UIADD | H4PE_UISYNC | H4PE_UIMSG),
             AsyncWebServer(H4P_WEBSERVER_PORT){
-                h4p.gvSetInt(goTag(),0,false);
                 h4p[ssidTag()]=h4Tag();
                 h4p[pskTag()]=h4Tag();
-#else
-        explicit H4P_WiFi(): H4Service(wifiTag()),AsyncWebServer(H4P_WEBSERVER_PORT){}
+                h4p.gvSetstring(deviceTag(),"",true);
+//#endif
+                _commonStartup();
+            }                
+//#else
+//        explicit H4P_WiFi(): H4Service(wifiTag()),AsyncWebServer(H4P_WEBSERVER_PORT){}
 
         H4P_WiFi(string ssid,string psk,string device=""):
             H4Service(wifiTag(),H4PE_FACTORY | H4PE_GPIO | H4PE_GVCHANGE | H4PE_UIADD | H4PE_UISYNC | H4PE_UIMSG),
@@ -119,7 +124,7 @@ class H4P_WiFi: public H4Service, public AsyncWebServer {
                 h4p.gvSetstring(ssidTag(),ssid,true);
                 h4p.gvSetstring(pskTag(),psk,true);
                 h4p.gvSetstring(deviceTag(),device,true);
-#endif
+//#endif
                 _commonStartup();
             }
                 void            change(string ssid,string psk);

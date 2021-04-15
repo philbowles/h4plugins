@@ -70,12 +70,11 @@ void H4P_AsyncMQTT::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg
             }
             break;
         case H4PE_GVCHANGE:
-            /*
-            if(svc==brokerTag()) {
+            if((svc==brokerTag() || svc==portTag()) && _running) {
+                Serial.printf("RESTARTING DUE TO GVCHANGE\n");
                 restart();
                 break;
             }
-            */
             if(svc==stateTag()) {
                 publishDevice(stateTag(),msg);
                 break;
@@ -85,7 +84,13 @@ void H4P_AsyncMQTT::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg
 
 void H4P_AsyncMQTT::_init() {
     h4p.gvSetInt(_me,0,false);
-
+/*
+    Serial.printf("H4P_AsyncMQTT::_init()\n");
+    Serial.printf("Broker %s\n",CSTR(h4p[brokerTag()]));
+    Serial.printf("Port %s\n",CSTR(h4p[portTag()]));
+    Serial.printf("MQU %s\n",CSTR(h4p[mQuserTag()]));
+    Serial.printf("MQP %s\n",CSTR(h4p[mQpassTag()]));
+*/
     onError([=](uint8_t && e,int && info){ XEVENT(H4PE_SYSWARN,"%d,%d",e,info); });
 
     device=h4p[deviceTag()];
@@ -135,27 +140,21 @@ void H4P_AsyncMQTT::_init() {
 }
 
 void H4P_AsyncMQTT::_setup(){ // allow for TLS
-    if(h4p[brokerTag()]==""){
-        string ip=CSTR(WiFi.H4P_FALLBACK_IP().toString());
-        int x=atoi(CSTR(ip));
-        if(x==192){ // yes, I know .168 etc
-            h4p[brokerTag()]=ip;
-            h4p[portTag()]="1883";
-            SYSINFO("MQTT DEFAULTED TO %s:%s",CSTR(h4p[brokerTag()]),CSTR(h4p[portTag()]));
-        } else SYSWARN("TYPE h4/mqtt/change/...etc to get MQTT!","");
-    }
-
     setServer(CSTR(h4p[brokerTag()]),h4p.gvGetInt(portTag()));
     if(h4p[mQuserTag()]!="") setCredentials(CSTR(h4p[mQuserTag()]),CSTR(h4p[mQpassTag()])); // optimise tag()
 }
-
+/*
+void H4P_AsyncMQTT::_update(const string& name,const string& value){
+    h4p[name]=value;
+    h4puiSync(name,value);
+}
+*/
 void H4P_AsyncMQTT::change(const string& broker,const string& user,const string& passwd,uint16_t port){ // add creds
     XLOG("MQTT change to %s:%d user=%s",CSTR(broker),port,CSTR(user));
-    h4p[portTag()]=stringFromInt(port);
     h4p[mQuserTag()]=user;
     h4p[mQpassTag()]=passwd;
-    h4p[brokerTag()]=broker; // use thgis to trigger change
-    restart();
+    h4p[portTag()]=stringFromInt(port);
+    h4p[brokerTag()]=broker;
 }
 
 #if H4P_LOG_MESSAGES

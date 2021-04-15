@@ -30,7 +30,7 @@ SOFTWARE.
 #include<H4P_BinaryThing.h>
 
 void H4P_BinaryThing::_onChange(bool b){
-    h4puiSync(stateTag(),CSTR(stringFromInt(b)));
+//    h4puiSync(stateTag(),CSTR(stringFromInt(b)));
     h4.queueFunction([=](){ _thing(b); });
     auto off=h4p.gvGetInt(autoOffTag());
     if(off) h4.once(off,[=]{ h4p.gvSetInt(stateTag(),OFF); });
@@ -40,7 +40,6 @@ void H4P_BinaryThing::_handleEvent(const string& svc,H4PE_TYPE t,const string& m
     switch(t){
         case H4PE_VIEWERS:
             {
-//                Serial.printf("H4P_BinaryThing::_handleEvent msg=%s\n",CSTR(msg));
                 uint32_t mode=STOI(msg);
                 if(mode) {
                 #if H4P_USE_WIFI_AP
@@ -52,7 +51,7 @@ void H4P_BinaryThing::_handleEvent(const string& svc,H4PE_TYPE t,const string& m
             }
             break;
         case H4PE_GVCHANGE:
-            if(_running && svc==stateTag()) _onChange(STOI(msg));
+            if(_running && svc==stateTag()) return _onChange(STOI(msg));
     }
 }
 

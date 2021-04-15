@@ -73,7 +73,7 @@ class H4P_BinaryThing: public H4Service{
                 void        turnOff(){ turn(OFF); }
                 void        turnOn(){ turn(ON); }
                 void        toggle(){ turn(!h4p.gvGetInt(stateTag())); }
-                void        turn(bool b){ h4p.gvSetInt(stateTag(),b); }
+                void        turn(bool b){ if(h4punlocked) h4p.gvSetInt(stateTag(),b); }
 //
         virtual void        svcDown() override;
 };

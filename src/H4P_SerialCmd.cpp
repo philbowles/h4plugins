@@ -98,7 +98,7 @@ uint32_t H4P_SerialCmd::_config(vector<string> vs){
         }
         for(auto const& p:pending) {
             h4p[p.first]=p.second;
-            h4psysevent(_me,H4PE_UIMSG,"CONFIG: %s now=%s\n",CSTR(p.first),CSTR(p.second));
+            h4psysevent(_me,H4PE_UIMSG,"CONFIG: %s now=%s",CSTR(p.first),CSTR(p.second));
         }
         return H4_CMD_OK;
     });

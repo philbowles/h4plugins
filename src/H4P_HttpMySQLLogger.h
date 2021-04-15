@@ -31,7 +31,7 @@ SOFTWARE.
 
 #include <H4PCommon.h>
 #include<H4P_WiFi.h>
-#include <asyncHTTPrequest.h>
+#include <smartClient.h>
 
 #define H4P_MYSQL_HOLDOFF   5
 /*
@@ -50,13 +50,13 @@ SOFTWARE.
 */
 
 using H4P_FN_HTTPFAIL = function<void(int)>;
-class H4P_HttpMySQLLogger: public H4Service, public asyncHTTPrequest {
+class H4P_HttpMySQLLogger: public H4Service, public smartClient {
         string          ip;
         H4P_FN_HTTPFAIL _fail;
         bool            inflight=false;
         bool            warning=false;
 
-        void        _requestCB(void* optParm, asyncHTTPrequest* r, int readyState){ 
+        void        _requestCB(void* optParm, smartClient* r, int readyState){ 
             if(readyState == 4) {
                 inflight=false;
                 if(r->responseHTTPcode() < 0){
@@ -89,6 +89,6 @@ class H4P_HttpMySQLLogger: public H4Service, public asyncHTTPrequest {
         void _hookIn() override { // protect
             h4pdepend<H4P_WiFi>(this,H4PID_WIFI);
 //            setDebug(true);
-            onReadyStateChange( [this](void* && a,asyncHTTPrequest* && b,int  && c){ _requestCB(a,b,c); });
+            onReadyStateChange( [this](void* && a,smartClient* && b,int  && c){ _requestCB(a,b,c); });
         }
 };

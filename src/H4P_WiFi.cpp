@@ -107,7 +107,7 @@ void H4P_WiFi::HAL_WIFI_startSTA(){
 void H4P_WiFi::svcUp(){ 
     _signalBad();
     WiFi.begin();
- };
+};
 
 void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
     switch(event) {
@@ -129,7 +129,7 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
 void H4P_WiFi::_coreStart(){
 //    WiFi.printDiag(Serial); 
 #if H4P_USE_WIFI_AP
-    Serial.printf("AP MODE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+//    Serial.printf("AP MODE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
     if(!_dns53){
         if(_cannotConnectSTA()) _startAP();
         else if(WiFi.getMode()==WIFI_OFF) h4puncheckedcall<H4P_WiFi>(wifiTag())->HAL_WIFI_startSTA();
@@ -207,10 +207,31 @@ void H4P_WiFi::_commonStartup(){
     });
 }
 
+void H4P_WiFi::_defaultSync(const string& svc,const string& msg) {
+    if(h4pUserItems.count(svc)) {
+        Serial.printf("H4P_WiFi::GVC DFLT SYNC %s %s\n",CSTR(svc),CSTR(msg));
+        string sync;
+        switch(h4pUserItems[svc].type){
+            case H4P_UI_DROPDOWN:
+                sync=h4pUserItems[svc].f();
+                break;
+            case H4P_UI_IMGBTN:
+                if(svc==stateTag()) sync=msg;
+                else {
+                    Serial.printf("%s No AUTO-SYNC for buttons\n",CSTR(svc));
+                    return;
+                }
+            default:
+                sync=msg;
+        }
+        _sendSSE(svc,sync);
+    }
+}
+
 void H4P_WiFi::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg) {
     switch(t){
         case H4PE_UIMSG:
-            uiMessage("%s says: %s\n",CSTR(svc),CSTR(msg));
+            uiMessage("%s",CSTR(msg));
             break;
         case H4PE_FACTORY:
             _clear();
@@ -220,34 +241,29 @@ void H4P_WiFi::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg) {
             break;
         case H4PE_GPIO:
         case H4PE_UISYNC:
-            if(h4pUserItems.count(svc)) {
-                string sync=h4pUserItems[svc].type==H4P_UI_DROPDOWN ? h4pUserItems[svc].f():msg;
-                _sendSSE(svc,sync);
-            }
+            //_defaultSync(svc,msg);
+            if(h4pUserItems.count(svc)) _sendSSE(svc,msg);
             break;
-        default:
-            if(!_running) break;
+        case H4PE_GVCHANGE:
 #if H4P_USE_WIFI_AP
-            if(svc == deviceTag()){
-                if(WiFi.getMode()==WIFI_STA) h4pevent(h4pSrc,H4PE_REBOOT,svc);
-                else Serial.printf("H4P_USE_WIFI_AP DEVICE NAME CHANGED\n");
-                break;
-            }
-            if(svc == goTag()) {
-                Serial.printf("DO NOT COLLECT £200 *%s*\n",CSTR(msg));
+            if(svc == GoTag() && STOI(msg)) {
+//                Serial.printf("DO NOT COLLECT £200 *%s*\n",CSTR(msg));
                 HAL_WIFI_startSTA();
-                h4.once(1000,[]{ h4pevent(h4pSrc,H4PE_REBOOT,goTag()); });
-                Serial.printf("YOU'RE GOIN' DAAAAAAAAAAAAAAAAAHN\n");
+                h4.once(1000,[]{ h4pevent(h4pSrc,H4PE_REBOOT,GoTag()); });
+//                Serial.printf("YOU'RE GOIN' DAAAAAAAAAAAAAAAAAHN\n");
                 return;
             }
-#else
-            if(svc == deviceTag()) h4pevent(h4pSrc,H4PE_REBOOT,svc);
 #endif
+            if(svc == deviceTag() && _running) h4pevent(h4pSrc,H4PE_REBOOT,svc);
+            _defaultSync(svc,msg);
+        default:
+//            Serial.printf("H4P_WiFi::HEVT %s %s %s\n",CSTR(svc),CSTR(h4pGetEventName(t)),CSTR(msg));
+            break;
     }
 }
 
 void H4P_WiFi::_init(){
-    Serial.printf("********************* H4P_WiFi::_init ********** prevent double dip\n");
+//    Serial.printf("********************* H4P_WiFi::_init ********** prevent double dip\n");
     WiFi.persistent(true);
     WiFi.onEvent(_wifiEvent);
     
@@ -260,7 +276,7 @@ void H4P_WiFi::_init(){
     if(h4p[h4UITag()]=="") SYSWARN("NO FS: webUI will not start","");
     SYSINFO("Device: %s Chip: %s UI v%s",CSTR(h4p[deviceTag()]),CSTR(h4p[chipTag()]),CSTR(h4p[h4UITag()]));
 
-    h4p.gvSetstring(ipTag(),"",false);
+//    h4p.gvSetstring(ipTag(),"",false);
     h4p.gvSave(deviceTag());
 }
 
@@ -331,12 +347,14 @@ void H4P_WiFi::_startWebserver(){
         else {
             h4.queueFunction([this,client](){
                 if(_evts->count()==1) {
-                    _clearUI();
-                    h4psysevent("viewers",H4PE_VIEWERS,"%d",WiFi.getMode());
-                    _uiAdd(chipTag(),H4P_UI_TEXT,"s");
                 #if H4P_USE_WIFI_AP
-                    if(WiFi.getMode()==WIFI_AP) _uiAdd(deviceTag(),H4P_UI_INPUT,"s");
+                    if(WiFi.getMode()==WIFI_AP) {
+                        _uiAdd(chipTag(),H4P_UI_TEXT,"s"); // clumsy, don't like
+                        _uiAdd(deviceTag(),H4P_UI_INPUT,"s");
+                    }
                     else {
+                        _clearUI();
+                        _uiAdd(chipTag(),H4P_UI_TEXT,"s");
                         _uiAdd(deviceTag(),H4P_UI_TEXT,"s");
                         _uiAdd(boardTag(),H4P_UI_TEXT,"s");
                         _uiAdd(h4Tag(),H4P_UI_TEXT,"s",H4_VERSION);
@@ -346,6 +364,8 @@ void H4P_WiFi::_startWebserver(){
                         _uiAdd(ipTag(),H4P_UI_TEXT,"s"); // cos we don't know it yet
                     }
                 #else
+                    _clearUI();
+                    _uiAdd(chipTag(),H4P_UI_TEXT,"s");
                     _uiAdd(deviceTag(),H4P_UI_TEXT,"s");
                     _uiAdd(boardTag(),H4P_UI_TEXT,"s");
                     _uiAdd(h4Tag(),H4P_UI_TEXT,"s",H4_VERSION);
@@ -354,6 +374,7 @@ void H4P_WiFi::_startWebserver(){
                     _uiAdd(NBootsTag(),H4P_UI_TEXT,"s");
                     _uiAdd(ipTag(),H4P_UI_TEXT,"s"); // cos we don't know it yet
                 #endif
+                    h4psysevent("viewers",H4PE_VIEWERS,"%d",WiFi.getMode());
                     h4pUIorder.shrink_to_fit();
                 }
                 for(auto const& ui:h4pUIorder){

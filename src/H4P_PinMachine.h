@@ -87,7 +87,7 @@ class h4pGPIO {
 //
         h4pGPIO(uint8_t p,uint8_t m,H4PM_SENSE s=ACTIVE_LOW,npFLOW flow={});
         
-                msg                 dump();
+                string              dump();
                 msg                 getEvent(){ return _prev; }
                 int                 getValue(){ return _prev.load; }
                 msg                 inject(uint32_t metal,bool timer=false);

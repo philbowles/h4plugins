@@ -14,7 +14,11 @@
             "vector": "cpp",
             "typeinfo": "cpp",
             "functional": "cpp",
-            "*.tcc": "cpp"
+            "*.tcc": "cpp",
+            "array": "cpp",
+            "bitset": "cpp",
+            "initializer_list": "cpp",
+            "regex": "cpp"
         }
     }
 }

@@ -52,7 +52,7 @@ SOFTWARE.
 
         H4P_UI_HEALTH = 1 adds Heap,Q,nLoops to UI
 */
-#define SANITY                  1
+#define SANITY                  0
 #define H4P_LOG_MESSAGES        1
 #define H4P_SYS_LEVEL           2
 #define H4P_UI_HEALTH           0
@@ -82,6 +82,7 @@ enum H4P_UILED_COLOR {
     H4P_UILED_BLUE,
     H4P_UILED_BI
 };
+
 #ifdef LED_BUILTIN
     #define H4P_ASSUMED_LED      LED_BUILTIN
     #define H4P_ASSUMED_SENSE     ACTIVE_LOW
@@ -89,8 +90,6 @@ enum H4P_UILED_COLOR {
 #endif
 
 #define H4P_WEBSERVER_PORT      80
-#define H4P_FALLBACK_IP dnsIP
-//#define H4P_FALLBACK_IP gatewayIP
 /*
             TWEAKABLES
 */

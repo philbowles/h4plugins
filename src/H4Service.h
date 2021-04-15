@@ -431,8 +431,8 @@ case H4PE_SYSINFO: \
 
 #define H4P_LATCH_BUTTON_HANDLER(x) if(svc==#x){ \
     if(svc==#x){\
-    bool b=STOI(msg);\
-    H4PGLUE3(on,x,Button(b)); \
-    h4puiSync(#x,msg);\
+        bool b=STOI(msg);\
+        H4PGLUE3(on,x,Button(b)); \
+        h4puiSync(#x,msg);\
     }\
 }

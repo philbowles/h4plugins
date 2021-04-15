@@ -44,7 +44,7 @@ class H4Service;
     };
 
 std::unordered_map<std::string,H4Service*> h4pmap;
-bool                h4punlocked=false;
+bool                h4punlocked=true;
 
 H4P_CMDMAP          h4pCmdMap;
 H4P_FLASHMAP        h4pFlashMap;
