@@ -77,8 +77,6 @@ void h4StartPlugins(){
         Serial.printf(" %02d S=%d C=%d NPL=%d\n",p.first,p.second->_s,p.second->_c,p.second->_pipeline.size()); 
         p.second->dump();
     }
-    Serial.printf("Roamers defined:\n");
-    for(auto const& p:h4pRoamers) Serial.printf("%s\n",CSTR(p->_describe())); 
 #else
 void h4StartPlugins(){
 #endif
@@ -114,15 +112,6 @@ void h4StartPlugins(){
     }
     for(auto &e:h4pevt) e.second.shrink_to_fit();
     h4psysevent(h4pTag(),H4PE_SYSINFO,"Ready: Heap=%u",HAL_getFreeHeap());
-}
-
-string flattenMap(const H4P_NVP_MAP& m,const string& fs,const string& rs){
-    string flat;
-    if(m.size()){
-        for(auto const& nvp:m) flat+=nvp.first+fs+nvp.second+rs;
-        flat.pop_back();
-    }
-    return flat;
 }
 
 string h4preplaceparams(const string& s){ // oh for a working regex!

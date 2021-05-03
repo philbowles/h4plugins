@@ -64,6 +64,12 @@ void h4pGlobalEventHandler(const string& svc,H4PE_TYPE t,const string& msg){
     case H4PE_UISYNC:
       Serial.printf("Keep UI in sync - user should call h4puiSync\n");
       break;
+    case H4PE_UIADD:
+      Serial.printf("Add an element to the UI user should call the appropriate function\n");
+      break;
+    case H4PE_UIMSG:
+      Serial.printf("Send message to UI scrolling infor area\n");
+      break;
     case H4PE_RTC:
       Serial.printf("NTP 'clock' time is now valid\n");
       break;

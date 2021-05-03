@@ -32,9 +32,8 @@ SOFTWARE.
 uint32_t H4P_AsyncMQTT::_change(vector<string> vs){  // broker,uname,pword,port
     return _guard1(vs,[this](vector<string> vs){
         auto vg=split(H4PAYLOAD,",");
-        if(vg.size()!=4) return H4_CMD_PAYLOAD_FORMAT;
-        if(!stringIsNumeric(vg[3])) return H4_CMD_NOT_NUMERIC;
-        change(vg[0],vg[1],vg[2],STOI(vg[3])); // change this to a vs?
+        if(vg.size()!=3) return H4_CMD_PAYLOAD_FORMAT;
+        change(vg[0],vg[1],vg[2]); // change this to a vs?
         return H4_CMD_OK;
     });
 }
@@ -48,7 +47,6 @@ void H4P_AsyncMQTT::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg
                 #if H4P_USE_WIFI_AP
                     if(WiFi.getMode()==WIFI_AP){
                         h4puiAdd(brokerTag(),H4P_UI_INPUT,"m");
-                        h4puiAdd(portTag(),H4P_UI_INPUT,"m");
                         h4puiAdd(mQuserTag(),H4P_UI_INPUT,"m");
                         h4puiAdd(mQpassTag(),H4P_UI_INPUT,"m");
                     }
@@ -56,21 +54,19 @@ void H4P_AsyncMQTT::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg
                         h4puiAdd("Pangolin",H4P_UI_TEXT,"m",h4p[pmvTag()]); // mhang!
                         h4puiAdd(_me,H4P_UI_BOOL,"m","",H4P_UILED_BI);
                         h4puiAdd(brokerTag(),H4P_UI_TEXT,"m");
-                        h4puiAdd(portTag(),H4P_UI_TEXT,"m");
                         h4puiAdd(nDCXTag(),H4P_UI_TEXT,"m"); // cos we don't know it yet
                     }
                 #else
                     h4puiAdd("Pangolin",H4P_UI_TEXT,"m",h4p[pmvTag()]); // mhang!
                     h4puiAdd(_me,H4P_UI_BOOL,"m","",H4P_UILED_BI);
                     h4puiAdd(brokerTag(),H4P_UI_TEXT,"m");
-                    h4puiAdd(portTag(),H4P_UI_TEXT,"m");
                     h4puiAdd(nDCXTag(),H4P_UI_TEXT,"m"); // cos we don't know it yet
                 #endif
                 }
             }
             break;
         case H4PE_GVCHANGE:
-            if((svc==brokerTag() || svc==portTag()) && _running) {
+            if((svc==brokerTag()) && _running) {
                 Serial.printf("RESTARTING DUE TO GVCHANGE\n");
                 restart();
                 break;
@@ -87,28 +83,27 @@ void H4P_AsyncMQTT::_init() {
 /*
     Serial.printf("H4P_AsyncMQTT::_init()\n");
     Serial.printf("Broker %s\n",CSTR(h4p[brokerTag()]));
-    Serial.printf("Port %s\n",CSTR(h4p[portTag()]));
     Serial.printf("MQU %s\n",CSTR(h4p[mQuserTag()]));
     Serial.printf("MQP %s\n",CSTR(h4p[mQpassTag()]));
 */
-    onError([=](uint8_t && e,int && info){ XEVENT(H4PE_SYSWARN,"%d,%d",e,info); });
+    onMqttError([=](int e,int info){ XEVENT(H4PE_SYSWARN,"%d,%d",e,info); });
 
     device=h4p[deviceTag()];
-    setClientId(CSTR(device));
     if(_lwt.topic=="") {
         _lwt.topic=CSTR(string(prefix+device+"/offline"));
         _lwt.payload=CSTR(h4p[chipTag()]);
     }
+
     setWill(_lwt.topic,_lwt.QOS,_lwt.retain,_lwt.payload);
     prefix+=device+"/";
 
-    onMessage([this](const char* topic, const uint8_t* payload, size_t length, uint8_t qos, bool retain,bool dup){
+    onMqttMessage([this](const char* topic, const uint8_t* payload, size_t length, uint8_t qos, bool retain,bool dup){
         string top(topic);
-        string pload=stringFromBuff((uint8_t*) payload,length);
+        string pload((const char*) payload,length);
         h4.queueFunction([top,pload](){ h4p._executeCmd(CSTR(string(mqttTag()).append("/").append(top)),pload); },nullptr,H4P_TRID_MQMS);
     });
 
-    onConnect([this](bool b){
+    onMqttConnect([this](bool b){
         h4.queueFunction([this](){
             _signalOff();
             h4.cancelSingleton(H4P_TRID_MQRC);
@@ -119,12 +114,12 @@ void H4P_AsyncMQTT::_init() {
             subscribe(CSTR(string(h4p[boardTag()]+cmdhash())),0);
             report();
             h4p[_me]=stringFromInt(_running=true);
-            SYSINFO("CNX %s:%s",CSTR(h4p[brokerTag()]),CSTR(h4p[portTag()]));
+            SYSINFO("CNX %s",CSTR(h4p[brokerTag()]));
             H4Service::svcUp();
         });
     });
 
-    onDisconnect([this](int8_t reason){
+    onMqttDisconnect([this](int8_t reason){
         if(!_discoDone){
             h4.queueFunction([this,reason](){
                 _signalBad();
@@ -140,8 +135,7 @@ void H4P_AsyncMQTT::_init() {
 }
 
 void H4P_AsyncMQTT::_setup(){ // allow for TLS
-    setServer(CSTR(h4p[brokerTag()]),h4p.gvGetInt(portTag()));
-    if(h4p[mQuserTag()]!="") setCredentials(CSTR(h4p[mQuserTag()]),CSTR(h4p[mQpassTag()])); // optimise tag()
+    setServer(CSTR(h4p[brokerTag()]),CSTR(h4p[mQuserTag()]),CSTR(h4p[mQpassTag()])); // optimise tag()
 }
 /*
 void H4P_AsyncMQTT::_update(const string& name,const string& value){
@@ -149,18 +143,17 @@ void H4P_AsyncMQTT::_update(const string& name,const string& value){
     h4puiSync(name,value);
 }
 */
-void H4P_AsyncMQTT::change(const string& broker,const string& user,const string& passwd,uint16_t port){ // add creds
-    XLOG("MQTT change to %s:%d user=%s",CSTR(broker),port,CSTR(user));
+void H4P_AsyncMQTT::change(const string& broker,const string& user,const string& passwd){ // add creds
+    XLOG("MQTT change to %s user=%s",CSTR(broker),CSTR(user));
     h4p[mQuserTag()]=user;
     h4p[mQpassTag()]=passwd;
-    h4p[portTag()]=stringFromInt(port);
     h4p[brokerTag()]=broker;
 }
 
 #if H4P_LOG_MESSAGES
 void H4P_AsyncMQTT::info(){
     H4Service::info();
-    reply(" Server: %s, port:%s, %s",CSTR(h4p[brokerTag()]),CSTR(h4p[portTag()]),connected() ? "CNX":"DCX");
+    reply(" Server: %s, %s",CSTR(h4p[brokerTag()]),connected() ? "CNX":"DCX");
     string reporting;
     for(auto const r:_reportList) reporting+=r+",";
     reporting.pop_back();
@@ -197,12 +190,12 @@ void H4P_AsyncMQTT::svcUp(){
     _signalBad();
     _setup();
     autorestart=true;
-    connect();
+    connect(device);
 }
 
 void H4P_AsyncMQTT::svcDown(){
     autorestart=false;
-    disconnect(true);
+    disconnect();
 }
 
 void H4P_AsyncMQTT::unsubscribeDevice(string topic){

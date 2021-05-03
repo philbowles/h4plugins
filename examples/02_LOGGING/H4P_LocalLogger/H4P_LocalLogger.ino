@@ -3,7 +3,7 @@ H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCm
 
 /*
 
-Let it run for a while, then try dome of the following:
+Let it run for a while, then try some of the following:
 
 h4/svc/info/llog ( to view the permanently saved log )
 h4/llog/flush ( to view then clear the permanently saved log )

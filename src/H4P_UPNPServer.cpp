@@ -123,7 +123,7 @@ void H4P_UPNPServer::_listenTag(const string& tag,const string& value){ h4pUPNPM
 void H4P_UPNPServer::_listenUDP(){ 
     if(!_udp.listenMulticast(_ubIP, 1900)) return; // some kinda error?
     _udp.onPacket([this](AsyncUDPPacket packet){
-        string pkt=stringFromBuff(packet.data(),packet.length());
+        string pkt((const char*)packet.data(),packet.length());
         IPAddress ip=packet.remoteIP();
         uint16_t port=packet.remotePort();
         h4.queueFunction([=](){ _handlePacket(pkt,ip,port); }); // shud be named etc
@@ -140,7 +140,7 @@ void H4P_UPNPServer::_notify(const string& phase){
 
 void H4P_UPNPServer::_upnp(AsyncWebServerRequest *request){ // redo
     h4.queueFunction([=]() {
-        string soap=stringFromBuff((const byte*) request->_tempObject,strlen((const char*) request->_tempObject));
+        string soap((const char*) request->_tempObject,strlen((const char*) request->_tempObject));
        	h4p.gvSetstring("gs",(soap.find("Get")==string::npos) ? "Set":"Get"); 
         uint32_t _set=soap.find(">1<")==string::npos ? 0:1;
         if(h4p["gs"]=="Set") h4p.gvSetInt(stateTag(),_set); //=//XEVENT(H4PE_ONOF,"%d",_set);

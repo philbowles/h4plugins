@@ -163,7 +163,8 @@ uint32_t H4P_SerialCmd::_get(vector<string> vs){
 void H4P_SerialCmd::_init(){
     for(auto const& i:split(read(_fname),RECORD_SEPARATOR)){
         vector<string> nv=split(i,UNIT_SEPARATOR);
-        h4p[nv[0]]=h4proxy{nv[0],nv.size() > 1 ? nv[1]:"",true};
+        h4pGlobal[nv[0]]=h4proxy{nv[0],nv.size() > 1 ? nv[1]:"",true};
+//        Serial.printf("FROM PS: %s=%s\n",nv[0].data(),h4pGlobal[nv[0]].c_str());
     }
     gvInc(NBootsTag());
     gvSave(NBootsTag());
@@ -267,7 +268,7 @@ string H4P_SerialCmd::read(const string& fn){
             int n=f.size();
             uint8_t* buff=(uint8_t *) malloc(n+1);
             f.readBytes((char*) buff,n);
-            rv=stringFromBuff(buff,n);
+            rv.assign((const char*) buff,n);
             free(buff);
         }
         f.close();
@@ -459,7 +460,6 @@ h4proxy& h4proxy::_set(const string& s){
 }
 
 h4proxy& h4proxy::operator=(const h4proxy& s) {
-
     if(_id=="") {
         _id=s._id;
         _v=s._v;

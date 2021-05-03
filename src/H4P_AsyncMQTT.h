@@ -71,7 +71,6 @@ class H4P_AsyncMQTT: public H4Service, public PangolinMQTT{
 //#if H4P_USE_WIFI_AP
         H4P_AsyncMQTT(H4P_LWT lwt={"","",0,false}): _lwt(lwt), H4Service(mqttTag(),H4PE_GVCHANGE|H4PE_VIEWERS){
             h4p.gvSetstring(brokerTag(),"",true);
-            h4p.gvSetstring(portTag(),"",true);
             h4p.gvSetstring(mQuserTag(),"",true);
             h4p.gvSetstring(mQpassTag(),"",true);
             _commonStartup();
@@ -79,18 +78,17 @@ class H4P_AsyncMQTT: public H4Service, public PangolinMQTT{
 //#else
 //        explicit H4P_AsyncMQTT(): _lwt{"","",0,false},H4Service(mqttTag(),H4PE_GVCHANGE){ Serial.printf("H4P_AsyncMQTT EXPLICIT LOAD!",""); }
 
-        H4P_AsyncMQTT(string broker,uint16_t port, string user="",string pass="",H4P_LWT lwt={"","",0,false}):
+        H4P_AsyncMQTT(string url, string user="",string pass="",H4P_LWT lwt={"","",0,false}):
             _lwt(lwt), H4Service(mqttTag(),H4PE_GVCHANGE|H4PE_VIEWERS)
         {
-            h4p.gvSetstring(brokerTag(),broker,true);
-            h4p.gvSetInt(portTag(),port,true);
+            h4p.gvSetstring(brokerTag(),url,true);
             h4p.gvSetstring(mQuserTag(),user,true);
             h4p.gvSetstring(mQpassTag(),pass,true);
             _commonStartup();
         }
 //#endif
                 void        addReportingItem(const string& ri){ _reportList.insert(ri); }
-                void        change(const string& broker,const string& user,const string& passwd,uint16_t port);
+                void        change(const string& broker,const string& user,const string& passwd);
                 void        publishDevice(const string& topic,const string& payload,uint8_t qos=0, bool retain=false){ xPublish(CSTR(string(prefix+topic)),payload,qos,retain); }
                 void        publishDevice(const string& topic,uint32_t payload,uint8_t qos=0, bool retain=false){ publishDevice(topic,stringFromInt(payload),qos,retain); }
                 void        report();

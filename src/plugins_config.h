@@ -28,11 +28,11 @@ SOFTWARE.
 */
 #pragma once
 
-#define H4P_VERSION "2.0.0"
+#define H4P_VERSION "3.0.0"
 
 // Make sure you read the documentation and have arrangements in place for using AP mode :)
 // If you don't have the H4P_WiFiAP.cpp file, the linker will fail.
-#define H4P_USE_WIFI_AP         1
+#define H4P_USE_WIFI_AP         0
 /*
         DIAGNOSTICS
         comment out H4P_LOG_MESSAGES to prevent any Serial output of  H4PE_MSG EVENTs
@@ -55,7 +55,7 @@ SOFTWARE.
 #define SANITY                  0
 #define H4P_LOG_MESSAGES        1
 #define H4P_SYS_LEVEL           2
-#define H4P_UI_HEALTH           0
+#define H4P_UI_HEALTH           1
 /*
         HARDWARE ASSUMPTIONS
 

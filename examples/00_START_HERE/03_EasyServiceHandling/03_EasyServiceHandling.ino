@@ -1,4 +1,3 @@
-#define H4P_VERBOSE 1
 #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 //
@@ -15,7 +14,7 @@ H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCm
 //
 H4P_Signaller blinky;
 H4P_WiFi wifi("XXXXXXXX","XXXXXXXX","easysvc");
-H4P_AsyncMQTT mqtt("192.168.1.4",1883);
+H4P_AsyncMQTT mqtt("http://192.168.1.4:1883");
 
 void h4pGlobalEventHandler(const string& svc,H4PE_TYPE t,const string& msg){
   //Serial.printf("Big Brother sees EVERYTHING %s %s %s\n",CSTR(svc),CSTR(h4pGetEventName(t)),CSTR(msg));

@@ -14,9 +14,9 @@ H4P_EventListener gpio(H4PE_GPIO,[](const string& pin,H4PE_TYPE t,const string& 
         break;
     }
 });
-//
+
 // Reports every F mSec if value has changed by more than H since last F period
-//h4pAnalogPolled ap(A0,U_POLL_FREQ,U_HYSTERESIS);
+h4pAnalogPolled ap(A0,U_POLL_FREQ,U_HYSTERESIS);
 //
 // Reports every F mSec * N_SAMPLES taking arithmetic mean of N_SAMPLES
 //h4pAnalogAverage aa(A0,U_POLL_FREQ,N_SAMPLES);

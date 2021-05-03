@@ -26,40 +26,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include<H4P_Heartbeat.h>
 
-void H4P_Heartbeat::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg) {
+#include<H4P_AsyncHTTP.h>
+
+void H4P_AsyncHTTP::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg){
     switch(t){
-        case H4PE_HEARTBEAT:
-            h4p[upTimeTag()]=secsToTime(STOI(msg));
-            break;
-#if H4P_UI_HEALTH
-        case H4PE_HEAP:
-            h4puiSync(heapTag(),msg);
-            break;
-        case H4PE_LOOPS:
-            h4puiSync("LPS",msg);
-            break;
-        case H4PE_Q:
-            h4puiSync("Q",msg);
-            break;
-#endif
     }
 }
 
-void H4P_Heartbeat::_init() {
-    h4p.gvSetInt(upTimeTag(),0,false);
-    h4puiAdd(upTimeTag(),H4P_UI_TEXT,"s");
-#if H4P_UI_HEALTH
-    #pragma message("Compilng with healthy options")
-    h4puiAdd("Q",H4P_UI_TEXT,"h");
-    h4puiAdd(heapTag(),H4P_UI_TEXT,"h");
-    h4puiAdd("LPS",H4P_UI_TEXT,"h");
+#if H4P_LOG_MESSAGES
+void H4P_AsyncHTTP::info(){ 
+    H4Service::info();
+}
 #endif
-}
-
-string H4P_Heartbeat::secsToTime(uint32_t sex){ 
-    char buf[15];
-    sprintf(buf,"%3d %02d:%02d:%02d",sex/86400,(sex%86400)/3600,(sex/60)%60,sex%60);
-    return string(buf);
-}

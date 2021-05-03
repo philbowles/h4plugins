@@ -2,7 +2,7 @@
 
 # ArduinoIDE library of IOT functions including WiFi, MQTT, OTA updates, NTP, UPNP, SSDP, Alexa voice control and much more... for ESP8266/ESP32 
 
-[Release Notes v2.0.0](docs/rn200.md) This is a *major* release, existing users *must* read the release notes as they will need to make changes to existing code. As an *absolute minimum* you will need to update [H4](https://github.com/philbowles/H4), [PangolinMQTT](http://github.com/philbowles/PangolinMQTT), [ESP8266 ESPAsyncTCP Library](https://github.com/philbowles/ESPAsyncTCP) and [ESPAsyncWebServer](https://github.com/philbowles/ESPAsyncWebServer) libraries.
+[Release Notes v3.0.0](docs/rn300.md) This is a *major* release, existing users *must* read the release notes as they will need to make changes to existing code. As an *absolute minimum* you will need to update [H4](https://github.com/philbowles/H4), [PangolinMQTT](http://github.com/philbowles/PangolinMQTT), [ESP8266 ESPAsyncTCP Library](https://github.com/philbowles/ESPAsyncTCP) and [ESPAsyncWebServer](https://github.com/philbowles/ESPAsyncWebServer) libraries.
 
 ***N.B. The code is tested and stable but parts of the documentation are still being updated. Until this message is removed , refer to the 70+ example sketches for detailed API usage. This document itself is accurate and up-to-date as at 21/03/2021***
 
@@ -204,7 +204,27 @@ Networking is not required but if you *are* connected, the webserver will automa
 
 ---
 
-# Installation
+# The "menagerie" roadmap
+
+AardvarkTCP is the core driver of several other firmware packages for simple *robust* and rapid ***asynchronous*** IOT development on ESP8266 / ESP32
+
+![roadmap](assets/common/menagerieroadmap.jpg)
+
+## The related / dependent libraries
+
+|| Name | Provides | Notes |
+| :---: | :----------  | :--- | :--- |
+||[Forked AsyncTCP](https://github.com/philbowles/AsyncTCP-master)|"Glue" to LwIP (ESP8266)| Important bugfixes |
+||[Forked ESPAsyncTCP](https://github.com/philbowles/ESPAsyncTCP-master)|"Glue" to LwIP(ESP32)| Missing features added |
+||[Forked ESPAsyncWebserver](https://github.com/philbowles/ESPAsyncWebServer)| Basis of webUI in H4Plugins| Several major bugfixes |
+|![roadmap](assets/common/tools_icon.jpg)|[PMB Tools](https://github.com/philbowles/pmbtools)|'32/'8266 HAL and utility functions| |
+|![roadmap](assets/common/aardvark_icon.jpg)|[AardvarkTCP](https://github.com/philbowles/AardvarkTCP)|Simple Large-payload Async TCP| API-compatible with ESPAsyncTCP, seamless TLS/SSL |
+|![roadmap](assets/common/pangolin_icon.jpg)|[PangolinMQTT](https://github.com/philbowles/PangolinMQTT)|Async MQTT Client|QoS 0/1/2 Fully 3.1.1 compliant. Large payloads |
+|![roadmap](assets/common/armadillo_icon.jpg)|[ArmadilloHTTP](https://github.com/philbowles/ArmadilloHTTP)|Async HTTP/S Client| Simple send/callback of large payloads |
+|![roadmap](assets/common/h4_icon.jpg)|[H4](https://github.com/philbowles/H4)|Scheduler/Async Timers| |
+|![roadmap](assets/common/h4p_icon.jpg)|[H4/Plugins](https://github.com/philbowles/h4plugins)|Full Async IOT Firmware| Webserver, MQTT, OTA, NTP, HTTP etc etc |
+
+![h4p install](assets/roadmaph4p.jpg)
 
 H4Plugins is tested using
 
@@ -212,32 +232,7 @@ H4Plugins is tested using
 * ESP8266 core 2.7.4
 * ESP32 core 1.0.4
 
-Earlier version *may* work, but I am only able to offer support when all the above are in use.
-
-H4Plugins is a standard Arduino library. The simplest method is to download the zip frm the links below and then use the menu command: `Sketch / Include Library / Add .ZIP Library...`
-
-First you need to install the latest [H4](https://github.com/philbowles/H4) library. 
-
-Next install the 3rd-party libraries:
-
-* [PangolinMQTT](http://github.com/philbowles/PangolinMQTT)
-* [ESP8266 ESPAsyncUDP Library](https://github.com/me-no-dev/ESPAsyncUDP)
-* [ESP32 AsyncTCP Library](https://github.com/me-no-dev/AsyncTCP)
-* [ESP32 AsyncUDP Library](https://github.com/me-no-dev/AsyncUDP)
-
-The above libraries coexist quite happily if you download all of them to enable targetting both ESP8266 and ESP32. 
-
-Also, install the patched versions of these 3rd-party libraries:
-
-* [ESPAsyncWebServer](https://github.com/philbowles/ESPAsyncWebServer)
-* [ESP8266 ESPAsyncTCP Library](https://github.com/philbowles/ESPAsyncTCP)
-
-**N.B** If you have previously installed the original version of either of the above, by "me-no-dev" you *must* replace it with the patched version. The originals of these are buggy and will prevent H4/Plugins from working correctly, so the patched versions *are required*.
-  
-* Finally, install this H4Plugins library
-
-If using WiFi, you will need to install either the [LittleFS upload tool](https://github.com/earlephilhower/arduino-esp8266littlefs-plugin) or the [ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin) (or both) depending on which platform you compile for. 
-
+---
 ## Tools / Build Guidelines
 
 To reduce the footprint of the binary code and provide best WiFi / MQTT performance, the following IDE options

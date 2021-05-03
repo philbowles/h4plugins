@@ -1,9 +1,8 @@
-#define H4P_VERBOSE 1
 #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false)
 /*
     Open Serial monitor and try typing any of the following:
-    
+   
 h4/clear
 h4/config
 h4/dump
@@ -21,8 +20,6 @@ h4/svc/restart
 h4/svc/start
 h4/svc/stop
 help
-
-
 */
 
 void h4setup() {

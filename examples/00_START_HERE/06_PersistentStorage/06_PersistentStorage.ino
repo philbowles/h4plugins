@@ -1,5 +1,4 @@
-#define H4P_VERBOSE 1
-#include<H4Plugins.h>
+  #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 
 /* Uncomment this to see what's happening "under the hood"
@@ -15,11 +14,11 @@ void h4setup() {
     h4p["peasy"]="easy"; //can also set string values like this
     string easy=h4p["peasy"]; // or get them like this
     easy=h4p.gvGetstring("peasy"); // and this
-    Serial.printf("Using H4P_PersistentStorage is %s\n",CSTR(h4p["peasy"]));
+    Serial.printf("Using H4Plugins is %s\n",CSTR(h4p["peasy"]));
  
     if(!h4p.gvExists("answer")){
         Serial.printf("What is the secret of %s?\n",CSTR(h4p["secret"]));
-        h4p["answer"]=42;
+        h4p.gvSetInt("answer",42,true);
         Serial.println("send h4/reboot to find out");
     }
     else {
