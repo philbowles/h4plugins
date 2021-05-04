@@ -53,13 +53,15 @@ class H4Flasher{
             void      		_pulse(uint32_t width);	
     public:  
         H4Flasher(h4pOutput*  opp,uint32_t period,uint8_t duty);
-        H4Flasher(h4pOutput*  opp,uint32_t period,uint32_t valley);
         H4Flasher(h4pOutput*  opp,const char* pattern,uint32_t timebase);
 
                 void        flashPattern();
                 void        PWM();
                 void        stop();
+#ifdef ARDUINO_ARCH_ESP8266
+        H4Flasher(h4pOutput*  opp,uint32_t period,uint32_t valley);
                 void        throb();
+#endif
 //      syscall
 #if H4P_LOG_MESSAGES
                 string      _dump(){
@@ -125,7 +127,9 @@ class H4P_Signaller: public H4Service {
             void            stopAll();
             void            stopPin(uint8_t pin);
             void            stopPin(h4pOutput*);
+#ifdef ARDUINO_ARCH_ESP8266
             void 			throbPin(uint32_t rate, uint32_t valley, uint8_t pin,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);
             void 			throbPin(uint32_t rate, uint32_t valley,h4pOutput*);
+#endif
 //          syscall only
 };

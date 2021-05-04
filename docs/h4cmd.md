@@ -48,7 +48,7 @@ None, but when preceded by [H4P_VerboseMessages](h4vm.md), numeric codes / error
 * `h4/show/all` (runs all the commands starting `h4/show/`)
 * `h4/show/config` (internal configuration variables)
 * `h4/show/fs`  (show all LittleFS filesystem files + sizes and used / free space)
-* `h4/show/heap` ( result if ESP.getFreeHeap()) 
+* `h4/show/heap` ( result if _HAL_freeHeap()) 
 * `h4/show/plugins` lists all the currrently loaded plugins
 * `h4/show/q` (shows all tasks in the Q waiting to be scheduled)
 * ... service control commands (see above)

@@ -35,11 +35,25 @@ string h4pSrc=h4pTag();
 void __attribute__((weak)) h4pGlobalEventHandler(const string& svc,H4PE_TYPE t,const string& msg){}
 //
 //   Events Listeners Emitters
+/*
+using H4P_FN_EVENTHANDLER   = function<void(const string& svc,H4PE_TYPE t,const string& msg)>;
+using H4P_EVENT_LISTENER    = pair<string,H4P_FN_EVENTHANDLER>;
+using H4P_EVENT_LISTENERS   = vector<H4P_EVENT_LISTENER>;
+using H4P_EVENT_HANDLERS    = std::map<uint32_t,H4P_EVENT_LISTENERS>;
+using H4P_FN_USEREVENT      = function<void(const string &msg)>;
+*/
 //
 void h4pregisterhandler(const string& svc,uint32_t t,H4P_FN_EVENTHANDLER f){
     for(int i=0;i<32;i++){
         uint32_t inst=1 << i;
-        if(t & inst) if(h4pGetEventName(static_cast<H4PE_TYPE>(inst))!="") h4pevt[inst].push_back(make_pair(svc,f)); // fix this
+        if(t & inst) {
+            if(h4pGetEventName(static_cast<H4PE_TYPE>(inst))!="") {
+                auto dip=find_if(h4pevt[inst].begin(),h4pevt[inst].end(),[=](H4P_EVENT_LISTENER const& e){ return svc==e.first; });
+                if(dip==h4pevt[inst].end()){
+                    h4pevt[inst].push_back(make_pair(svc,f)); // fix this
+                }// else Serial.printf("DOUBLEDIPPER %s 0x%08x %s\n",svc.data(),inst,h4pGetEventName(static_cast<H4PE_TYPE>(inst)).data());
+            }
+        }
     }
 }
 
@@ -111,7 +125,7 @@ void h4StartPlugins(){
         for(auto s:h4pmap) s.second->_filter&=~e;
     }
     for(auto &e:h4pevt) e.second.shrink_to_fit();
-    h4psysevent(h4pTag(),H4PE_SYSINFO,"Ready: Heap=%u",HAL_getFreeHeap());
+    h4psysevent(h4pTag(),H4PE_SYSINFO,"Ready: Heap=%u",_HAL_freeHeap());
 }
 
 string h4preplaceparams(const string& s){ // oh for a working regex!

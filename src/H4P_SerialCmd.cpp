@@ -66,7 +66,7 @@ H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Service(cmdTag(),H4PE_FACTORY | H
         {"help",       { 0,         0, CMD(help) }}
     });
     if(autoStop) QTHIS(svcDown);
-    HAL_FS.begin();
+//    HAL_FS.begin();
 }
 
 H4P_CMDMAP_I H4P_SerialCmd::__exactMatch(const string& cmd,uint32_t owner){
@@ -161,6 +161,7 @@ uint32_t H4P_SerialCmd::_get(vector<string> vs){
 }
 
 void H4P_SerialCmd::_init(){
+    HAL_FS.begin();
     for(auto const& i:split(read(_fname),RECORD_SEPARATOR)){
         vector<string> nv=split(i,UNIT_SEPARATOR);
         h4pGlobal[nv[0]]=h4proxy{nv[0],nv.size() > 1 ? nv[1]:"",true};

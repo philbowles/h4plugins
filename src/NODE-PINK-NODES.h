@@ -31,7 +31,7 @@ SOFTWARE.
 class npANALOGTMP36: public npNODE { // aritmetic mean
     public:
         msg operator()(msg m) override {
-            uint32 mV=(m.load * 3275)/1024;
+            uint32_t mV=(m.load * 3275)/1024;
 //            Serial.printf("v=%d mV=%d ar=%d\n",m.load,mV,analogRead(A0));
             m.load=mV - 500; // e only deal with ints, caller will haveto scale or truncate 
             return m;

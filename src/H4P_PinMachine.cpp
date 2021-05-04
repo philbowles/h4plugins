@@ -86,7 +86,7 @@ msg         H4P_PinMachine::runFlow     (uint8_t p,msg m)               { return
     bool HAL_isAnalog(uint8_t p){ return p==A0; }
 #else
     bool HAL_isAnalog(uint8_t p){
-        unordered_set analogPins={5,8,10,11,12,13};
+        unordered_set<uint8_t> analogPins={5,8,10,11,12,13};
         return analogPins.count(p);
     }
 #endif

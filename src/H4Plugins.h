@@ -6,6 +6,7 @@
     #pragma message("Using Wifi AP - Make sure you have made arrangements!")
 #endif
 
+#include<H4P_AsyncHTTP.h>
 #include<H4P_AsyncMQTT.h>
 #include<H4P_BinarySwitch.h>
 #include<H4P_BinaryThing.h>
@@ -22,6 +23,7 @@
 #include<H4P_LocalLogger.h>
 #include<H4P_MQTTLogger.h>
 #include<H4P_PinMachine.h>
+#include<H4P_RemoteLogger.h>
 #include<H4P_QueueWarn.h>
 #include<H4P_RemoteUpdate.h>
 #include<H4P_SerialCmd.h>
@@ -149,7 +151,4 @@ H4P_ROAMER_MAP      h4pRoamers;
     string h4pGetTaskType    (uint32_t e){ return stringFromInt(e,"%04d"); }
     string h4pGetTaskName    (uint32_t e){ return stringFromInt(e,"%04d"); }
     void   h4pClearEvent     (H4PE_TYPE e){}
-#endif
-#ifdef  ARDUINO_ARCH_ESP8266
-    long HAL_getFreeHeap(){ return ESP.getFreeHeap(); }
 #endif

@@ -1,5 +1,5 @@
 SHORTTERM
-    fix dump / localloger to avoid large file crash
+    fix dump / locallogger to avoid large file crash
     fix HTTP logger database
     adv docs + / example creating your own commands
 MEDIUMTERM

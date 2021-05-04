@@ -26,6 +26,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#ifdef ARDUINO_ARCH_ESP8266
 #include<H4P_Gatekeeper.h>
 #include<H4P_UPNPServer.h>
 
@@ -141,3 +142,4 @@ h4pRoamingUPNP::h4pRoamingUPNP(const string& name,const string& tag,const string
 }
 
 void h4pRoamingUPNP::_startSniffing(){ _pUPNP->_listenTag(_tag,_id); }
+#endif

@@ -11,7 +11,7 @@ string fsharp_s="F#3S "; // dotted semiquaver, normal = s
 string fsharp_c="F#3c "; // crotchet = 1/4 note = 250mS @ 60 bpm
 
 void h4setup(){
-  Serial.printf("You should now hear 'Concert A'  (440Hz) for5 seconds \n",ESP.getFreeHeap());
+  Serial.printf("You should now hear 'Concert A'  (440Hz) for5 seconds \n",_HAL_freeHeap());
   h4tc.tone(D8,440,5000,4); // 440Hz = Concert 'A', 5sec vol 4
   h4.once(7000,[]{
     h4tc.metronome(60); // 60 BPM

@@ -32,13 +32,16 @@ SOFTWARE.
 #include<H4Service.h>
 #include<ArmadilloHTTP.h>
 
-class H4P_AsyncHTTP: public H4Service, ArmadilloHTTP {
-            void            _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override;
-    public:                
-        H4P_AsyncHTTP(): H4Service("http"){}
-#if H4P_LOG_MESSAGES
-                void           info() override;
-#endif
-//          _syscall only
-//                void        _init() override;
+class H4P_AsyncHTTP: public H4Service, public ArmadilloHTTP {
+    protected:
+        virtual void            _errorHandler(int e,int i){ h4psysevent(_me,H4PE_SYSWARN,"e=%d i=%d",e,i); }
+        virtual void            _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override;
+    public:
+        H4P_AsyncHTTP(const string& name="http",uint32_t filter=H4PE_NOOP);
+
+        virtual void    DELETE(const std::string& url,ARMA_FN_HTTP rx,const uint8_t* fingerprint=nullptr,uint32_t phase=ARMA_PHASE_EXECUTE) override;
+        virtual void    GET(const std::string& url,ARMA_FN_HTTP rx,const uint8_t* fingerprint=nullptr,uint32_t phase=ARMA_PHASE_EXECUTE) override;
+        virtual void    PATCH(const std::string& url,const VARK_NVP_MAP& fields,ARMA_FN_HTTP rx,const uint8_t* fingerprint=nullptr,uint32_t phase=ARMA_PHASE_EXECUTE) override;
+        virtual void    POST(const std::string& url,const VARK_NVP_MAP& fields,ARMA_FN_HTTP rx,const uint8_t* fingerprint=nullptr,uint32_t phase=ARMA_PHASE_EXECUTE) override;
+        virtual void    PUT(const std::string& url,const VARK_NVP_MAP& fields,ARMA_FN_HTTP rx,const uint8_t* fingerprint=nullptr,uint32_t phase=ARMA_PHASE_EXECUTE) override;
 };

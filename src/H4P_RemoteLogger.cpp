@@ -26,45 +26,31 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include<H4P_HeapWarn.h>
+#include<H4P_RemoteLogger.h>
+#include<H4P_SerialCmd.h>
 
-H4P_HeapWarn::H4P_HeapWarn(function<void(bool)> f,uint32_t pc): _f(f),H4Service("hwrn"){
-    _addLocals({
-        {_me,      {H4PC_H4, _pid, nullptr}},
-        {pcentTag(),  {_pid,   0, CMDVS(_hwPcent)}}
-    });
-    _minh=_initial=_HAL_freeHeap();
-    _limit=_setLimit(pc);
-//    info();
-}
-
-void H4P_HeapWarn::_run(){
-    static bool warned=false;
-    uint32_t hsize=_HAL_freeHeap();
-    if(hsize < _minh) _minh=hsize;
-    bool state=hsize < _limit;
-    if(state ^ warned) {
-        SYSWARN("Heap,%d,%d",state,hsize);
-        _f(state);
+H4P_RemoteLogger::H4P_RemoteLogger(const string& url,uint32_t filter): _url(url), H4P_AsyncHTTP("rlog",filter) { _eventdata[deviceTag()]=h4p[deviceTag()]; }
+//
+//      our raison d'etre
+//
+void H4P_RemoteLogger::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg) {
+    if(_running && svc!=_me){
+        _eventdata["source"]=svc;
+        _eventdata["type"]=stringFromInt(static_cast<uint32_t>(t));
+        _eventdata["msg"]=msg;
+        POST(_url,_eventdata,[](ARMA_HTTP_REPLY r){
+/*
+            Serial.printf("H4P_RL RCVD T=%u %d\n",millis(),r.httpResponseCode);
+            for(auto const h:r.responseHeaders) Serial.printf("%s=%s\n",h.first.data(),h.second.data());
+            if(r.httpResponseCode < 200 || r.httpResponseCode > 299){
+                Serial.printf("HTTP Response Code: %d\n",r.httpResponseCode);
+                Serial.printf("Response Headers:\n");
+                for(auto const h:r.responseHeaders) Serial.printf("%s=%s\n",h.first.data(),h.second.data());
+                Serial.printf("\nRaw Data\n");
+                dumphex(r.data,r.length);
+                Serial.printf("\nAs a std::string - BE CAREFUL, IT MAY NOT BE A STRING!!!\n%s\n",r.asStdstring().data()); // Data may NOT be a string -> crash!!!
+            }
+*/
+        });
     }
-    warned=state;
 }
-
-uint32_t H4P_HeapWarn::_hwPcent(vector<string> vs){ return _guardInt1(vs,[this](uint32_t && i){ pcent(i); }); }
-
-uint32_t H4P_HeapWarn::_setLimit(uint32_t v){ return (_initial*v)/100; }
-#define H4P_ABSMIN_HPCNT    5
-void H4P_HeapWarn::pcent(uint32_t pc){
-    _limit=constrain(_setLimit(pc),H4P_ABSMIN_HPCNT,(uint32_t) _initial);
-#if H4P_LOG_MESSAGES
-    info();
-#endif
-}
-
-#if H4P_LOG_MESSAGES
-void H4P_HeapWarn::info(){
-    H4Service::info();
-    reply(" Startvalue=%d warn when size < %d",_initial,_limit);
-    reply(" Min level=%d [%d%%]",_minh,(_minh*100)/_initial);
-}
-#endif

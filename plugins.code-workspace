@@ -19,6 +19,21 @@
             "bitset": "cpp",
             "initializer_list": "cpp",
             "regex": "cpp"
-        }
+        },
+        "sqltools.connections": [
+            {
+                "mysqlOptions": {
+                    "authProtocol": "default"
+                },
+                "previewLimit": 1000,
+                "server": "localhost",
+                "port": 3306,
+                "driver": "MySQL",
+                "name": "vscode",
+                "database": "h4",
+                "username": "phil",
+                "password": "CanonD60"
+            }
+        ]
     }
 }

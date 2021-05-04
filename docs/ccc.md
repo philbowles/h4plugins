@@ -158,7 +158,7 @@ Let's summarize them briefly then look at some in a little more detail
 * `h4/show/all` (runs all the commands starting `show/`)
 * `h4/show/config` (internal configuration variables)
 * `h4/show/fs`  (show all LittleFS filesystem files + sizes and used / free space)
-* `h4/show/heap` ( result of ESP.getFreeHeap()) 
+* `h4/show/heap` ( result of _HAL_freeHeap()) 
 * `h4/show/plugins` lists all the currrently loaded plugins and info about each
 * `h4/show/q` (shows all tasks in H4's queue waiting to be scheduled)
 * ... service control commands (see above)

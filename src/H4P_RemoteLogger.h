@@ -30,18 +30,19 @@ SOFTWARE.
 #pragma once
 
 #include <H4Service.h>
+#include <H4P_AsyncHTTP.h>
 
-class H4P_EmitHeap: public H4Service {
-        uint32_t _f;
+class H4P_RemoteLogger: public H4P_AsyncHTTP {
+        string          _url;
+
+        VARK_NVP_MAP    _eventdata = {
+            {deviceTag(),""},
+            {"type","0"},
+            {"source",""},
+            {"msg",""}
+        };
+    protected:
+        virtual void        _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override;
     public:
-        H4P_EmitHeap(uint32_t f=1000): _f(f),H4Service(heapTag()){}
-
-        virtual void svcUp() override { 
-            h4.every(_f,[this](){ XEVENT(H4PE_HEAP,"%u",_HAL_freeHeap()); },nullptr,H4P_TRID_HLOG,true);
-            H4Service::svcUp();
-        }
-        virtual void svcDown() override { 
-            h4.cancelSingleton(H4P_TRID_HLOG);
-            H4Service::svcDown();
-        }
+        H4P_RemoteLogger(const string& url,uint32_t filter=H4PE_ALL); // amount of free SPIFFS space to use
 };

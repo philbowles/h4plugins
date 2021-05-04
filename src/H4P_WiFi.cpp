@@ -119,7 +119,7 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
 			h4.queueFunction([](){ h4puncheckedcall<H4P_WiFi>(wifiTag())->_lostIP(); });
             break;
 		case SYSTEM_EVENT_STA_GOT_IP:
-			h4.queueFunction([](){ h4puncheckedcall<H4P_WiFi>(wifiTag())->_gottIP(); });
+			h4.queueFunction([](){ h4puncheckedcall<H4P_WiFi>(wifiTag())->_gotIP(); });
 			break;
 	}
 }
@@ -320,7 +320,7 @@ void H4P_WiFi::_sendSSE(const string& name,const string& msg){
     static bool bakov=false;
 
     if(_evts && _evts->count()) {
-        auto fh=HAL_getFreeHeap();
+        auto fh=_HAL_freeHeap();
         if(fh > H4P_THROTTLE_LO){
             if(bakov && (fh > H4P_THROTTLE_HI)){
                 SYSINFO("SSE BACKOFF RECOVERY H=%lu nQ=%d",fh,_evts->avgPacketsWaiting());
@@ -446,7 +446,7 @@ void H4P_WiFi::change(string ssid,string psk){ // add device / name?
     h4p[ssidTag()]=ssid;
     h4p[pskTag()]=psk;
     HAL_WIFI_startSTA();
-    MDNS.notifyAPChange(); // ?
+//    MDNS.notifyAPChange(); // ?
 #if H4P_WIFI_USE_AP
     if(_dns53) QEVENT(H4PE_REBOOT);
 #endif

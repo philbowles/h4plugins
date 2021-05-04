@@ -70,7 +70,6 @@ void H4P_Timekeeper::sync(){
 	}
 }
 #else 
-
 void H4P_Timekeeper::__HALsetTimezone(int tzo){
     _tzo=tzo;
     string tz="GMT"+stringFromInt((-1*tzo),"%+02d");
@@ -79,7 +78,6 @@ void H4P_Timekeeper::__HALsetTimezone(int tzo){
  }
 
 void H4P_Timekeeper::sync(){
-    XLOG("TK sync ESP32");
     time_t now = 0;
     time(&now);
     uint32_t adjusted=now+_tzo*60;

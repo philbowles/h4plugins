@@ -2,7 +2,7 @@
 H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 
 void heapIsLow(bool inDanger){ 
-    Serial.print("Current heap size is ");Serial.println(ESP.getFreeHeap());
+    Serial.print("Current heap size is ");Serial.println(_HAL_freeHeap());
     if(inDanger) Serial.println("Warning, Will Robinson - low heap!!!"); // See 1960s TV SciFi series "Lost in Space" :)
     else Serial.println("Disaster Averted"); 
 }
@@ -27,11 +27,11 @@ void h4setup() { // H4 constructor starts Serial
 //
     h4.every(500,[](){
       chunks.push_back(malloc(512));
-      Serial.printf("Heap=%d\n",ESP.getFreeHeap());
+      Serial.printf("Heap=%d\n",_HAL_freeHeap());
     });    
     h4.once(30000,[](){ 
       Serial.println("30 seconds later, claw it back");
       for(auto c:chunks) free(c);
-      Serial.printf("Heap=%d\n",ESP.getFreeHeap());
+      Serial.printf("Heap=%d\n",_HAL_freeHeap());
     });
 }

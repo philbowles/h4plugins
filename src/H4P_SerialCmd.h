@@ -91,7 +91,7 @@ class H4P_SerialCmd: public H4Service {
 
 #if H4P_LOG_MESSAGES
                 void            all();
-                void            heap(){ reply("Heap=%u",HAL_getFreeHeap()); } // NEEDS TO BE HAL'd
+                void            heap(){ reply("Heap=%u",_HAL_freeHeap()); } // NEEDS TO BE HAL'd
                 void            info() override;
                 void            plugins();
                 void            showFS();

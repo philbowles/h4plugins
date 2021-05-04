@@ -122,7 +122,7 @@ h4pSafeCall	KEYWORD2
 h4pSetConfig	KEYWORD2
 h4psysevent	KEYWORD2
 h4puncheckedcall	KEYWORD2
-HAL_getFreeHeap	KEYWORD2
+_HAL_freeHeap	KEYWORD2
 heap	KEYWORD2
 help	KEYWORD2
 host	KEYWORD2

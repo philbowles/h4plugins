@@ -78,7 +78,7 @@ If you want the value of  static field to change, then you must do it yourself u
 Notice that when we added the fields we want to change, we saved the return value form the `uiAdd...` function.
 
 ```cpp
-myHeap=h4wifi.uiAddLabel("Heap",ESP.getFreeHeap());  
+myHeap=h4wifi.uiAddLabel("Heap",_HAL_freeHeap());  
 myMillis=h4wifi.uiAddLabel("Millis",millis());  
 myRandomBool=h4wifi.uiAddBoolean("Random Bool",boolData());
 ```
@@ -88,7 +88,7 @@ We need this to send it a new value later:
 ```cpp
 TIM0=h4.everyRandom(2500,5500,[](){ h4wifi.uiSetBoolean(myRandomBool,boolData()); });
 TIM1=h4.every(1000,[](){
-    h4wifi.uiSetLabel(myHeap,ESP.getFreeHeap());  
+    h4wifi.uiSetLabel(myHeap,_HAL_freeHeap());  
     h4wifi.uiSetLabel(myMillis,millis());
 });
 ```
