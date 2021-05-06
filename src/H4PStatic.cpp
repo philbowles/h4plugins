@@ -35,13 +35,6 @@ string h4pSrc=h4pTag();
 void __attribute__((weak)) h4pGlobalEventHandler(const string& svc,H4PE_TYPE t,const string& msg){}
 //
 //   Events Listeners Emitters
-/*
-using H4P_FN_EVENTHANDLER   = function<void(const string& svc,H4PE_TYPE t,const string& msg)>;
-using H4P_EVENT_LISTENER    = pair<string,H4P_FN_EVENTHANDLER>;
-using H4P_EVENT_LISTENERS   = vector<H4P_EVENT_LISTENER>;
-using H4P_EVENT_HANDLERS    = std::map<uint32_t,H4P_EVENT_LISTENERS>;
-using H4P_FN_USEREVENT      = function<void(const string &msg)>;
-*/
 //
 void h4pregisterhandler(const string& svc,uint32_t t,H4P_FN_EVENTHANDLER f){
     for(int i=0;i<32;i++){

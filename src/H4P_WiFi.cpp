@@ -209,7 +209,7 @@ void H4P_WiFi::_commonStartup(){
 
 void H4P_WiFi::_defaultSync(const string& svc,const string& msg) {
     if(h4pUserItems.count(svc)) {
-        Serial.printf("H4P_WiFi::GVC DFLT SYNC %s %s\n",CSTR(svc),CSTR(msg));
+        Serial.printf("FH=%u H4P_WiFi::GVC DFLT SYNC %s %s\n",_HAL_freeHeap(),CSTR(svc),CSTR(msg));
         string sync;
         switch(h4pUserItems[svc].type){
             case H4P_UI_DROPDOWN:
@@ -218,12 +218,13 @@ void H4P_WiFi::_defaultSync(const string& svc,const string& msg) {
             case H4P_UI_IMGBTN:
                 if(svc==stateTag()) sync=msg;
                 else {
-                    Serial.printf("%s No AUTO-SYNC for buttons\n",CSTR(svc));
+//                    Serial.printf("%s No AUTO-SYNC for buttons\n",CSTR(svc));
                     return;
                 }
             default:
                 sync=msg;
         }
+        Serial.printf("FH=%u SYNC W/O TRACE %s %s\n",_HAL_freeHeap(),CSTR(svc),CSTR(sync));
         _sendSSE(svc,sync);
     }
 }
@@ -330,6 +331,7 @@ void H4P_WiFi::_sendSSE(const string& name,const string& msg){
                     _evts->send(CSTR(ui.second.f()),CSTR(ui.first),_evtID++); // hook to sse event q size
                 }
             }
+            Serial.printf("SEND SSE %s => %s\n",CSTR(msg),CSTR(name));
             _evts->send(CSTR(msg),CSTR(name),_evtID++); // hook to sse event q size
         } 
         else {
@@ -357,9 +359,9 @@ void H4P_WiFi::_startWebserver(){
                         _uiAdd(chipTag(),H4P_UI_TEXT,"s");
                         _uiAdd(deviceTag(),H4P_UI_TEXT,"s");
                         _uiAdd(boardTag(),H4P_UI_TEXT,"s");
-                        _uiAdd(h4Tag(),H4P_UI_TEXT,"s",H4_VERSION);
-                        _uiAdd(H4PTag(),H4P_UI_TEXT,"s");
-                        _uiAdd(h4UITag(),H4P_UI_TEXT,"s");
+//                        _uiAdd(h4Tag(),H4P_UI_TEXT,"s",H4_VERSION);
+//                        _uiAdd(H4PTag(),H4P_UI_TEXT,"s");
+//                        _uiAdd(h4UITag(),H4P_UI_TEXT,"s");
                         _uiAdd(NBootsTag(),H4P_UI_TEXT,"s");
                         _uiAdd(ipTag(),H4P_UI_TEXT,"s"); // cos we don't know it yet
                     }
@@ -368,9 +370,9 @@ void H4P_WiFi::_startWebserver(){
                     _uiAdd(chipTag(),H4P_UI_TEXT,"s");
                     _uiAdd(deviceTag(),H4P_UI_TEXT,"s");
                     _uiAdd(boardTag(),H4P_UI_TEXT,"s");
-                    _uiAdd(h4Tag(),H4P_UI_TEXT,"s",H4_VERSION);
-                    _uiAdd(H4PTag(),H4P_UI_TEXT,"s");
-                    _uiAdd(h4UITag(),H4P_UI_TEXT,"s");
+//                    _uiAdd(h4Tag(),H4P_UI_TEXT,"s",H4_VERSION);
+//                    _uiAdd(H4PTag(),H4P_UI_TEXT,"s");
+//                    _uiAdd(h4UITag(),H4P_UI_TEXT,"s");
                     _uiAdd(NBootsTag(),H4P_UI_TEXT,"s");
                     _uiAdd(ipTag(),H4P_UI_TEXT,"s"); // cos we don't know it yet
                 #endif
@@ -394,8 +396,9 @@ void H4P_WiFi::_startWebserver(){
     addHandler(_evts);
 
     on("/",HTTP_GET, [this](AsyncWebServerRequest *request){
-        XLOG("Root %s",request->client()->remoteIP().toString().c_str());
+        XLOG("FH=%u --> Root %s",_HAL_freeHeap(),request->client()->remoteIP().toString().c_str());
         request->send(HAL_FS,"/sta.htm",String(),false,_aswsReplace);
+        XLOG("FH=%u <-- Root %s",_HAL_freeHeap(),request->client()->remoteIP().toString().c_str());
     });
 
 	on("/rest",HTTP_GET,[this](AsyncWebServerRequest *request){ _rest(request); });
@@ -413,6 +416,7 @@ void H4P_WiFi::_stopWebserver(){
 }
 
 void H4P_WiFi::_uiAdd(const string& name,H4P_UI_TYPE t,const string& h,const string& value,uint8_t color){
+    Serial.printf("FH=%u --> H4P_WiFi::_uiAdd\n",_HAL_freeHeap());
     function<string(void)>  f;
     string v=value;
     switch(t){
@@ -435,6 +439,7 @@ void H4P_WiFi::_uiAdd(const string& name,H4P_UI_TYPE t,const string& h,const str
     }
     h4pUIorder.push_back(name);
     h4pUserItems[name]={t,f,color,h};
+    Serial.printf("FH=%u <-- H4P_WiFi::_uiAdd\n",_HAL_freeHeap());
 }
 /*
 
@@ -470,6 +475,10 @@ void H4P_WiFi::svcDown(){
     h4.cancelSingleton(H4P_TRID_HOTA);
     WiFi.mode(WIFI_OFF);
     H4Service::svcDown();
+}
+
+void H4P_WiFi::uiAddAllUsrFields(const string& section){
+    for(auto const& g:h4pGlobal) if(g.first.rfind("usr_")!=string::npos) _uiAdd(replaceAll(g.first,"usr_",""),H4P_UI_TEXT,section,g.second);
 }
 
 void H4P_WiFi::uiAddDropdown(const string& name,H4P_NVP_MAP options,const string& section){ _uiAdd(name,H4P_UI_DROPDOWN,section,flattenMap(options)); }

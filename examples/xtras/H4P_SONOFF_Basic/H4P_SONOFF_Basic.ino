@@ -23,7 +23,7 @@ H4P_SerialLogger slog(H4PE_ALMOST_ALL &~ H4PE_GPIO);
 
 H4P_WiFi wiffy("XXXXXXXX","XXXXXXXX","basic");
 H4P_Heartbeat hb;
-H4P_AsyncMQTT cutie("192.168.1.4",1883);
+H4P_AsyncMQTT cutie("http://192.168.1.4:1883");
 H4P_BinarySwitch ting(RELAY_BUILTIN,ACTIVE_HIGH,OFF);
 H4P_UPNPServer lexy("Sonoff Basic Switch");
 h4pMultifunctionButton mfb(BUTTON_BUILTIN,INPUT,H4P_ASSUMED_SENSE,15);

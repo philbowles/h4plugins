@@ -44,17 +44,15 @@ class H4P_Heartbeat: public H4Service {
                 void        _run();
     public: 
 #if H4P_UI_HEALTH
-        H4P_Heartbeat(): H4Service("beat",H4PE_HEARTBEAT | H4PE_HEAP | H4PE_LOOPS | H4PE_Q){
+        H4P_Heartbeat(): H4Service("beat",H4PE_VIEWERS | H4PE_HEARTBEAT | H4PE_HEAP | H4PE_LOOPS | H4PE_Q){
             require<H4P_EmitHeap>(heapTag());
             require<H4P_EmitQ>("Q");
             require<H4P_EmitLoopCount>("LPS");
-
-            depend<H4P_WiFi>(wifiTag());
 #else
-        H4P_Heartbeat(): H4Service("beat",H4PE_HEARTBEAT){
+        H4P_Heartbeat(): H4Service("beat",H4PE_VIEWERS | H4PE_HEARTBEAT){
+#endif
             require<H4P_EmitTick>(tickTag());
             depend<H4P_WiFi>(wifiTag());
-#endif
         }
 
 #if H4P_LOG_MESSAGES
@@ -62,6 +60,4 @@ class H4P_Heartbeat: public H4Service {
 #endif
         static  string      secsToTime(uint32_t sex);
         static  string      upTime(){ return h4p.gvGetstring(upTimeTag()); }
-//
-                void        _init() override; // autostart
 };

@@ -64,7 +64,7 @@ What follows is the *entire H4Plugins code* - despite the fact it might look lik
 #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 H4P_WiFi wiffy("XXXXXXXX","XXXXXXXX","basic");
-H4P_AsyncMQTT cutie("192.168.1.4",1883);
+H4P_AsyncMQTT cutie("http://192.168.1.4:1883");
 H4P_BinarySwitch relay(D6,ACTIVE_HIGH,OFF);
 H4P_UPNPServer lexy("Sonoff Basic Switch");
 h4pMultifunctionButton mfb(0,INPUT,ACTIVE_LOW,15); // 15ms of debounce

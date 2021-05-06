@@ -80,16 +80,16 @@ void H4Service::_sysHandleEvent(const string& svc,H4PE_TYPE t,const string& msg)
     switch(t){
         case H4PE_BOOT:
             if(_filter & H4PE_BOOT){
-                Serial.printf("%s BOOT calls _init()\n",CSTR(_me));
+//                Serial.printf("%s BOOT calls _init()\n",CSTR(_me));
                 _init();
-            } else Serial.printf("%s BOOT PREVENTS DOUBLE DIP _init()\n",CSTR(_me)); 
+            } //else Serial.printf("%s BOOT PREVENTS DOUBLE DIP _init()\n",CSTR(_me)); 
             break;
         case H4PE_STAGE2:
-            Serial.printf("%s STAGE2 %s %s\n",CSTR(_me),CSTR(svc),CSTR(msg));
+//            Serial.printf("%s STAGE2 %s %s\n",CSTR(_me),CSTR(svc),CSTR(msg));
             if(!(_filter & H4PE_SERVICE)) svcUp(); // not waiting to be started
             break;
         case H4PE_SERVICE:
-            Serial.printf("%s SERVICE %s %s parent=%s\n",CSTR(_me),CSTR(svc),CSTR(msg),CSTR(_parent));
+//            Serial.printf("%s SERVICE %s %s parent=%s\n",CSTR(_me),CSTR(svc),CSTR(msg),CSTR(_parent));
             if(_parent==svc){
                 if(STOI(msg)) svcUp();
                 else svcDown();

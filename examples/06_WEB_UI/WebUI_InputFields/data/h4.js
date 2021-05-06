@@ -68,6 +68,7 @@ function options(elem,value){
 
 function makeValue(id,type,active,color,value){
     let valueNode;
+    let imgNode;
     switch(type){
         case 0: // TEXT
             valueNode=makeBaseValueNode(id,"div","uv",(n,e) => n.innerHTML=e.data )
@@ -111,9 +112,17 @@ function makeValue(id,type,active,color,value){
             valueNode.appendChild(binner)
             break;
         case 5: // dropdown
-            valueNode=makeBaseValueNode(id,"select","",(n,e) => options(n,e) )
+            valueNode=makeBaseValueNode(id,"select","",(n,e) => options(n,e.data) )
             options(valueNode,value)
             valueNode.addEventListener("change", (e) => ajaxvalue(e) )
+            break;
+        case 6: // image
+            valueNode=document.createElement("div")
+            valueNode.classList="bouter"
+            imgnode=document.createElement("img");
+            imgnode.id=id;
+            imgnode.src=value;
+            valueNode.appendChild(imgnode)
             break;
         default:
             valueNode=makeBaseValueNode(id,"div","uv");

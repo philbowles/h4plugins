@@ -13,7 +13,7 @@ void myThingFunction(bool b){
 }
 
 H4P_WiFi wiffy("XXXXXXXX","XXXXXXXX","picky");
-H4P_AsyncMQTT asink("192.168.1.4",1883);
+H4P_AsyncMQTT asink("http://192.168.1.4:1883");
 H4P_LinkMaster lm({"landing","master"});
 H4P_ConditionalThing ct(myThingFunction,conditionPredicate);
 

@@ -191,4 +191,8 @@ input[type="image"]{ outline:none; }
     display:grid;
     justify-content: center;
 }
-.bouter{ grid-column: 1 / span 2; }
+.bouter{ 
+    grid-column: 1 / span 2;
+    margin:auto;
+}
+div.bouter img { max-width: 250px; }

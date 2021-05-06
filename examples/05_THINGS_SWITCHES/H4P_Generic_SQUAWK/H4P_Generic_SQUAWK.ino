@@ -14,8 +14,8 @@ H4_USE_PLUGINS(0,20,true) // Serial baud rate, Q size, SerialCmd autostop
 //
 const char* WIFI_SSID="XXXXXXXX";
 const char* WIFI_PASS="XXXXXXXX";
-const char* MQTT_SERVER="192.168.1.4";
-const int   MQTT_PORT=1883;
+const char* MQTT_SERVER="http://192.168.1.4:1883";
+
 const char* MQTT_USER="";
 const char* MQTT_PASS="";
 const char* REMOTE_UPDATE_URL="192.168.1.4:1880/update";
@@ -29,7 +29,7 @@ void onMQTTDisconnect();
 H4P_PinMachine h4gm;
 H4P_Signaller h4fc;
 H4P_WiFi h4wifi(WIFI_SSID,WIFI_PASS);
-H4P_AsyncMQTT h4mqtt(MQTT_SERVER,MQTT_PORT,MQTT_USER,MQTT_PASS,onMQTTConnect,onMQTTDisconnect);
+H4P_AsyncMQTT h4mqtt(MQTT_SERVER,MQTT_USER,MQTT_PASS,onMQTTConnect,onMQTTDisconnect);
 H4P_ConditionalSwitch h4onof(SQUAWK,ACTIVE_HIGH,OFF,[](bool){ return armed; });
 H4P_UPNPServer h4upnp;
 H4P_RemoteUpdate h4ru(REMOTE_UPDATE_URL,__FILE__);

@@ -184,7 +184,7 @@ Since we have an empty sketch, there isn't much else to see, so the following ex
 #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","basic");
-H4P_AsyncMQTT h4mqtt("192.168.1.20",1883);
+H4P_AsyncMQTT h4mqtt("http://192.168.1.20:1883");
 H4P_BinarySwitch h4onof(RELAY_BUILTIN,ACTIVE_HIGH,OFF);
 H4P_UPNPServer h4upnp("Sonoff Basic Switch");
 h4pMultifunctionButton h4mfb(BUTTON_BUILTIN,INPUT,ACTIVE_LOW,15);

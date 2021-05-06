@@ -32,8 +32,8 @@ SOFTWARE.
 #include<H4.h>
 #include<pmbtools.h>
 
-#define RECORD_SEPARATOR "|"
-#define UNIT_SEPARATOR "~"
+//#define RECORD_SEPARATOR "|"
+//#define UNIT_SEPARATOR "~"
 
 #include"plugins_config.h"
 #include<h4proxy.h>
@@ -134,7 +134,8 @@ enum H4P_UI_TYPE {
     H4P_UI_BOOL,
     H4P_UI_INPUT,
     H4P_UI_IMGBTN,
-    H4P_UI_DROPDOWN
+    H4P_UI_DROPDOWN,
+    H4P_UI_IMG
 };
 
 using   H4P_NVP_MAP      = unordered_map<string,string>;
@@ -168,8 +169,6 @@ extern void   h4pClearEvent     (H4PE_TYPE e);
 //
 void    h4pFactoryReset();
 void    h4pReboot();
-
-string flattenMap(const H4P_NVP_MAP& m,const string& fs=UNIT_SEPARATOR,const string& rs=RECORD_SEPARATOR);
 
 string  h4preplaceparams(const string& s);
 
@@ -299,7 +298,7 @@ template<typename T>
 T* require(const string& svc){
     T* dll=h4puncheckedcall<T>(svc);
     if(!dll){
-        Serial.printf("**** X DYNALOADS %s\n",CSTR(svc));
+//        Serial.printf("**** X DYNALOADS %s\n",CSTR(svc));
         dll=new T;
         dll->_init();
         dll->_filter&=~H4PE_BOOT; // we already done it!
@@ -345,17 +344,17 @@ class H4Service {
                 bool                _running=false;
 //
         H4Service(const string& name,uint32_t events=H4PE_NOOP,bool singleton=true): _filter(events | H4PE_BOOT | H4PE_STAGE2){
-            Serial.printf("%s Exists %s\n",CSTR(name),singleton ? "SINGLE":"MULTI");
+//            Serial.printf("%s Exists %s\n",CSTR(name),singleton ? "SINGLE":"MULTI");
             _me=_uniquify(name);
             if(_me==name || (!singleton)){
                 _pid=h4pmap.size()+H4PC_MAX;
                 h4pmap[_me]=this;
-                Serial.printf("%s registers as %s\n",CSTR(name),CSTR(_me));
+//                Serial.printf("%s registers as %s\n",CSTR(name),CSTR(_me));
                 h4pregisterhandler(_me,_filter,[this](const string& s,H4PE_TYPE t,const string& m){ _sysHandleEvent(s,t,m); });
             } 
             else {
                 SYSWARN("Reload %s",CSTR(_me));
-                Serial.printf("********** Reload %s",CSTR(_me));
+//                Serial.printf("********** Reload %s",CSTR(_me));
             }
         }
 #if H4P_LOG_MESSAGES
@@ -393,6 +392,25 @@ case H4PE_SYSINFO: \
 #define H4P_ONOFF_CONNECTOR(e) case H4PEVENTNAME(e): \
     h4p[stateTag()]=msg; \
     break;
+
+#define H4P_TACT_BUTTON_CONNECTOR(x) if(svc==#x){ \
+    if(STOI(msg)){\
+        h4puiSync(#x,"1");\
+        H4PGLUE3(on,x,Button()); \
+        h4.once(175,[]{ \
+            h4p.gvSetInt(#x,0);\
+            h4puiSync(#x,"0");\
+        });\
+    }\
+}
+
+#define H4P_LATCH_BUTTON_CONNECTOR(x) if(svc==#x){ \
+    if(svc==#x){\
+        bool b=STOI(msg);\
+        H4PGLUE3(on,x,Button(b)); \
+        h4puiSync(#x,msg);\
+    }\
+}
 //
 //      ADAPTERS
 //
@@ -415,22 +433,3 @@ case H4PE_SYSINFO: \
 #define H4P_FUNCTION_ADAPTER_VOID(e) case H4PEVENTNAME(e): \
     H4PGLUE2(on,e)(); \
     break;
-
-#define H4P_TACT_BUTTON_HANDLER(x) if(svc==#x){ \
-    if(STOI(msg)){\
-        h4puiSync(#x,"1");\
-        H4PGLUE3(on,x,Button()); \
-        h4.once(175,[]{ \
-            h4p.gvSetInt(#x,0);\
-            h4puiSync(#x,"0");\
-        });\
-    }\
-}
-
-#define H4P_LATCH_BUTTON_HANDLER(x) if(svc==#x){ \
-    if(svc==#x){\
-        bool b=STOI(msg);\
-        H4PGLUE3(on,x,Button(b)); \
-        h4puiSync(#x,msg);\
-    }\
-}

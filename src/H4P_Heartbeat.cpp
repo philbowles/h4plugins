@@ -30,6 +30,16 @@ SOFTWARE.
 
 void H4P_Heartbeat::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg) {
     switch(t){
+        case H4PE_VIEWERS:
+            if(STOI(msg)){
+                h4puiAdd(upTimeTag(),H4P_UI_TEXT,"s");
+            #if H4P_UI_HEALTH
+                h4puiAdd("Q",H4P_UI_TEXT,"h");
+                h4puiAdd(heapTag(),H4P_UI_TEXT,"h");
+                h4puiAdd("LPS",H4P_UI_TEXT,"h");
+            #endif
+            }
+            break;
         case H4PE_HEARTBEAT:
             h4p[upTimeTag()]=secsToTime(STOI(msg));
             break;
@@ -45,17 +55,6 @@ void H4P_Heartbeat::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg
             break;
 #endif
     }
-}
-
-void H4P_Heartbeat::_init() {
-    h4p.gvSetInt(upTimeTag(),0,false);
-    h4puiAdd(upTimeTag(),H4P_UI_TEXT,"s");
-#if H4P_UI_HEALTH
-    #pragma message("Compilng with healthy options")
-    h4puiAdd("Q",H4P_UI_TEXT,"h");
-    h4puiAdd(heapTag(),H4P_UI_TEXT,"h");
-    h4puiAdd("LPS",H4P_UI_TEXT,"h");
-#endif
 }
 
 string H4P_Heartbeat::secsToTime(uint32_t sex){ 

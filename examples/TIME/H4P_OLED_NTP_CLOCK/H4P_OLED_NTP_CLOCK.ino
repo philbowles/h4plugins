@@ -32,7 +32,7 @@ H4P_SerialLogger h4sl;
 H4P_PinMachine h4gm;
 H4P_Signaller h4fc;
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","ntpclock");
-H4P_AsyncMQTT h4mqtt("192.168.1.4",1883);
+H4P_AsyncMQTT h4mqtt("http://192.168.1.4:1883");
 H4P_Timekeeper h4tk("0.fr.pool.ntp.org","1.fr.pool.ntp.org",2); // 1 cos France is GMT+1
 
 H4P_BinarySwitch h4onof(RELAY_BUILTIN,ACTIVE_HIGH,OFF);

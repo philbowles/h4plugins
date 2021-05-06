@@ -24,7 +24,7 @@ H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCm
 H4P_PinMachine h4gm;
 H4P_Signaller h4fc;
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","h4plugins");
-H4P_AsyncMQTT h4mqtt("192.168.1.4",1883);
+H4P_AsyncMQTT h4mqtt("http://192.168.1.4:1883");
 
 H4P_BinarySwitch h4onof(LED_BUILTIN,UL_ACTIVE,OFF,[](bool b){
     Serial.print("STATE NOW ");Serial.println(b);

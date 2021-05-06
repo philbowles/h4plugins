@@ -1,7 +1,9 @@
-#define H4P_VERBOSE 1
 #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
-
+//
+// See https://github.com/philbowles/mysqlrest for a webserver that will
+// store the events being logged here 
+//
 H4P_SerialLogger h4sl;
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","mysqllogger");
 H4P_RemoteLogger dillo("http://192.168.1.20:8266");

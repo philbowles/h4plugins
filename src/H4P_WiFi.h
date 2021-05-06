@@ -84,7 +84,7 @@ class H4P_WiFi: public H4Service, public AsyncWebServer {
                 void            _clear();
                 void            _clearUI();
                 bool            _cannotConnectSTA(){ 
-                    Serial.printf("_cannotConnectSTA() ssid=%s psk=%s can/not=%d\n",CSTR(WiFi.SSID()),CSTR(WiFi.psk()),WiFi.SSID()==h4Tag() || WiFi.psk()==""); 
+//                    Serial.printf("_cannotConnectSTA() ssid=%s psk=%s can/not=%d\n",CSTR(WiFi.SSID()),CSTR(WiFi.psk()),WiFi.SSID()==h4Tag() || WiFi.psk()==""); 
                     return WiFi.SSID()==h4Tag() || WiFi.psk()=="";
                 }
                 void            _commonStartup();
@@ -138,9 +138,12 @@ class H4P_WiFi: public H4Service, public AsyncWebServer {
                 void            uiAddBoolean(const string& name,const string& section="u"){ _uiAdd(name,H4P_UI_BOOL,section); }
                 void            uiAddDropdown(const string& name,H4P_NVP_MAP options,const string& section="u");
                 void            uiAddGlobal(const string& name,const string& section="u"){ _uiAdd(name,H4P_UI_TEXT,section); }
-                void            uiAddInput(const string& name,const string& section="u");
+                void            uiAddImg(const string& name,const string& url,const string& section="u"){ _uiAdd(name,H4P_UI_IMG,section,url); }
+                void            uiAddImgButton(const string& name,const string& section="u"){ _uiAdd(name,H4P_UI_IMGBTN,section); }
+                void            uiAddInput(const string& name,const string& section="u"){ _uiAdd(name,H4P_UI_INPUT,section); }
                 void            uiAddText(const string& name,const string& v,const string& section="u"){ _uiAdd(name,H4P_UI_TEXT,section,v); }
                 void            uiAddText(const string& name,int v,const string& section="u"){ _uiAdd(name,H4P_UI_TEXT,section,stringFromInt(v)); }
+                void            uiAddAllUsrFields(const string& section="u");
 
                 void            uiSetBoolean(const string& ui,const bool b){ _sendSSE(ui,CSTR(stringFromInt(b))); }
                 void            uiSetValue(const string& ui,const int f){ _sendSSE(ui,CSTR(stringFromInt(f))); }

@@ -8,8 +8,8 @@ void onMQTTDisconnect();
 struct H4P_LWT myLWT={"myLWT","byebye",1,false}; // topic,pload,QoS,retain
 
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","testbed");
-H4P_AsyncMQTT h4mqtt("192.168.1.4",1883,"","",onMQTTConnect,onMQTTDisconnect,myLWT); // Custom lwt
-//H4P_AsyncMQTT h4mqtt("192.168.1.4",1883,"","",onMQTTConnect,onMQTTDisconnect); // NO Custom lwt
+H4P_AsyncMQTT h4mqtt("http://192.168.1.4:1883","","",onMQTTConnect,onMQTTDisconnect,myLWT); // Custom lwt
+//H4P_AsyncMQTT h4mqtt("http://192.168.1.4:1883","","",onMQTTConnect,onMQTTDisconnect); // NO Custom lwt
 
 uint32_t myCallback(vector<string> vs){
   Serial.printf("USER: Msg received with payload=%s\n",H4PAYLOAD.c_str()); // convert payload to C-style string

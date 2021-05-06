@@ -76,7 +76,7 @@ void trafficLights(bool onoff){ // this is  the actual "thing" function
 //////////////////////////////////////////////////////////////////////////////
 //
 H4P_WiFi wiffy("XXXXXXXX","XXXXXXXX","traffic");
-H4P_AsyncMQTT qt("192.168.1.4",1883);
+H4P_AsyncMQTT qt("http://192.168.1.4:1883");
 H4P_Heartbeat hb;
 H4P_BinaryThing fing(trafficLights);
 H4P_UPNPServer lexy("Traffic Light Sequencer");

@@ -6,8 +6,8 @@ const char* WIFI_SSID="XXXXXXXX";
 const char* WIFI_PASS="XXXXXXXX";
 const char* REMOTE_UPDATE_URL="192.168.1.4:1880/update";
 /*
-const char* MQTT_SERVER="192.168.1.4";
-const int   MQTT_PORT=1883;
+const char* MQTT_SERVER="http://192.168.1.4:1883";
+
 */
 #define RELAY_BUILTIN 12
 #define BUTTON_BUILTIN 0

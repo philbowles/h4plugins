@@ -37,7 +37,7 @@ void onMQTTConnect();
 void onMQTTDisconnect();
 
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","testbed");
-H4P_AsyncMQTT h4mqtt("192.168.1.4",1883,"","",onMQTTConnect,onMQTTDisconnect); // no username / pword
+H4P_AsyncMQTT h4mqtt("http://192.168.1.4:1883","","",onMQTTConnect,onMQTTDisconnect); // no username / pword
 
 uint32_t myCallback(vector<string> vs){
   for(auto const& v:vs) Serial.printf("v: %s\n",CSTR(v)); // show input

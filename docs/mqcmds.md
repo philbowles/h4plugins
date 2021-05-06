@@ -69,7 +69,7 @@ void onMQTTConnect(){
 }
 
 ...
-[H4P_AsyncMQTT](h4mqtt.md)h4mqtt("myMQTTserver.local",1883,"username","password",onMQTTConnect);
+[H4P_AsyncMQTT](h4mqtt.md)h4mqtt("http://myMQTTserver.local:1883","username","password");
 ...
 ```
 
