@@ -31,11 +31,7 @@ SOFTWARE.
 
 #include<H4.h>
 #include<pmbtools.h>
-
-//#define RECORD_SEPARATOR "|"
-//#define UNIT_SEPARATOR "~"
-
-#include"plugins_config.h"
+#include<plugins_config.h>
 #include<h4proxy.h>
 
 #ifdef ARDUINO_ARCH_ESP8266
@@ -64,8 +60,7 @@ STAG(cmd);
 STAG(device);
 STAG(gpio);
 STAG(h4);
-STAG(H4P);
-STAG(h4UI);
+//STAG(H4P);
 STAG(heap);
 STAG(ip);
 STAG(mqconf);
@@ -76,7 +71,7 @@ STAG(name);
 STAG(NBoots);
 STAG(onof);
 STAG(pcent);
-STAG(pmv);
+//STAG(pmv);
 STAG(psk); // chg password
 STAG(report);
 STAG(rupd);
@@ -433,3 +428,5 @@ case H4PE_SYSINFO: \
 #define H4P_FUNCTION_ADAPTER_VOID(e) case H4PEVENTNAME(e): \
     H4PGLUE2(on,e)(); \
     break;
+
+#define H4P_FUNCTION_ADAPTER_GPIO H4P_FUNCTION_ADAPTER_GPIO

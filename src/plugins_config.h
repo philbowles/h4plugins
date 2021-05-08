@@ -50,12 +50,12 @@ SOFTWARE.
         INCLUDE ALL SERIAL MONITOR OUTPUT WHEN SUBMITTING BUG REPORTS
         ***********************************************************************
 
-        H4P_UI_HEALTH = 1 adds Heap,Q,nLoops to UI
+        H4P_UI_HEALTH = 1 adds Heap,Q,nLoops to UI when using heartbeat
 */
-#define SANITY                  0
+#define SANITY                  1
 #define H4P_LOG_MESSAGES        1
 #define H4P_SYS_LEVEL           2
-#define H4P_UI_HEALTH           0
+#define H4P_UI_HEALTH           1
 /*
         HARDWARE ASSUMPTIONS
 
@@ -122,10 +122,10 @@ enum H4P_UILED_COLOR {
 
 #define H4P_RUPD_STRETCH         5
 
-#define H4PM_GRANULARITY       100
+#define H4PM_GRANULARITY        50
 
 #ifdef ARDUINO_ARCH_ESP8266
-    #define H4P_ANALOG_MAX        1023
+    #define H4P_ANALOG_MAX    PWMRANGE
     #define H4P_THROTTLE_LO       6000
     #define H4P_THROTTLE_HI       9000
 #else

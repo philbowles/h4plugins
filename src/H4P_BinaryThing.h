@@ -49,6 +49,7 @@ class H4P_BinaryThing: public H4Service{
         H4P_BinaryThing(function<void(bool)> thingFunction,bool initial=OFF,uint32_t timer=0): _thing(thingFunction),H4Service(onofTag(),H4PE_GVCHANGE|H4PE_VIEWERS) {
             h4p.gvSetInt(stateTag(),initial,false);
             h4p.gvSetInt(autoOffTag(),timer,true);
+            Serial.printf("H4P_BinaryThing autoOffTag %d\n",timer);
             _addLocals({
                 {"auto",    {H4PC_H4, 0, CMDVS(_autoOff)}},
                 {"on",      {H4PC_H4, 0, CMD(turnOn)}},

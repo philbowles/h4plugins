@@ -6,12 +6,10 @@ H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCm
 //  h4/on
 //  h4/toggle
 //  h4/switch/n where n=0 or 1
-//  And reports current state with h4/state
-//  If MQTT is used, publishes current state 
 //
 
 // instead of just on/offing a GPIO like a Switch does, a thing calls a function
-// the function does anything you want...and is on/offed by all the same features as a switch
+// the function does anything you want...and is on/off'ed by all the same features as a switch
 H4P_BinaryThing h4onof([](bool b){ Serial.printf("I am now %s\n",b ? "ON":"OFF"); });
 
 void h4setup(){

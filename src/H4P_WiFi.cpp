@@ -272,12 +272,8 @@ void H4P_WiFi::_init(){
     h4p.gvSetstring(boardTag(),replaceAll(H4_BOARD,"ESP8266_",""));
 
     if(h4p[deviceTag()]=="") h4p[deviceTag()]=string("H4-").append(HAL_WIFI_chipID());
-    h4p.gvSetstring(h4UITag(),h4p.read(string("/").append(h4UITag())));
+    SYSINFO("Device: %s Chip: %s",CSTR(h4p[deviceTag()]),CSTR(h4p[chipTag()]));
 
-    if(h4p[h4UITag()]=="") SYSWARN("NO FS: webUI will not start","");
-    SYSINFO("Device: %s Chip: %s UI v%s",CSTR(h4p[deviceTag()]),CSTR(h4p[chipTag()]),CSTR(h4p[h4UITag()]));
-
-//    h4p.gvSetstring(ipTag(),"",false);
     h4p.gvSave(deviceTag());
 }
 
@@ -331,7 +327,7 @@ void H4P_WiFi::_sendSSE(const string& name,const string& msg){
                     _evts->send(CSTR(ui.second.f()),CSTR(ui.first),_evtID++); // hook to sse event q size
                 }
             }
-            Serial.printf("SEND SSE %s => %s\n",CSTR(msg),CSTR(name));
+//            Serial.printf("SEND SSE %s => %s\n",CSTR(msg),CSTR(name));
             _evts->send(CSTR(msg),CSTR(name),_evtID++); // hook to sse event q size
         } 
         else {
@@ -398,7 +394,7 @@ void H4P_WiFi::_startWebserver(){
     on("/",HTTP_GET, [this](AsyncWebServerRequest *request){
         XLOG("FH=%u --> Root %s",_HAL_freeHeap(),request->client()->remoteIP().toString().c_str());
         request->send(HAL_FS,"/sta.htm",String(),false,_aswsReplace);
-        XLOG("FH=%u <-- Root %s",_HAL_freeHeap(),request->client()->remoteIP().toString().c_str());
+//        XLOG("FH=%u <-- Root %s",_HAL_freeHeap(),request->client()->remoteIP().toString().c_str());
     });
 
 	on("/rest",HTTP_GET,[this](AsyncWebServerRequest *request){ _rest(request); });
@@ -416,7 +412,7 @@ void H4P_WiFi::_stopWebserver(){
 }
 
 void H4P_WiFi::_uiAdd(const string& name,H4P_UI_TYPE t,const string& h,const string& value,uint8_t color){
-    Serial.printf("FH=%u --> H4P_WiFi::_uiAdd\n",_HAL_freeHeap());
+//    Serial.printf("FH=%u --> H4P_WiFi::_uiAdd\n",_HAL_freeHeap());
     function<string(void)>  f;
     string v=value;
     switch(t){
@@ -439,7 +435,7 @@ void H4P_WiFi::_uiAdd(const string& name,H4P_UI_TYPE t,const string& h,const str
     }
     h4pUIorder.push_back(name);
     h4pUserItems[name]={t,f,color,h};
-    Serial.printf("FH=%u <-- H4P_WiFi::_uiAdd\n",_HAL_freeHeap());
+//    Serial.printf("FH=%u <-- H4P_WiFi::_uiAdd\n",_HAL_freeHeap());
 }
 /*
 

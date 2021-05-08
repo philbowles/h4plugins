@@ -27,6 +27,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_SerialCmd.h>
+// just for the versions
+#include<vark_config.h>
+#include<dillo_config.h>
+#include<pango_config.h>
 //
 string                   H4P_SerialCmd::_fname="/";
 
@@ -150,13 +154,9 @@ uint32_t H4P_SerialCmd::_get(vector<string> vs){
 [[noreturn]] void H4P_SerialCmd::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg){
     switch(t){
         case H4PE_FACTORY:
-//            Serial.printf("MORITURI: DO NOT BELIEVE WHAT ARNIE SAYS!\n");
             clear(); 
         case H4PE_REBOOT:
-//            Serial.printf("ARNIE SAYS: I'LL BE BACK!\n");
             h4rebootCore();
-//        default:
-//            Serial.printf("%s CATASTROPHE %s %s %s\n",CSTR(_me),CSTR(svc),CSTR(h4pGetEventName(t)),CSTR(msg));
     }
 }
 
@@ -165,7 +165,6 @@ void H4P_SerialCmd::_init(){
     for(auto const& i:split(read(_fname),RECORD_SEPARATOR)){
         vector<string> nv=split(i,UNIT_SEPARATOR);
         h4pGlobal[nv[0]]=h4proxy{nv[0],nv.size() > 1 ? nv[1]:"",true};
-//        Serial.printf("FROM PS: %s=%s\n",nv[0].data(),h4pGlobal[nv[0]].c_str());
     }
     gvInc(NBootsTag());
     gvSave(NBootsTag());
@@ -379,6 +378,12 @@ void H4P_SerialCmd::all(){
 #if H4P_LOG_MESSAGES
 void H4P_SerialCmd::info(){ 
     H4Service::info();
+    reply(" H4 %s",H4_VERSION);
+    reply(" H4P %s",H4P_VERSION);
+    reply(" H4UI %s",h4p.read("/h4UI").data());
+    reply(" AARD %s",AARDVARK_VERSION);
+    reply(" ARMA %s",ARMADILLO_VERSION);
+    reply(" PANGO %s",PANGO_VERSION);
     reply(" Globals:");
     for(auto const& p:h4pGlobal) _showItem(p.first);
 }

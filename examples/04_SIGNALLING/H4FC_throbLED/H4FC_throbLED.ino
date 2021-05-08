@@ -12,20 +12,21 @@ instead of going OFF
 */
 
 void h4setup() { // H4 constructor starts Serial
-    Serial.println("H4P_Signaller Integrated Example v"H4P_VERSION);
-    h4fc.flashPin(1024,LED_BUILTIN,H4P_ASSUMED_SENSE); // LED depends on platform
+    Serial.println("H4P_Signaller Throb Example v"H4P_VERSION);
+    h4fc.throbPin(1000,1,LED_BUILTIN,H4P_ASSUMED_SENSE); // LED depends on platform
 
     h4.once(10000,[](){ 
-      h4fc.flashPin(512,LED_BUILTIN,H4P_ASSUMED_SENSE); // LED depends on platform
+      h4fc.throbPin(2000,25,LED_BUILTIN,H4P_ASSUMED_SENSE); // LED depends on platform
     });
+    
     h4.once(20000,[](){ 
-      h4fc.flashPin(256,LED_BUILTIN,H4P_ASSUMED_SENSE); // LED depends on platform
+      h4fc.throbPin(3000,50,LED_BUILTIN,H4P_ASSUMED_SENSE); // LED depends on platform
     });
     h4.once(30000,[](){ 
-      h4fc.flashPin(128,LED_BUILTIN,H4P_ASSUMED_SENSE); // LED depends on platform
+      h4fc.throbPin(5000,75,LED_BUILTIN,H4P_ASSUMED_SENSE); // LED depends on platform
     });
     h4.once(40000,[](){ 
-      h4fc.flashPin(64,LED_BUILTIN,H4P_ASSUMED_SENSE); // LED depends on platform
+      h4fc.throbPin(10000,10,LED_BUILTIN,H4P_ASSUMED_SENSE); // LED depends on platform
     });
     h4.once(60000,[](){ 
         h4fc.stopPin(LED_BUILTIN);

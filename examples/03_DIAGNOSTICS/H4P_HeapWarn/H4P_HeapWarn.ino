@@ -21,7 +21,6 @@ vector<void*> chunks;
 void h4setup() { // H4 constructor starts Serial
     Serial.println("H4P_HeapWarn example v"H4P_VERSION);
     Serial.println("This WILL crash!");
-    //h4hw.show(); // show limits
 //
 //  we need to chew up the heap in 0.5k chunks
 //

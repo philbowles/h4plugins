@@ -9,14 +9,7 @@ H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCm
  * h4/switch/n where n is 0 or 1
  * 
  */
-#define USER_BTN 0
-#define UB_ACTIVE ACTIVE_LOW
-#define UL_ACTIVE ACTIVE_LOW
-
-H4P_PinMachine h4gm;
-H4P_BinarySwitch h4onof(LED_BUILTIN,UL_ACTIVE,OFF,[](bool b){
-    Serial.print("STATE NOW ");Serial.println(b);
-  });
+H4P_BinarySwitch h4onof(LED_BUILTIN,H4P_ASSUMED_SENSE);
 
 void h4setup() { // H4 constructor starts Serial
     Serial.println("H4P_BinarySwitch Simple Example v"H4P_VERSION);

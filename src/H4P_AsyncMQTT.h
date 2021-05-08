@@ -48,12 +48,12 @@ class H4P_AsyncMQTT: public H4Service, public PangolinMQTT{
                 string          device;
                 string          prefix=string(h4Tag()).append("/");
                 struct H4P_LWT  _lwt;
-                unordered_set<string> _reportList={binTag(),boardTag(),ipTag(),H4PTag(),h4UITag(),pmvTag()};
+                unordered_set<string> _reportList={binTag(),boardTag(),ipTag()};
 
                 VSCMD(_change);
 
                 void        _commonStartup(){
-                    h4p.gvSetstring(pmvTag(),PANGO_VERSION);
+//                    h4p.gvSetstring(pmvTag(),PANGO_VERSION);
                     h4p.gvSetInt(nDCXTag(),0,false);
                     depend<H4P_WiFi>(wifiTag());
                     _addLocals({
@@ -98,6 +98,8 @@ class H4P_AsyncMQTT: public H4Service, public PangolinMQTT{
 #endif
                 void        subscribeDevice(string topic,H4_FN_MSG f,H4PC_CMD_ID root=H4PC_ROOT);
                 void        unsubscribeDevice(string topic);
+                void        subscribeDevice(initializer_list<string> topic,H4_FN_MSG f,H4PC_CMD_ID root=H4PC_ROOT);
+                void        unsubscribeDevice(initializer_list<string> topic);
 //
         virtual void        svcUp() override;
         virtual void        svcDown() override;

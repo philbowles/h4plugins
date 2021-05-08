@@ -8,7 +8,7 @@ h4pOutput builtinLED(LED_BUILTIN, H4P_ASSUMED_SENSE,OFF);
 
 void h4pGlobalEventHandler(const string& svc,H4PE_TYPE t,const string& msg){
   switch(t){
-    H4P_FUNCTION_ADAPTER_II(GPIO);
+    H4P_FUNCTION_ADAPTER_GPIO;
   }   
 }
 

@@ -51,13 +51,13 @@ void H4P_AsyncMQTT::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg
                         h4puiAdd(mQpassTag(),H4P_UI_INPUT,"m");
                     }
                     else {
-                        h4puiAdd("Pangolin",H4P_UI_TEXT,"m",h4p[pmvTag()]); // mhang!
+//                        h4puiAdd("Pangolin",H4P_UI_TEXT,"m",h4p[pmvTag()]); // mhang!
                         h4puiAdd(_me,H4P_UI_BOOL,"m","",H4P_UILED_BI);
                         h4puiAdd(brokerTag(),H4P_UI_TEXT,"m");
                         h4puiAdd(nDCXTag(),H4P_UI_TEXT,"m"); // cos we don't know it yet
                     }
                 #else
-                    h4puiAdd("Pangolin",H4P_UI_TEXT,"m",h4p[pmvTag()]); // mhang!
+//                    h4puiAdd("Pangolin",H4P_UI_TEXT,"m",h4p[pmvTag()]); // mhang!
                     h4puiAdd(_me,H4P_UI_BOOL,"m","",H4P_UILED_BI);
                     h4puiAdd(brokerTag(),H4P_UI_TEXT,"m");
                     h4puiAdd(nDCXTag(),H4P_UI_TEXT,"m"); // cos we don't know it yet
@@ -137,12 +137,7 @@ void H4P_AsyncMQTT::_init() {
 void H4P_AsyncMQTT::_setup(){ // allow for TLS
     setServer(CSTR(h4p[brokerTag()]),CSTR(h4p[mQuserTag()]),CSTR(h4p[mQpassTag()])); // optimise tag()
 }
-/*
-void H4P_AsyncMQTT::_update(const string& name,const string& value){
-    h4p[name]=value;
-    h4puiSync(name,value);
-}
-*/
+
 void H4P_AsyncMQTT::change(const string& broker,const string& user,const string& passwd){ // add creds
     XLOG("MQTT change to %s user=%s",CSTR(broker),CSTR(user));
     h4p[mQuserTag()]=user;
@@ -183,6 +178,8 @@ void H4P_AsyncMQTT::subscribeDevice(string topic,H4_FN_MSG f,H4PC_CMD_ID root){
     XLOG("Subscribed to %s",CSTR(fullTopic));
 }
 
+void H4P_AsyncMQTT::subscribeDevice(initializer_list<string> topic,H4_FN_MSG f,H4PC_CMD_ID root){ for(auto const& t:topic) subscribeDevice(t,f,root); }
+
 void H4P_AsyncMQTT::svcUp(){
 #if H4P_USE_WIFI_AP
     if(WiFi.getMode()==WIFI_AP) return;
@@ -208,3 +205,5 @@ void H4P_AsyncMQTT::unsubscribeDevice(string topic){
     unsubscribe(CSTR(fullTopic));
     XLOG("Unsubscribed from %s\n",CSTR(topic));
 }
+
+void H4P_AsyncMQTT::unsubscribeDevice(initializer_list<string> topic){ for(auto const& t:topic) unsubscribeDevice(t); }

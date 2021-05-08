@@ -264,12 +264,14 @@ void H4Flasher::flashPattern(){
 	},nullptr,H4P_TRID_PATN);
 }
 
+
+#ifdef ARDUINO_ARCH_ESP8266
 void H4Flasher::stop(){
 	h4.cancel({_timer,_off});
-//    analogWrite(_opp->_p,H4P_ANALOG_MAX);
+    analogWrite(_opp->_p,H4P_ANALOG_MAX);
 	_opp->turn(OFF);
 }
-#ifdef ARDUINO_ARCH_ESP8266
+
 H4Flasher::H4Flasher(h4pOutput* opp,uint32_t period,uint32_t valley): _period(period),_valley(valley),_opp(opp){ throb(); }
 
 void H4Flasher::throb(){
@@ -279,7 +281,8 @@ void H4Flasher::throb(){
     for(int i=0;i<(1+nSlices);i++) plan.push_back(H4P_ANALOG_MAX - (i * thickness));
     vector<uint32_t> tr=plan;
     plan.insert(plan.end(), tr.rbegin(), tr.rend());
-    
+//    for(auto const& p:plan) Serial.printf("Plan %d\n",p);
+
     _opp->turn(ON);
     _timer=h4.every(H4PM_GRANULARITY,[=]{
         static int i=0;
@@ -287,13 +290,19 @@ void H4Flasher::throb(){
         if(i==plan.size()) i=0;
     },nullptr,H4P_TRID_THRB);
 }
+
 void H4P_Signaller::throbPin(uint32_t rate, uint32_t valley, uint8_t pin,H4PM_SENSE active,uint8_t col){
     stopPin(pin);
     _dynaLoad(pin,active,col,
         [=](H4Flasher* fp){ fp->throb(); },
-        [rate,valley](h4pOutput* opp){ return new H4Flasher(opp,rate,valley);   }
+        [rate,valley](h4pOutput* opp){ return new H4Flasher(opp,rate,valley); }
     );
 }
 
 void H4P_Signaller::throbPin(uint32_t rate, uint32_t valley,h4pOutput* p){ throbPin(rate,valley,p->_p,p->_s,p->_c); }
+#else
+void H4Flasher::stop(){
+	h4.cancel({_timer,_off});
+	_opp->turn(OFF);
+}
 #endif

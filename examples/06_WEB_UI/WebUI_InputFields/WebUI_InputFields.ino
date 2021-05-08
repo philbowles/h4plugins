@@ -28,7 +28,7 @@ void onViewersConnect(){
   h4wifi.uiAddText("pink button is...","Latching"); // gets "proper cased"
   h4wifi.uiAddImgButton("pink");
 
-  h4wifi.uiAddInput("special","replay");
+  h4wifi.uiAddInput("special");
   h4wifi.uiAddDropdown("Select",{
     {"Both Cases","BcBc"},
     {"Uppercase","UUUU"},
@@ -73,4 +73,5 @@ H4P_EventListener allexceptmsg(H4PE_VIEWERS | H4PE_GVCHANGE,[](const string& svc
 void h4setup(){
   h4p.gvSetInt("Go",0);
   h4p.gvSetInt("pink",0);
+  h4p.gvSetstring("special","replay");
 }

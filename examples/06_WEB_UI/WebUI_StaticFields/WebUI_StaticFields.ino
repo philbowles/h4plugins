@@ -10,7 +10,6 @@ H4_TIMER  TIM0,TIM1;
 H4P_SerialLogger woof(H4PE_ALMOST_ALL &~ H4PE_GPIO);
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","uistatic");
 H4P_AsyncMQTT kewpie("http://192.168.1.4:1883");
-//H4P_BinarySwitch h4onof(D6,ACTIVE_HIGH,OFF);
 H4P_ConditionalSwitch h4onof([]{ return condition; },D6,ACTIVE_HIGH,OFF);
 
 void onViewersConnect(){

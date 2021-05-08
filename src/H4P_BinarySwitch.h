@@ -38,8 +38,6 @@ class H4P_BinarySwitch: public H4P_BinaryThing{
             uint32_t        _initial;      
     protected:
         h4pOutput*          _pp;
-
-//        virtual void         _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override { Serial.printf("H4P_BinarySwitch HEVT\n"); H4P_BinaryThing::_handleEvent(svc,t,msg); };
     public:
             uint8_t         _color;
 

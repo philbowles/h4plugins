@@ -1,3 +1,4 @@
+#define H4P_VERBOSE 1
 #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 //  Starts OFF, commanded ON after 5sec then turns OFF automatically after AUTO_OFF milliseconds
@@ -11,7 +12,7 @@ H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCm
 //  And reports current state with h4/state
 //  If MQTT is used, publishes current state 
 //
-#define AUTO_OFF  10000
+#define AUTO_OFF  5000
 
 H4P_SerialLogger h4sl;
 
@@ -20,5 +21,5 @@ H4P_SerialLogger h4sl;
 H4P_BinaryThing h4onof([](bool b){ Serial.printf("I am now %s\n",b ? "ON":"OFF"); },OFF,AUTO_OFF);
 
 void h4setup(){
-  h4.once(5000,[]{ h4onof.toggle(); });
+  h4.every(15000,[]{ h4onof.turnOn(); });
 }

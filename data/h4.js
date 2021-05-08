@@ -4,10 +4,6 @@ const RECORD_SEPARATOR="|"
 const UNIT_SEPARATOR="~"
 
 function toaster(t){
-    if(t.startsWith("CONFIG: ")){
-        let i=t.indexOf(" now=",8)
-        document.getElementById(t.slice(8,i)).classList.remove("edit")
-    }
     msg.innerHTML=t;
     setTimeout(function () { msg.innerHTML="&nbsp;"; },30000);
 }
@@ -26,7 +22,10 @@ function ajax(url,decode=true){
             r.style.color="#ffffff" // css
             var j=JSON.parse(e.currentTarget.responseText);
             if(j.res) toaster("Error: "+j.res+" "+j.msg)
-            else j.lines.forEach(function(l){ r.innerHTML+=l+'\n'})
+            else {
+                j.lines.forEach(function(l){ r.innerHTML+=l+'\n'})
+                document.querySelectorAll("input.edit").forEach(x => x.classList.remove("edit") )
+            }
         }
     })
     http.send();

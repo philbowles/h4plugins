@@ -15,9 +15,10 @@ std::vector<h4pOutput*> LEDS={
   new h4pOutput(D8,ACTIVE_HIGH,OFF,H4P_UILED_GREEN),
   new h4pOutput(LED_BUILTIN,ACTIVE_LOW,OFF,H4P_UILED_BLUE)
 };
+
 void h4pGlobalEventHandler(const string& svc,H4PE_TYPE t,const string& msg){
   switch(t){
-    H4P_FUNCTION_ADAPTER_II(GPIO);
+    H4P_FUNCTION_ADAPTER_GPIO;
   }
 }
 

@@ -56,8 +56,8 @@ void h4punregisterhandler(const string& svc,uint32_t t){
 }
 
 void h4pevent(const string& svc,H4PE_TYPE t,const string& msg){
-    if(h4pevt.count(t)) for(auto const& e:h4pevt[t]) e.second(svc,t,msg);
     h4pGlobalEventHandler(svc,t,msg);
+    if(h4pevt.count(t)) for(auto const& e:h4pevt[t]) e.second(svc,t,msg);
 }
 
 void h4pOnEvent(H4PE_TYPE t,H4P_FN_USEREVENT e){
@@ -94,7 +94,6 @@ void h4StartPlugins(){
     reverse(h4pevt[H4PE_REBOOT].begin(),h4pevt[H4PE_REBOOT].end());
     reverse(h4pevt[H4PE_FACTORY].begin(),h4pevt[H4PE_FACTORY].end());
 //
-
 #if SANITY
     for(auto const& s:h4pmap){
         auto ps=s.second;

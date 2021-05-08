@@ -40,10 +40,7 @@ class H4Service;
 #define H4_USE_PLUGINS(s,q,b) \
     H4 h4(s,q); \
     H4P_SerialCmd h4p(b);\
-    H4P_PROXY_MAP h4pGlobal={ \
-        {H4PTag(),{H4PTag(),H4P_VERSION,false}}, \
-        {binTag(),{binTag(),__FILE__,false}} \
-    };
+    H4P_PROXY_MAP h4pGlobal={ {binTag(),{binTag(),__FILE__,false}} };
 
 std::unordered_map<std::string,H4Service*> h4pmap;
 bool                h4punlocked=true;

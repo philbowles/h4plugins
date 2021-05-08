@@ -18,46 +18,49 @@ const char* MQTT_SERVER="http://192.168.1.4:1883";
 
 const char* MQTT_USER="";
 const char* MQTT_PASS="";
-const char* REMOTE_UPDATE_URL="192.168.1.4:1880/update";
+const char* REMOTE_UPDATE_URL="http://192.168.1.4:1880/update";
 
 boolean armed=false;
-
-// necessary forward references
-void onMQTTConnect();
-void onMQTTDisconnect();
 
 H4P_PinMachine h4gm;
 H4P_Signaller h4fc;
 H4P_WiFi h4wifi(WIFI_SSID,WIFI_PASS);
-H4P_AsyncMQTT h4mqtt(MQTT_SERVER,MQTT_USER,MQTT_PASS,onMQTTConnect,onMQTTDisconnect);
-H4P_ConditionalSwitch h4onof(SQUAWK,ACTIVE_HIGH,OFF,[](bool){ return armed; });
+H4P_AsyncMQTT mqtt(MQTT_SERVER,MQTT_USER,MQTT_PASS);
+H4P_ConditionalSwitch h4onof([](){ return armed; },SQUAWK,ACTIVE_HIGH,OFF,H4P_UILED_RED);
 H4P_UPNPServer h4upnp;
-H4P_RemoteUpdate h4ru(REMOTE_UPDATE_URL,__FILE__);
+H4P_RemoteUpdate h4ru(REMOTE_UPDATE_URL);
 
-void onMQTTConnect(){ h4mqtt.subscribeDevice("arm",arm); }
-void onMQTTDisconnect(){ h4mqtt.unsubscribeDevice("arm"); }
-
-void armingStateChange(bool b){
-  if(b) h4fc.flashPin(500,ARMED);
-  else {
-    h4fc.stopPin(ARMED);
-    h4onof.turn(OFF); 
-  }
-  h4mqtt.publishDevice("armed",armed=b);
-  h4onof.syncCondition();
-}
+h4pPolled ark(LIGHT,INPUT,ACTIVE_HIGH,5000);
 
 uint32_t arm(vector<string> vs){
-  if(vs.size()){
-    bool b=H4PAYLOAD_INT;
-    if(b!=armed) armingStateChange(b); 
-    return H4_CMD_OK;
-  } else return H4_CMD_TOO_FEW_PARAMS;
+    if(vs.size()){
+        bool b=H4PAYLOAD_INT;
+        if(b!=armed) armingStateChange(b); 
+        return H4_CMD_OK;
+    } else return H4_CMD_TOO_FEW_PARAMS;
 }
 
-void h4setup(){
-    h4gm.Polled(LIGHT,INPUT,ACTIVE_HIGH,60000,false,[](H4GPIOPin* ptr){
-        H4GM_PIN(Polled); // Create the correct pointer type in 'pin'
-        arm({stringFromInt(pin->state)});
-    });
+void onMqttConnect(){ mqtt.subscribeDevice("arm",arm);}
+void onMqttDisconnect(){ mqtt.unsubscribeDevice("arm"); }
+
+void armingStateChange(bool b){
+    if(b) h4fc.flashPin(500,ARMED);
+    else {
+        h4fc.stopPin(ARMED);
+        h4onof.turn(OFF); 
+    }
+    mqtt.publishDevice("armed",armed=b);
+    h4onof.syncCondition();
+}
+
+void onGPIO(int pin,int value){ if(pin==LIGHT) armingStateChange(value); }
+
+void h4pGlobalEventHandler(const string& svc,H4PE_TYPE t,const string& msg){
+    switch(t){
+        H4P_DEFAULT_SYSTEM_HANDLER
+        H4P_FUNCTION_ADAPTER_GPIO;
+        case H4PE_SERVICE:
+            H4P_SERVICE_ADAPTER(Mqtt);
+            break;
+    }
 }
