@@ -67,7 +67,6 @@ void H4P_UPNPServer::_handleEvent(const string& svc,H4PE_TYPE t,const string& ms
             break;
         case H4PE_GVCHANGE:
             if(_running && svc==nameTag()){
-//                h4puiSync(nameTag(),msg);
                 svcDown(); // shut down old name, send bye bye etc
                 svcUp();
             }
@@ -81,7 +80,7 @@ void H4P_UPNPServer::_handlePacket(string p,IPAddress ip,uint16_t port){
     if(hdrs.size() > 4){
         for (auto const &h :vector<string>(++hdrs.begin(), hdrs.end())) {
             vector<string> parts=split(h,":");
-            if(parts.size()) uhdrs[parts[0]]=ltrim(join(vector<string>(++parts.begin(),parts.end()),":"));
+            if(parts.size()) uhdrs[parts[0]]=ltrim(join(vector<string>(++parts.begin(),parts.end()),":")); // y no u/case???
         }
     }
     uint32_t mx=1000 * atoi(CSTR(replaceAll(uhdrs["CACHE-CONTROL"],"max-age=","")));
@@ -99,9 +98,7 @@ void H4P_UPNPServer::_handlePacket(string p,IPAddress ip,uint16_t port){
             for(auto &L:h4pUPNPMap){
                 if(uhdrs.count(L.first)){
                     string v=uhdrs[L.first];
-                    if(L.second.count("*") || L.second.count(v)) {
-                        h4psysevent(v,H4PE_UPNP,"%s,%s",(replaceAll(uhdrs["NTS"],"ssdp:","")==aliveTag()) ? CSTR(ip.toString()):"",CSTR(L.first));
-                    }
+                    if(L.second.count("*") || L.second.count(v)) h4psysevent(v,H4PE_UPNP,"%s",(replaceAll(uhdrs["NTS"],"ssdp:","")==aliveTag()) ? CSTR(ip.toString()):"");
                 }
             }
     }
@@ -153,6 +150,15 @@ void H4P_UPNPServer::_upnp(AsyncWebServerRequest *request){ // redo
 void H4P_UPNPServer::info(){ 
     H4Service::info();
     reply(" Name: %s UDN=%s",CSTR(h4p[nameTag()]),CSTR(_udn));
+    if(h4pUPNPMap.size()){
+        reply(" Listening for tags:");
+        for(auto const& t:h4pUPNPMap){
+            reply("  Tag: %s",t.first.data());
+            for(auto const& s:t.second){
+                reply("   %s",s.data());
+            }
+        }
+    }
 }
 #endif
 

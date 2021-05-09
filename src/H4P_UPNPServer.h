@@ -75,6 +75,6 @@ class H4P_UPNPServer: public H4Service {
                 void           svcDown() override;
 //          _syscall only
                 void           _broadcast(uint32_t mx,const string s){ __upnpSend(mx,s,_ubIP,1900); }
-                void           _listenTag(const string& tag,const string& value);
+        static  void           _listenTag(const string& tag,const string& value);
                 void           _init() override;
 };

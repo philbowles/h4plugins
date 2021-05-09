@@ -29,74 +29,94 @@ SOFTWARE.
 */
 #pragma once
 
+#ifdef ARDUINO_ARCH_ESP8266
+
 #include<H4Service.h>
 #include<H4P_WiFi.h>
-#include<H4P_UPNPServer.h>
 
 class h4pRoamer;
 
-using H4P_ROAMER_MAP = vector<h4pRoamer*>;
+using H4P_ROAMER_MAP        = vector<h4pRoamer*>;
 extern H4P_ROAMER_MAP       h4pRoamers;
 
-using H4P_GRID_MAP   = std::unordered_map<string,string>;
+extern "C" {  
+    #include <ping.h>
+}
 //
 // H4P_Gatekeeper
 //
+#define H4P_GATEKEEPER_SCAVENGE 30000
+#define H4P_GATEKEEPER_STAGGER      1
 class H4P_Gatekeeper: public H4Service{
-    public:
-            H4P_Gatekeeper(): H4Service("gate"){ depend<H4P_WiFi>(wifiTag()); }
+        static  H4_TIMER                    _chunker;
+        static  struct  ping_option         _pop;
+        static  H4P_ROAMER_MAP::iterator    _matched;
 
+        static  void            _ping_recv_cb(void *opt, void *resp);
+        static  void            _scavenge();
+    public:
+            H4P_Gatekeeper(): H4Service("gate"){ 
+                depend<H4P_WiFi>(wifiTag());
+                memset(&_pop,'\0',sizeof(ping_option));
+                _pop.count = 1;    //  try to ping how many times
+                _pop.coarse_time = H4P_GATEKEEPER_STAGGER;  // ping interval
+                ping_regist_recv(&_pop,_ping_recv_cb);
+                ping_regist_sent(&_pop,NULL);
+            }
+            
+//        static  void                enrol(const string& ip,h4pRoamer* r);
 #if H4P_LOG_MESSAGES
-                void        info() override;
+                void                info() override;
 #endif
 // syscall only
-        virtual void        svcUp() override;
-        virtual void        svcDown() override;
+        virtual void                svcUp() override;
+        virtual void                svcDown() override;
 };
+
 /////////////////////////////////////////////////////////////////
 //
 // h4pRoamer
 //
 class h4pRoamer {
-    protected:
-            string      _name;
+    public:
+            string      _ip;
             string      _id;
-            bool        _present=false;
-    public:        
-        virtual string      _type(){ return"roam"; }
+            string      _name;
+
         h4pRoamer(const string& name,const string& id): _name(name),_id(id){
             require<H4P_Gatekeeper>("gate");
             h4pRoamers.push_back(this);
         }
 //syscall
-        virtual void    _announce(const string& ip);
-        virtual string  _describe(){ return string(_name)+" "+_type()+" "+_id+(_present ? " PRE":" AB")+"SENT "; } 
-        virtual void    _startSniffing()=0;
-        virtual void    _stopSniffing(){};
+        virtual void        _announce(const string& ip);
+        virtual string      _describe(){ return string(_name)+" "+_type()+" "+_id+" "+_ip.data(); }
+        virtual void        _startSniffing(){};
+        virtual void        _stopSniffing(){};
+        virtual string      _type()=0;
+
+        virtual string      getIP(){ return _ip; }
 };
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // Roamers
 //
-#ifdef ARDUINO_ARCH_ESP8266
-extern "C" {  
-    #include <ping.h>
-}
+
+//
+//      IP
+//
 class h4pRoamingIP: public h4pRoamer{
-        H4_TIMER            _pinger;
-        struct ping_option  _pop;
-        
-               void    _commonCTOR();
-        static void    _ping_recv_cb(void *opt, void *resp);
-   public:
+    public:
         virtual string _type() override { return uppercase(ipTag()); }
         h4pRoamingIP(const string& name,const string& id);
         h4pRoamingIP(const string& name,const IPAddress& ip);
 //      syscall
-        virtual void    _startSniffing() override;
-        virtual void    _stopSniffing() override { h4.cancel(_pinger); }
+//        virtual void    _announce(const string& ip) override;
+//        virtual void    _startSniffing() override;
+        virtual string  getIP() override { return _id; }
 };
-
+//
+//      MDNS (.local)
+//
 class h4pRoamingDotLocal: public h4pRoamer{
         string      _service;
         string      _protocol;
@@ -107,19 +127,31 @@ class h4pRoamingDotLocal: public h4pRoamer{
         virtual string _type() override { return "MDNS"; }
         h4pRoamingDotLocal(const string& name,const string& service,const string& protocol);
 //      syscall
-        virtual string  _describe(){ return string(_name)+" "+_type()+" _"+_service+"._"+_protocol+".local "+(_present ? "PRE":"AB")+"SENT "; } 
+        virtual string  _describe(){ return string(_name)+" "+_type()+" _"+_service+"._"+_protocol+".local "+_ip.data(); } 
         virtual void    _startSniffing() override;
         virtual void    _stopSniffing() override;
 };
-
-#endif
+//
+//      UPNP
+//
 class h4pRoamingUPNP: public h4pRoamer{
-        H4P_UPNPServer* _pUPNP;
+//        H4P_UPNPServer* _pUPNP;
         string          _tag;
     public:
-        virtual string _type() override { return "UPNP"; }
         h4pRoamingUPNP(const string& name,const string& tag,const string& id);
 //      syscall
-        virtual string  _describe(){ return string(_name)+" "+_type()+" "+_tag+" "+_id+" "+(_present ? "PRE":"AB")+"SENT "; } 
+        virtual string  _describe(){ return string(_name)+" "+_type()+" "+_tag+" "+_id+" "+_ip.data(); } 
         virtual void    _startSniffing() override;
+        virtual string  _type() override { return "UPNP"; }
 };
+//
+//      H4
+//
+class h4pRoamingH4: public h4pRoamingUPNP{
+    public:
+        h4pRoamingH4(const string& name): h4pRoamingUPNP(name,"X-H4-Device",name){}
+        virtual string  _describe(){ return string(_name)+" "+_type()+" "+_ip.data(); } 
+        virtual string _type() override { return "H4"; }
+};
+
+#endif

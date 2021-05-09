@@ -355,9 +355,6 @@ void H4P_WiFi::_startWebserver(){
                         _uiAdd(chipTag(),H4P_UI_TEXT,"s");
                         _uiAdd(deviceTag(),H4P_UI_TEXT,"s");
                         _uiAdd(boardTag(),H4P_UI_TEXT,"s");
-//                        _uiAdd(h4Tag(),H4P_UI_TEXT,"s",H4_VERSION);
-//                        _uiAdd(H4PTag(),H4P_UI_TEXT,"s");
-//                        _uiAdd(h4UITag(),H4P_UI_TEXT,"s");
                         _uiAdd(NBootsTag(),H4P_UI_TEXT,"s");
                         _uiAdd(ipTag(),H4P_UI_TEXT,"s"); // cos we don't know it yet
                     }
@@ -366,9 +363,6 @@ void H4P_WiFi::_startWebserver(){
                     _uiAdd(chipTag(),H4P_UI_TEXT,"s");
                     _uiAdd(deviceTag(),H4P_UI_TEXT,"s");
                     _uiAdd(boardTag(),H4P_UI_TEXT,"s");
-//                    _uiAdd(h4Tag(),H4P_UI_TEXT,"s",H4_VERSION);
-//                    _uiAdd(H4PTag(),H4P_UI_TEXT,"s");
-//                    _uiAdd(h4UITag(),H4P_UI_TEXT,"s");
                     _uiAdd(NBootsTag(),H4P_UI_TEXT,"s");
                     _uiAdd(ipTag(),H4P_UI_TEXT,"s"); // cos we don't know it yet
                 #endif
@@ -382,8 +376,8 @@ void H4P_WiFi::_startWebserver(){
                 }
                 h4.repeatWhile([this]{ return _evts->count(); },
                     ((H4WF_EVT_TIMEOUT*3)/4),
-                    [this]{ },
-                    [this]{ h4psysevent("viewers",H4PE_VIEWERS,"%d",0); },
+                    []{},
+                    []{ h4psysevent("viewers",H4PE_VIEWERS,"%d",0); },
                     H4P_TRID_SSET,true
                 );
             });

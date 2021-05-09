@@ -2,9 +2,8 @@
 #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 
-h4pRoamingUPNP crow("squawk","USN","uuid:Socket-1_0-upnp0BC939");
-h4pRoamingUPNP master("master","USN","uuid:Socket-1_0-upnpF906B3");
-h4pRoamingUPNP earth("middle","USN","uuid:Socket-1_0-upnpF9198B");
+h4pRoamingDotLocal dot("H3","smb","tcp"); // my satellite TV receiver
+h4pRoamingDotLocal box("box","http","tcp"); // my satellite TV receiver
 
 int occupancy=0;
 

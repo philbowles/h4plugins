@@ -127,8 +127,6 @@ H4P_ToneController::H4P_ToneController(uint32_t tempo): H4Service("tune"){
         n.second=distance(xpose.begin(), find(xpose.begin(),xpose.end(),f));
     }
     metronome(tempo);
-
-    _addLocals({ {_me,    { H4PC_H4, 0, CMDVS(_siren) }} });
 }
 
 void H4P_ToneController::_repeat(const string& siren,uint8_t pin,uint32_t speed,uint32_t duration){
@@ -142,16 +140,6 @@ void H4P_ToneController::_repeat(const string& siren,uint8_t pin,uint32_t speed,
         h4.cancel(h); 
         delete v;
     });
-}
-
-uint32_t H4P_ToneController::_siren(vector<string> vs){
-    /*
-    if(vs.size()<2) return H4_CMD_TOO_FEW_PARAMS;
-    if(vs.size()>2) return H4_CMD_TOO_MANY_PARAMS;
-    if(!stringIsNumeric(H4PAYLOAD)) return H4_CMD_NOT_NUMERIC;
-    if(H4PAYLOAD_INT > H4P_SIREN_MAX) return H4_CMD_OUT_OF_BOUNDS;
-*/
-    return H4_CMD_OK;
 }
 
 uint32_t H4P_ToneController::length(const string& tune){

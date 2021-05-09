@@ -48,8 +48,7 @@ using H4P_TUNE          = vector<H4P_STAVE>;
 
 class H4P_ToneController: public H4Service {
         friend class H4P_Voice;
-        VSCMD(_siren);
-//      dsqcmb
+
         static unordered_map<char,uint32_t> timing;
         static unordered_map<string,uint32_t> notes;
         static unordered_map<uint32_t,pair<uint32_t,string>> sirens;

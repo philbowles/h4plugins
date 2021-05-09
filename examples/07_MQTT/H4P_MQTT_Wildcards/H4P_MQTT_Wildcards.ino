@@ -31,13 +31,8 @@ H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCm
 //  vs[4]="42"     in code, use int myInt=PARAM(4);    // 42
 //  vs[5]="666"    in code use int myPayload=H4PAYLOAD_INT; // 666
 //
-
-// necessary forward declarations
-void onMQTTConnect();
-void onMQTTDisconnect();
-
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","testbed");
-H4P_AsyncMQTT h4mqtt("http://192.168.1.4:1883","","",onMQTTConnect,onMQTTDisconnect); // no username / pword
+H4P_AsyncMQTT h4mqtt("http://192.168.1.4:1883"); // no username / pword
 
 uint32_t myCallback(vector<string> vs){
   for(auto const& v:vs) Serial.printf("v: %s\n",CSTR(v)); // show input
@@ -60,11 +55,15 @@ uint32_t myCallback(vector<string> vs){
   }
 }
 
-void onMQTTConnect(){
-    Serial.print("USER: MQTT connected\n");
-    h4mqtt.subscribeDevice("cards/#",myCallback);
-}
+void onMqttConnect(){ h4mqtt.subscribeDevice("cards/#",myCallback); }
 
-void onMQTTDisconnect(){
-    Serial.print("USER: MQTT Disconnected\n");
+void onMqttDisconnect(){ h4mqtt.unsubscribeDevice("cards/#"); }
+
+void h4pGlobalEventHandler(const string& svc,H4PE_TYPE t,const string& msg){
+    switch(t){
+        H4P_DEFAULT_SYSTEM_HANDLER
+        case H4PE_SERVICE:
+            H4P_SERVICE_ADAPTER(Mqtt);
+            break;
+    }
 }

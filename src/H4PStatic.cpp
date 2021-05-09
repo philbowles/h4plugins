@@ -74,8 +74,6 @@ void h4pOnEvent(H4PE_TYPE t,H4P_FN_USEREVENT e){
 #include<H4P_PinMachine.h>
 #include<H4P_Gatekeeper.h>
 
-extern H4P_ROAMER_MAP          h4pRoamers;
-
 void h4StartPlugins(){
     Serial.printf("Registered to start:\n");
     for(auto const& s:h4pmap) Serial.printf(" %s\n",CSTR(s.first));

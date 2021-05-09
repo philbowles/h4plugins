@@ -2,13 +2,22 @@
 #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 
-h4pRoamingUPNP crow("squawk","USN","uuid:Socket-1_0-upnp0BC939");
-h4pRoamingUPNP master("master","USN","uuid:Socket-1_0-upnpF906B3");
+IPAddress htcIP(192,168,1,252);
+
+h4pRoamingIP htc("HTC",htcIP);
+h4pRoamingIP elvis("Elvis","192.168.1.31");
+
+h4pRoamingH4 crow("squawk");
+h4pRoamingH4 master("master");
+h4pRoamingH4 landing("landing");
+h4pRoamingH4 salon("salon");
+h4pRoamingH4 clok("ntpclock");
+
+h4pRoamingDotLocal dot("H3","smb","tcp");
+
 h4pRoamingUPNP earth("middle","USN","uuid:Socket-1_0-upnpF9198B");
 
 int occupancy=0;
-
-IPAddress htcIP(192,168,1,252);
 
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","detector");
 H4P_BinarySwitch h4onof(D6,ACTIVE_HIGH,OFF);

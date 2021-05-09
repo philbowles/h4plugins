@@ -27,8 +27,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #ifdef ARDUINO_ARCH_ESP8266
+
 #include<H4P_Gatekeeper.h>
 #include<H4P_UPNPServer.h>
+
+H4_TIMER                    H4P_Gatekeeper::_chunker=nullptr;
+H4P_ROAMER_MAP::iterator    H4P_Gatekeeper::_matched;
+struct  ping_option         H4P_Gatekeeper::_pop;
 
 unordered_map<string,h4pRoamingDotLocal*> h4pRoamingDotLocal::localList;
 
@@ -37,18 +42,48 @@ void h4pMDNScb(MDNSResponder::MDNSServiceInfo serviceInfo, MDNSResponder::Answer
         vector<string> vs=split(string(serviceInfo.serviceDomain()),".");
         string who=vs[0];
         string ip=p_bSetContent ? serviceInfo.IP4Adresses()[0].toString().c_str():"";
-        if(h4pRoamingDotLocal::localList.count(who)){ h4pRoamingDotLocal::localList[who]->_announce(ip); }
+        if(h4pRoamingDotLocal::localList.count(who)){ h4.queueFunction([=]{ h4pRoamingDotLocal::localList[who]->_announce(ip); }); }
     }
 }
 //
 //      Gatekeeper
 //
+void H4P_Gatekeeper::_ping_recv_cb(void *opt, void *resp){
+    auto pOpt=static_cast<struct ping_option*>(opt);
+    auto caller=reinterpret_cast<h4pRoamer*>(pOpt->reverse);
+    int v=(1+static_cast<struct ping_resp*>(resp)->ping_err);
+    IPAddress ip(pOpt->ip);
+    h4.queueFunction([=](){ caller->_announce(v ? ip.toString().c_str():""); });
+    _matched++;
+}
+
+void H4P_Gatekeeper::_scavenge() {
+    _matched=h4pRoamers.begin();
+    h4.cancel(_chunker);
+    _chunker=h4.repeatWhile(
+        []{ return _matched!=h4pRoamers.end(); },
+        (H4P_GATEKEEPER_STAGGER * 3000) / 2, // 1.5 * ping t/o
+        []{
+            if(_matched!=h4pRoamers.end()){
+                auto p=*_matched;
+                string mip=p->getIP();
+                if(mip.size()){
+                    _pop.ip = ipaddr_addr(mip.data());
+                    _pop.reverse=p;
+                    ping_start(&_pop);
+                } 
+                else _matched++;
+            }
+        }
+    );
+}
+
 #if H4P_LOG_MESSAGES
 void H4P_Gatekeeper::info() { 
     H4Service::info();
     if(h4pRoamers.size()){
         reply(" Roamers:");
-        for(auto const& r:h4pRoamers) reply("  %s",CSTR(r->_describe()));
+        for(auto const& r:h4pRoamers) reply("  %s ",CSTR(r->_describe()));
     }
 }
 #endif
@@ -56,11 +91,17 @@ void H4P_Gatekeeper::info() {
 void H4P_Gatekeeper::svcUp(){
     h4pRoamers.shrink_to_fit();
     for(auto const& r:h4pRoamers) r->_startSniffing();
+    h4.every(H4P_GATEKEEPER_SCAVENGE,_scavenge,nullptr,H4P_TRID_GATE,true);
     H4Service::svcUp();
 }
 
 void H4P_Gatekeeper::svcDown(){
-    for(auto const& r:h4pRoamers) r->_stopSniffing();
+    h4.cancelSingleton(H4P_TRID_GATE);
+    h4.cancel(_chunker);
+    for(auto &r:h4pRoamers) {
+        r->_stopSniffing();
+        r->_ip="";
+    }
     H4Service::svcDown();
 }
 //
@@ -69,48 +110,18 @@ void H4P_Gatekeeper::svcDown(){
 extern H4P_ROAMER_MAP          h4pRoamers;
 
 void  h4pRoamer::_announce(const string& ip){
-    bool b=ip.size();
-    if(b ^ _present){
-        _present=b;
-        h4psysevent(_name,H4PE_PRESENCE,"%s",CSTR(ip));
+    if(ip!=_ip){
+        Serial.printf("%s _announce ip CHANGE %s to %s\n",_name.data(),_ip.data(),ip.data());
+        _ip=ip;
+        h4psysevent(_name,H4PE_PRESENCE,"%s",_ip.data());
     }
 }
 //
-//      h4pRoamingIP
+//      IP
 //
-#ifdef ARDUINO_ARCH_ESP8266
+h4pRoamingIP::h4pRoamingIP(const string& name,const string& id): h4pRoamer(name,id){}
 
-h4pRoamingIP::h4pRoamingIP(const string& name,const string& id): h4pRoamer(name,id){ _commonCTOR(); }
-
-h4pRoamingIP::h4pRoamingIP(const string& name,const IPAddress& ip): h4pRoamer(name,"unset"){
-    _id=ip.toString().c_str();
-    _commonCTOR();
-}
-
-void h4pRoamingIP::_commonCTOR(){
-    memset(&_pop,'\0',sizeof(ping_option));
-    _pop.count = 1;    //  try to ping how many times
-    _pop.coarse_time = 1;  // ping interval
-    _pop.ip = ipaddr_addr(_id.c_str());
-    _pop.reverse=this;
-    ping_regist_recv(&_pop,_ping_recv_cb);
-    ping_regist_sent(&_pop,NULL);
-}
-
-void h4pRoamingIP::_ping_recv_cb(void *opt, void *resp){
-    auto pOpt=static_cast<struct ping_option*>(opt);
-    auto caller=reinterpret_cast<h4pRoamingIP*>(pOpt->reverse);
-    int v=(1+static_cast<struct ping_resp*>(resp)->ping_err);
-    IPAddress ip(pOpt->ip);
-    h4.queueFunction([=](){ caller->_announce(v ? ip.toString().c_str():""); });
-}
-
-void h4pRoamingIP::_startSniffing(){
-    static uint32_t stagger=0;
-    uint32_t stag=H4P_IPPD_RATE / (1+h4pRoamers.size());
-    h4.once(stagger,[=]{ _pinger=h4.everyRandom(H4P_PJ_LO,H4P_PJ_HI,[=](){ ping_start(&_pop); },nullptr,H4P_TRID_IPPD); });
-    stagger+=stag;
-}
+h4pRoamingIP::h4pRoamingIP(const string& name,const IPAddress& ip): h4pRoamer(name,ip.toString().c_str()){}
 //
 //      MDNS
 //
@@ -121,25 +132,19 @@ h4pRoamingDotLocal::h4pRoamingDotLocal(const string& name,const string& service,
         localList[name]=this;
 }
 
-void h4pRoamingDotLocal::_startSniffing(){
-    if(!hsq) hsq=MDNS.installServiceQuery(CSTR(_service),CSTR(_protocol), h4pMDNScb);
-}
+void h4pRoamingDotLocal::_startSniffing(){ if(!hsq) hsq=MDNS.installServiceQuery(CSTR(_service),CSTR(_protocol), h4pMDNScb); }
 
 void h4pRoamingDotLocal::_stopSniffing(){ 
     MDNS.removeServiceQuery(hsq); 
     hsq=0;
 }
-#endif
 //
 //      UPNP
 //
 h4pRoamingUPNP::h4pRoamingUPNP(const string& name,const string& tag,const string& id): _tag(tag), h4pRoamer(name,id){ 
-    _pUPNP=require<H4P_UPNPServer>(upnpTag());
-    h4pregisterhandler("uprh",H4PE_UPNP,[=](const string& svc,H4PE_TYPE t,const string& msg){
-        auto vs=split(msg,",");
-        if(vs[1]==_tag) _announce(vs[0]);
-    });
+    require<H4P_UPNPServer>(upnpTag());
+    h4pregisterhandler(name,H4PE_UPNP,[=](const string& svc,H4PE_TYPE t,const string& msg){ if(svc==_id) _announce(msg); });
 }
 
-void h4pRoamingUPNP::_startSniffing(){ _pUPNP->_listenTag(_tag,_id); }
+void h4pRoamingUPNP::_startSniffing(){ H4P_UPNPServer::_listenTag(_tag,_id); }
 #endif

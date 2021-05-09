@@ -4,7 +4,7 @@ H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, larger Q size fo
 #define TREBLE  D8
 #define BASS    D7
 
-H4P_ToneController h4tc; // defaults to metornome = 60 b.p.m.
+H4P_ToneController h4tc; // defaults to metronome = 60 b.p.m.
 
 H4P_Voice vox_t(TREBLE);
 H4P_Voice vox_b(BASS);
@@ -34,7 +34,7 @@ uint32_t T;
 
 void h4setup(){
   h4tc.metronome(165); // Beats per minute (BPM) 
-  T=h4tc.length(tom_t); // musical time length in mS so we knwo when to srat next piece
+  T=h4tc.length(tom_t); // musical time length in mS so we know when to start next piece
   Serial.printf("You should now hear the melody of 'Take on Me' by Aha\n");
   vox_t.play(tom_t);
   h4.once(T+5000,[]{ // for a bit of breathing space
