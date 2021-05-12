@@ -1,4 +1,6 @@
+//#define H4P_VERBOSE 1
 #include<H4Plugins.h>
+//H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
 H4_USE_PLUGINS(0,20,true) // Serial baud rate, Q size, SerialCmd autostop
 //
 //  This is designed for an external alarm box, which will only "arm" itself after dark
@@ -15,20 +17,21 @@ H4_USE_PLUGINS(0,20,true) // Serial baud rate, Q size, SerialCmd autostop
 const char* WIFI_SSID="XXXXXXXX";
 const char* WIFI_PASS="XXXXXXXX";
 const char* MQTT_SERVER="http://192.168.1.4:1883";
-
 const char* MQTT_USER="";
 const char* MQTT_PASS="";
-const char* REMOTE_UPDATE_URL="http://192.168.1.4:1880/update";
+//const char* REMOTE_UPDATE_URL="http://192.168.1.4:1880/update";
 
 boolean armed=false;
 
+//H4P_SerialLogger slog;
 H4P_PinMachine h4gm;
 H4P_Signaller h4fc;
 H4P_WiFi h4wifi(WIFI_SSID,WIFI_PASS);
 H4P_AsyncMQTT mqtt(MQTT_SERVER,MQTT_USER,MQTT_PASS);
-H4P_ConditionalSwitch h4onof([](){ return armed; },SQUAWK,ACTIVE_HIGH,OFF,H4P_UILED_RED);
+H4P_LinkMaster  lynx;
+H4P_ConditionalSwitch h4onof([](){ return armed; },SQUAWK,ACTIVE_HIGH);
 H4P_UPNPServer h4upnp;
-H4P_RemoteUpdate h4ru(REMOTE_UPDATE_URL);
+H4P_RemoteUpdate h4ru;
 
 h4pPolled ark(LIGHT,INPUT,ACTIVE_HIGH,5000);
 
@@ -57,7 +60,7 @@ void onGPIO(int pin,int value){ if(pin==LIGHT) armingStateChange(value); }
 
 void h4pGlobalEventHandler(const string& svc,H4PE_TYPE t,const string& msg){
     switch(t){
-        H4P_DEFAULT_SYSTEM_HANDLER
+//        H4P_DEFAULT_SYSTEM_HANDLER
         H4P_FUNCTION_ADAPTER_GPIO;
         case H4PE_SERVICE:
             H4P_SERVICE_ADAPTER(Mqtt);

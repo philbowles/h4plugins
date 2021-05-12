@@ -39,7 +39,6 @@ enum H4P_SVC_CONTROL {
 };
 
 class H4P_SerialCmd: public H4Service {        
-        static  string          _fname; // cos rd/w are static :)
 
                 VSCMD(_config);
                 VSCMD(_get);
@@ -104,7 +103,6 @@ class H4P_SerialCmd: public H4Service {
         static  uint32_t        write(const string& fn,const string& data,const char* mode="w");
 //      syscall only
                 uint32_t        _executeCmd(string topic, string pload);
-                void            _init() override;
         static  void            _persist();
                 uint32_t        _simulatePayload(string flat,const char* src=cmdTag());
 };

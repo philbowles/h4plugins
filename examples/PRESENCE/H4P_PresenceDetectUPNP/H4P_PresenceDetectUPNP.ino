@@ -11,7 +11,7 @@ int occupancy=0;
 IPAddress htcIP(192,168,1,252);
 
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","detector");
-H4P_BinarySwitch h4onof(D6,ACTIVE_HIGH,OFF);
+H4P_BinarySwitch h4onof(D6,ACTIVE_HIGH);
 
 void onPRESENCE(const string& who,bool b){
   if(b) occupancy++;

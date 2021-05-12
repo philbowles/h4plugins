@@ -1,0 +1,107 @@
+void h4pregisterhandler(const string& svc,uint32_t t,H4P_FN_EVENTHANDLER f);
+void h4punregisterhandler(const string& svc,uint32_t t);
+void h4pevent(const string& svc,H4PE_TYPE t,const string& msg="");
+void h4pOnEvent(H4PE_TYPE t,H4P_FN_USEREVENT f);
+extern string h4pGetErrorMessage(uint32_t e);
+extern string h4pGetEventName   (H4PE_TYPE e);
+extern string h4pGetTaskType    (uint32_t e);
+extern string h4pGetTaskName    (uint32_t e);
+extern void   h4pClearEvent     (H4PE_TYPE e);
+void    h4pFactoryReset();
+void    h4pReboot();
+
+string  h4preplaceparams(const string& s);
+T* h4puncheckedcall(const string& svc){ return h4pmap.count(svc) ? static_cast<T*>(h4pmap[svc]):nullptr; }
+
+template<typename... Args>
+void h4psysevent(const string& svc,H4PE_TYPE t,const string& fmt, Args... args){
+    char* buff=static_cast<char*>(malloc(H4PE_BUFFER+1));
+    snprintf(buff,H4PE_BUFFER,CSTR(fmt),args...);
+    h4pevent(svc,t,buff);
+    free(buff);
+}
+
+void h4puiAdd(const string& n,H4P_UI_TYPE t,string h="u",const string& v="",uint8_t c=0);
+void h4puiSync(const string& n,const string& v="");
+
+require(const string& svc){
+        void reply(const char* f, Args... args){
+                h4pregisterhandler(_me,_filter,[this](const string& s,H4PE_TYPE t,const string& m){ _sysHandleEvent(s,t,m); });
+        virtual void                info();
+        virtual void                svcDown(){ YEVENT(H4PE_SERVICE,CSTR(stringFromInt(_running=false))); }
+        virtual void                svcUp(){ YEVENT(H4PE_SERVICE,CSTR(stringFromInt(_running=true))); }
+        void    center(){ PIPELINE(1,npLIMITER)->center(); }
+        int     getValue(){ return PIPELINE(1,npLIMITER)->getValue(); }
+        void    setPercent(int v){ PIPELINE(1,npLIMITER)->setPercent(v); }
+        void    setToMax(){ PIPELINE(1,npLIMITER)->setToMax(); }
+        void    setToMin(){ PIPELINE(1,npLIMITER)->setToMin(); }
+        void    setValue(int v){ PIPELINE(1,npLIMITER)->setValue(v); }
+    virtual bool        isAnalog() override { return false; }
+    virtual bool        isOutput() override { return true; }
+            void        logicalWrite(bool b){ turn(b); }
+            void        turnOff(){ turn(false); }
+            void        turnOn(){ turn(true); }
+            void        toggle(){ turn(!_normalise(_r)); }
+            void        turn(bool b);
+    string h4pGetErrorMessage(uint32_t e){ return cmdErrors.count(e) ? cmdErrors[e]:string("No such error (")+stringFromInt(e)+")"; }
+    string h4pGetEventName   (H4PE_TYPE e){ return eventTypes.count(e) ? eventTypes[e]:""; }
+    string h4pGetTaskType    (uint32_t e){ return taskTypes.count(e) ? taskTypes[e]:stringFromInt(e,"?%02d?"); }
+    string h4pGetTaskName    (uint32_t e){ return taskNames.count(e) ? taskNames[e]:giveTaskName(e); }
+    void   h4pClearEvent     (H4PE_TYPE e){ eventTypes.erase(e); }
+                void            change(string ssid,string psk);
+                void            info() override;
+        virtual void            svcDown() override;
+        virtual void            svcUp() override;
+                void            uiAddBoolean(const string& name,const string& section="u"){ _uiAdd(name,H4P_UI_BOOL,section); }
+                void            uiAddDropdown(const string& name,H4P_NVP_MAP options,const string& section="u");
+                void            uiAddGlobal(const string& name,const string& section="u"){ _uiAdd(name,H4P_UI_TEXT,section); }
+                void            uiAddImg(const string& name,const string& url,const string& section="u"){ _uiAdd(name,H4P_UI_IMG,section,url); }
+                void            uiAddImgButton(const string& name,const string& section="u"){ _uiAdd(name,H4P_UI_IMGBTN,section); }
+                void            uiAddInput(const string& name,const string& section="u"){ _uiAdd(name,H4P_UI_INPUT,section); }
+                void            uiAddText(const string& name,const string& v,const string& section="u"){ _uiAdd(name,H4P_UI_TEXT,section,v); }
+                void            uiAddText(const string& name,int v,const string& section="u"){ _uiAdd(name,H4P_UI_TEXT,section,stringFromInt(v)); }
+                void            uiAddAllUsrFields(const string& section="u");
+                void            uiSetBoolean(const string& ui,const bool b){ _sendSSE(ui,CSTR(stringFromInt(b))); }
+                void            uiSetValue(const string& ui,const int f){ _sendSSE(ui,CSTR(stringFromInt(f))); }
+                void            uiSetValue(const string& ui,const string& value){ _sendSSE(ui,CSTR(value)); }
+                void            uiMessage(const string& msg, Args... args){ // variadic T<>
+                                void            friendlyName(const string& name){ h4p[nameTag()]=name; }
+replaceParamsFile
+        static uint32_t     length(const string& tune);
+        static void         metronome(uint32_t tempo);
+        static void         multiVox(H4P_TUNE tune,uint32_t tempo,int transpose=0);
+        static string       setVolume(const string& s,uint8_t volume);
+        static void         siren(H4P_SIREN S,uint8_t pin,uint32_t duration);
+        static void         tone(uint8_t pin,uint32_t freq,uint32_t duration=0,uint8_t volume=8);
+        void         chromaticRun(const string& nStart,const string& nFinish,const char duration);
+        void         play(const string& tune,int transpose=0);
+        void         rest(const char duration){ play(string("R  ").append(1,duration).append(1,' ')); }
+H4P_sirenBuzz(p,d) h4tc.siren(H4P_SIREN_BUZZ,p,d)
+H4P_sirenChirp(p,d) h4tc.siren(H4P_SIREN_CHIRP,p,d)
+H4P_sirenHiLo(p,d) h4tc.siren(H4P_SIREN_HILO,p,d)
+H4P_sirenScreech(p,d) h4tc.siren(H4P_SIREN_SCREECH,p,d)
+H4P_sirenWoopWoop(p,d) h4tc.siren(H4P_SIREN_WOOPWOOP,p,d)
+                uint32_t	clockEPOCH() { time_t now = 0; return _mss00 ? time(&now) : 0; }  // Current number of seconds since EPOCH.
+                uint32_t	clockEPOCHLocal() { return clockEPOCH() + (_tzo * 60); }  // Current number of seconds since EPOCH plus TZ offset.
+                string		clockStrTimeLocal() { return strTime( (clockEPOCHLocal() % 86400) * 1000 ); }  // Current time + TZ as string HH:MM:SS.
+                string 		strfTime(uint32_t t);
+                string 		strfDate(uint32_t t);
+                string 		strfDateTime(char fmt[] = "%a %Y-%m-%d %H:%M:%S", uint32_t t=0);
+        static  int 		DST_EU(uint32_t t);  // DST offset for t in EU (inc UK).
+        static  int 		DST_USA(uint32_t t);  // DST offset for t in USA.
+///
+                void        at(const string& when,bool onoff);
+                void        change(const string& ntp1,const string& ntp2);
+                string 		clockTime() { return _mss00 ? strTime(msSinceMidnight()) : "0"; }
+                void        daily(const string& when,bool onoff);
+                uint32_t 	msSinceMidnight() { return _mss00 + millis(); }
+                int      	parseTime(const string& ts);
+                string      minutesFromNow(uint32_t s);
+                void        setSchedule(H4P_SCHEDULE);
+#if H4P_LOG_MESSAGES
+                void        info() override;
+#endif
+                string 		strTime(uint32_t t);
+                void        sync();
+                void        tz(int tzOffset);
+                string 		upTime();

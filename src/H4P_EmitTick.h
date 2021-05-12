@@ -46,10 +46,4 @@ class H4P_EmitTick: public H4Service {
                 }
 
         H4P_EmitTick(): H4Service(tickTag()){}
-/*
-                void    info() override {
-                    H4Service::info();
-                    reply("Upsecs %u",_uptime);
-                }
-*/
 };

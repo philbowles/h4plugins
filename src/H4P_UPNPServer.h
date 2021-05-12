@@ -64,8 +64,9 @@ class H4P_UPNPServer: public H4Service {
         static  string 	        replaceParamsFile(const string &f){ return h4preplaceparams(CSTR(H4P_SerialCmd::read(f))); }
     public:                
         H4P_UPNPServer(const string& name=""): H4Service(upnpTag(),H4PE_GVCHANGE|H4PE_VIEWERS){
-            h4p.gvSetstring(nameTag(),name,true);
             _pWiFi=depend<H4P_WiFi>(wifiTag());
+            if(!h4p.gvExists(nameTag())) h4p.gvSetstring(nameTag(),(name=="") ? (uppercase(h4Tag())+" "+deviceTag()+" "+string(h4p[chipTag()])):name,true);
+            XLOG("UPNP name %s",CSTR(h4p[nameTag()]));
         }
                 void            friendlyName(const string& name){ h4p[nameTag()]=name; }
 #if H4P_LOG_MESSAGES

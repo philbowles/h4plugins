@@ -3,14 +3,14 @@
 H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 
 h4pRoamingDotLocal dot("H3","smb","tcp"); // my satellite TV receiver
-h4pRoamingDotLocal box("box","http","tcp"); // my satellite TV receiver
+h4pRoamingDotLocal box("box","http","tcp"); // my main pc
 
 int occupancy=0;
 
 IPAddress htcIP(192,168,1,252);
 
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","detector");
-H4P_BinarySwitch h4onof(D6,ACTIVE_HIGH,OFF);
+H4P_BinarySwitch h4onof(D6,ACTIVE_HIGH);
 
 void onPRESENCE(const string& who,bool b){
   if(b) occupancy++;

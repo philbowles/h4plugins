@@ -2,7 +2,7 @@
 H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","eighteen");
-H4P_BinarySwitch h4onof(D6,ACTIVE_HIGH,OFF);
+H4P_BinarySwitch h4onof(D6,ACTIVE_HIGH);
 
 h4pRoamingDotLocal dot("H3","smb","tcp");
 

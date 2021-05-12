@@ -48,7 +48,7 @@ void H4P_WiFi::_startAP(){
         opts.pop_back();
     }
     WiFi.scanDelete();
-    Serial.printf("OPTS=%s \n",CSTR(opts));
+
     _uiAdd(ssidTag(),H4P_UI_DROPDOWN,"s",opts);
     _uiAdd(pskTag(),H4P_UI_INPUT,"s");
     _uiAdd(deviceTag(),H4P_UI_INPUT,"s");

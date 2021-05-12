@@ -62,6 +62,8 @@ std::unordered_map<char,string>	H4P_Signaller::_morse={
 //
 //      H4P_Signaller
 //
+#if H4P_CMDLINE_FLASHERS
+
 uint32_t H4P_Signaller::__validator(vector<string> vs,H4_FN_MSG f){
     return _guard1(vs,[=](vector<string> V){
         auto vs=split(V.back(),",");
@@ -75,40 +77,6 @@ uint32_t H4P_Signaller::__validator(vector<string> vs,H4_FN_MSG f){
         if(H4P_PinMachine::isManaged(p) && H4P_PinMachine::isOutput(p)) return H4_CMD_NOT_NOW; /// just is op?
         return static_cast<H4_CMD_ERROR>(f(vs));
     });
-}
-
-void H4P_Signaller::_dynaLoad(uint8_t pin,H4PM_SENSE active,uint8_t col,H4FC_FN_F1 f1,H4FC_FN_F2 f2){
-    auto opp=static_cast<h4pOutput*>(H4P_PinMachine::isManaged(pin));
-    if(opp && opp->isOutput()) h4pFlashMap[pin]=f2(opp);
-    else {
-        new h4pOutput(pin,active,OFF,col);
-        _dynaLoad(pin,active,col,f1,f2);
-    }
-}
-
-void H4P_Signaller::_flash(uint32_t period,uint8_t duty,uint8_t pin,H4PM_SENSE active,uint8_t col){
-    stopPin(pin);
-	if(duty < 100){
-        _dynaLoad(pin,active,col,
-            [](H4Flasher* fp){ fp->PWM(); },
-            [period,duty](h4pOutput* opp){ return new H4Flasher(opp,period,duty); }
-        );
-	}
-}
-
-void H4P_Signaller::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg){
-    if(t==H4PE_SIGNAL){
-    #if H4P_ASSUMED_LED
-        if(msg.size()){
-            vector<string> parts=split(msg,",");
-            flashMorse(CSTR(parts[1]),STOI(parts[0]),H4P_ASSUMED_LED,H4P_ASSUMED_SENSE);
-        } else stopPin(H4P_ASSUMED_LED);
-    #else
-        YEVENT(H4PE_SYSWARN,"NO SIGNAL LED DEFINED");
-    #endif
-    }    
-//    else
-//            Serial.printf("%s CATASTROPHE %s %s %s\n",CSTR(_me),CSTR(svc),CSTR(h4pGetEventName(t)),CSTR(msg));
 }
 
 uint32_t H4P_Signaller::_morse(vector<string> vs){ 
@@ -160,6 +128,39 @@ uint32_t H4P_Signaller::_stop(vector<string> vs){
         } 
         return H4_CMD_OK;
     });
+}
+#endif
+
+void H4P_Signaller::_dynaLoad(uint8_t pin,H4PM_SENSE active,uint8_t col,H4FC_FN_F1 f1,H4FC_FN_F2 f2){
+    auto opp=static_cast<h4pOutput*>(H4P_PinMachine::isManaged(pin));
+    if(opp && opp->isOutput()) h4pFlashMap[pin]=f2(opp);
+    else {
+        new h4pOutput(pin,active,OFF,col);
+        _dynaLoad(pin,active,col,f1,f2);
+    }
+}
+
+void H4P_Signaller::_flash(uint32_t period,uint8_t duty,uint8_t pin,H4PM_SENSE active,uint8_t col){
+    stopPin(pin);
+	if(duty < 100){
+        _dynaLoad(pin,active,col,
+            [](H4Flasher* fp){ fp->PWM(); },
+            [period,duty](h4pOutput* opp){ return new H4Flasher(opp,period,duty); }
+        );
+	}
+}
+
+void H4P_Signaller::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg){
+    if(t==H4PE_SIGNAL){
+    #if H4P_ASSUMED_LED
+        if(msg.size()){
+            vector<string> parts=split(msg,",");
+            flashMorse(CSTR(parts[1]),STOI(parts[0]),H4P_ASSUMED_LED,H4P_ASSUMED_SENSE);
+        } else stopPin(H4P_ASSUMED_LED);
+    #else
+        YEVENT(H4PE_SYSWARN,"NO SIGNAL LED DEFINED");
+    #endif
+    }    
 }
 
 void H4P_Signaller::flashMorse(const char* pattern,uint32_t timebase,uint8_t pin,H4PM_SENSE active,uint8_t col){// flash arbitrary pattern ... --- ... convert dot / dash into Farnsworth Timing
@@ -281,7 +282,6 @@ void H4Flasher::throb(){
     for(int i=0;i<(1+nSlices);i++) plan.push_back(H4P_ANALOG_MAX - (i * thickness));
     vector<uint32_t> tr=plan;
     plan.insert(plan.end(), tr.rbegin(), tr.rend());
-//    for(auto const& p:plan) Serial.printf("Plan %d\n",p);
 
     _opp->turn(ON);
     _timer=h4.every(H4PM_GRANULARITY,[=]{

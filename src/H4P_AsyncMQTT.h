@@ -48,12 +48,11 @@ class H4P_AsyncMQTT: public H4Service, public PangolinMQTT{
                 string          device;
                 string          prefix=string(h4Tag()).append("/");
                 struct H4P_LWT  _lwt;
-                unordered_set<string> _reportList={binTag(),boardTag(),ipTag()};
+                unordered_set<string> _reportList={binTag(),ipTag(),h4pTag()};
 
                 VSCMD(_change);
 
                 void        _commonStartup(){
-//                    h4p.gvSetstring(pmvTag(),PANGO_VERSION);
                     h4p.gvSetInt(nDCXTag(),0,false);
                     depend<H4P_WiFi>(wifiTag());
                     _addLocals({
@@ -68,25 +67,22 @@ class H4P_AsyncMQTT: public H4Service, public PangolinMQTT{
     protected:
         virtual void        _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override;
     public:
-//#if H4P_USE_WIFI_AP
+#if H4P_USE_WIFI_AP
         H4P_AsyncMQTT(H4P_LWT lwt={"","",0,false}): _lwt(lwt), H4Service(mqttTag(),H4PE_GVCHANGE|H4PE_VIEWERS){
-            h4p.gvSetstring(brokerTag(),"",true);
-            h4p.gvSetstring(mQuserTag(),"",true);
-            h4p.gvSetstring(mQpassTag(),"",true);
+//            h4p.gvSetstring(brokerTag(),"",true);
+//            h4p.gvSetstring(mQuserTag(),"",true);
+//            h4p.gvSetstring(mQpassTag(),"",true);
             _commonStartup();
         }
-//#else
-//        explicit H4P_AsyncMQTT(): _lwt{"","",0,false},H4Service(mqttTag(),H4PE_GVCHANGE){ Serial.printf("H4P_AsyncMQTT EXPLICIT LOAD!",""); }
-
-        H4P_AsyncMQTT(string url, string user="",string pass="",H4P_LWT lwt={"","",0,false}):
-            _lwt(lwt), H4Service(mqttTag(),H4PE_GVCHANGE|H4PE_VIEWERS)
-        {
+#else
+        explicit H4P_AsyncMQTT(): H4Service(mqttTag(),H4PE_NOOP){}
+        H4P_AsyncMQTT(string url, string user="",string pass="",H4P_LWT lwt={"","",0,false}): _lwt(lwt), H4Service(mqttTag(),H4PE_GVCHANGE|H4PE_VIEWERS){
             h4p.gvSetstring(brokerTag(),url,true);
             h4p.gvSetstring(mQuserTag(),user,true);
             h4p.gvSetstring(mQpassTag(),pass,true);
             _commonStartup();
         }
-//#endif
+#endif
                 void        addReportingItem(const string& ri){ _reportList.insert(ri); }
                 void        change(const string& broker,const string& user,const string& passwd);
                 void        publishDevice(const string& topic,const string& payload,uint8_t qos=0, bool retain=false){ xPublish(CSTR(string(prefix+topic)),payload,qos,retain); }

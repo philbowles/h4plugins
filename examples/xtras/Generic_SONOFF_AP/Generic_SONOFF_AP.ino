@@ -1,7 +1,7 @@
 /*
  * Read documentation re using AP MODE first!!!
  * 
- * Edit plugins_config.h, set
+ * Edit config_plugins.h, set
  * 
  * #define H4P_USE_WIFI_AP          1
  * 

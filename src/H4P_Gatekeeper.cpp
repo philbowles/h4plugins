@@ -31,11 +31,18 @@ SOFTWARE.
 #include<H4P_Gatekeeper.h>
 #include<H4P_UPNPServer.h>
 
+H4P_ROAMER_MAP              h4pRoamers;
+
 H4_TIMER                    H4P_Gatekeeper::_chunker=nullptr;
 H4P_ROAMER_MAP::iterator    H4P_Gatekeeper::_matched;
 struct  ping_option         H4P_Gatekeeper::_pop;
 
 unordered_map<string,h4pRoamingDotLocal*> h4pRoamingDotLocal::localList;
+
+h4pRoamer::h4pRoamer(const string& name,const string& id): _name(name),_id(id){
+    require<H4P_Gatekeeper>("gate");
+    h4pRoamers.push_back(this);
+}
 
 void h4pMDNScb(MDNSResponder::MDNSServiceInfo serviceInfo, MDNSResponder::AnswerType answerType, bool p_bSetContent) {
     if(answerType ==  MDNSResponder::AnswerType::IP4Address){
@@ -62,7 +69,7 @@ void H4P_Gatekeeper::_scavenge() {
     h4.cancel(_chunker);
     _chunker=h4.repeatWhile(
         []{ return _matched!=h4pRoamers.end(); },
-        (H4P_GATEKEEPER_STAGGER * 3000) / 2, // 1.5 * ping t/o
+        (H4P_GK_STAGGER * 3000) / 2, // 1.5 * ping t/o
         []{
             if(_matched!=h4pRoamers.end()){
                 auto p=*_matched;
@@ -71,8 +78,7 @@ void H4P_Gatekeeper::_scavenge() {
                     _pop.ip = ipaddr_addr(mip.data());
                     _pop.reverse=p;
                     ping_start(&_pop);
-                } 
-                else _matched++;
+                } else _matched++;
             }
         }
     );
@@ -81,17 +87,15 @@ void H4P_Gatekeeper::_scavenge() {
 #if H4P_LOG_MESSAGES
 void H4P_Gatekeeper::info() { 
     H4Service::info();
-    if(h4pRoamers.size()){
-        reply(" Roamers:");
-        for(auto const& r:h4pRoamers) reply("  %s ",CSTR(r->_describe()));
-    }
+    reply(" Roamers:");
+    for(auto const& r:h4pRoamers) reply("  %s ",CSTR(r->_describe()));
 }
 #endif
 
 void H4P_Gatekeeper::svcUp(){
     h4pRoamers.shrink_to_fit();
     for(auto const& r:h4pRoamers) r->_startSniffing();
-    h4.every(H4P_GATEKEEPER_SCAVENGE,_scavenge,nullptr,H4P_TRID_GATE,true);
+    h4.every(H4P_GK_SCAVENGE,_scavenge,nullptr,H4P_TRID_GATE,true);
     H4Service::svcUp();
 }
 
@@ -107,13 +111,12 @@ void H4P_Gatekeeper::svcDown(){
 //
 //      roamers
 //
-extern H4P_ROAMER_MAP          h4pRoamers;
+//extern H4P_ROAMER_MAP          h4pRoamers;
 
 void  h4pRoamer::_announce(const string& ip){
     if(ip!=_ip){
-        Serial.printf("%s _announce ip CHANGE %s to %s\n",_name.data(),_ip.data(),ip.data());
         _ip=ip;
-        h4psysevent(_name,H4PE_PRESENCE,"%s",_ip.data());
+        h4psysevent(_name,H4PE_PRESENCE,"%d",_ip.size());
     }
 }
 //
@@ -147,4 +150,5 @@ h4pRoamingUPNP::h4pRoamingUPNP(const string& name,const string& tag,const string
 }
 
 void h4pRoamingUPNP::_startSniffing(){ H4P_UPNPServer::_listenTag(_tag,_id); }
+
 #endif

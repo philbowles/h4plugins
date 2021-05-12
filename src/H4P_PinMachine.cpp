@@ -36,10 +36,7 @@ void H4P_PinMachine::_run(){
     for(auto const& p:h4pPinMap) {
         auto ptr=p.second;
         uint32_t metal=ptr->isAnalog() ? analogRead(p.first):digitalRead(p.first);
-        if(metal!=ptr->_r) {
-//            Serial.printf("P%02d Hardware change metal=%d\n",p.first,metal);
-            ptr->inject(metal,false);
-        }
+        if(metal!=ptr->_r) ptr->inject(metal,false);
     }
 }
 

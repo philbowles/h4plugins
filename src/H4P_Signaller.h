@@ -82,19 +82,21 @@ extern H4P_FLASHMAP h4pFlashMap;
 class H4P_Signaller: public H4Service {     
             void            _dynaLoad(uint8_t pin,H4PM_SENSE active,uint8_t col,H4FC_FN_F1 f1,H4FC_FN_F2 f2);
             void            _flash(uint32_t period,uint8_t duty,uint8_t pin,H4PM_SENSE active=ACTIVE_HIGH,uint8_t col=H4P_ASSUMED_COLOR);
+#if H4P_CMDLINE_FLASHERS
             uint32_t        __validator(vector<string> vs,H4_FN_MSG f);
-
             VSCMD(_morse);
             VSCMD(_onof);
             VSCMD(_patn);
             VSCMD(_pwm);
             VSCMD(_stop);
+#endif
     protected:
         virtual void        _handleEvent(const string& svc,H4PE_TYPE t,const string& msg);
     public:
         H4P_Signaller(): H4Service(winkTag(),H4PE_SIGNAL){
             require<H4P_PinMachine>(gpioTag());
             _running=true; // earliest possible start
+#if H4P_CMDLINE_FLASHERS
             _addLocals({
                 {_me,       { H4PC_H4, _pid, nullptr }}, 
                 {"morse",   { _pid, 0, CMDVS(_morse) }},
@@ -103,6 +105,7 @@ class H4P_Signaller: public H4Service {
                 {"pwm",     { _pid, 0, CMDVS(_pwm) }},
                 {stopTag(), { _pid, 0, CMDVS(_stop) }}
             });
+#endif
         }
              
             void 			flashMorse(const char *pattern, uint32_t timebase, uint8_t pin,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);	

@@ -60,15 +60,26 @@ void h4pevent(const string& svc,H4PE_TYPE t,const string& msg){
     if(h4pevt.count(t)) for(auto const& e:h4pevt[t]) e.second(svc,t,msg);
 }
 
-void h4pOnEvent(H4PE_TYPE t,H4P_FN_USEREVENT e){
-    h4pregisterhandler(userTag(),static_cast<uint32_t>(t),[e](const string& i,H4PE_TYPE t,const string& m){ e(m); });
-}
+void h4pOnEvent(H4PE_TYPE t,H4P_FN_USEREVENT e){ h4pregisterhandler(userTag(),static_cast<uint32_t>(t),[e](const string& i,H4PE_TYPE t,const string& m){ e(m); }); }
 //
 //      Lifecycle callbacks
 //
 [[noreturn]] void h4pFactoryReset(){ h4psysevent(userTag(),H4PE_FACTORY,""); }// QEVENT(H4PE_FACTORY); }
 
 [[noreturn]] void h4pReboot(){ h4psysevent(userTag(),H4PE_REBOOT,""); }
+
+#ifdef ARDUINO_ARCH_ESP32
+string getTerminalName(const string& s) {
+//#if platform?
+   char sep = '\\';
+//#else
+//   char sep = '/';
+//#endif
+   size_t i = s.rfind(sep, s.length());
+   if (i != string::npos) return(s.substr(i+1, s.length() - i));
+   return("");
+}
+#endif
 
 #if SANITY
 #include<H4P_PinMachine.h>
@@ -85,6 +96,20 @@ void h4StartPlugins(){
 #else
 void h4StartPlugins(){
 #endif
+    #ifdef ARDUINO_ARCH_ESP32
+    string terminalname=getTerminalName(h4p[binTag()]); // sigh...just WHY????
+    h4p[binTag()]=terminalname;
+    #endif
+    //
+    HAL_FS.begin();
+    for(auto const& i:split(H4P_SerialCmd::read(glob()),RECORD_SEPARATOR)){
+        vector<string> nv=split(i,UNIT_SEPARATOR);
+        h4pGlobal[nv[0]]=h4proxy{nv[0],nv.size() > 1 ? nv[1]:"",true};
+        Serial.printf("%s=%s\n",nv[0].data(),h4pGlobal[nv[0]].data());
+    }
+    h4p.gvInc(NBootsTag());
+    h4p.gvSave(NBootsTag());
+
     h4psysevent(h4pTag(),H4PE_SYSINFO,"%s",H4P_VERSION);
     h4pevent(h4pTag(),H4PE_BOOT);
     h4pevent(h4pTag(),H4PE_STAGE2);

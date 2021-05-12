@@ -32,7 +32,6 @@ class npANALOGTMP36: public npNODE { // aritmetic mean
     public:
         msg operator()(msg m) override {
             uint32_t mV=(m.load * 3275)/1024;
-//            Serial.printf("v=%d mV=%d ar=%d\n",m.load,mV,analogRead(A0));
             m.load=mV - 500; // e only deal with ints, caller will haveto scale or truncate 
             return m;
         }
@@ -202,7 +201,6 @@ class  npROLLINGAVERAGE: public npNODE {
     public:
         msg operator()(msg m) override {
             auto cma=((_cma * m.sigE) + m.load)/(m.sigE+1);
-//            Serial.printf("old cma=%d inst=%d sigE=%d new cma=%d\n",_cma,m.load,m.sigE,cma);
             m.load=_cma=cma;
             return m;
         }

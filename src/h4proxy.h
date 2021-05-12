@@ -42,6 +42,7 @@ class h4proxy {
         h4proxy& operator=(const int i){ return _set(stringFromInt(i)); }
         string& operator+(const string& s) const { static string tmp=_v + s; return tmp; }
         const char* c_str() const { return _v.c_str(); }
+        const char* data() const { return _v.data(); }
         operator const string& () const { return _v; }
         bool operator!=(const string& s) const { return s!=_v; }
         bool operator==(const string& s) const { return s==_v; }

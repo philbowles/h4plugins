@@ -260,7 +260,7 @@ Which emits an event of type `H4PE_MSG` with a message made up from `printf`-sty
 
 More importantly it can be "compiled out"
 
-If you edit [plugins_config.h](../src/plugins_config.h) and set:
+If you edit [config_plugins.h](../src/config_plugins.h) and set:
 
 ```cpp
 #define H4P_LOG_EVENTS      0

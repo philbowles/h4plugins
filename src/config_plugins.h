@@ -28,11 +28,11 @@ SOFTWARE.
 */
 #pragma once
 
-#define H4P_VERSION "3.0.0"
+#define H4P_VERSION "3.0.2"
 
 // Make sure you read the documentation and have arrangements in place for using AP mode :)
 // If you don't have the H4P_WiFiAP.cpp file, the linker will fail.
-#define H4P_USE_WIFI_AP         0
+#define H4P_USE_WIFI_AP         1
 /*
         DIAGNOSTICS
         comment out H4P_LOG_MESSAGES to prevent any Serial output of  H4PE_MSG EVENTs
@@ -52,10 +52,10 @@ SOFTWARE.
 
         H4P_UI_HEALTH = 1 adds Heap,Q,nLoops to UI when using heartbeat
 */
-#define SANITY                  1
+#define SANITY                  0
 #define H4P_LOG_MESSAGES        1
-#define H4P_SYS_LEVEL           2
-#define H4P_UI_HEALTH           1
+#define H4P_SYS_LEVEL           0
+#define H4P_UI_HEALTH           0
 /*
         HARDWARE ASSUMPTIONS
 
@@ -67,7 +67,7 @@ SOFTWARE.
 
         Finally, if you want to correctly visualise the LED on the web UI give it a color: the basic assumption is blue;
 
-        These affect the way wifi, mqtt and multfunction buttons do their signalling
+        These affect the way wifi, mqtt and multifunction buttons do their signalling
 */
 enum H4PM_SENSE:uint8_t {
     ACTIVE_LOW,
@@ -93,6 +93,8 @@ enum H4P_UILED_COLOR {
 /*
             TWEAKABLES
 */
+#define H4P_CMDLINE_FLASHERS     0
+
 #define H4P_REPLY_BUFFER       256
 #define H4PE_BUFFER            256
 #define H4P_REBOOT_DELAY      1000
@@ -113,6 +115,9 @@ enum H4P_UILED_COLOR {
 #define H4WF_AP_RATE           500
 #define H4WF_OTA_RATE         1500
 #define H4WF_EVT_TIMEOUT     30000
+
+#define H4P_GK_SCAVENGE      30000
+#define H4P_GK_STAGGER           1
 
 #define H4P_IPPD_RATE        10000
 #define H4P_PJ_SPREAD            5
@@ -140,3 +145,5 @@ enum H4P_UILED_COLOR {
 constexpr const char* h4pTag(){ return "H4P"; }
 constexpr const char* httpTag(){ return "http://"; }
 constexpr const char* rootTag(){ return "upnp:rootdevice"; }
+constexpr const char* rupdTag(){ return "updateURL"; }
+constexpr const char* glob(){ return "/glob"; }

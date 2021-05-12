@@ -32,15 +32,18 @@ SOFTWARE.
 #include<dillo_config.h>
 #include<pango_config.h>
 //
-string                   H4P_SerialCmd::_fname="/";
 
 extern std::unordered_map<string,H4Service*> h4pmap;
 extern bool h4punlocked;
 
 const char* __attribute__((weak)) giveTaskName(uint32_t id){ return "ANON"; }
 
+
 H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Service(cmdTag(),H4PE_FACTORY | H4PE_REBOOT){
-    _fname.append(_me);
+    h4p.gvSetstring(chipTag(),_HAL_uniqueName(""));
+    h4p.gvSetstring(boardTag(),replaceAll(H4_BOARD,"ESP8266_",""));
+    h4p.gvSetstring(h4pTag(),H4P_VERSION);
+
     _addLocals({
 #if SANITY
         {"sanity",     { 0,         0, CMD(h4pInventory) }},
@@ -69,8 +72,11 @@ H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Service(cmdTag(),H4PE_FACTORY | H
 #endif
         {"help",       { 0,         0, CMD(help) }}
     });
-    if(autoStop) QTHIS(svcDown);
-//    HAL_FS.begin();
+    if(autoStop) h4._unHook(_pid);
+    string ino=h4p[binTag()];
+    ino+="."+lowercase(H4_BOARD)+".bin";
+//    Serial.printf("full exported binary name=%s\n",ino.data());
+    h4p[binTag()]=ino;
 }
 
 H4P_CMDMAP_I H4P_SerialCmd::__exactMatch(const string& cmd,uint32_t owner){
@@ -96,14 +102,13 @@ uint32_t H4P_SerialCmd::_config(vector<string> vs){
         for(auto const& c:ci){
             vector<string> parts=split(c,"=");
             if(parts.size()>2) return H4_CMD_PAYLOAD_FORMAT;
-            if(!h4p.gvExists(parts[0])) return H4_CMD_NAME_UNKNOWN;
-            if(parts[0]==stateTag() && !h4punlocked) return H4_CMD_NOT_NOW; // dont like it but waaaaaaaay smaller / faster
-            pending[parts[0]]=parts.size() >1 ? parts[1]:"";
+            if(!h4p.gvExists(parts[0])) SYSWARN("CONFIG %s=%s name not known\n",parts[0].data(),parts[1].data());
+            else {
+                if(parts[0]==stateTag() && !h4punlocked) return H4_CMD_NOT_NOW; // dont like it but waaaaaaaay smaller / faster
+                pending[parts[0]]=parts.size() >1 ? parts[1]:"";
+            }
         }
-        for(auto const& p:pending) {
-            h4p[p.first]=p.second;
-//            h4psysevent(_me,H4PE_UIMSG,"CONFIG: %s now=%s",CSTR(p.first),CSTR(p.second));
-        }
+        for(auto const& p:pending) h4p[p.first]=p.second;
         return H4_CMD_OK;
     });
 }
@@ -151,7 +156,7 @@ uint32_t H4P_SerialCmd::_get(vector<string> vs){
     });
 }
 
-[[noreturn]] void H4P_SerialCmd::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg){
+void H4P_SerialCmd::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg){
     switch(t){
         case H4PE_FACTORY:
             clear(); 
@@ -160,23 +165,13 @@ uint32_t H4P_SerialCmd::_get(vector<string> vs){
     }
 }
 
-void H4P_SerialCmd::_init(){
-    HAL_FS.begin();
-    for(auto const& i:split(read(_fname),RECORD_SEPARATOR)){
-        vector<string> nv=split(i,UNIT_SEPARATOR);
-        h4pGlobal[nv[0]]=h4proxy{nv[0],nv.size() > 1 ? nv[1]:"",true};
-    }
-    gvInc(NBootsTag());
-    gvSave(NBootsTag());
-}
-
 void H4P_SerialCmd::_persist(){
     string items;
     for(auto const& p:h4pGlobal) if(p.second._save) items+=p.second.get()+RECORD_SEPARATOR;
     if(items.size()){
         items.pop_back();
-        if(h4p._running) write(_fname,items);
-    } // else Serial.printf("**** NOWT TO SAVE!!!\n"); 
+        if(h4p._running) write(glob(),items);
+    }
 }
 
 void H4P_SerialCmd::_run(){
@@ -193,9 +188,17 @@ void H4P_SerialCmd::_run(){
 }
 
 uint32_t H4P_SerialCmd::_simulatePayload(string flat,const char* src){ // refac
-    vector<string> vs=split(flat,"/");
+    // a bit of hoop-jumping to allow / characters in simulated payloads
+    vector<string> bt=split(flat,"\`");
+    string f2;
+    if(bt.size() > 1){
+		string esc=replaceAll(bt.back(),"/","\`");
+        bt.pop_back();
+        f2=join(bt,"/")+esc;
+    } else f2=flat;
+    vector<string> vs=split(f2,"/");
     if(vs.size()){
-		string pload=CSTR(H4PAYLOAD);
+		string pload=replaceAll(vs.back(),"\`","/");
 		vs.pop_back();
 		string topic=join(vs,"/");
 		return invokeCmd(topic,pload,src); // _invoke
@@ -243,7 +246,7 @@ void H4P_SerialCmd::addCmd(const string& name,uint32_t owner, uint32_t levID,H4_
 
 void H4P_SerialCmd::clear(){
     h4pGlobal.clear();
-    HAL_FS.remove(CSTR(_fname));
+    HAL_FS.remove(glob());
 }
 
 void H4P_SerialCmd::help(){ 
@@ -279,12 +282,10 @@ void H4P_SerialCmd::removeCmd(const string& s,uint32_t pid){ if(__exactMatch(s,p
 
 uint32_t H4P_SerialCmd::write(const string& fn,const string& data,const char* mode){
     File b=HAL_FS.open(CSTR(fn), mode);
-    b.print(CSTR(data));
-    uint32_t rv=b.size(); // ESP32 pain
+    b.print(data.data());
     b.close();
-    return rv; 
+    return data.size(); // fix this!!!!!!!!!!!!
 }
-// ifdef log events?
 
 uint32_t H4P_SerialCmd::_dump(vector<string> vs){
     return _guard1(vs,[this](vector<string> vs){
@@ -315,18 +316,12 @@ string H4P_SerialCmd::_dumpTask(task* t){
 //
 //      PERSISTENT STORAGE
 //
-void H4P_SerialCmd::_createProxy(const string& name,bool save){ 
-    if(!h4pGlobal.count(name)){
-//        Serial.printf("PROXY %s CREATED AS %s\n",CSTR(name),save ? "PERMANET":"TEMPORARY");
-        h4pGlobal[name]=h4proxy(name,"",save);
-    } 
-}
+void H4P_SerialCmd::_createProxy(const string& name,bool save){ if(!h4pGlobal.count(name)) h4pGlobal[name]=h4proxy(name,"",save); }
 
 void H4P_SerialCmd::_adjust(const string& name,int value){ 
     _createProxy(name);
     if(stringIsNumeric(h4p[name])){
         auto cv=atoi(CSTR(h4pGlobal[name]));
-//        Serial.printf("ADJUST %s by %d cv=%d nv=%d\n",CSTR(name),value,cv,cv+value);
         h4pGlobal[name]=stringFromInt(cv+value);
     }
 }
@@ -337,7 +332,6 @@ void H4P_SerialCmd::gvErase(initializer_list<const char*> nil){
     bool    anypersistent=false;
     for(auto n:nil) {
         auto mts=h4pGlobal[n];
-//        Serial.printf("PROXY %s DESTROYED AS %s\n",n,mts._save ? "PERMANET":"TEMPORARY");
         anypersistent|=mts._save;
         h4pGlobal.erase(n);
     }
@@ -379,7 +373,7 @@ void H4P_SerialCmd::all(){
 void H4P_SerialCmd::info(){ 
     H4Service::info();
     reply(" H4 %s",H4_VERSION);
-    reply(" H4P %s",H4P_VERSION);
+    reply(" H4P %s",h4p[h4pTag()].data());
     reply(" H4UI %s",h4p.read("/h4UI").data());
     reply(" AARD %s",AARDVARK_VERSION);
     reply(" ARMA %s",ARMADILLO_VERSION);

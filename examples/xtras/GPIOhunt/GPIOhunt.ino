@@ -10,7 +10,7 @@ h4pEncoderAuto ea(D1,D2,INPUT,ACTIVE_HIGH,0,3,1,0,true); // false = no wrap
 h4pLatching latch(0,INPUT_PULLUP,ACTIVE_LOW,15); // 15 ms of debounce
 // OUTPUTS
 std::vector<h4pOutput*> LEDS={
-  new h4pOutput(D6,ACTIVE_HIGH,OFF,H4P_UILED_RED),
+  new h4pOutput(D6,ACTIVE_HIGH,H4P_UILED_RED),
   new h4pOutput(D7,ACTIVE_HIGH,OFF,H4P_UILED_ORANGE),
   new h4pOutput(D8,ACTIVE_HIGH,OFF,H4P_UILED_GREEN),
   new h4pOutput(LED_BUILTIN,ACTIVE_LOW,OFF,H4P_UILED_BLUE)

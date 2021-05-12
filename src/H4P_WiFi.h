@@ -74,7 +74,6 @@ class H4P_WiFi: public H4Service, public AsyncWebServer {
                 VSCMD(_change);
                 VSCMD(_msg);
 
-                string          HAL_WIFI_chipID();
                 void            HAL_WIFI_disconnect();
                 void            HAL_WIFI_setHost(const string& host);
 //
@@ -111,7 +110,7 @@ class H4P_WiFi: public H4Service, public AsyncWebServer {
             AsyncWebServer(H4P_WEBSERVER_PORT){
                 h4p[ssidTag()]=h4Tag();
                 h4p[pskTag()]=h4Tag();
-                h4p.gvSetstring(deviceTag(),"",true);
+//                h4p.gvSetstring(deviceTag(),"",true);
 //#endif
                 _commonStartup();
             }                
@@ -123,7 +122,8 @@ class H4P_WiFi: public H4Service, public AsyncWebServer {
             AsyncWebServer(H4P_WEBSERVER_PORT){
                 h4p.gvSetstring(ssidTag(),ssid,true);
                 h4p.gvSetstring(pskTag(),psk,true);
-                h4p.gvSetstring(deviceTag(),device,true);
+                if(!h4p.gvExists(deviceTag())) h4p.gvSetstring(deviceTag(),(device=="") ? string("H4-").append(h4p[chipTag()]):device,true);
+                XLOG("Device: %s Chip: %s",CSTR(h4p[deviceTag()]),CSTR(h4p[chipTag()]));
 //#endif
                 _commonStartup();
             }

@@ -32,7 +32,6 @@ SOFTWARE.
 void H4P_BinaryThing::_onChange(bool b){
     h4.queueFunction([=](){ _thing(b); });
     auto off=h4p.gvGetInt(autoOffTag());
-    Serial.printf("H4P_BinaryThing _onChange %d auto=%d\n",b,off);
     if(off) h4.once(off,[=]{ h4p.gvSetInt(stateTag(),OFF); });
 }
 

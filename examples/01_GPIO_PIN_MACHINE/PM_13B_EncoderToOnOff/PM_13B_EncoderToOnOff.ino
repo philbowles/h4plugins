@@ -11,5 +11,5 @@ class npENCODER10: public npNODE {
         }
 };
 
-H4P_BinarySwitch bs(LED_BUILTIN,H4P_ASSUMED_SENSE,OFF);
+H4P_BinarySwitch bs(LED_BUILTIN,H4P_ASSUMED_SENSE);
 h4pEncoder rotary(D1,D2,INPUT,ACTIVE_HIGH,true, new npENCODER10);

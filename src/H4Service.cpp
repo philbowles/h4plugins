@@ -28,7 +28,6 @@ SOFTWARE.
 */
 #include<H4Service.h>
 //
-//vector<string> h4pnames={};
 H4P_EVENT_HANDLERS h4pevt;
 
 void H4Service::_addLocals(H4P_CMDMAP local){
@@ -79,10 +78,7 @@ uint32_t H4Service::_guardString2(vector<string> vs,function<H4_CMD_ERROR(string
 void H4Service::_sysHandleEvent(const string& svc,H4PE_TYPE t,const string& msg){
     switch(t){
         case H4PE_BOOT:
-            if(_filter & H4PE_BOOT){
-//                Serial.printf("%s BOOT calls _init()\n",CSTR(_me));
-                _init();
-            } //else Serial.printf("%s BOOT PREVENTS DOUBLE DIP _init()\n",CSTR(_me)); 
+            if(_filter & H4PE_BOOT) _init();
             break;
         case H4PE_STAGE2:
 //            Serial.printf("%s STAGE2 %s %s\n",CSTR(_me),CSTR(svc),CSTR(msg));
@@ -96,6 +92,11 @@ void H4Service::_sysHandleEvent(const string& svc,H4PE_TYPE t,const string& msg)
             } 
             else _handleEvent(svc,H4PE_SYSINFO,string("Svc").append(STOI(msg) ? "Up":"Down"));
             break;
+        case H4PE_GVCHANGE:
+            if(h4pevt.count(H4PE_BOOT)) {
+//                Serial.printf("%s STILL IN INIT, IGNORING H4PE_GVCHANGE %s=>%s\n",_me.data(),svc.data(),msg.data());
+                return;
+            }
         default:
             _handleEvent(svc,t,msg);
             break;

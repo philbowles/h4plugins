@@ -29,11 +29,13 @@ SOFTWARE.
 #include<H4P_SerialCmd.h>
 #include<H4P_AsyncMQTT.h>
 
+// payload: scheme,broker,uname,pws,port e.g. https,192.168.1.4,,,1883
 uint32_t H4P_AsyncMQTT::_change(vector<string> vs){  // broker,uname,pword,port
     return _guard1(vs,[this](vector<string> vs){
         auto vg=split(H4PAYLOAD,",");
-        if(vg.size()!=3) return H4_CMD_PAYLOAD_FORMAT;
-        change(vg[0],vg[1],vg[2]); // change this to a vs?
+        if(vg.size()!=5) return H4_CMD_PAYLOAD_FORMAT;
+        string url=vg[0]+"://"+vg[1]+":"+vg[4];
+        change(url,vg[2],vg[3]); // change this to a vs?
         return H4_CMD_OK;
     });
 }
@@ -51,13 +53,11 @@ void H4P_AsyncMQTT::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg
                         h4puiAdd(mQpassTag(),H4P_UI_INPUT,"m");
                     }
                     else {
-//                        h4puiAdd("Pangolin",H4P_UI_TEXT,"m",h4p[pmvTag()]); // mhang!
                         h4puiAdd(_me,H4P_UI_BOOL,"m","",H4P_UILED_BI);
                         h4puiAdd(brokerTag(),H4P_UI_TEXT,"m");
                         h4puiAdd(nDCXTag(),H4P_UI_TEXT,"m"); // cos we don't know it yet
                     }
                 #else
-//                    h4puiAdd("Pangolin",H4P_UI_TEXT,"m",h4p[pmvTag()]); // mhang!
                     h4puiAdd(_me,H4P_UI_BOOL,"m","",H4P_UILED_BI);
                     h4puiAdd(brokerTag(),H4P_UI_TEXT,"m");
                     h4puiAdd(nDCXTag(),H4P_UI_TEXT,"m"); // cos we don't know it yet
@@ -66,7 +66,8 @@ void H4P_AsyncMQTT::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg
             }
             break;
         case H4PE_GVCHANGE:
-            if((svc==brokerTag()) && _running) {
+//            if((svc==brokerTag()) && _running) {
+            if(svc==brokerTag()) {
                 Serial.printf("RESTARTING DUE TO GVCHANGE\n");
                 restart();
                 break;
@@ -80,12 +81,6 @@ void H4P_AsyncMQTT::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg
 
 void H4P_AsyncMQTT::_init() {
     h4p.gvSetInt(_me,0,false);
-/*
-    Serial.printf("H4P_AsyncMQTT::_init()\n");
-    Serial.printf("Broker %s\n",CSTR(h4p[brokerTag()]));
-    Serial.printf("MQU %s\n",CSTR(h4p[mQuserTag()]));
-    Serial.printf("MQP %s\n",CSTR(h4p[mQpassTag()]));
-*/
     onMqttError([=](int e,int info){ XEVENT(H4PE_SYSWARN,"%d,%d",e,info); });
 
     device=h4p[deviceTag()];
@@ -135,7 +130,9 @@ void H4P_AsyncMQTT::_init() {
 }
 
 void H4P_AsyncMQTT::_setup(){ // allow for TLS
+//    if(h4p[brokerTag()]!="") 
     setServer(CSTR(h4p[brokerTag()]),CSTR(h4p[mQuserTag()]),CSTR(h4p[mQpassTag()])); // optimise tag()
+//    else SYSWARN("NO MQTT DETAILS","");
 }
 
 void H4P_AsyncMQTT::change(const string& broker,const string& user,const string& passwd){ // add creds

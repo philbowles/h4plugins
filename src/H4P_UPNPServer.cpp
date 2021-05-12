@@ -66,7 +66,8 @@ void H4P_UPNPServer::_handleEvent(const string& svc,H4PE_TYPE t,const string& ms
             }
             break;
         case H4PE_GVCHANGE:
-            if(_running && svc==nameTag()){
+//            if(_running && svc==nameTag()){
+            if(svc==nameTag()){
                 svcDown(); // shut down old name, send bye bye etc
                 svcUp();
             }
@@ -107,12 +108,6 @@ void H4P_UPNPServer::_handlePacket(string p,IPAddress ip,uint16_t port){
 void H4P_UPNPServer::_init(){
     _pups.push_back(_urn+"device:controllee:1");
     _pups.push_back(_urn+"service:basicevent:1");
-
-    string dn=string(uppercase(h4Tag())+" "+deviceTag()+" ");
-
-    if(h4p[nameTag()]=="") h4p[nameTag()]=dn.append(h4p[chipTag()]);
-    h4p.gvSave(nameTag());
-    XLOG("UPNP name %s",CSTR(h4p[nameTag()]));
 }
 
 void H4P_UPNPServer::_listenTag(const string& tag,const string& value){ h4pUPNPMap[tag].insert(value); }
@@ -141,6 +136,7 @@ void H4P_UPNPServer::_upnp(AsyncWebServerRequest *request){ // redo
        	h4p.gvSetstring("gs",(soap.find("Get")==string::npos) ? "Set":"Get"); 
         uint32_t _set=soap.find(">1<")==string::npos ? 0:1;
         if(h4p["gs"]=="Set") h4p.gvSetInt(stateTag(),_set); //=//XEVENT(H4PE_ONOF,"%d",_set);
+//        Serial.printf("XML RESPONSE %s\n",h4preplaceparams(_soap).data());
         request->send(200, "text/xml", CSTR(h4preplaceparams(_soap))); // refac
         h4p.gvErase("gs");
     },nullptr, H4P_TRID_SOAP);

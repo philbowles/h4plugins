@@ -30,14 +30,13 @@ SOFTWARE.
 
 void H4P_LinkMaster::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg){
     if(_running && svc==stateTag()) for(auto s:_slaves) _pMQTT->xPublish(CSTR((s+"/h4/switch")),msg);
-//        else
-//            Serial.printf("%s CATASTROPHE %s %s %s\n",CSTR(_me),CSTR(svc),CSTR(h4pGetEventName(t)),CSTR(msg));
 }
 
 uint32_t H4P_LinkMaster::_slave(vector<string> vs){
     if(vs.size()<1) return H4_CMD_TOO_FEW_PARAMS;
     if(vs.size()>1) return H4_CMD_TOO_MANY_PARAMS;
     vector<string> parts=split(vs[0],",");
+    if(parts.size()!=2) return H4_CMD_PAYLOAD_FORMAT;
     if(!stringIsNumeric(parts[1])) return H4_CMD_NOT_NUMERIC;
     uint32_t action=STOI(parts[1]);
     if(action > 1) return H4_CMD_OUT_OF_BOUNDS;

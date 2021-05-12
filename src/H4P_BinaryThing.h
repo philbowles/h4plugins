@@ -40,6 +40,7 @@ extern bool h4punlocked;
 class H4P_BinaryThing: public H4Service{
         function<void(bool)>        _thing;
                 void                _onChange(bool b);
+//                bool                _iv;
     protected:
                 uint32_t            _autoOff(vector<string> vs){ return _guardInt1(vs,[this](uint32_t t){ autoOff(t); }); }
         virtual void                _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override;
@@ -49,7 +50,6 @@ class H4P_BinaryThing: public H4Service{
         H4P_BinaryThing(function<void(bool)> thingFunction,bool initial=OFF,uint32_t timer=0): _thing(thingFunction),H4Service(onofTag(),H4PE_GVCHANGE|H4PE_VIEWERS) {
             h4p.gvSetInt(stateTag(),initial,false);
             h4p.gvSetInt(autoOffTag(),timer,true);
-            Serial.printf("H4P_BinaryThing autoOffTag %d\n",timer);
             _addLocals({
                 {"auto",    {H4PC_H4, 0, CMDVS(_autoOff)}},
                 {"on",      {H4PC_H4, 0, CMD(turnOn)}},
@@ -61,7 +61,7 @@ class H4P_BinaryThing: public H4Service{
                 {"toggle",  {H4PC_H4, 0, CMD(toggle)}}
             });
         }
-        
+
 #if H4P_LOG_MESSAGES
         virtual void info() override {
                     H4Service::info();

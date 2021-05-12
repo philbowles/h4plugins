@@ -17,13 +17,14 @@ H4_Wemos_d1mini.menu.xtal.80.build.f_cpu=80000000L
 H4_Wemos_d1mini.menu.xtal.160=160 MHz
 H4_Wemos_d1mini.menu.xtal.160.build.f_cpu=160000000L
 H4_Wemos_d1mini.build.vtable_flags=-DVTABLES_IN_FLASH
-H4_Wemos_d1mini.build.exception_flags=-fno-exceptions
+H4_Wemos_d1mini.build.exception_flags=-fno-exceptions -DNEW_OOM_ABORT
 H4_Wemos_d1mini.build.stdcpp_lib=-lstdc++
 H4_Wemos_d1mini.build.sslflags=-DBEARSSL_SSL_BASIC
 H4_Wemos_d1mini.upload.resetmethod=--before default_reset --after hard_reset
 H4_Wemos_d1mini.build.flash_mode=dio
 H4_Wemos_d1mini.build.flash_flags=-DFLASHMODE_DIO
 H4_Wemos_d1mini.build.flash_freq=40
+
 H4_Wemos_d1mini.build.flash_size=4M
 H4_Wemos_d1mini.build.flash_size_bytes=0x400000
 H4_Wemos_d1mini.build.flash_ld=eagle.flash.4m1m.ld
@@ -31,8 +32,9 @@ H4_Wemos_d1mini.build.spiffs_pagesize=256
 H4_Wemos_d1mini.upload.maximum_size=1044464
 H4_Wemos_d1mini.build.rfcal_addr=0x3FC000
 H4_Wemos_d1mini.build.spiffs_start=0x300000
-H4_Wemos_d1mini.build.spiffs_end=0x3FB000
+H4_Wemos_d1mini.build.spiffs_end=0x3FA000
 H4_Wemos_d1mini.build.spiffs_blocksize=8192
+
 H4_Wemos_d1mini.build.lwip_include=lwip2/include
 H4_Wemos_d1mini.build.lwip_lib=-llwip2-1460
 H4_Wemos_d1mini.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
@@ -68,7 +70,7 @@ H4_sonoff.serial.disableRTS=true
 H4_sonoff.build.mcu=esp8266
 H4_sonoff.build.core=esp8266
 H4_sonoff.build.debug_port=
-H4_sonoff.build.debug_level=
+H4_sonoff.build.debug_level= -DNDEBUG
 H4_sonoff.menu.xtal.80=80 MHz
 H4_sonoff.menu.xtal.80.build.f_cpu=80000000L
 H4_sonoff.menu.xtal.160=160 MHz
@@ -81,20 +83,20 @@ H4_sonoff.upload.resetmethod=--before no_reset --after soft_reset
 H4_sonoff.build.flash_mode=dout
 H4_sonoff.build.flash_flags=-DFLASHMODE_DOUT
 H4_sonoff.build.flash_freq=40
+
 H4_sonoff.build.flash_size=1M
 H4_sonoff.build.flash_size_bytes=0x100000
-H4_sonoff.build.flash_ld=eagle.flash.1m64.ld
+H4_sonoff.build.flash_ld=eagle.flash.1m96.ld
 H4_sonoff.build.spiffs_pagesize=256
 H4_sonoff.upload.maximum_size=958448
 H4_sonoff.build.rfcal_addr=0xFC000
-H4_sonoff.build.spiffs_start=0xEB000
+H4_sonoff.build.spiffs_start=0xE7000
 H4_sonoff.build.spiffs_end=0xFB000
 H4_sonoff.build.spiffs_blocksize=4096
+
 H4_sonoff.build.lwip_include=lwip2/include
 H4_sonoff.build.lwip_lib=-llwip2-1460
 H4_sonoff.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
-H4_sonoff.build.debug_port=
-H4_sonoff.build.debug_level= -DNDEBUG
 H4_sonoff.menu.wipe.none=Only Sketch
 H4_sonoff.menu.wipe.none.upload.erase_cmd=
 H4_sonoff.menu.wipe.sdk=Sketch + WiFi Settings

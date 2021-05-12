@@ -61,7 +61,7 @@ You define the output GPIO12 as a BinarySwitch:
 ```cpp
 #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
-H4P_BinarySwitch h4onof(12,ACTIVE_HIGH,OFF);
+H4P_BinarySwitch h4onof(12,ACTIVE_HIGH);
 ```
 
 Even before adding anything else you can now switch on the light  when any source ( [Serial](h4p.md), [MQTT](h4mqtt.md), [HTTP REST](h4wifi.md) or [UPNP device](h4upnp) (e.g. Amazon Alexa voice command) sends an `on`,`off`,`toggle` or `switch` command.

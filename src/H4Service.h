@@ -31,7 +31,7 @@ SOFTWARE.
 
 #include<H4.h>
 #include<pmbtools.h>
-#include<plugins_config.h>
+#include<config_plugins.h>
 #include<h4proxy.h>
 
 #ifdef ARDUINO_ARCH_ESP8266
@@ -41,6 +41,7 @@ SOFTWARE.
     #include<FS.h>
     #include<SPIFFS.h>
     #define HAL_FS SPIFFS
+    string getTerminalName(const string& s);
 #endif
 
 #include<unordered_set>
@@ -60,7 +61,6 @@ STAG(cmd);
 STAG(device);
 STAG(gpio);
 STAG(h4);
-//STAG(H4P);
 STAG(heap);
 STAG(ip);
 STAG(mqconf);
@@ -71,10 +71,8 @@ STAG(name);
 STAG(NBoots);
 STAG(onof);
 STAG(pcent);
-//STAG(pmv);
 STAG(psk); // chg password
 STAG(report);
-STAG(rupd);
 STAG(show);
 STAG(snif);
 STAG(ssid);
@@ -256,7 +254,6 @@ void h4puiSync(const string& n,const string& v="");
 #define CMDNULL ([this](vector<string>)->uint32_t{ return H4_CMD_OK; })
 #define CMDVS(x) ([this](vector<string> vs)->uint32_t{ return x(vs); })
 #define VSCMD(x) uint32_t x(vector<string>)
-#define QTHIS(f) h4.queueFunction([this]{ (f)(); })
 
 #define QEVENT(e) h4pevent(_me,e)
 #define XEVENT(e,f,...) h4psysevent(_me,e,f,__VA_ARGS__)
@@ -389,6 +386,10 @@ case H4PE_SYSINFO: \
     h4p[stateTag()]=msg; \
     break;
 
+#define H4P_ONOFF_CONNECTOR_INVERTED(e) case H4PEVENTNAME(e): \
+    h4p.gvSetInt(stateTag(),(bool) !(STOI(msg))); \
+    break;
+
 #define H4P_TACT_BUTTON_CONNECTOR(x) if(svc==#x){ \
     if(STOI(msg)){\
         h4puiSync(#x,"1");\
@@ -432,6 +433,4 @@ case H4PE_SYSINFO: \
 
 #define H4P_FUNCTION_ADAPTER_GPIO H4P_FUNCTION_ADAPTER_II(GPIO)
 
-#define H4P_FUNCTION_ADAPTER_PRESENCE case H4PE_PRESENCE: \
-    H4PEVENTCALL(PRESENCE,svc,msg.size()); \
-    break;
+#define H4P_FUNCTION_ADAPTER_PRESENCE H4P_FUNCTION_ADAPTER_SI(PRESENCE)
