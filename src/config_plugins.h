@@ -93,7 +93,7 @@ enum H4P_UILED_COLOR {
 /*
             TWEAKABLES
 */
-#define H4P_CMDLINE_FLASHERS     0
+//#define H4P_CMDLINE_FLASHERS     0
 
 #define H4P_REPLY_BUFFER       256
 #define H4PE_BUFFER            256
