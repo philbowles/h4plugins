@@ -291,7 +291,6 @@ template<typename T>
 T* require(const string& svc){
     T* dll=h4puncheckedcall<T>(svc);
     if(!dll){
-//        Serial.printf("**** X DYNALOADS %s\n",CSTR(svc));
         dll=new T;
         dll->_init();
         dll->_filter&=~H4PE_BOOT; // we already done it!
@@ -337,18 +336,13 @@ class H4Service {
                 bool                _running=false;
 //
         H4Service(const string& name,uint32_t events=H4PE_NOOP,bool singleton=true): _filter(events | H4PE_BOOT | H4PE_STAGE2){
-//            Serial.printf("%s Exists %s\n",CSTR(name),singleton ? "SINGLE":"MULTI");
             _me=_uniquify(name);
             if(_me==name || (!singleton)){
                 _pid=h4pmap.size()+H4PC_MAX;
                 h4pmap[_me]=this;
-//                Serial.printf("%s registers as %s\n",CSTR(name),CSTR(_me));
                 h4pregisterhandler(_me,_filter,[this](const string& s,H4PE_TYPE t,const string& m){ _sysHandleEvent(s,t,m); });
             } 
-            else {
-                SYSWARN("Reload %s",CSTR(_me));
-//                Serial.printf("********** Reload %s",CSTR(_me));
-            }
+            else SYSWARN("Reload %s",CSTR(_me));
         }
 #if H4P_LOG_MESSAGES
         virtual void                info();

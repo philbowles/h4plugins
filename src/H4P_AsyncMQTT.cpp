@@ -130,9 +130,9 @@ void H4P_AsyncMQTT::_init() {
 }
 
 void H4P_AsyncMQTT::_setup(){ // allow for TLS
-//    if(h4p[brokerTag()]!="") 
+    if(h4p[brokerTag()]!="") 
     setServer(CSTR(h4p[brokerTag()]),CSTR(h4p[mQuserTag()]),CSTR(h4p[mQpassTag()])); // optimise tag()
-//    else SYSWARN("NO MQTT DETAILS","");
+    else SYSWARN("NO MQTT DETAILS","");
 }
 
 void H4P_AsyncMQTT::change(const string& broker,const string& user,const string& passwd){ // add creds

@@ -38,7 +38,6 @@ extern bool h4punlocked;
 
 const char* __attribute__((weak)) giveTaskName(uint32_t id){ return "ANON"; }
 
-
 H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Service(cmdTag(),H4PE_FACTORY | H4PE_REBOOT){
     h4p.gvSetstring(chipTag(),_HAL_uniqueName(""));
     h4p.gvSetstring(boardTag(),replaceAll(H4_BOARD,"ESP8266_",""));
@@ -55,7 +54,6 @@ H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Service(cmdTag(),H4PE_FACTORY | H
         {"factory",    { H4PC_H4,   0, ([=](vector<string>){ h4psysevent(h4pSrc,H4PE_FACTORY,""); return H4_CMD_OK; }) }},
         {"get",        { H4PC_H4,   0, CMDVS(_get)}},
         {"reboot",     { H4PC_H4,   0, ([=](vector<string>){ h4psysevent(h4pSrc,H4PE_REBOOT,""); return H4_CMD_OK; }) }},
-//
         {"svc",        { H4PC_H4,   H4PC_SVC, nullptr}},
         {"restart",    { H4PC_SVC,  0, CMDVS(_svcRestart) }},
         {"start",      { H4PC_SVC,  0, CMDVS(_svcStart) }},
@@ -75,7 +73,6 @@ H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Service(cmdTag(),H4PE_FACTORY | H
     if(autoStop) h4._unHook(_pid);
     string ino=h4p[binTag()];
     ino+="."+lowercase(H4_BOARD)+".bin";
-//    Serial.printf("full exported binary name=%s\n",ino.data());
     h4p[binTag()]=ino;
 }
 
@@ -256,13 +253,9 @@ void H4P_SerialCmd::help(){
     for(auto const& s:unsorted) { reply(CSTR(s)); }
 }
 
-uint32_t H4P_SerialCmd::invokeCmd(string topic,string payload,const char* src){ 
-    return _executeCmd(string(src)+"/h4/"+CSTR(topic),string(CSTR(payload)));
-}
+uint32_t H4P_SerialCmd::invokeCmd(string topic,string payload,const char* src){ return _executeCmd(string(src)+"/h4/"+CSTR(topic),string(CSTR(payload))); }
 
-uint32_t H4P_SerialCmd::invokeCmd(string topic,uint32_t payload,const char* src){ 
-    return invokeCmd(topic,stringFromInt(payload),src);
-}
+uint32_t H4P_SerialCmd::invokeCmd(string topic,uint32_t payload,const char* src){ return invokeCmd(topic,stringFromInt(payload),src); }
 
 string H4P_SerialCmd::read(const string& fn){
 	string rv="";
@@ -313,9 +306,6 @@ string H4P_SerialCmd::_dumpTask(task* t){
     return string(buf);
 }
 
-//
-//      PERSISTENT STORAGE
-//
 void H4P_SerialCmd::_createProxy(const string& name,bool save){ if(!h4pGlobal.count(name)) h4pGlobal[name]=h4proxy(name,"",save); }
 
 void H4P_SerialCmd::_adjust(const string& name,int value){ 
@@ -356,8 +346,6 @@ void H4P_SerialCmd::gvSetstring(const string& name,const string& value,bool save
 
 void H4P_SerialCmd::gvSetInt(const string& name,int value,bool save){ gvSetstring(name,stringFromInt(value),save); }
 //
-//
-//
 #if H4P_LOG_MESSAGES
 void H4P_SerialCmd::all(){
     __flatten([this](string s){ 
@@ -369,7 +357,7 @@ void H4P_SerialCmd::all(){
         }
     });
 }
-#if H4P_LOG_MESSAGES
+
 void H4P_SerialCmd::info(){ 
     H4Service::info();
     reply(" H4 %s",H4_VERSION);
@@ -381,7 +369,7 @@ void H4P_SerialCmd::info(){
     reply(" Globals:");
     for(auto const& p:h4pGlobal) _showItem(p.first);
 }
-#endif
+
 void  H4P_SerialCmd::plugins(){ for(auto const& s:h4pmap) s.second->info(); }
 
 #ifdef ARDUINO_ARCH_ESP8266
@@ -435,7 +423,8 @@ void H4P_SerialCmd::showQ(){
     sort(tlist.begin(),tlist.end(),[](const task* a, const task* b){ return a->at < b->at; });
     for(auto const& t:tlist) reply(CSTR(_dumpTask(t)));
 }
-#endif
+#endif // logmessages
+
 void H4P_SerialCmd::svcUp(){
     h4._hookLoop([this](){ _run(); },_pid); 
     H4Service::svcUp();
@@ -450,12 +439,11 @@ void H4P_SerialCmd::svcDown(){
 //      h4proxy
 //
 h4proxy& h4proxy::_set(const string& s){
-//    Serial.printf("** %s ** string assign => %s (cv=%s)\n",CSTR(_id),CSTR(s),CSTR(_v));
     if(_v!=s){
         _v=s;
         if(_save) H4P_SerialCmd::_persist();
         h4psysevent(CSTR(_id),H4PE_GVCHANGE,"%s",CSTR(_v));
-    }// else Serial.printf("** %s **NO CHANGE %s\n",CSTR(_id),CSTR(_v));
+    }
     return *this;
 }
 
@@ -464,9 +452,7 @@ h4proxy& h4proxy::operator=(const h4proxy& s) {
         _id=s._id;
         _v=s._v;
         _save=s._save;
-//        Serial.printf("VIRGIN %s created with value %s P/T=%d\n",CSTR(_id),CSTR(_v),_save);
         return *this; // creation: don't send change ?
     }
-//    Serial.printf("EXISTING %s updated to %s\n",CSTR(_id),CSTR(s._v));
     return _set(s._v);
 }

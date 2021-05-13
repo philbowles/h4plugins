@@ -69,9 +69,9 @@ class H4P_AsyncMQTT: public H4Service, public PangolinMQTT{
     public:
 #if H4P_USE_WIFI_AP
         H4P_AsyncMQTT(H4P_LWT lwt={"","",0,false}): _lwt(lwt), H4Service(mqttTag(),H4PE_GVCHANGE|H4PE_VIEWERS){
-//            h4p.gvSetstring(brokerTag(),"",true);
-//            h4p.gvSetstring(mQuserTag(),"",true);
-//            h4p.gvSetstring(mQpassTag(),"",true);
+            h4p.gvSetstring(brokerTag(),"",true);
+            h4p.gvSetstring(mQuserTag(),"",true);
+            h4p.gvSetstring(mQpassTag(),"",true);
             _commonStartup();
         }
 #else

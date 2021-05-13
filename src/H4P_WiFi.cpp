@@ -72,7 +72,7 @@ void H4P_WiFi::svcUp(){
 */
 
 void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
-//    Serial.printf("***************************** WiFi EVENT %d\n",event);
+    Serial.printf("***************************** WiFi EVENT %d\n",event);
     switch(event) {
         case WIFI_EVENT_STAMODE_DISCONNECTED:
 			h4.queueFunction([](){ h4puncheckedcall<H4P_WiFi>(wifiTag())->_lostIP(); });
@@ -119,9 +119,7 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
 #endif
 
 void H4P_WiFi::_coreStart(){
-//    WiFi.printDiag(Serial); 
 #if H4P_USE_WIFI_AP
-//    Serial.printf("AP MODE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
     if(!_dns53){
         if(_cannotConnectSTA()) _startAP();
         else if(WiFi.getMode()==WIFI_OFF) h4puncheckedcall<H4P_WiFi>(wifiTag())->HAL_WIFI_startSTA();
@@ -146,7 +144,6 @@ String H4P_WiFi::_aswsReplace(const String& var){
 uint32_t H4P_WiFi::_change(vector<string> vs){ return _guardString2(vs,[this](string a,string b){ change(a,b); return H4_CMD_OK; }); }
 
 void H4P_WiFi::_clear(){
-    H4Service::svcDown();
     WiFi.onEvent([](WiFiEvent_t event){});
     WiFi.mode(WIFI_STA);
     WiFi.begin(h4Tag(),h4Tag()); // // === eraseConfig :) becos it wont allow "",""
@@ -164,6 +161,8 @@ void H4P_WiFi::_commonStartup(){
     require<H4P_PinMachine>(gpioTag());
     require<H4P_Signaller>(winkTag());
 #endif
+    if(h4p[deviceTag()]=="") h4p[deviceTag()]=string("H4-").append(h4p[chipTag()]);
+    XLOG("Device: %s Chip: %s",CSTR(h4p[deviceTag()]),CSTR(h4p[chipTag()]));
     _addLocals({
         {_me,           { H4PC_H4, _pid, nullptr}},
         {changeTag(),   { _pid, 0, CMDVS(_change)}},
@@ -208,7 +207,7 @@ void H4P_WiFi::_gotIP(){
 
     ArduinoOTA.setHostname(CSTR(host));
     ArduinoOTA.setRebootOnSuccess(false);	
-    ArduinoOTA.begin(); // matching end???
+    ArduinoOTA.begin();
 
     SYSINFO("IP=%s",CSTR(h4p[ipTag()]));
     _startWebserver();
@@ -228,29 +227,25 @@ void H4P_WiFi::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg) {
             break;
         case H4PE_GPIO:
         case H4PE_UISYNC:
-            //_defaultSync(svc,msg);
             if(h4pUserItems.count(svc)) _sendSSE(svc,msg);
             break;
         case H4PE_GVCHANGE:
 #if H4P_USE_WIFI_AP
             if(svc == GoTag() && STOI(msg)) {
-//                Serial.printf("DO NOT COLLECT £200 *%s*\n",CSTR(msg));
                 HAL_WIFI_startSTA();
-                h4.once(1000,[]{ h4pevent(h4pSrc,H4PE_REBOOT,GoTag()); });
-//                Serial.printf("YOU'RE GOIN' DAAAAAAAAAAAAAAAAAHN\n");
+                h4.once(1000,[]{ h4pevent(h4pSrc,H4PE_REBOOT,GoTag()); }); // P for holdoff value?
                 return;
             }
 #endif
+            if(svc == ssidTag() && _running) _restart();
             if(svc == deviceTag() && _running) h4pevent(h4pSrc,H4PE_REBOOT,svc);
             _defaultSync(svc,msg);
         default:
-//            Serial.printf("H4P_WiFi::HEVT %s %s %s\n",CSTR(svc),CSTR(h4pGetEventName(t)),CSTR(msg));
             break;
     }
 }
 
 void H4P_WiFi::_init(){
-//    Serial.printf("********************* H4P_WiFi::_init ********** prevent double dip\n");
     WiFi.persistent(true);
     WiFi.onEvent(_wifiEvent);
 }
@@ -291,6 +286,11 @@ void H4P_WiFi::_rest(AsyncWebServerRequest *request){
 	},nullptr,H4P_TRID_REST);
 }
 
+void H4P_WiFi::_restart(){
+    svcDown();
+    HAL_WIFI_startSTA();
+}
+
 void H4P_WiFi::_sendSSE(const string& name,const string& msg){
     static bool bakov=false;
 
@@ -312,6 +312,11 @@ void H4P_WiFi::_sendSSE(const string& name,const string& msg){
             SYSWARN("SSE BACKOFF H=%lu nQ=%d",fh,_evts->avgPacketsWaiting());
         }
     }
+}
+
+void H4P_WiFi::_signalBad(){ 
+    h4p[ipTag()]="";
+    YEVENT(H4PE_SIGNAL,"175,...   ---   ...   ");
 }
 
 void H4P_WiFi::_startWebserver(){
@@ -394,12 +399,9 @@ void H4P_WiFi::_uiAdd(const string& name,H4P_UI_TYPE t,const string& h,const str
             f=[=]{ return value; };
             break;
         default:
-//            Serial.printf("DEF UIA %s t=%d h=%s c=%d v=*%s* (%d)\n",CSTR(name),t,CSTR(h),color,CSTR(value),value.size());
             if(v.size()) f=[=](){ return v; };
             else {
-//                Serial.printf("NOVALU %s GLOB=%d\n",CSTR(name),h4p.gvExists(name));
                 if(!h4p.gvExists(name)) h4p.gvSetstring(name,value,false);
-//                Serial.printf("VALU %s=%s\n",CSTR(name),CSTR(h4p[name]));
                 f=[=](){ return h4p[name]; };
             }
     }
@@ -412,11 +414,9 @@ void H4P_WiFi::_uiAdd(const string& name,H4P_UI_TYPE t,const string& h,const str
 
 */
 void H4P_WiFi::change(string ssid,string psk){ // add device / name?
-    svcDown();
-    h4p[ssidTag()]=ssid;
     h4p[pskTag()]=psk;
-    HAL_WIFI_startSTA();
-//    MDNS.notifyAPChange(); // ?
+    h4p[ssidTag()]=ssid;
+    _restart();
 #if H4P_WIFI_USE_AP
     if(_dns53) QEVENT(H4PE_REBOOT);
 #endif
@@ -425,7 +425,6 @@ void H4P_WiFi::change(string ssid,string psk){ // add device / name?
 #if H4P_LOG_MESSAGES
 void H4P_WiFi::info() { 
     H4Service::info();
-//    WiFi.printDiag(Serial);
     reply(" Device %s Mode=%d Status: %d IP=%s",CSTR(h4p[deviceTag()]),WiFi.getMode(),WiFi.status(),WiFi.localIP().toString().c_str());
     reply(" SSID %s PSK=%s",CSTR(WiFi.SSID()),CSTR(WiFi.psk()));
     #if H4P_ASSUMED_LED
@@ -442,8 +441,6 @@ void H4P_WiFi::svcDown(){
     H4Service::svcDown();
 }
 
-void H4P_WiFi::uiAddAllUsrFields(const string& section){
-    for(auto const& g:h4pGlobal) if(g.first.rfind("usr_")!=string::npos) _uiAdd(replaceAll(g.first,"usr_",""),H4P_UI_TEXT,section,g.second);
-}
+void H4P_WiFi::uiAddAllUsrFields(const string& section){ for(auto const& g:h4pGlobal) if(g.first.rfind("usr_")!=string::npos) _uiAdd(replaceAll(g.first,"usr_",""),H4P_UI_TEXT,section,g.second); }
 
 void H4P_WiFi::uiAddDropdown(const string& name,H4P_NVP_MAP options,const string& section){ _uiAdd(name,H4P_UI_DROPDOWN,section,flattenMap(options)); }

@@ -100,13 +100,14 @@ void h4StartPlugins(){
     string terminalname=getTerminalName(h4p[binTag()]); // sigh...just WHY????
     h4p[binTag()]=terminalname;
     #endif
-    //
+    
     HAL_FS.begin();
     for(auto const& i:split(H4P_SerialCmd::read(glob()),RECORD_SEPARATOR)){
         vector<string> nv=split(i,UNIT_SEPARATOR);
         h4pGlobal[nv[0]]=h4proxy{nv[0],nv.size() > 1 ? nv[1]:"",true};
-        Serial.printf("%s=%s\n",nv[0].data(),h4pGlobal[nv[0]].data());
+        Serial.printf("  %s=%s\n",nv[0].data(),h4pGlobal[nv[0]].data());
     }
+
     h4p.gvInc(NBootsTag());
     h4p.gvSave(NBootsTag());
 
@@ -122,10 +123,7 @@ void h4StartPlugins(){
         auto ps=s.second;
         if(!ps->_running){
             if(ps->_parent!="") h4psysevent(h4pTag(),H4PE_SYSINFO,"%s waits %s\n",CSTR(s.first),CSTR(ps->_parent));
-            else  {
-                h4psysevent(h4pTag(),H4PE_SYSWARN,"%s ZOMBIE!!\n",CSTR(s.first));
-                ps->svcUp();
-            }
+            else h4psysevent(h4pTag(),H4PE_SYSWARN,"%s ZOMBIE!!\n",CSTR(s.first));
         }
     }
 #endif
@@ -140,6 +138,7 @@ void h4StartPlugins(){
         for(auto s:h4pmap) s.second->_filter&=~e;
     }
     for(auto &e:h4pevt) e.second.shrink_to_fit();
+
     h4psysevent(h4pTag(),H4PE_SYSINFO,"Ready: Heap=%u",_HAL_freeHeap());
 }
 

@@ -82,17 +82,15 @@ class H4P_WiFi: public H4Service, public AsyncWebServer {
         static  String          _aswsReplace(const String& var);
                 void            _clear();
                 void            _clearUI();
-                bool            _cannotConnectSTA(){ 
-//                    Serial.printf("_cannotConnectSTA() ssid=%s psk=%s can/not=%d\n",CSTR(WiFi.SSID()),CSTR(WiFi.psk()),WiFi.SSID()==h4Tag() || WiFi.psk()==""); 
-                    return WiFi.SSID()==h4Tag() || WiFi.psk()=="";
-                }
+                bool            _cannotConnectSTA(){ return WiFi.SSID()==h4Tag() || WiFi.psk()==h4Tag(); }
                 void            _commonStartup();
                 void            _coreStart();
                 void            _defaultSync(const string& svc,const string& msg);
                 void            _gotIP();
                 void            _lostIP();
                 void            _rest(AsyncWebServerRequest *request);
-                void            _signalBad(){ h4p[ipTag()]=""; YEVENT(H4PE_SIGNAL,"175,...   ---   ...   "); }
+                void            _restart();
+                void            _signalBad();
                 void            _startWebserver();
                 void            _stopWebserver();
         static  void            _wifiEvent(WiFiEvent_t event);
@@ -101,30 +99,25 @@ class H4P_WiFi: public H4Service, public AsyncWebServer {
         virtual void            _handleEvent(const string& s,H4PE_TYPE t,const string& msg) override;
     public:
                 void            HAL_WIFI_startSTA(); // Has to be static for bizarre start sequence on ESP32 FFS
-//          included here against better wishes due to compiler bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89605
+
 #if H4P_USE_WIFI_AP
                 void            _startAP();
-#endif
         H4P_WiFi(): 
             H4Service(wifiTag(),H4PE_FACTORY | H4PE_GPIO | H4PE_GVCHANGE | H4PE_UIADD | H4PE_UISYNC | H4PE_UIMSG),
             AsyncWebServer(H4P_WEBSERVER_PORT){
                 h4p[ssidTag()]=h4Tag();
                 h4p[pskTag()]=h4Tag();
-//                h4p.gvSetstring(deviceTag(),"",true);
-//#endif
-                _commonStartup();
-            }                
-//#else
-//        explicit H4P_WiFi(): H4Service(wifiTag()),AsyncWebServer(H4P_WEBSERVER_PORT){}
+                h4p.gvSetstring(deviceTag(),"",true);
+#else
+        explicit H4P_WiFi(): H4Service(wifiTag()),AsyncWebServer(H4P_WEBSERVER_PORT){}
 
         H4P_WiFi(string ssid,string psk,string device=""):
             H4Service(wifiTag(),H4PE_FACTORY | H4PE_GPIO | H4PE_GVCHANGE | H4PE_UIADD | H4PE_UISYNC | H4PE_UIMSG),
             AsyncWebServer(H4P_WEBSERVER_PORT){
                 h4p.gvSetstring(ssidTag(),ssid,true);
                 h4p.gvSetstring(pskTag(),psk,true);
-                if(!h4p.gvExists(deviceTag())) h4p.gvSetstring(deviceTag(),(device=="") ? string("H4-").append(h4p[chipTag()]):device,true);
-                XLOG("Device: %s Chip: %s",CSTR(h4p[deviceTag()]),CSTR(h4p[chipTag()]));
-//#endif
+                h4p.gvSetstring(deviceTag(),device,true);
+#endif
                 _commonStartup();
             }
                 void            change(string ssid,string psk);

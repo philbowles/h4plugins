@@ -81,11 +81,9 @@ void H4Service::_sysHandleEvent(const string& svc,H4PE_TYPE t,const string& msg)
             if(_filter & H4PE_BOOT) _init();
             break;
         case H4PE_STAGE2:
-//            Serial.printf("%s STAGE2 %s %s\n",CSTR(_me),CSTR(svc),CSTR(msg));
             if(!(_filter & H4PE_SERVICE)) svcUp(); // not waiting to be started
             break;
         case H4PE_SERVICE:
-//            Serial.printf("%s SERVICE %s %s parent=%s\n",CSTR(_me),CSTR(svc),CSTR(msg),CSTR(_parent));
             if(_parent==svc){
                 if(STOI(msg)) svcUp();
                 else svcDown();
@@ -93,10 +91,7 @@ void H4Service::_sysHandleEvent(const string& svc,H4PE_TYPE t,const string& msg)
             else _handleEvent(svc,H4PE_SYSINFO,string("Svc").append(STOI(msg) ? "Up":"Down"));
             break;
         case H4PE_GVCHANGE:
-            if(h4pevt.count(H4PE_BOOT)) {
-//                Serial.printf("%s STILL IN INIT, IGNORING H4PE_GVCHANGE %s=>%s\n",_me.data(),svc.data(),msg.data());
-                return;
-            }
+            if(h4pevt.count(H4PE_BOOT)) return;
         default:
             _handleEvent(svc,t,msg);
             break;
