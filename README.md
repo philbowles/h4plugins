@@ -2,9 +2,11 @@
 
 ## Enables rapid devlopment of IOT apps using WiFi, MQTT, NTP, OTA, Alexa voice control etc with an emphasis on performing multiple simultaneous functions
 
-### Most of the above is avheived with only a few lines of code, with many features requiring on the inclusion of a single line
+### Most of the above is achieved with only a few lines of code, with many features requiring on the inclusion of a single line
 
-#### Watch the [Youtube Video](https://www.youtube.com/watch?v=SRHze-LRvN4) showing it in action
+![YT](assets/h4cover1blinkyonsteroids.jpg)
+
+ Watch the [Youtube Video](https://www.youtube.com/watch?v=SRHze-LRvN4) showing it in action
 
 [Release Notes v3.0.0](docs/rn300.md)
 
