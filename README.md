@@ -1,15 +1,19 @@
 ![H4PluginsFF](assets/h4plugins.jpg)
 
-## Enables rapid devlopment of IOT apps using WiFi, MQTT, NTP, OTA, Alexa voice control etc with an emphasis on performing multiple simultaneous functions
+## Enables rapid development of IOT apps using WiFi, MQTT, NTP, OTA, Alexa voice control etc with an emphasis on performing multiple simultaneous functions
 
-### Most of the above is achieved with only a few lines of code, with many features requiring on the inclusion of a single line
-
-![youtube](assets/h4cover1blinkyonsteroids.jpg)
-
-Watch the [Youtube Video](https://www.youtube.com/watch?v=SRHze-LRvN4) showing it in action
+### Most of the above is achieved with only a few lines of code, with many features requiring on the inclusion of only a single line
 
 [Release Notes v3.0.0](docs/rn300.md)
+## Watch the videos
 
+  ![youtube](assets/h4cover1blinkyonsteroids.jpg) 
+* [1. "Blinky on Steroids"](https://www.youtube.com/watch?v=SRHze-LRvN4)
+  
+  ![youtube](assets/h4cover2whyyouneedit.jpg) 
+  
+* [2. Why you need it](https://www.youtube.com/watch?v=OvOz3QPGoY0)
+  
 ---
 
 # Documentation caveat
