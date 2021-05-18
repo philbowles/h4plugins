@@ -4,7 +4,7 @@
 
 ### Most of the above is achieved with only a few lines of code, with many features requiring on the inclusion of a single line
 
-![YT](assets/h4cover1blinkyonsteroids.jpg)
+![youtube](assets/h4cover1blinkyonsteroids.jpg)
 
  Watch the [Youtube Video](https://www.youtube.com/watch?v=SRHze-LRvN4) showing it in action
 
