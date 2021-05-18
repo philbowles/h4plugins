@@ -72,7 +72,6 @@ void H4P_WiFi::svcUp(){
 */
 
 void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
-    Serial.printf("***************************** WiFi EVENT %d\n",event);
     switch(event) {
         case WIFI_EVENT_STAMODE_DISCONNECTED:
 			h4.queueFunction([](){ h4puncheckedcall<H4P_WiFi>(wifiTag())->_lostIP(); });

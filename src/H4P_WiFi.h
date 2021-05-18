@@ -138,7 +138,6 @@ class H4P_WiFi: public H4Service, public AsyncWebServer {
                 void            uiAddText(const string& name,int v,const string& section="u"){ _uiAdd(name,H4P_UI_TEXT,section,stringFromInt(v)); }
                 void            uiAddAllUsrFields(const string& section="u");
 
-                void            uiSetBoolean(const string& ui,const bool b){ _sendSSE(ui,CSTR(stringFromInt(b))); }
                 void            uiSetValue(const string& ui,const int f){ _sendSSE(ui,CSTR(stringFromInt(f))); }
                 void            uiSetValue(const string& ui,const string& value){ _sendSSE(ui,CSTR(value)); }
 //

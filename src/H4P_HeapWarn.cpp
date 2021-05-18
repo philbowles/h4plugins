@@ -28,7 +28,7 @@ SOFTWARE.
 */
 #include<H4P_HeapWarn.h>
 
-H4P_HeapWarn::H4P_HeapWarn(function<void(bool)> f,uint32_t pc): _f(f),H4Service("hwrn"){
+H4P_HeapWarn::H4P_HeapWarn(H4P_FN_VB f,uint32_t pc): _f(f),H4Service("hwrn"){
     _addLocals({
         {_me,      {H4PC_H4, _pid, nullptr}},
         {pcentTag(),  {_pid,   0, CMDVS(_hwPcent)}}

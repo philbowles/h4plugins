@@ -76,7 +76,7 @@ void onQueueWarning(bool) // called after switch state changes
 //  constructor:
 //  onQueueWarning callback function
 //  limit = "safe" percentage
-H4P_QueueWarn(function<void(bool)> onQueueWarning,uint32_t _limit=50);
+H4P_QueueWarn(H4P_FN_VB onQueueWarning,uint32_t _limit=50);
 
 void        pcent(uint32_t pc); // Set new "safe" percentage
 ```

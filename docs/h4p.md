@@ -1,4 +1,4 @@
-![H4P Logo](/assets/DiagLogo.jpg)
+![H4P Logo](../assets/DiagLogo.jpg)
 
 # H4P_SerialCmd
 
@@ -36,11 +36,13 @@ This plugin is a "singleton" - there may be only one single instance of it in th
 
 # Dependencies
 
-None, but when preceded by [H4P_VerboseMessages](h4vm.md), numeric codes / errors are translated to meaningful messages
+N/A 
 
 ---
 
 # Commands Added
+
+See also [Common Command and Control: H4P_SerialCmd and Services](ccc.md)
 
 * `h4/dump/x` (payload x = FS file name. Show contents of file.) 
 * `h4/factory` ( "factory resets" the device)
@@ -55,32 +57,6 @@ None, but when preceded by [H4P_VerboseMessages](h4vm.md), numeric codes / error
 * `help`
 
 ---
-
-# Events Emitted
-
-* H4PE_FACTORY
-* H4PE_REBOOT
-
-More information on [Event Emitters and Listeners](docs/../events.md)
-
----
-
-# Events Listened for
-
-N/A
-
-More information on [Event Emitters and Listeners](docs/../events.md)
-
----
-
-# Tasks Run
-
-| Symbolic Name | Short Name | Type | Singleton | Purpose |
-| :----------   | :--------- | :--- | :-------: | :---    |
-|H4P_TRID_SCMD|SCMD|Single-shot QF|:x:|Execute common function on main loop|
-
-
----
 # Service Commands
 
 SerialCmd can be safely stopped - it will continue to provide command functionality to other plugins that depend upon it. e.g. [(http "REST")](h4wifi.md) and [**H4P_AsyncMQTT**](h4mqtt.md) but it will no longer accept serial commands on its own behalf. Thus it can only be stopped *once* from the serial console*. Unloading `cmd` will show a huge performance improvement (+50% ish), so it is worth considering once testing is complete, especially for devices that will be deployed remotely and will never be able to recive serial commands. (see autoStop parameter above)
@@ -90,11 +66,12 @@ SerialCmd can be safely stopped - it will continue to provide command functional
 ---
 
 # API
+
 ## Constructor
 
 ```cpp
 /* Information only: this is instantiated automatically and should never be called by the user
-autoStop = true will stop the servce from receiving serial commnds and improve performance by about +50%
+autoStop = true will stop the service from listening to serial commands and improve performance by about +35%
 */
 H4P_SerialCmd(bool autoStop=false);
 ```
@@ -123,15 +100,34 @@ Runs all commands from any loaded plugins containing "show", i.e. `h4/show/q` ..
 
 ---
 
-## config
+## gvXXXX functions
+
+See also [Global Variables and persistent storage](globals.md)
 
 ```cpp
-void config();
+// The Global variables function set:
+void gvDec(const string& name); // decrements variable expected to be numeric
+
+void gvErase(const string& name); // remove a variable from the global store
+
+void gvErase(initializer_list<const char*> nil); // remove several variables at once from the global store
+
+bool gvExists(const string& name); // true if name is in the global store
+
+int gvGetInt(const string& name); // return expected numeric value of name
+
+string gvGetstring(const string& name); // return expected string value of name
+
+void gvInc(const string& name); // increments variable expected to be numeric
+
+void gvSave(const string& name); // changes temp / permanent flag to permanet and forces update flush
+
+void gvSave(initializer_list<const char*> sav); // as above, more effifient for several at a time
+
+void gvSetInt(const string& name,int value,bool save=false);// set value to int
+
+void gvSetstring(const string& name,const string& value,bool save=false); // set vallue to string
 ```
-
-Shows the contents of H4's internal configuration items. Useful for debugging, and will be relevant to users who are using and of the [`h4p` config functions](statics.md#dealing-with-global-variables).
-
-### Equivalent command: h4/show/config
 
 ---
 
@@ -246,10 +242,8 @@ A result as as described in the [LittleFS documentation](link?)
 (c) 2021 Phil Bowles h4plugins@gmail.com
 
 * [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
-* [Blog](https://8266iot.blogspot.com)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)
-* [Facebook IOT with ESP8266 (moderator)}](https://www.facebook.com/groups/1591467384241011/)
 * [Facebook ESP Developers (moderator)](https://www.facebook.com/groups/ESP8266/)
 * [Support me on Patreon](https://patreon.com/esparto)

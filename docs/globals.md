@@ -1,8 +1,7 @@
-![H4P Logo](/assets/DiagLogo.jpg)
-
+![H4P Logo](../assets/DiagLogo.jpg)
 # Global Variables and persistent storage
 
-Essential background for getting started with H4Plugins
+:gem: Essential background for getting started with H4Plugins
 
 ---
 
@@ -18,7 +17,7 @@ Imagine that instead of a standard C++ `int` or `std::string` data type, you had
 * Save its value across reboots ("persistent storage")
 * Tell you when its value changes
 
-H4Plugins provides both of these features with its "global variables" concept. The full API is described in [Common Command and Control: H4P_SerialCmd and Services](ccc.md) but here we explain the bsic concepts and some caveats so that you fully understand the API when you come to use it.
+H4Plugins provides both of these features with its "global variables" concept. The full API is described in [H4P_SerialCmd](h4p.md) but here we explain the basic concepts and some caveats so that you fully understand the API when you come to use it.
 
 ---
 
@@ -30,19 +29,19 @@ In order for your code to react to different variables changing at different tim
 
 Globals are saved in a file in the program Flash partition. This has a finite number of read / write cycles (usually in the tens of thousands) before it can start to fail, so ***it is absolutely essential*** to minimise both the number of persistent global variables you use and how often they get updated.
 
-In order not to lose any persistent values if there is a crash, the globals file is written every time any value in it changes, so makes sure to only change you globals when you cannot avoid it and ony when they are absolutely funamental to the functioning of your app across reboots.
+In order not to lose any persistent values if there is a crash, the globals file is written every time any value in it changes, so makes sure to only change you globals when you cannot avoid it and ony when they are absolutely fundamental to the functioning of your app across reboots.
 
 ## Notification of changed values: the H4PE_GVCHANGE event
 
-**N.B.** Do not proceed unless you have already read and understood [Everything is an event: Listeners, Emitters and Handlers](events.md)
+(You need to have already read and understood [Everything is an event: Listeners, Emitters and Handlers](events.md) ) before continuing
 
-When *any* change is made to a global, no matter where / how / by whom, an `H4PE_GVCHANGE` event is emiited with the `svc` field set to the name of the variable and the `msg` field set to is new value.
+When *any* change is made to a global, no matter where / how / by whom, an `H4PE_GVCHANGE` event is emitted with the `svc` field set to the name of the variable and the `msg` field set to is new value.
 
 ## Choosing between int and string
 
 Internally, all globals are stored as `std::string`. If you only ever use them to hold integer values then there are some handy shortcuts (e.g. `inc` and `dec` functions) but all `int`-type globals are converted internally to  `std::string` before being saved, and back again to `int` on retrieval / access.
 
-Therefore, choose the type which reduces the amount of data conversion required. For example if you are only ever holding 1 or 0 and treating the global like you would a standard C++ `bool` then you may as well keep it as a `std::string` and test for "0" or "1" rather than converting it to `int` and testing for 0 or 1. If you nee to do maths on it then probably an `int` will be more efficient.
+Therefore, choose the type which reduces the amount of data conversion required. For example if you are only ever holding 1 or 0 and treating the global like you would a standard C++ `bool` then you may as well keep it as a `std::string` and test for "0" or "1" rather than converting it to `int` and testing for 0 or 1. If you need to do maths on it then probably an `int` will be more efficient.
 
 ---
 
@@ -101,11 +100,11 @@ void gvInc(const string& name); // increment
 h4p.gvInc("MyCounter"); // mycount now = 667
 ```
 
-The whole point of any of these is that when they happen, an `H4PE_GVCHANGE` event is emiited with the `svc` field set to the name of the variable and the `msg` field set to is new value. See below for a quick example of handling the event.
+The whole point of any of these is that when they happen, an `H4PE_GVCHANGE` event is emitted with the `svc` field set to the name of the variable and the `msg` field set to is new value. See below for a quick example of handling the event.
 
 ## Deletion
 
-When we say "deletion" we mean *completely*: not only will the variable cease to exists in this bootup, it will be dleted from persitent storage and will not exist at next boot, so take care.
+When we say "deletion" we mean *completely*: not only will the variable cease to exists in this bootup, it will be deleted from persistent storage and will no longer exist at *next* boot, so take care.
 
 ```cpp
 void gvErase(const string& name); // remove a single named variable
@@ -148,16 +147,16 @@ H4P_EventListener myglobals(H4PE_GVCHANGE,[](const string& svc,H4PE_TYPE t,const
 });
 ```
 
-Then you are going to get very confusing results! Firstly, you are going to get called dozens, if not hundereds of times without you ever changing the value of your own variable. Second, *if* the msg contains what *could look like* an integer value then you will get confusing results. Most likely it will be text in which case `atoi` will return zero and you code will - wrongly - print `Blast Off!`.
+Then you are going to get very confusing results! Firstly, you are probably going to get called dozens of times without your own variable's value having changed! Second, *if* the msg contains what *could look like* an integer value then you will get confusing results. Most likely it will be text in which case `atoi` will return zero and you code will - wrongly - print `Blast Off!`.
 
 *Always check for your own expected variables by name and ignore all others*
 
 ***YOU HAVE BEEN WARNED!***
-
 ---
 
 (c) 2021 Phil Bowles h4plugins@gmail.com
 
+* [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)

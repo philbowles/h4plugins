@@ -1,8 +1,8 @@
-![H4P Flyer](/assets/WiFiLogo.jpg) 
+![H4P Flyer](../assets/WiFiLogo.jpg) 
 
 # H4P_WiFi
 
-## Shortname wifi
+## Service shortname wifi
 
 Provides WiFi management / reconnection, Asynchronous Webserver, and OTA updates.
 
@@ -13,9 +13,6 @@ Provides WiFi management / reconnection, Asynchronous Webserver, and OTA updates
 * [Usage](#usage)
 * [Dependencies](#dependencies)
 * [Commands Added](#commands-added)
-* [Events Emitted](#s-emitted)
-* [Events Listened for](#s-listened-for)
-* [Tasks Run](#tasks-run)
 * [Service Commands](#service-commands)
 * [API](#api)
 
@@ -27,7 +24,7 @@ H4P_WiFi whiffy(...
 ```
 
 This plugin is a "singleton" - there may be only one single instance of it in the app. 
-It may be instantiated as any name the user chooses, prefix all API calls below with `myChosenName.`
+It may be instantiated as any name the user chooses, prefix all API calls below with that name.
 
 # Dependencies
 
@@ -35,116 +32,72 @@ It may be instantiated as any name the user chooses, prefix all API calls below 
 [H4P_Signaller](h4gm.md)
 
 * You must copy the `data` sub-folder to your sketch folder and upload to LittleFS (ESP8266) or SPIFFS (ESP32). To do this you will need to intall either the [LittleFS upload tool](https://github.com/earlephilhower/arduino-esp8266littlefs-plugin) or the [ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin) (or both).
+  
+* On devices with > 1MB flash also copy the images in the `data_jpg` folder for an enhanced UI experience
 
 # Commands Added
 
 * `h4/wifi/change/x,y` (payload x,y = newssid,newpassword)
-* `h4/wifi/host/x` (payload x = new device name. Causes a reboot. Remains until factory reset)
 * `h4/wifi/msg/x` (payload x = messge to be sent to scrolling message area in webUI
-
-# Events Listened for
-
-`H4PE_FACTORY`
-
-# Events Emitted
-
-`H4PE_BACKOFF`
-
-# Tasks Run
-
-| Symbolic Name | Short Name | Type | Singleton | Purpose |
-| :----------   | :--- | :--- | :-------: | :---    |
-|H4P_TRID_HOTA|HOTA|every|:heavy_check_mark:|OTA handler|
-|H4P_TRID_REST|REST|QF|:heavy_check_mark:|HTTP REST handler|
-|H4P_TRID_SSET|SSET|repeatwhile|:heavy_check_mark:|webUI SSE sender|
 
 # Service Commands
 
 `stop` will disconnect from WiFi and initiate closedown of all Plugins the depend on WiFi
 `start` will connect to WiFi and start webserver and all dependent services
 
-## Callback functions
-
-```cpp
-void onConnect(void);
-void onDisconnect(void);
-void onNoViewers(void); // no viewers: cancel timers, clean up resources etc
-void onUiChange(const string& name,const string& ref value); // called when user item <name> changes value if no spcific funtion given
-void onViewers(void); // User requests web page: add user items + "setter" functions
-```
-
 ---
 
 ## API
 
-For guuidance on the sue of the `ui...` functions, see [Customising the web UI](webui.md)
+For guidance on the use of the `ui...` functions, see [Customising the web UI](webui.md)
 
 ```cpp
 /*
 Constructor
 ssid / psk = your router credentials. psk = pre-shared key = password
 device is the local name for e.g. OTA. Will be visible in your system as < device >.local
-onConnect = user callback when WiFi connects / reconnects
-onDisconnect = user callback when WiFi disconnects
 */
-H4P_WiFi(string ssid,string psk,string device="",H4_FN_VOID onC=nullptr,H4_FN_VOID onD=nullptr):
+H4P_WiFi(string ssid,string psk,string device=""):
 
 // Command and control
 void change(string ssid,string psk); // connect to new SSID
-void host() // change device name. Causes a reboot
 /*
 webUI functions
 
 Common parameters:
 
 const string& name; Title Of The Field...It Gets "Proper Cased" "oh my" becomes "Oh My" 
-
-f = a delayed value getter function
-using H4P_FN_UITXT      = function<string(void)>;
-using H4P_FN_UINUM      = function<int(void)>;
-using H4P_FN_UIBOOL     = function<boolean(void)>;
-
-bool repeat; // false = single-shot, true = repeating
-
-onChange = function called when user changes input field, if none specified, goes to global callback onUiChange
-
-All of the uiAdd.. functios return the field's ID, required by:
-...all of the uiSet... functions for later changes to the value
-...and uiSync for specific fields.
+const string& section="u"; the webUI panel to add the field to.
+It is recommended to leave this as the default "u" for User fields.
 
 */
-uint32_t uiAddLabel(const string& name); // special case, take value of config variable of the same name
-uint32_t uiAddLabel(const string& name,const string& v); // fixed string value
-uint32_t uiAddLabel(const string& name,const int v); // fixed int value
-uint32_t uiAddLabel(const string& name,H4P_FN_UITXT f,bool repeat=false); // delayed getter string
-uint32_t uiAddLabel(const string& name,H4P_FN_UINUM f,bool repeat=false); // delyed getter int
-void uiAddGPIO(); //  Add ALL managed GPIO pins as red/green booleans (page refresh needed)
-uint32_t uiAddGPIO(uint8_t pin); //  Add specific GPIO pin as red/green boolean (page refresh needed)
-uint32_t uiAddBoolean(const string& name,const boolean tf); // fixed red/green boolean as tf=true or false
-uint32_t uiAddBoolean(const string& name,H4P_FN_UIBOOL f,H4P_FN_UICHANGE onChange=nullptr,bool repeat=false); // clickable red/green boolean
-uint32_t uiAddDropdown(const string& name,H4P_NVP_MAP options,H4P_FN_UICHANGE onChange=nullptr); // dropdown box from maps of options
-uint32_t uiAddInput(const string& name,const string& value="",H4P_FN_UICHANGE onChange=nullptr); // simple text input
-void uiSetInput(uint32_t ui,const string& value); // forcibly change value of input field
-void uiSetBoolean(uint32_t ui,const bool b); // change value of red/green bool
-void uiSetLabel(uint32_t ui,const int f); // change int field value
-void uiSetLabel(uint32_t ui,const string& value); // change string field value
-void uiSync(); // redisplay all fields with repeating getter function
-void uiSync(uint32_t ui); // redisplay specific repeating getter
-void uiMessage(const string& msg, Args... args); // Show scrolling printf-style message in UI
+uiAddBoolean(const string& name,const string& section="u"); // fixed red/green boolean as tf=true or false
+uiAddDropdown(const string& name,H4P_NVP_MAP options,const string& section="u");// dropdown box from maps of options
+uiAddGlobal(const string& name,const string& section="u"); // Take field values from h4p[name]
+uiAddImg(const string& name,const string& url,const string& section="u");// adds image from url
+uiAddImgButton(const string& name,const string& section="u");// adds clickable image (simulates a button)
+uiAddInput(const string& name,const string& section="u")// simple text input
+uiAddText(const string& name,const string& v,const string& section="u")// fixed string value
+uiAddText(const string& name,int v,const string& section="u")// fixed int value
+uiAddAllUsrFields(const string& section="u");// searches for all global variable starting usr_... and adds them to UI
+uiMessage(const string& msg, Args... args); // Show scrolling printf-style message in UI
+uiSetValue(const string& ui,const int f); // change int field value
+uiSetValue(const string& ui,const string& value); // change string field value
 ```
 
 ---
 
 # Example sketches
 
-* [Web UI Static Fields](../examples/WEBUI/WebUI_StaticFields/WebUI_StaticFields.ino)
-* [Web UI Dynamic Fields](../examples/WEBUI/WebUI_DynamicFields/WebUI_DynamicFields.ino)
-* [Web UI Input Fields](../examples/WEBUI/WebUI_InputFields/WebUI_InputFields.ino)
+* [Web UI Static Fields](../examples/06_WEB_UI/WebUI_StaticFields/WebUI_StaticFields.ino)
+* [Web UI Input Fields](../examples/06_WEB_UI/WebUI_InputFields/WebUI_InputFields.ino)
+* [Add remote data](../examples/06_WEB_UI/WebUI_RemoteInclusions/WebUI_RemoteInclusions.ino)
   
 ---
 
 (c) 2021 Phil Bowles h4plugins@gmail.com
 
+* [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)

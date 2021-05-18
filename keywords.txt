@@ -250,7 +250,6 @@ uiAddImgButton	KEYWORD2
 uiAddInput	KEYWORD2
 uiAddText	KEYWORD2
 uiMessage	KEYWORD2
-uiSetBoolean	KEYWORD2
 uiSetValue	KEYWORD2
 unsubscribeDevice	KEYWORD2
 upTime	KEYWORD2

@@ -42,9 +42,7 @@ void h4pregisterhandler(const string& svc,uint32_t t,H4P_FN_EVENTHANDLER f){
         if(t & inst) {
             if(h4pGetEventName(static_cast<H4PE_TYPE>(inst))!="") {
                 auto dip=find_if(h4pevt[inst].begin(),h4pevt[inst].end(),[=](H4P_EVENT_LISTENER const& e){ return svc==e.first; });
-                if(dip==h4pevt[inst].end()){
-                    h4pevt[inst].push_back(make_pair(svc,f)); // fix this
-                }// else Serial.printf("DOUBLEDIPPER %s 0x%08x %s\n",svc.data(),inst,h4pGetEventName(static_cast<H4PE_TYPE>(inst)).data());
+                if(dip==h4pevt[inst].end()) h4pevt[inst].push_back(make_pair(svc,f)); // fix this
             }
         }
     }
@@ -105,7 +103,6 @@ void h4StartPlugins(){
     for(auto const& i:split(H4P_SerialCmd::read(glob()),RECORD_SEPARATOR)){
         vector<string> nv=split(i,UNIT_SEPARATOR);
         h4pGlobal[nv[0]]=h4proxy{nv[0],nv.size() > 1 ? nv[1]:"",true};
-        Serial.printf("  %s=%s\n",nv[0].data(),h4pGlobal[nv[0]].data());
     }
 
     h4p.gvInc(NBootsTag());

@@ -48,7 +48,7 @@ void h4setup() {
 
         If you dont have any, delete the whole function
 
-        NB - SEE H4 config.h as h4UserLoop can be turned off to improve performance
+        NB - SEE H4 config_plugins.h as h4UserLoop can be turned off to improve performance
 */
 void h4UserLoop(){
   static long prev=0;

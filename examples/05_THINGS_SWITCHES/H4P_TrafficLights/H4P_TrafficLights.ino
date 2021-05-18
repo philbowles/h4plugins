@@ -1,4 +1,3 @@
-#define H4P_VERBOSE 1
 #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 
@@ -32,7 +31,6 @@ H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCm
 #define AMBER_LIGHT  D7
 #define GREEN_LIGHT  D8
 
-H4P_SerialLogger slog(H4PE_ALMOST_ALL &~H4PE_GVCHANGE&~H4PE_GPIO);
 H4P_PinMachine pm;
 
 int T1=5000; // see the phasing.xls spreadsheet for choosing these numbers
@@ -73,7 +71,6 @@ void trafficLights(bool onoff){ // this is  the actual "thing" function
 //
 H4P_WiFi wiffy("XXXXXXXX","XXXXXXXX","traffic");
 H4P_AsyncMQTT qt("http://192.168.1.4:1883");
-H4P_Heartbeat hb;
 H4P_BinaryThing fing(trafficLights);
 H4P_UPNPServer lexy("Traffic Light Sequencer");
 h4pMultifunctionButton mfb(BUTTON_BUILTIN,INPUT,H4P_ASSUMED_SENSE,15);

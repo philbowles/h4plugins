@@ -1,21 +1,29 @@
-![H4P Logo](/assets/DiagLogo.jpg)
+![H4P Logo](../assets/DiagLogo.jpg)
 
 # H4P_SerialCmd plugin and the common command core
 
-![ccc](/assets/ccc.jpg)
+:gem: Essential background for getting started with H4Plugins
+
+---
+
+![ccc](../assets/ccc.jpg)
 
 # Contents
 * [The "Common Command Core" concept](#the-common-command-core-concept)
 * [Your first plugin: H4P_SerialCmd](#your-first-plugin-h4p_serialcmd)
 * [The "Plugin is a Service" concept](#the-plugin-is-a-service-concept)
 * [Commands provided by H4P_SerialCmd](#commands-provided-by-h4p_serialcmd)
-* [Formal API Specification H4P_SerialCmd](h4p.md)
-  
+* [Error messages](#error-messages)
+* :door: [Formal API Specification H4P_SerialCmd](h4p.md)
+* :door: [Youtube video showing this in action](https://www.youtube.com/watch?v=SRHze-LRvN4&t=209s)
+
 ---
 
 # The "Common Command Core" concept
 
-Take a simple device that switches on a relay, perhaps connected to a lamp. Its most fundamental control mechanism is to be switched either ON or OFF.
+Take a simple device that switches on a relay, perhaps connected to a lamp. Its most fundamental control mechanism is to be switched either ON or OFF....maybe something like this:
+
+![sonoff](../assets/sonoff.jpg)
 
 H4Plugins allows that switching to be done in a number of ways, including:
 
@@ -25,6 +33,7 @@ H4Plugins allows that switching to be done in a number of ways, including:
 * Serial Console
 * Remote HTTP REST-like interface
 * Internal program code
+* Linked internal events
 * Amazon Alexa Voice command
 
 (Depending on which plugins you choose to include in your app)
@@ -33,11 +42,11 @@ H4/Plugins tries to make the format of all those commands as close as possible a
 
 For example, imagine our device is called `demo` and is on IP 192.168.1.4
 
-* If I am connected to it via a serial console, to turn it on I would type:
+* If I am connected to it via a serial console, to turn it on I could type:
 
 `h4/on`
 
-* If I have an MQTT client, I would publish the topic:
+* If I have an MQTT client, I could publish the topic:
 
 `demo/h4/on`
 
@@ -53,16 +62,16 @@ For example, imagine our device is called `demo` and is on IP 192.168.1.4
 * I can turn it on from code in several ways:
 
 ```cpp
-    h4p.invokeCmd("h4/on"); // invoke any command you could type at the serial console
+    h4p.invokeCmd("h4/on"); // invoke any command you could type at the serial console, from MQTT etc
     ...
-    h4onof.turn(ON); // plugins have direct calls that map 1:1 onto the commands
+    h4onof.turn(ON); // most plugins have direct calls that map 1:1 onto the commands
 ```
 
-Quite simply a command is a command is a command no matter where it comes from. Subject to the necessary quirks of each source, the final part of the command is always the same. This means that when reading the documentation, only that last part of the command is described, no matter how simple or how complex its effect is.
+Quite simply a command is a command is a command no matter where it comes from. Subject to the necessary quirks of each source, the final part of the command is always the same. This means that when reading the documentation, only that last part of the command is described, no matter how simple or how complex its effect may be.
 
-If it can be done by *any* of the methods described above, it can - by definition - be done by *all* of them. In the documentation or support groups you might see "try giving it an h4/reboot" or "what is the result of an h4/show/config?" and how you actually do that to *your* device depends entirely on what plugins you have included: in effect the actual command itself is disconnected from its source - how you choose to get the command into the device is up to you, but the device will do exactly the same thing whichever method you choose.
+If it can be done by *any* of the methods described above, it can - by definition - be done by *all* of them. In the documentation or support groups you might see "try giving it an h4/reboot" or "what is the result of an h4/show/config?" and how you actually do that to *your* device depends entirely on what plugins you have included: in effect the actual command itself is disconnected from its source - how you choose to get the command into the device is up to you, but the device will do exactly the same thing (calling the "common command core" function) whichever method you choose.
 
-Every plugin has the ability to add its own specific commands on top of those provided by H4P_SerialCmd itself. Details of the additional commands that each plugin adds (if any) are found in the documentation for the relevant plugin - here we will discuss only those that come already "baked-in"
+Every plugin has the ability to add its own specific commands on top of those provided by `H4P_SerialCmd` itself. Details of the additional commands that each plugin adds (if any) are found in the API documentation for the relevant plugin - here we will discuss only those that come already "baked-in" no matter what plugins you add for yourself.
 
 ---
 
@@ -70,7 +79,7 @@ Every plugin has the ability to add its own specific commands on top of those pr
 
 ## What does it do?
 
-H4P_SerialCmd is the "command and control" centre of H4 and its plugin system. It does everything you have read about so far.  It is so important that it is included automatically when you use the mandatory opening sequence of any and all H4Plugins sketches:
+`H4P_SerialCmd` is the "command and control" centre of H4 and its plugin system. It does everything you have read about so far.  It is so important that it is included automatically when you use the mandatory opening sequence of any and all H4Plugins sketches:
 
 ```cpp
 #include<H4Plugins.h>
@@ -82,6 +91,14 @@ If you put in a Serial speed, make sure your monitor matches and you will see an
 Next is the size of the H4 queue. `H4_Q_CAPACITY` is just a system-wide default value, currently 10. Some features or techniques may need  bigger queue, you will be told about those when necessary. Until you become more expert. just leave it as it is.
 
 Finally, if you are ready to deploy your app "in the wild" and you will never "talk" to it with a serial cable again, stopping the Serial message handler will improve the performance quite a lot: saying 'true' here says, *"Yes, I want to stop the serial handler, there's no point in wasting machine cycles!*" Until then, and all the time while testing, leave it at 'false' meaning  *"I do **not** want to stop talking to my MCU!"*
+
+A single global instance is already declared for you and can be accessed by calling any of the methods on `h4p` for example:
+
+```cpp
+    h4p.info();
+```
+
+Do *not* try to instantiate a `H4P_SerialCmd` object yourself!
 
 ---
 
@@ -109,13 +126,13 @@ h4p.invokeCmd("h4/some/cmd/with/many/levels","42,666");
 
 * Direct call
 
-Generally, each plugin also provides functions that correspond to the command-line equivalent, but are more efficient than the `invokeCmd` method. For example, calling
+Generally, each plugin also provides native C++ functions that correspond to the command-line equivalent (the actual "commond command core" function itself) which are far more efficient than the `invokeCmd` method. At the end of the analysis, `invokeCmd` is only going to end up calling the function you could have called directly yourself! For example, calling
 
 ```cpp
 h4p.showQ();
 ```
 
-Has the same effect as typing `h4/show/q` at the console, MQTT publishing a topic of `yourdevicename/h4/show/q` or the built-inw webserver receiving `http://< your device ip >/rest/h4/show/q`. The only difference is *that the results are sent back to the originating source*, respectively the console, MQTT server, or the web browser.
+Has the same effect as typing `h4/show/q` at the console, MQTT publishing a topic of `yourdevicename/h4/show/q`, your code (pointlessly) calling` h4p.invokeCmd("h4/show/q");`or the built-in webserver receiving `http://< your device ip >/rest/h4/show/q`. The only difference is *that the results are sent back to the originating source*, e.g. the serial terminal, MQTT server, the web browser etc.
 
 ---
 
@@ -127,7 +144,9 @@ Generally speaking, they work together happily without any user intervention (th
 
 ## Dependencies
 
-Often one plugin will depend on another, for example [H4P_AsyncMQTT](h4mqtt.md) cannnot run unless [H4P_WiFi](h4wifi.md) is running. When [H4P_WiFi](h4wifi.md) is stopped (or it notices that maybe WiFi has dropped out) the first thing it does is tell all its dependents e.g. [H4P_AsyncMQTT](h4mqtt.md) also to stop. Each of those in turn do the same to *their* dependents, so you can cause a "cascade" of services stopping if you are not careful, so it is good to get to know what depends on what else before using these commands.
+Often one plugin will depend on another, for example [H4P_AsyncMQTT](h4mqtt.md) cannnot run unless [H4P_WiFi](h4wifi.md) is running and connected to your router. When [H4P_WiFi](h4wifi.md) is stopped (or it notices that maybe WiFi has dropped out) the first thing it does is tell all its dependents e.g. [H4P_AsyncMQTT](h4mqtt.md) also to stop. Each of those in turn do the same to *their* dependents, so you can cause a "cascade" of services stopping if you are not careful, so it is good to get to know what depends on what else before using these commands.
+
+In the same way when a service with dependents starts up, each of its dependents is automatcially started, which starts all of *its* dependents etc until the whole dependency tree is started.
 
 ## Service control / shortnames
 
@@ -152,16 +171,16 @@ Compile the following completely empty sketch and type `help` into the serial mo
 
 Let's summarize them briefly then look at some in a little more detail
 
-* `h4/dump/x` (payload x = FS file name. Show contents of file.) 
+* `h4/dump/x` (payload x = FS file name. Show contents of file x.) 
 * `h4/factory` ( "factory resets" the device)
 * `h4/reboot` ( reboots the device )
 * `h4/show/all` (runs all the commands starting `show/`)
-* `h4/show/config` (internal configuration variables)
+* `h4/show/globals` (internal configuration variables)
 * `h4/show/fs`  (show all LittleFS filesystem files + sizes and used / free space)
 * `h4/show/heap` ( result of _HAL_freeHeap()) 
-* `h4/show/plugins` lists all the currrently loaded plugins and info about each
+* `h4/show/plugins` lists all the currrently loaded plugins and calls `info() ` on each
 * `h4/show/q` (shows all tasks in H4's queue waiting to be scheduled)
-* ... service control commands (see above)
+* ... the common service control commands (see above)
 * `help`
 
 ## A short tour of some of the commands
@@ -199,65 +218,49 @@ This effectively does a `h4/svc/info/XXXX` for every loaded plugin and produces 
 
 ![empty](../assets/plugins.jpg)
 
-### `h4/show/q`
+### :cherry_blossom: `h4/show/q`
 
 ![empty](../assets/showq.jpg)
 
-This shows 3 tasks in H4's queue. Again this will not mean much right now, but it does allow us to look very briefly at another plugin [H4P_VerboseMessages](vm.md). If this is included at the top of any sketch, some of the "gibberish" in the `show` commands is translated in to slightly more meaningful gibberish.
+This shows 3 tasks in H4's queue. Again this will not mean much right now, but if you include `#define H4P_VERBOSE 1` at the top of any sketch, some of the "gibberish" in the `show` commands is translated in to slightly more meaningful gibberish.
 
-Recompiling with [H4P_VerboseMessages](vm.md) and running it again we see:
+Recompiling with `#define H4P_VERBOSE 1` and running it again we see:
 
 ![empty](../assets/showq2.jpg)
 
 What it tells tells us is:
 
-1. [H4P_PinMachine](h4gm.md) runs a task every 1000ms. (It is doing this so it can calculate the GPIO pin statistics (per / second) of pins 2 (LED_BUILTIN), 0 (BUTTON_BUILTIN) and 12 (RELAY_BUILTIN)
- which it is managing on behalf of:
+1. [H4P_PinMachine](h4gm.md) ("GPIO") runs a task every 1000ms.
 
-* [H4P_BinarySwitch](docs/../things.md) to switch the RELAY_BUILTIN on/off 
-* [h4pMultifunctionButton](h4mfnb.md) to listen out for button presses on BUTTON_BUILTIN which will tell H4P_BinarySwitch to switch the RELAY_BUILTIN on/off, or reboot or factoiry reset the device (depending on how long the user holds it down)
-* [H4P_WiFi](h4wifi.md) to flash LED_BUILTIN to signify abnormal netwrok conditions *and* h4pMultifunctionButton to flash it ever more rapidly the longer it is held down to warn the user of impending reboot or factory reset.
-
-That's a lot to take in from one line of information, but its an excellent example of some of the features of H4Plugins at work:
-
-* The hierarchy of dependencies: all those three mentioned above depend on (at least) H4P_GPIOMnager, which is why it needs to be mentioned a) at all b) before the plugins that depend on it
-
-* H4Plugins working seamlessly together and communicating with each other to share tasks
-
-* The remarkable power and fucntionality that comnes "baked in" to each plugin
-  
-* The minmal amount of simple code required to perfrom some pretty complex tasks
-
-1. [H4P_WiFi](h4wifi.md) is running a task every 1.5 seconds which **H**andles the Arduino **OTA** code, allowing your app to be updated **O**ver-**T**he-**A**ir from the ArduinoIDE
+2. [H4P_WiFi](h4wifi.md) is running a task every 1.5 seconds which **H**andles the Arduino **OTA** code, allowing your app to be updated **O**ver-**T**he-**A**ir from the ArduinoIDEor the [H4P_RemoteUpdate](rupd.md) plugin.
    
-2. [H4P_UPNPServer](upnp.md) Is the plugin responsible for allowing Alexa voice communications. It also is the plugin that allows Windows10 for example to "see" the device and be able to jump straight to its web UI: 
+3. [H4P_UPNPServer](upnp.md) Is the plugin responsible for allowing Alexa voice communications. It also is the plugin that allows Windows10 for example to "see" the device and be able to jump straight to its web UI: 
 
 ![empty](../assets/upnp2.jpg)
 
-As part of the UPNP/SSDP protocol it is required to periodically send "`NOTIFY`" broadcasts to let the rest of the world know it is still alive, This is done by the `UNFY` task evry 2.5 minutes.
+As part of the UPNP/SSDP protocol it is required to periodically send "`NOTIFY`" broadcasts to let the rest of the world know it is still alive, This is done by the `UNFY` (**U**PNP **N**oti**FY**) task evry 2.5 minutes.
 
 ---
 
 ## Error Messages
 
-Validation of commands is fairly basic, to reduce code size. Two main principles underlie command handling:
+Validation of commands is fairly basic and very "lightweight" to reduce code size. Two main principles underlie all command handling:
 
-* Silent failure ("do no harm")
+1. Silent failure ("do no harm")
 
-If a command is valid, but is not a sensible thing to do at the time then it simply does nothing and no error message is received (the command was syntactically valid, after all).
+If a command is valid, but is not a sensible thing to do at the time then it simply does nothing. Quite often error message is received (the command was syntactically valid, after all) but some commands will return `H4_CMD_NOT_NOW`
 
-So while there is little indication why something "hasn't worked" it is because it *never could have worked*, but at least no harm is done.
+Thus while there is little indication why something "hasn't worked" it is because it *never could have worked*, but at least no harm is done.
 
-* Parameter "clipping"
+2. Parameter "clipping"
 
 If a numeric value is given to a command but it is too large or too small, e.g. 150% then the value will be "clipped" to within a safe range and the command will run with the clipped value. In the above example it would be as if you had typed 100%, the "sensible" maximum.
 
-If there is no "sensible" alternative then the "Silent failure" rule applies.
+If there is no "sensible" alternative then rule 1, "Silent failure" applies.
 
 #### Error Codes
 
-Meaningful error messages will only be shown if the [**H4P_VerboseMessages**](h4vm.md) plugin is also loaded. (If it is, then it must be loaded *before* SerialCmd)
-Otherwise a simple numeric code is returned:
+Human-readable error messages will only be shown if you include `#define H4P_VERBOSE 1` at the top of any sketch, otherwise a simple numeric code is returned:
 
 ```cpp
 H4_INT_MAP cmdErrors={
@@ -273,12 +276,13 @@ H4_INT_MAP cmdErrors={
 };
 ```
 
-[Example Sketch](../examples/BASICS/H4P_SerialCmd/H4P_SerialCmd.ino)
+[Example Sketch](../examples/00_START_HERE/05_H4P_SerialCmd/05_H4P_SerialCmd.ino)
 
 ---
 
 (c) 2021 Phil Bowles h4plugins@gmail.com
 
+* [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)

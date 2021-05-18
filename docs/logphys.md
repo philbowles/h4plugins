@@ -1,5 +1,5 @@
-![NODE PINK](/assets/nodepink.jpg)
-![H4P Flyer](/assets/GPIOLogo.jpg)
+![NODE PINK](../assets/nodepink.jpg)
+![H4P Flyer](../assets/GPIOLogo.jpg)
 
 # GPIO Handling and "NODE-PINK": the logical approach
 
@@ -68,8 +68,9 @@ The code above sets the `pinMode` for you and also sets the initial state of the
 
 (c) 2021 Phil Bowles h4plugins@gmail.com
 
+* [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)
 * [Facebook ESP Developers (moderator)](https://www.facebook.com/groups/ESP8266/)
-* [Support me on Patreon](https://patreon.com/esparto)
+* [Support me on Patreon](https://patreon.c

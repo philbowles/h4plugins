@@ -1,12 +1,9 @@
-align icons: faded into root / go into root 
 SHORTTERM
     fix write length return for 32/8266
     fix dump / locallogger to avoid large file crash
-    fix HTTP logger database
     adv docs + / example creating your own commands
 MEDIUMTERM
     grid??
-    remote client get
     ESp32 MDNS detector
     ESp32 tonecontroller
 LONGTERM

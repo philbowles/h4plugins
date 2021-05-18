@@ -140,6 +140,7 @@ using H4P_EVENT_LISTENER    = pair<string,H4P_FN_EVENTHANDLER>;
 using H4P_EVENT_LISTENERS   = vector<H4P_EVENT_LISTENER>;
 using H4P_EVENT_HANDLERS    = std::map<uint32_t,H4P_EVENT_LISTENERS>;
 using H4P_FN_USEREVENT      = function<void(const string &msg)>;
+using H4P_FN_VB             = function<void(bool)>;
 
 using H4P_FN_UIGET          = function<string(void)>;
 

@@ -1,5 +1,5 @@
-![NODE PINK](/assets/nodepink.jpg)
-![H4P Flyer](/assets/GPIOLogo.jpg)
+![NODE PINK](../assets/nodepink.jpg)
+![H4P Flyer](../assets/GPIOLogo.jpg)
 
 # GPIO Handling and "NODE-PINK": basic flows
 
@@ -40,8 +40,6 @@ These are listed in order of increasing pipeline complexity, as many of the more
 
 Thus the order is a *logical* one, so that as you step through it you will find it much easier to understand the subsequent flows
 
-While some of the nodes in the following flows may not be immediately obvious, to keep things manageable they are mreley mentioned here in passing, but defined in detail in the [NODE-PINK node catalog](npnodes.md) if more information is required.
-
 ## Common Parameters
 
 To save time and space, parameters that are common to many flows are mentioned here once only.
@@ -50,9 +48,7 @@ To save time and space, parameters that are common to many flows are mentioned h
 * `uint8_t` m // The mode as per Arduino's `pinMode`: either `INPUT` or `INPUT_PULLUP`
 * `H4PM_SENSE` s // Whether `ACTIVE_HIGH` or `ACTIVE_LOW` 
 
-For a discussion of active low vs high and the difference between logical and physical pin values, read [Logical vs Physical GPIO](logphys.md). TL;DR: `ACTIVE_HIGH` inputs are "ON" / `true` when physically reading Vcc 3.3v or "digital 1". `ACTIVE_LOW` inputs are "ON" / `true` when physically reading GND 0v or "digital 0".
-
-Be aware that many boards have builtin-leds and/or buttons that are `ACTIVE_LOW`
+For a discussion of active low vs high and the difference between logical and physical pin values, read [Logical vs Physical GPIO](logphys.md). In brief: `ACTIVE_HIGH` inputs are "ON" / `true` when physically reading Vcc 3.3v or "digital 1". `ACTIVE_LOW` inputs are "ON" / `true` when physically reading GND 0v or "digital 0". Be aware that many boards have builtin-leds and/or buttons that are `ACTIVE_LOW`
 
 * `uint32_t` dbTime // the number of milliseconds to debounce the input
 
@@ -62,15 +58,10 @@ Be aware that many boards have builtin-leds and/or buttons that are `ACTIVE_LOW`
 
 More "an absence of flow", it has a single node, `npPUBLISHVALUE` giving the effect that every single transition sends a `H4PE_GPIO` event to the user's code, i.e. the signal is "raw" and unprocessed.
 
-## Pipeline
-
- `npPUBLISHVALUE`
-
-## Simplified Declaration
+Pipeline: `npPUBLISHVALUE`
 
 ```cpp
 h4pRaw(uint8_t p,uint8_t m,H4PM_SENSE s);
-
 ```
 
 [Example Sketch](../examples/01_GPIO_PIN_MACHINE/PM_01_Raw/PM_01_Raw.ino)
@@ -81,11 +72,7 @@ h4pRaw(uint8_t p,uint8_t m,H4PM_SENSE s);
 
 Is essentially an `h4pRaw` with only one type of transition being passed through. `uint8_t filter` is either `HIGH` or `LOW` and dictates which type of transitions are passed: the others are blocked. Specifying `HIGH` for example will produce a (probably) "bouncy" stream of 1's.
 
-## Pipeline
-
- `npFilter{filter}`->`npPUBLISHVALUE`
-
-## Simplified Declaration
+Pipeline:  `npFilter{filter}`->`npPUBLISHVALUE`
 
 ```cpp
 h4pFiltered(uint8_t p,uint8_t m,H4PM_SENSE s,uint8_t filter);
@@ -99,15 +86,10 @@ h4pFiltered(uint8_t p,uint8_t m,H4PM_SENSE s,uint8_t filter);
 
 Debounces the input and sends event 1x per "clean" transition, given `dbTime` of debounce time.
 
-## Pipeline
-
- `npSmooth{dbTime}`->`npPUBLISHVALUE`
-
-## Simplified Declaration
+Pipeline: `npSmooth{dbTime}`->`npPUBLISHVALUE`
 
 ```cpp
 h4pDebounced(uint8_t p,uint8_t m,H4PM_SENSE s,uint32_t dbms);
-
 ```
 
 [Example Sketch](../examples/01_GPIO_PIN_MACHINE/PM_03_Debounced/PM_03_Debounced.ino)
@@ -120,17 +102,10 @@ Converts a typical bouncy "tact" button into a clean, debounced "single-shot" bu
 
 The single upstroke `H4PE_EVENT` `msg` will be logical `OFF`, This will always be - by defintion - the opposite of its declared `sense`.
 
-## Pipeline
-
- `npSmooth{dbTime}`->`npFilterINACTIVE`->`npPUBLISHVALUE`
-
- (`npFilterINACTIVE` is exactly equivalent to `npFilter{ !sense }`)
-
-## Simplified Declaration
+Pipeline: `npSmooth{dbTime}`->`npFilterINACTIVE`->`npPUBLISHVALUE` (`npFilterINACTIVE` is exactly equivalent to `npFilter{ !sense }`)
 
 ```cpp
 h4pTactless(uint8_t p,uint8_t m,H4PM_SENSE s,uint32_t dbTime);
-
 ```
 
 [Example Sketch](../examples/01_GPIO_PIN_MACHINE/PM_04_Tactless/PM_04_Tactless.ino)
@@ -141,17 +116,13 @@ h4pTactless(uint8_t p,uint8_t m,H4PM_SENSE s,uint32_t dbTime);
 
 Emits `H4PE_EVENT` with an ever-increasing value in `msg`, i.e. it counts how many clean, debounced transition *pairs* or short "stabs" (as in `h4pTactless`) have occurred.
 
-This may seem initially to be of little practical use, but it serves as the basis of several more obviously useful types when the count is acted upon: A "latching" switch (one that stays in the same state till you poke it again) is simply a GPIO that counts from 0 to 1 then starts again.
+This may seem initially to be of little practical use, but it serves as the basis of several more obviously useful types when the count is acted upon: A "latching" switch (one that stays in the same state till you poke it again) is simply a `h4pCounting` that counts from 0 to 1 then starts again.
 
-Similary, imagine you need to "cycle" through a list of options on a graphcial menu - a quite common user input pattern for many devices is to repeatedly press/release an up/down "arrow" button...which is simply a GPIO that counts from 1 to < however many menu options you have > then starts again.
+Similary, imagine you need to "cycle" through a list of options on a graphcial menu - a quite common user input pattern for many devices is to repeatedly press/release an up/down "arrow" button...which is simply a `h4pCounting` that counts from 1 to < however many menu options you have > then starts again.
 
-## Pipeline
+Pipeline: `npSmooth{dbTime}`->`npFilterINACTIVE`->`npPUBLISHSIGE`
 
- `npSmooth{dbTime}`->`npFilterINACTIVE`->`npPUBLISHSIGE`
-
- (sigE [ short for "sigma Events"] is an internal value held by each pin of the all-time total count of events sent. *This* is the value emitted in the `H4PE_EVENT` rather than the more usual instaneous actual physical/logical value 0 or 1, since that has no use / meaning in this context)
-
-## Simplified Declaration
+ (sigE [ short for "sigma Events"] is an internal value held by each pin of the all-time total count of events sent. *This* is the value emitted in the `H4PE_EVENT` rather than the more usual instantaneous actual physical/logical value 0 or 1, since that has no use / meaning in this context)
 
 ```cpp
 h4pCounting(uint8_t p,uint8_t m,H4PM_SENSE s,uint32_t dbTime);
@@ -165,15 +136,11 @@ h4pCounting(uint8_t p,uint8_t m,H4PM_SENSE s,uint32_t dbTime);
 
 This is one of those GPIOs mentioned in `h4pCounting` (above) that count from 1 to `uint32_t` N and then repeats. It Emits `H4PE_EVENT` with an ever-increasing value in `msg`, i.e. it counts how many clean, debounced transition *pairs* or short "stabs" (as in `h4pTactless`) have occurred, until N is reached, whereupon it returns to 1.
 
-## Pipeline
+Pipeline: `npSmooth{dbTime}`->`npFilterINACTIVE`->`npPUBLISHCYCLE{N}`
 
- `npSmooth{dbTime}`->`npFilterINACTIVE`->`npPUBLISHCYCLE{N}`
-
- ("cycle" is internal value *logically* equivalent to sigE % N: it's the current step from 1 to N, hence *this* is the value emitted in the `H4PE_EVENT` rather than the more usual instaneous actual physical/logical value 0 or 1, since that has no use / meaning in this context)
+ ("cycle" is internal value *logically* equivalent to sigE % N: it's the current step from 1 to N, hence *this* is the value emitted in the `H4PE_EVENT` rather than the more usual instantaneous actual physical/logical value 0 or 1, since that has no use / meaning in this context)
 
  If N == 3, subsequent `msg` values will be 1,2,3,1,2,3,1,2... etc
-
-## Simplified Declaration
 
 ```cpp
 h4pCircular(uint8_t p,uint8_t m,H4PM_SENSE s,uint32_t dbTime,uint32_t N);
@@ -189,13 +156,9 @@ This is one of those GPIOs mentioned in `h4pCounting` (above) that count from 0 
 
 It therefore "flip-flops" between 1 and 0 on every subsequent press/release and effectively converts a cheap "tact" button into a "latching" or "toggling" switch.
 
-## Pipeline
-
- `npSmooth{dbTime}`->`npFilterINACTIVE`->`npFLIPFLOP`->`npPUBLISHVALUE`
+Pipeline: `npSmooth{dbTime}`->`npFilterINACTIVE`->`npFLIPFLOP`->`npPUBLISHVALUE`
 
  (`npFLIPFLOP` is *logically* equivalent to sigE % 2, or `npPUBLISHCYCLE{2}` but more efficient than either)
-
-## Simplified Declaration
 
 ```cpp
 h4pLatching(uint8_t p,uint8_t m,H4PM_SENSE s,uint32_t dbTime);
@@ -209,13 +172,9 @@ h4pLatching(uint8_t p,uint8_t m,H4PM_SENSE s,uint32_t dbTime);
 
 Emits `H4PE_EVENT` with a `msg` value of the number of milliseconds the button was held down for.
 
-## Pipeline
+Pipeline: `npSmooth{dbTime}`->`npPUBLISHDELTA`
 
- `npSmooth{dbTime}`->`npPUBLISHDELTA`
-
- (delta is an internal value measuring the time difference between two subsequent entries to the node)
-
-## Simplified Declaration
+ (`delta` is an internal value measuring the time difference between two subsequent entries to the node)
 
 ```cpp
 h4pTimed(uint8_t p,uint8_t m,H4PM_SENSE s,uint32_t dbTime);
@@ -228,7 +187,7 @@ h4pTimed(uint8_t p,uint8_t m,H4PM_SENSE s,uint32_t dbTime);
 
 This is similar to `h4pTimed` but in addition to emitting `H4PE_EVENT` with a `msg` value of the number of milliseconds once it is released, it also emits an event every (`uint32_t f`) milliseconds.
 
-Imagine that `f` == 1000, i.e. the event will repeat every second while ever the button is held down and also that the user hold the button down for 3.142 seconds. The events sent will be as follows:
+Imagine that `f` == 1000, i.e. the event will repeat every second while the button is held down and also that the user holds the button down for 3.142 seconds. The events sent will be as follows:
 
 |T(ms)|`msg` value*|
 | ---: | ---: |
@@ -237,7 +196,7 @@ Imagine that `f` == 1000, i.e. the event will repeat every second while ever the
 |3000|3000|
 |3142|3142|
 
-  * The values are almost certain *not* to be exact multiples of `f` due to "jitter" within the timing code, In reality it will be more like:
+*The values are almost certain *not* to be exact multiples of `f` due to "jitter" within the timing code, In reality it will be more like:
 
 |T(ms)|`msg` value|
 | ---: | ---: |
@@ -247,7 +206,7 @@ Imagine that `f` == 1000, i.e. the event will repeat every second while ever the
 |3142|3143|
 
 This raises two points:
-1. Your code must cope with non-exact round multiples of `f`
+1. Your code must cope with non-exact multiples of `f`
 2. If your code is senstive to the odd millisecond here or there, maybe H4Plugins wasn't the best choice.
 
 Finally, if the button is held for less than `f` then `h4pRepeating` behaves exactly as `h4pTimed`, e.g.:
@@ -256,11 +215,7 @@ Finally, if the button is held for less than `f` then `h4pRepeating` behaves exa
 | ---: | ---: |
 |786|787|
 
-## Pipeline
-
- `npSmooth{dbTime}`->`npDELTAREPEAT{f}`->`npPUBLISHVALUE`
-
-## Simplified Declaration
+Pipeline: `npSmooth{dbTime}`->`npDELTAREPEAT{f}`->`npPUBLISHVALUE`
 
 ```cpp
 h4pRepeating(uint8_t p,uint8_t m,H4PM_SENSE s,uint32_t dbTime,uint32_t f);
@@ -278,13 +233,9 @@ In practical terms, this is ideal in apps where there is a slowly changing value
 
 In such cases it is recommended that `f` is large, even of the order of numbers of minutes.
 
-## Pipeline
-
- `npPassTimer`->`npVALUEDIFF`->`npPUBLISHVALUE`
+Pipeline: `npPassTimer`->`npVALUEDIFF`->`npPUBLISHVALUE`
 
  (`npPassTimer` ignores any physical GPIO changes and passes through only synthetic timer-generated events)
-
-## Simplified Declaration
 
 ```cpp
  h4pPolled(uint8_t p,uint8_t m,H4PM_SENSE s,uint32_t f);
@@ -298,13 +249,9 @@ In such cases it is recommended that `f` is large, even of the order of numbers 
 
 `h4pRetriggering` emits an event when the GPIO first changes (the `ON` "triggering" event), and then an `OFF` event once (`uint32_t timeout`) milliseconds have elapsed - *unless another triggering event occurs before the timeout*. In that case, the internal clock is restarted. We say the device gets triggered, then may be *re*-triggered an infinite number of times before the `timeout` finally expires, causing the `OFF` event to be sent.
 
-In practical terms, this is emulates the behaviour of a PIR sensor. If connecting to such a devices, make sure you choose a `timeout` value that is greater then the physica device, whether that is hard-wired or user-selectable. We recommen that if user-selectable it is set tothe lowest possible value and that this GPIO's `timeout` value is used as the controlling value.
+In practical terms, this is emulates the behaviour of a PIR sensor. If connecting to such a devices, make sure you choose a `timeout` value that is greater than any timer in the physical device, whether that is hard-wired or user-selectable. We recommend that if user-selectable it is set to the lowest possible value and that `h4pRetriggering`'s `timeout` value is used as the controlling value.
 
-## Pipeline
-
- `npTRIGGER{timeout}`->`npPUBLISHVALUE`
-
-## Simplified Declaration
+Pipeline: `npTRIGGER{timeout}`->`npPUBLISHVALUE`
 
 ```cpp
 h4pRetriggering(uint8_t p,uint8_t m,H4PM_SENSE s,uint32_t timeout);
@@ -322,7 +269,7 @@ Your code is then given a "running commentary" as the button is held down. As ea
 
 When the button is finally released,  rather than just reporting the total hold time, as `h4pRepeating` does, `h4pMultistage` tells your code the index of the longest threshold that was passed.
 
-Imagine a commercial device with a single button that has to be "paired" with a controller on first install. Usually the user needs to hold down the button for longer than a few seconds, at which point and LED will light or change color etc. He then releases the button to put the device into pairing mode.
+Imagine a commercial device with a single button that has to be "paired" with a controller on first install. Usually the user needs to hold down the button for longer than a few seconds, at which point an LED will light or change color etc. He then releases the button to put the device into pairing mode.
 
 The `h4pMultistage` provides that exact functionality, allowing as many stages ( or different actions per different hold times) as required.
 
@@ -344,7 +291,7 @@ The events emitted would be as follows:
 | ---: | ---: | ---: |
 |2000|Stage 1 entered|-1|
 |5000|Stage 2 entered|-2|
-|6142|Release afetr stage 2(long press)|2|
+|6142|Release after stage 2(long press)|2|
 
 When held for just over 3 seconds:
 
@@ -363,11 +310,7 @@ Summarising, you get an increasingly negative index each time a new (longer!) st
 
 You then get a single positive index according to the stage the GPIO was in when the button was released.
 
-## Pipeline
-
- `npSmooth{dbTime}`->`npDELTAREPEAT{f}`->`npSTAGEMANAGER{sm}`
-
-## Simplified Declaration
+Pipeline:  `npSmooth{dbTime}`->`npDELTAREPEAT{f}`->`npSTAGEMANAGER{sm}`
 
 ```cpp
 h4pMultistage(uint8_t p,uint8_t m,H4PM_SENSE s,uint32_t dbTime,H4PM_STAGE_MAP stageMap);
@@ -381,28 +324,24 @@ h4pMultistage(uint8_t p,uint8_t m,H4PM_SENSE s,uint32_t dbTime,H4PM_STAGE_MAP st
 
 You need to understand the `h4pMultistage` first, since this is simply a 3-stage version with thresholds at 2000 and 5000 milliseconds with predefined actions as follows:
 
-* Release in Stage 0: perform default on/off action, toggle Global Variable `state`
+* Release in Stage 0: perform default on/off action by toggling Global Variable `state`
 * Release in Stage 1: Reboot MCU
 * Release in Stage 2: Factory Reset MCU
 * Hold time enters Stage 1: medium-paced flashing of builtin LED
-* Hold time enters Stage 2: medium-paced flashing of builtin LED
+* Hold time enters Stage 2: fast-paced flashing of builtin LED
 
 This forms the primary input / control mechanism for the majority of H4Plugins WiFi / MQTT examples and demo Apps. As such it is featured in many example sketches 
-## Pipeline
-
-see `h4pMultistage`
-
-## Simplified Declaration
+Pipeline: see `h4pMultistage`
 
 ```cpp
 h4pMultifunctionButton(uint8_t p,uint8_t m,H4PM_SENSE s,uint32_t dbTime);
-
 ```
 
 ---
 
 (c) 2021 Phil Bowles h4plugins@gmail.com
 
+* [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)

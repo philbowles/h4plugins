@@ -1,4 +1,4 @@
-![H4P Logo](/assets/MQTTLogo.jpg)
+![H4P Logo](../assets/MQTTLogo.jpg)
 
 # MQTT message handling
 
@@ -17,11 +17,11 @@ Essential background before using MQTT topic message handling. This document ass
 
 # Introduction
 
-[H4P_AsyncMQTT](h4mqtt.md) is a "wrapper" around the [PangolinMQTT](http://github.com/philbowles/PangolinMQTT) library, which means that as well as the examples here and the [H4P_AsyncMQTT](h4mqtt.md), any function in [PangolinMQTT](http://github.com/philbowles/PangolinMQTT) may also be called.
+[H4P_AsyncMQTT](h4mqtt.md) is a "wrapper" around the [PangolinMQTT](http://github.com/philbowles/PangolinMQTT) library, which means that as well as the examples here and the [H4P_AsyncMQTT](h4mqtt.md), any function in [PangolinMQTT](http://github.com/philbowles/PangolinMQTT) may also be called, so you are advised to familiarise yourself with that library.
 
-H4Plugins tries to keep identical command syntax across all its methods of controlling the app. When a topic is published by MQTT, it needs an additional prefix, which defines which of your devices receives the message. 
+H4Plugins tries to keep identical command syntax across all its methods of controlling the app (see [Common Command and Control: H4P_SerialCmd and Services](ccc.md) ). When a topic is published by MQTT, it needs an additional prefix, which defines which of your device(s) receives the message. 
 
-[H4P_AsyncMQTT](h4mqtt.md)automatically subscribes your device to:
+[H4P_AsyncMQTT](h4mqtt.md) automatically subscribes your device to:
 
 * `all/#`
 * `< your device name >/#`
@@ -34,7 +34,7 @@ Assuming the actual command is `h4/reboot` then:
 all/h4/reboot // reboots every H4 device on your network
 mydevice/h4/reboot // reboots only the device whose local name is "mydevice"
 WEMOS_D1MINI/h4/reboot // reboots every H4 device running on a Wemos D1 mini board
-17D858/h4/reboot // reboots only the device with chip ID of 17D848 see note
+17D858/h4/reboot // reboots only the device with chip ID of 17D848
 ```
 
 ---
@@ -46,7 +46,7 @@ WEMOS_D1MINI/h4/reboot // reboots every H4 device running on a Wemos D1 mini boa
 Publishing is simple, you have two choices:
 
 * call `publishDevice` which automatically prefixes the topic with your device name
-* call any of the functions made available by [PangolinMQTT](http://github.com/philbowles/PangolinMQTT)
+* call any of the bare `publish` or `xPublish` functions exposed by [PangolinMQTT](http://github.com/philbowles/PangolinMQTT)
 
 The first option makes it easy to see where the message came from in a complex and/or busy network. For example: if your device is named `myThing`
 
@@ -58,38 +58,39 @@ h4mqtt.publishDevice("myTopic","MY PAYLOAD");
 
 ## Subscribing
 
-Subscribing is a little more involved. To receive any topic messages, you must implement a function to handle the `onConnect` event, e.g.
+Subscribing is a little more involved. To receive any topic messages, you must implement a function to detect and react to the `H4PE_SERVICE` event. The simplest way is something like this:
 
 ```cpp
-void onMQTTConnect(){
-    // do all your subscribes in here
-    h4mqtt.subscribe(.... // standard pubsubclient subscribe
-    h4mqtt.subscribeDevice(... // special H4P subscribe (see later)
-    ...
+void onMqttConnect(){ 
+    /* do all your subscribes in here, e.g. */
+    h4mqtt.subscribeDevice("mytopic",myCallback);
 }
 
-...
-[H4P_AsyncMQTT](h4mqtt.md)h4mqtt("http://myMQTTserver.local:1883","username","password");
-...
+void onMqttDisconnect(){ /* do all your unsubscribes in here */ }
+
+void h4pGlobalEventHandler(const string& svc,H4PE_TYPE t,const string& msg){
+    switch(t){
+        case H4PE_SERVICE:
+            H4P_SERVICE_ADAPTER(Mqtt);
+            break;
+    }
+}
 ```
 
-In that function, (and *only* that function, nowhere else) you must subscribe to any topics your sketch requires. You are strongly advised againt doing any "major work" other than subscribing to your own topics. You are also advised and to provide a similar function for the `onDisconnect` event which *un*subscribes from the same topics.
+In the `onMqttConnect()` function, (and *only* that function, nowhere else) you must subscribe to any topics your sketch requires. You are strongly advised againt doing any "major work" other than subscribing to your own topics. You are also advised to provide a similar function for the `onMqttDisconnect` event which *un*subscribes from the same topics.
+
+### The topic handler function
 
 The "work" that is done for your topics is performed by the callback function named in each of the topic subscriptions, known as the "topic handler" function, e.g.
 
 ```cpp
-uint32_t myTopicHandler(std::vector<std::string> vs){
-    Serial.printf("We just received a ping\n");
+uint32_t myCallback(std::vector<std::string> vs){
+    Serial.printf("We just received a msg\n");
     return H4_CMD_OK;
-}
-...
-void onMQTTConnect(){
-    h4mqtt.subscribeDevice("ping",myTopicHandler);
-    ...
 }
 ```
 
-## The message itself
+### The message itself
 
 As already mentioned you can call any method of [PangolinMQTT](http://github.com/philbowles/PangolinMQTT) library e.g. `subscribe(...`  In this case you will be responsible for defining the callback function *and* parsing (splitting apart and "understanding") the message and the payload. This can be quite tricky if you are new to it and has a number of issues that can cause problems:
 
@@ -97,9 +98,9 @@ As already mentioned you can call any method of [PangolinMQTT](http://github.com
 * Calling `publish` inside a subscribe callback for example, is a recipe for disaster
 * It goes completely outside H4's "main loop" philosophy and will almost certainly "break" your code.
 
-For all of the above reasons, it is recommended that you use only* [H4P_AsyncMQTT](h4mqtt.md) functions. The benefit is they can contain any* code you want and then can* call `publish` with no issues. Also, [H4P_AsyncMQTT](h4mqtt.md) provides a lot of functionality for you when using `subscribeDevice`.
+For all of the above reasons, it is recommended that you use only [H4P_AsyncMQTT](h4mqtt.md) functions. The benefit is they can contain any code you want and then can* call `publish` with no issues. Also, [H4P_AsyncMQTT](h4mqtt.md) provides a lot of functionality for you when using `subscribeDevice`.
 
-## subscribeDevice
+### subscribeDevice
 
 It is important that you understand the MQTT topic syntax before reading his section. If this is not the case [read about MQTT topic syntax](https://mosquitto.org/man/mqtt-7.html) before continuing.
 
@@ -107,7 +108,7 @@ In the following examples, let's assume your device is called `mything` and you 
 
 The first thing to note is that your device name is added to the front of the topic, so "under the hood" you are actually subscribing to `mything/mytopic`. This allows you to have many devices in the system running the same code, but retain the ability to send messages only to a single named device (and of course be able to work out who messages are from when they use `publishDevice`)
 
-Secondly, the message and payload are parsed and split up for you already and passed to your callback as a `std::vector<std::string>` Don't worry if you don't know what that means, the examples below will show how easy it is to use - essentially it's just like an array of strings on steroids.
+Secondly, the message and payload are parsed and split up into subtopics for you already and passed to your callback as a `std::vector<std::string>`.
 
 Imagine the topic message was
 
@@ -130,15 +131,19 @@ int payloadAsInteger=H4PAYLOAD_INT; // = 123456: does the conversion for you
 
 Your callback then "does it thing" and *must* return a value showing if it succeeded or not. It can be any of the following
 
-* H4_CMD_OK
-* H4_CMD_UNKNOWN
-* H4_CMD_TOO_FEW_PARAMS
-* H4_CMD_TOO_MANY_PARAMS
-* H4_CMD_NOT_NUMERIC
-* H4_CMD_OUT_OF_BOUNDS
-* H4_CMD_NAME_UNKNOWN
-* H4_CMD_PAYLOAD_FORMAT
-* H4_CMD_NOT_NOW
+```cpp
+H4_INT_MAP cmdErrors={
+    {H4_CMD_OK,"OK"}, // 0
+    {H4_CMD_UNKNOWN,"Unknown cmd"}, // 1 
+    {H4_CMD_TOO_FEW_PARAMS,"Too few parameters"}, // 2 etc
+    {H4_CMD_TOO_MANY_PARAMS,"Too many parameters"},
+    {H4_CMD_NOT_NUMERIC,"Numeric value expected"},
+    {H4_CMD_OUT_OF_BOUNDS,"Value out of range"},
+    {H4_CMD_NAME_UNKNOWN,"Name not known"},
+    {H4_CMD_PAYLOAD_FORMAT,"Incorrect Payload Format"},
+    {H4_CMD_NOT_NOW,"Can't do now"}
+};
+```
 
 ## Simple example
 
@@ -146,7 +151,7 @@ Pulling together all of the above, a simple topic handler will look like somethi
 
 ```cpp
 uint32_t myCallback(std::vector<std::string> vs){
-    Serial.printf("Msg received with payload=%s\n",H4PAYLOAD.c_str()); // convert payload to C-style string
+    Serial.printf("Msg received with payload=%s\n",H4PAYLOAD.data()); // convert payload to C-style string
     if(H4PAYLOAD=="good") return H4_CMD_OK;
     else return H4_CMD_PAYLOAD_FORMAT;
 }
@@ -160,7 +165,7 @@ h4mqtt.subscribeDevice("mytopic",myCallback); // MUST be done from inside onConn
 
 [Example Code](../examples/MQTT/H4P_MQTT_Simple/H4P_MQTT_Simple.ino)
 
-## Subtopics
+### Subtopics
 
 You may need to implement multiple topics in a kind of "tree" hierarchy like the following, after all, H4Plugins does exactly this.
 
@@ -176,7 +181,7 @@ There are two ways to do it. Both can get quite complicated so its best to stick
 If you just subscribe to `a/b/c` your code may not get called unless you do the following:
 
 ```cpp
-void onMQTTConnect(){
+void onMqttConnect(){
     h4mqtt.subscribeDevice("a",myCallback);
     h4mqtt.subscribeDevice("a/b",myCallback);
     h4mqtt.subscribeDevice("a/b/c",myCallback);
@@ -220,7 +225,7 @@ As you can see, this could get complicated when multiple subtopics are required,
 
 [Example Code](../examples/MQTT/H4P_MQTT_Subtopics/H4P_MQTT_Subtopics.ino)
 
-## Wildcard topics
+### Wildcard topics
 
 **N.B.** *[H4P_AsyncMQTT](h4mqtt.md)Supports ONLY `#` wildcards. It does NOT support `+` wildcards**
 
@@ -240,7 +245,7 @@ You could also legitimately receive `mydevice/cards` - thats the way MQTT "#" wo
 
 If your code expects exactly one subtopic, it will almost certainly break when there are none. If it relies on `vs[0]` being a valid suit, it *will* break. It is up to you to prevent this.
 
-You *must* validate both the number of arguments (subtopics) and "sensible" values for each before trying to process the message, remembering to return the appropriate error code if you are unable to handle the message.
+You *must* always validate both the number of arguments (subtopics) and "sensible" values for each before trying to process the message, remembering to return the appropriate error code if you are unable to handle the message.
 
 [Example Code](../examples/MQTT/MQTT_Wildcards/MQTT_Wildcards.ino)
 
@@ -248,6 +253,7 @@ You *must* validate both the number of arguments (subtopics) and "sensible" valu
 
 (c) 2021 Phil Bowles h4plugins@gmail.com
 
+* [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)

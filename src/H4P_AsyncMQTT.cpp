@@ -68,7 +68,7 @@ void H4P_AsyncMQTT::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg
         case H4PE_GVCHANGE:
 //            if((svc==brokerTag()) && _running) {
             if(svc==brokerTag()) {
-                Serial.printf("RESTARTING DUE TO GVCHANGE\n");
+//                Serial.printf("RESTARTING DUE TO GVCHANGE\n");
                 restart();
                 break;
             }

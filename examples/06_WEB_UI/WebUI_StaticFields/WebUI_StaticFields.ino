@@ -23,7 +23,7 @@ void onViewersConnect(){
   h4wifi.uiAddText("Millis",millis());  
 
   TIM0=h4.everyRandom(5000,10000,[](){
-    h4wifi.uiSetBoolean("Random Bool",boolData());
+    h4wifi.uiSetValue("Random Bool",boolData());
     condition=random(0,100) > 50;
     h4pUIMessage("Sync condition now %d",condition); 
     h4onof.syncCondition();

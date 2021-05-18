@@ -75,7 +75,7 @@ void onHeapWarning(bool) // called after switch state changes
 //  constructor:
 //  onHeapWarning callback function
 //  limit = "safe" percentage
-H4P_HeapWarn(function<void(bool)> onHeapWarning,uint32_t _limit=50);
+H4P_HeapWarn(H4P_FN_VB onHeapWarning,uint32_t _limit=50);
 
 void        pcent(uint32_t pc); // Set new "safe" percentage
 ```

@@ -98,7 +98,7 @@ flashLED(uint32_t rate, uint8_t pin = LED_BUILTIN,uint8_t active=HIGH);
 // 200ms is a good starting point for the right "feel"
 flashMorse(const char *pattern, uint32_t timebase, uint8_t pin = LED_BUILTIN,uint8_t active=HIGH);
 
-// NB only available if you edit the config.h file and uncomment the define for H4F_MORSE_SUPPORT
+// NB only available if you edit the config_plugins.h file and uncomment the define for H4F_MORSE_SUPPORT
 // Translates text (no numerals or punctuation, [A-z a-z] only)
 flashMorseText(const char * pattern,uint32_t timebase,uint8_t pin=LED_BUILTIN,uint8_t active=HIGH);
 
