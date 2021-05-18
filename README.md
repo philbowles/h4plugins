@@ -6,7 +6,7 @@
 
 ![youtube](assets/h4cover1blinkyonsteroids.jpg)
 
- Watch the [Youtube Video](https://www.youtube.com/watch?v=SRHze-LRvN4) showing it in action
+Watch the [Youtube Video](https://www.youtube.com/watch?v=SRHze-LRvN4) showing it in action
 
 [Release Notes v3.0.0](docs/rn300.md)
 
