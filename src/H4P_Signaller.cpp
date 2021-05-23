@@ -243,8 +243,8 @@ H4Flasher::H4Flasher(h4pOutput* opp,uint32_t period,uint8_t duty): _period(perio
 H4Flasher::H4Flasher(h4pOutput* opp,const char* pattern,uint32_t timebase): _pattern(pattern),_timebase(timebase),_opp(opp){ flashPattern(); }
 
 void H4Flasher::_pulse(uint32_t width) {
-	_opp->toggle();
-	_off=h4.once(width,[=](){ _opp->toggle(); },nullptr,H4P_TRID_PP1x);
+	_opp->turnOn();
+	_off=h4.once(width,[=](){ _opp->turnOff(); },nullptr,H4P_TRID_PP1x);
 }
 
 void H4Flasher::PWM(){

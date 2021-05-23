@@ -66,3 +66,27 @@
   * [H4P_UPNPServer](upnp.md)
   * [H4P_WiFi](h4pwifi.md) :heavy_check_mark:
   * :building_construction: [H4P_Voice](h4pvox.md)
+ ---
+
+ # [H4Plugins Youtube channel](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
+
+ * [0: Version 3 taster](https://www.youtube.com/watch?v=4ySOh0ukyrc)
+ * [1: Blinky on steroids](https://www.youtube.com/watch?v=SRHze-LRvN4)
+ * [2: Why you need it](https://www.youtube.com/watch?v=OvOz3QPGoY0)
+ * [3: GPIO simple start RAW input](https://www.youtube.com/watch?v=k-TgHK5qTWc)
+ * [4: GPIO Filtering & Debouncing](https://www.youtube.com/watch?v=GflSWkZcr9g)
+ * [5: GPIO NODE-PINK and Debouncing descendants](https://www.youtube.com/watch?v=VUAuQOKkLLY)
+ * [6: GPIO The other children of debouncing: it's about time](https://www.youtube.com/watch?v=n6Y5OM-w2Kc)
+ * [7: GPIO Stragglers and DIY plumbing](https://www.youtube.com/watch?v=SSMLsgJKotA)
+ * [8: GPIO Rotary encoders need not be an Enigma](https://www.youtube.com/watch?v=4ySOh0ukyrc)
+
+---
+
+(c) 2021 Phil Bowles h4plugins@gmail.com
+
+* [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
+* [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
+* [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
+* [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)
+* [Facebook ESP Developers (moderator)](https://www.facebook.com/groups/ESP8266/)
+* [Support me on Patreon](https://patreon.com/esparto)

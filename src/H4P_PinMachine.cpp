@@ -60,7 +60,6 @@ void H4P_PinMachine::svcDown(){
     H4Service::svcDown();
 }
 
-//string      H4P_PinMachine::dump        (uint8_t p)                     { return delegate<msg>     (p,&h4pGPIO::dump); }
 uint8_t     H4P_PinMachine::logicalRead (uint8_t p)                     { return delegate<uint8_t> (p,&h4pGPIO::logicalRead); }
 msg         H4P_PinMachine::getEvent    (uint8_t p)                     { return delegate<msg>     (p,&h4pGPIO::getEvent); }
 uint32_t    H4P_PinMachine::getValue    (uint8_t p)                     { return delegate<uint32_t>(p,&h4pGPIO::getValue); }

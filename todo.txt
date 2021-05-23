@@ -1,4 +1,12 @@
+//
+fixes:
+default inital to OFF on h4poutput
+bug in pulse pin
+encoder defaults to input / active_high
+//
 SHORTTERM
+// ? h4poutput object in vector causes -> illegal x
+// fix crap example for asynhttp
     fix write length return for 32/8266
     fix dump / locallogger to avoid large file crash
     adv docs + / example creating your own commands

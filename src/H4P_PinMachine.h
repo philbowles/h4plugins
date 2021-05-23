@@ -110,7 +110,7 @@ class H4P_PinMachine: public H4Service {
         static  void            all(bool b);
         static  msg             dump(uint8_t p);
         static  uint8_t         logicalRead(uint8_t p);
-        static  void            logicalWrite (uint8_t p,bool b);
+        static  void            logicalWrite(uint8_t p,bool b);
         static  msg             getEvent(uint8_t p);
         static  uint32_t        getValue(uint8_t p);
         static  msg             inject(uint8_t p,uint32_t metal,bool timer=false);

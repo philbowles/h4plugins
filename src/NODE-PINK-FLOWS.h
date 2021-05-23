@@ -58,14 +58,14 @@ class h4pEncoder_Half: public h4pGPIO {
 class h4pEncoder {
     public:
         h4pGPIO*     _pA;
-        h4pEncoder(uint8_t pA,uint8_t pB,uint8_t m,H4PM_SENSE s,bool sord=true,npNODE* d=new npPUBLISHVALUE);
+        h4pEncoder(uint8_t pA,uint8_t pB,uint8_t m=INPUT,H4PM_SENSE s=ACTIVE_HIGH,bool sord=true,npNODE* d=new npPUBLISHVALUE);
 };
 
 class h4pEncoderAuto {
         friend class npLIMITER;
         h4pGPIO*     _pA;
     public:
-        h4pEncoderAuto(uint8_t pA,uint8_t pB,uint8_t m,H4PM_SENSE s,int vMin=0,int vMax=100,int vInc=1,int _vSet=50,bool wrap=false,npNODE* d=new npPUBLISHVALUE);
+        h4pEncoderAuto(uint8_t pA,uint8_t pB,uint8_t m=INPUT,H4PM_SENSE s=ACTIVE_HIGH,int vMin=0,int vMax=100,int vInc=1,int _vSet=50,bool wrap=false,npNODE* d=new npPUBLISHVALUE);
 
         void    center(){ PIPELINE(1,npLIMITER)->center(); }
         int     getValue(){ return PIPELINE(1,npLIMITER)->getValue(); }
@@ -96,7 +96,7 @@ class h4pMultifunctionButton: public h4pMultistage {
 
 class h4pOutput: public h4pGPIO {
     public:
-        h4pOutput(uint8_t p,H4PM_SENSE s,uint8_t initial,uint8_t c=H4P_UILED_RED,npNODE* d=new npPUBLISHVALUE);
+        h4pOutput(uint8_t p,H4PM_SENSE s,uint8_t initial=OFF,uint8_t c=H4P_UILED_RED,npNODE* d=new npPUBLISHVALUE);
 
     virtual bool        isAnalog() override { return false; }
     virtual bool        isOutput() override { return true; }

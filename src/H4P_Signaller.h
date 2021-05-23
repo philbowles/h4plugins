@@ -76,7 +76,7 @@ class H4Flasher{
 
 using H4FC_FN_F1        = function<void(H4Flasher*)>;
 using H4FC_FN_F2        = function<H4Flasher*(h4pOutput*)>;
-using H4P_FLASHMAP     = unordered_map<uint8_t,H4Flasher*>;
+using H4P_FLASHMAP      = unordered_map<uint8_t,H4Flasher*>;
 
 extern H4P_FLASHMAP h4pFlashMap;
 class H4P_Signaller: public H4Service {     
