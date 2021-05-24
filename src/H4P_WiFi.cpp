@@ -77,6 +77,9 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
 			h4.queueFunction([](){ h4puncheckedcall<H4P_WiFi>(wifiTag())->_lostIP(); });
             break;    
 		case WIFI_EVENT_STAMODE_GOT_IP:
+            
+            Serial.printf("Got IP address %s after %u mS\n",WiFi.localIP().toString().c_str(),millis());
+
 			h4.queueFunction([](){ h4puncheckedcall<H4P_WiFi>(wifiTag())->_gotIP(); });
 			break;
 	}
