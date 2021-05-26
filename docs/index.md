@@ -80,6 +80,8 @@
  * [7: GPIO Stragglers and DIY plumbing](https://www.youtube.com/watch?v=SSMLsgJKotA)
  * [8: GPIO Rotary encoders need not be an Enigma](https://www.youtube.com/watch?v=4ySOh0ukyrc)
  * [9: GPIO Analog Inputs](https://www.youtube.com/watch?v=1oxsNVHloqA)
+ * [10: Advanced Plumbing](https://youtu.be/yyyAttshSV0)
+ * [11: Internet of Things aint what they used to be](https://youtu.be/fLUKDAboAU8)
 
 ---
 

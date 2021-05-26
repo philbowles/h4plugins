@@ -1,4 +1,5 @@
 //
+long / weird pword prevents mqtt connect?
 fixes:
 youtube subfolder (dodgy)
 //

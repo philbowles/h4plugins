@@ -9,6 +9,8 @@
 * :door: [H4P_BinarySwitch](swings.md)
 * :door: [H4P_ConditionalSwitch](swings.md)
 
+[Watch Youtube Video](https://youtu.be/fLUKDAboAU8)
+
 # Contents
 
 * [What is a "Thing"?](#what-is-a-thing)
@@ -51,7 +53,6 @@ The [UPNPServer](upnp.md) provides (among other things) the abiity to detect Ama
 * ConditionalThing is a BinaryThing that only operates when user-defined function returns `true`
 * ConditionalSwitch is a BinarySwitch that only operates when user-defined function returns `true`
 * Only **one** Thing or Switch per app
-* It must be called `h4onof`
 
 This picture is slightly out-of-date but should give you an idea of how these all "hang together". For example, all of the "sources" have been replaced by the `H4P_ONOFF_CONNECTOR(e)` event connector mentioned [above](#link-to-h4pe_xxxx-event)
 
