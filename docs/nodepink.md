@@ -9,7 +9,6 @@
 * [Code Example: debouncing](#an-example---debouncing-in-code)
 * [Essential further reading](#essential-further-reading)
 * [Relevant Youtube channel videos](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
-
   * [3: GPIO simple start RAW input](https://www.youtube.com/watch?v=k-TgHK5qTWc)
   * [4: GPIO Filtering & Debouncing](https://www.youtube.com/watch?v=GflSWkZcr9g)
   * [5: GPIO NODE-PINK and Debouncing descendants](https://www.youtube.com/watch?v=VUAuQOKkLLY)
@@ -17,6 +16,7 @@
   * [7: GPIO Stragglers and DIY plumbing](https://www.youtube.com/watch?v=SSMLsgJKotA)
   * [8: GPIO Rotary encoders need not be an Enigma](https://www.youtube.com/watch?v=4ySOh0ukyrc)
   * [9: GPIO Analog Inputs](https://www.youtube.com/watch?v=1oxsNVHloqA)
+  * [10: Advanced Plumbing](https://youtu.be/yyyAttshSV0)
 
 ---
 

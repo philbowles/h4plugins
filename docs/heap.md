@@ -1,4 +1,4 @@
-![H4P Logo](/assets/DiagLogo.jpg)
+![H4P Logo](../assets/DiagLogo.jpg)
 
 # H4P_EmitHeap
 
@@ -6,7 +6,7 @@
 
 Emits `H4PE_HEAP` events at a user-defined frequency. The event message contains the string representation of the amount of free heap space.
 
-For information on how to use this plugin, see [Event Listeners, Event Emitters and logging](events.md)
+For information on how to use this plugin, see :gem:[Everything is an event: Listeners, Emitters and Handlers](events.md)
 
 ---
 
@@ -15,9 +15,6 @@ For information on how to use this plugin, see [Event Listeners, Event Emitters 
 * [Usage](#usage)
 * [Dependencies](#dependencies)
 * [Commands Added](#commands-added)
-* [Events Emitted](#s-emitted)
-* [Events Listened for](#s-listened-for)
-* [Tasks Run](#tasks-run)
 * [Service Commands](#service-commands)
 * [API](#api)
 
@@ -26,11 +23,11 @@ For information on how to use this plugin, see [Event Listeners, Event Emitters 
 # Usage
 
 ```cpp
-H4P_EmitHeap heapEmitter(...
+H4P_EmitHeap uriah(...
 ```
 
 This plugin is a "singleton" - there may be only one single instance of it in the app. 
-It may be instantiated as any name the user chooses, prefix all API calls below with `myChosenName.`
+It may be instantiated as any name the user chooses, prefix all API calls below with than name.
 
 # Dependencies
 
@@ -39,20 +36,6 @@ N/A
 # Commands Added
 
 N/A
-
-# Events Listened for
-
-N/A
-
-# Events Emitted
-
-`H4PE_HEAP`
-
-# Tasks Run
-
-| Symbolic Name | Short Name | Type | Singleton | Purpose |
-| :----------   | :--- | :--- | :-------: | :---    |
-|H4P_TRID_HLOG|HLOG|every|:heavy_check_mark:|Event frequency timer|
 
 # Service Commands
 
@@ -75,14 +58,17 @@ uint32_t f; event frequency in milliseconds
 H4P_EmitHeap(uint32_t f=1000);
 ```
 
-[Example Sketch](../examples/LOGGING/EmittersListeners/EmittersListeners.ino)
+[Example Sketch 1](../examples/00_START_HERE/04_YourOwnEventHandling/04_YourOwnEventHandling.ino)
+
+[Example Sketch 2](../examples/02_LOGGING/H4P_MQTTLogger/H4P_MQTTLogger.ino)
 
 ---
 
 (c) 2021 Phil Bowles h4plugins@gmail.com
 
+* [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)
 * [Facebook ESP Developers (moderator)](https://www.facebook.com/groups/ESP8266/)
-* [Support me on Patreon](https://patreon.com/esparto)
+* [Support me on Patreon](https://patreon.com/es/esparto)

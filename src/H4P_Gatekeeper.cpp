@@ -28,19 +28,19 @@ SOFTWARE.
 */
 #ifdef ARDUINO_ARCH_ESP8266
 
-#include<H4P_Gatekeeper.h>
+#include<H4P_GateKeeper.h>
 #include<H4P_UPNPServer.h>
 
 H4P_ROAMER_MAP              h4pRoamers;
 
-H4_TIMER                    H4P_Gatekeeper::_chunker=nullptr;
-H4P_ROAMER_MAP::iterator    H4P_Gatekeeper::_matched;
-struct  ping_option         H4P_Gatekeeper::_pop;
+H4_TIMER                    H4P_GateKeeper::_chunker=nullptr;
+H4P_ROAMER_MAP::iterator    H4P_GateKeeper::_matched;
+struct  ping_option         H4P_GateKeeper::_pop;
 
 unordered_map<string,h4pRoamingDotLocal*> h4pRoamingDotLocal::localList;
 
 h4pRoamer::h4pRoamer(const string& name,const string& id): _name(name),_id(id){
-    require<H4P_Gatekeeper>("gate");
+    require<H4P_GateKeeper>("gate");
     h4pRoamers.push_back(this);
 }
 
@@ -55,7 +55,7 @@ void h4pMDNScb(MDNSResponder::MDNSServiceInfo serviceInfo, MDNSResponder::Answer
 //
 //      Gatekeeper
 //
-void H4P_Gatekeeper::_ping_recv_cb(void *opt, void *resp){
+void H4P_GateKeeper::_ping_recv_cb(void *opt, void *resp){
     auto pOpt=static_cast<struct ping_option*>(opt);
     auto caller=reinterpret_cast<h4pRoamer*>(pOpt->reverse);
     int v=(1+static_cast<struct ping_resp*>(resp)->ping_err);
@@ -64,7 +64,7 @@ void H4P_Gatekeeper::_ping_recv_cb(void *opt, void *resp){
     _matched++;
 }
 
-void H4P_Gatekeeper::_scavenge() {
+void H4P_GateKeeper::_scavenge() {
     _matched=h4pRoamers.begin();
     h4.cancel(_chunker);
     _chunker=h4.repeatWhile(
@@ -85,21 +85,21 @@ void H4P_Gatekeeper::_scavenge() {
 }
 
 #if H4P_LOG_MESSAGES
-void H4P_Gatekeeper::info() { 
+void H4P_GateKeeper::info() { 
     H4Service::info();
     reply(" Roamers:");
     for(auto const& r:h4pRoamers) reply("  %s ",CSTR(r->_describe()));
 }
 #endif
 
-void H4P_Gatekeeper::svcUp(){
+void H4P_GateKeeper::svcUp(){
     h4pRoamers.shrink_to_fit();
     for(auto const& r:h4pRoamers) r->_startSniffing();
     h4.every(H4P_GK_SCAVENGE,_scavenge,nullptr,H4P_TRID_GATE,true);
     H4Service::svcUp();
 }
 
-void H4P_Gatekeeper::svcDown(){
+void H4P_GateKeeper::svcDown(){
     h4.cancelSingleton(H4P_TRID_GATE);
     h4.cancel(_chunker);
     for(auto &r:h4pRoamers) {

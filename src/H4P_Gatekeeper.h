@@ -42,9 +42,9 @@ extern "C" {
     #include <ping.h>
 }
 //
-// H4P_Gatekeeper
+// H4P_GateKeeper
 //
-class H4P_Gatekeeper: public H4Service{
+class H4P_GateKeeper: public H4Service{
         static  H4_TIMER                    _chunker;
         static  H4P_ROAMER_MAP::iterator    _matched;
         static  struct  ping_option         _pop;
@@ -52,7 +52,7 @@ class H4P_Gatekeeper: public H4Service{
         static  void            _ping_recv_cb(void *opt, void *resp);
         static  void            _scavenge();
     public:
-            H4P_Gatekeeper(): H4Service("gate"){ 
+            H4P_GateKeeper(): H4Service("gate"){ 
                 depend<H4P_WiFi>(wifiTag());
                 memset(&_pop,'\0',sizeof(ping_option));
                 _pop.count = 1;    //  try to ping how many times

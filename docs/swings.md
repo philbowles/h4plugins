@@ -1,6 +1,6 @@
 ![H4P Flyer](../assets/GPIOLogo.jpg) 
 
-# BinarySwitch, BinaryThing, ConditionalSwitch, ConditionalThing
+# H4P_BinarySwitch, H4P_BinaryThing, H4P_ConditionalSwitch, H4P_ConditionalThing
 
 ## Provide on/off/toggle/switch/auto commands to a GPIO (...Switch) or functional object (...Thing)
 
@@ -188,6 +188,10 @@ This should be called whenever the value returned by the predicate function chan
 * [BinarySwitch with MQTT](../examples/05_THINGS_SWITCHES/H4P_BinarySwitchMQTT/H4P_BinarySwitchMQTT.ino)
 * [ConditionalSwitch](../examples/05_THINGS_SWITCHES/H4P_ConditionalSwitch/H4P_ConditionalSwitch.ino)
 * [Advanced: Real-world ConditionalSwitch (Light-dependent Alarm)](../examples/XTRAS/H4P_Generic_SQUAWK/H4P_Generic_SQUAWK.ino)
+
+---
+
+See also  [Youtube video](https://youtu.be/fLUKDAboAU8)
 
 ---
 

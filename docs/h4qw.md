@@ -1,4 +1,4 @@
-![H4P Flyer](/assets/DiagLogo.jpg)
+![H4P Flyer](../assets/DiagLogo.jpg)
 
 # H4P_QueueWarn
 
@@ -17,9 +17,6 @@ It is intended purely for debugging and is not normally required. It could typic
 * [Usage](#usage)
 * [Dependencies](#dependencies)
 * [Commands Added](#commands-added)
-* [Events Emitted](#s-emitted)
-* [Events Listened for](#s-listened-for)
-* [Tasks Run](#tasks-run)
 * [Service Commands](#service-commands)
 * [API](#api)
 
@@ -32,7 +29,7 @@ H4P_QueueWarn h4qw(...
 ```
 
 This plugin is a "singleton" - there may be only one single instance of it in the app. 
-It may be instantiated as any name the user chooses, prefix all API calls below with `myChosenName.`
+It may be instantiated as any name the user chooses, prefix all API calls below with than name.
 
 # Dependencies
 
@@ -41,20 +38,6 @@ N/A
 # Commands Added
 
 * `h4/qwrn/pcent/N` // payload N = some sensible percentage
-
-# Events Listened for
-
-N/A
-
-# Events Emitted
-
-N/A
-
-# Tasks Run
-
-| Symbolic Name | Short Name | Type | Singleton | Purpose |
-| :----------   | :--- | :--- | :-------: | :---    |
-|N/A| | |||
 
 # Service Commands
 
@@ -81,14 +64,15 @@ H4P_QueueWarn(H4P_FN_VB onQueueWarning,uint32_t _limit=50);
 void        pcent(uint32_t pc); // Set new "safe" percentage
 ```
 
-[Example code](../examples/DIAGNOSTICS/H4P_QueueWarn/H4P_QueueWarn.ino)
+[Example code](../examples/03_DIAGNOSTICS/H4P_QueueWarn/H4P_QueueWarn.ino)
 
 ---
 
 (c) 2021 Phil Bowles h4plugins@gmail.com
 
+* [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)
 * [Facebook ESP Developers (moderator)](https://www.facebook.com/groups/ESP8266/)
-* [Support me on Patreon](https://patreon.com/esparto)
+* [Support me on Patreon](https://patreon.co

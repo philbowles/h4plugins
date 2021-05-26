@@ -76,7 +76,7 @@ Networking is not required but if you *are* connected, the webserver will automa
 
 ### Network presence detection
 
-* :building_construction: [H4P_Gatekeeper](h4pgk.md) Manages creation of "enter" and "leave" events whern specifc roaming devices move in and out of netwrork range. Currently detectable device types are:
+* :building_construction: [H4P_GateKeeper](gk.md) Manages creation of "enter" and "leave" events whern specifc roaming devices move in and out of netwrork range. Currently detectable device types are:
 
 |Roeaming Device Class|Identified by|Example
 | ---: | ---: | ---: |

@@ -81,7 +81,7 @@ string getTerminalName(const string& s) {
 
 #if SANITY
 #include<H4P_PinMachine.h>
-#include<H4P_Gatekeeper.h>
+#include<H4P_GateKeeper.h>
 
 void h4StartPlugins(){
     Serial.printf("Registered to start:\n");

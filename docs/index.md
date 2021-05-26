@@ -41,23 +41,23 @@
   * [H4P_BinaryThing](swings.md) :heavy_check_mark:
   * [H4P_ConditionalSwitch](swings.md) :heavy_check_mark:
   * [H4P_ConditionalThing](swings.md) :heavy_check_mark:
-  * [H4P_EmitHeap](heap.md)
-  * [H4P_EmitLoopCount](loops.md)
-  * :building_construction: [H4P_EmitQ](emq.md)
-  * [H4P_EmitTick](eq.md)
-  * [H4P_EventListener](ears.md)
-  * :building_construction: [H4P_Gatekeeper](h4pgk.md)
-  * [H4P_HeapWarn](h4hw.md)
+  * [H4P_EmitHeap](heap.md) :heavy_check_mark:
+  * [H4P_EmitLoopCount](loops.md) :heavy_check_mark:
+  * [H4P_EmitQ](eq.md) :heavy_check_mark:
+  * [H4P_EmitTick](tick.md) :heavy_check_mark:
+  * [H4P_EventListener](ears.md) :heavy_check_mark:
+  * [H4P_GateKeeper](gk.md) :heavy_check_mark:
+  * [H4P_HeapWarn](h4hw.md) :heavy_check_mark:
   * [H4P_Heartbeat](beat.md)
-  * :building_construction: [H4P_LinkMaster](h4plink.md)
+  * [H4P_LinkMaster](h4plink.md) :heavy_check_mark:
   * [H4P_LocalLogger](llog.md)
   * [H4P_MQTTLogger](mlog.md)
   * [H4P_PinMachine](h4pxxxx.md)
-  * [H4P_QueueWarn](h4qw.md)
+  * [H4P_QueueWarn](h4qw.md) :heavy_check_mark:
   * :building_construction: [H4P_RemoteLogger](h4rl.md)
   * :building_construction: [H4P_RemoteUpdate](h4pxxxx.md)
   * [H4P_SerialCmd](h4p.md) :heavy_check_mark:
-  * [H4P_SerialLogger](slog.md)
+  * [H4P_SerialLogger](ears.md) :heavy_check_mark:
   * [H4P_Signaller](h4fc.md)
   * :building_construction: [H4P_Sunrise](h4pxxxx.md)
   * :building_construction: [H4P_TaskSniffer](h4pxxxx.md)

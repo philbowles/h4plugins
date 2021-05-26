@@ -8,9 +8,9 @@ Reacting to the network arrival and departure of "roaming" devices
 
 # What does it do?
 
-There is a plugin called [H4P_Gatekeeper](h4pgk.md). Your sketch lists identifying fatures of specifc devices, for example your mobile phone, a family member's laptop etc.
+There is a plugin called [H4P_GateKeeper](gk.md). Your sketch lists identifying fatures of specifc devices, for example your mobile phone, a family member's laptop etc.
 
-The [H4P_Gatekeeper](h4pgk.md) emits an `H4PE_PRESENCE` event whenever one of the named roaming devices enters (msg==1) or leaves (msg=0) the network. 
+The [H4P_GateKeeper](gk.md) emits an `H4PE_PRESENCE` event whenever one of the named roaming devices enters (msg==1) or leaves (msg=0) the network. 
 
 This can be used for example to implement a self-arming alarm system which will switch one whenever your personal phone leaves the network and switches off when your phone is detected again as you arrive back home. It could turn on the outsiude lights at the same time when it is dark.
 
