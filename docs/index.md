@@ -32,6 +32,13 @@
 * [Handling MQTT topics / commands](mqcmds.md) :heavy_check_mark:
 * [Network Presence Detection](presence.md) :heavy_check_mark:
 * :building_construction: [Advanced Topics](docs/advanced.md)
+    * :building_construction: debugging ideas
+    * :building_construction: best parctice
+    * :building_construction: resource minimisation
+    * :building_construction: generic binaries
+    * :building_construction: using NODE-RED as an ecosystem controller
+    * :building_construction: optimised board types / 96k FS for sonoffs
+    * :building_construction: writing your own plugin
 * [Known Issues / FAQs](docs/faq.md) :heavy_check_mark:
 * [Raising an Issue](docs/issues.md) :heavy_check_mark:
 * :door: Plugins APIs
@@ -81,7 +88,7 @@
  * [8: GPIO Rotary encoders need not be an Enigma](https://www.youtube.com/watch?v=4ySOh0ukyrc)
  * [9: GPIO Analog Inputs](https://www.youtube.com/watch?v=1oxsNVHloqA)
  * [10: Advanced Plumbing](https://youtu.be/yyyAttshSV0)
- * [11: Internet of Things aint what they used to be](https://youtu.be/fLUKDAboAU8)
+ * [11: Internet of Things ain't what they used to be](https://youtu.be/fLUKDAboAU8)
 
 ---
 

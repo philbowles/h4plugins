@@ -142,12 +142,6 @@ String H4P_WiFi::_aswsReplace(const String& var){
 
 uint32_t H4P_WiFi::_change(vector<string> vs){ return _guardString2(vs,[this](string a,string b){ change(a,b); return H4_CMD_OK; }); }
 
-void H4P_WiFi::_clear(){
-    WiFi.onEvent([](WiFiEvent_t event){});
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(h4Tag(),h4Tag()); // // === eraseConfig :) becos it wont allow "",""
-}
-
 void H4P_WiFi::_clearUI(){ 
     h4pUserItems.clear();
     h4pUIorder.clear();
@@ -219,7 +213,8 @@ void H4P_WiFi::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg) {
             uiMessage("%s",CSTR(msg));
             break;
         case H4PE_FACTORY:
-            _clear();
+            WiFi.mode(WIFI_STA);
+            WiFi.begin(h4Tag(),h4Tag()); // // === eraseConfig :) becos it wont allow "",""
             break;
         case H4PE_UIADD:
             __uiAdd(msg);
@@ -381,7 +376,6 @@ void H4P_WiFi::_startWebserver(){
 void H4P_WiFi::_stopWebserver(){ 
     end();
     _discoDone=true;
-    _signalBad();
     _clearUI();
     svcDown();
 }
@@ -435,8 +429,8 @@ void H4P_WiFi::info() {
 #endif
 
 void H4P_WiFi::svcDown(){
+    _signalBad();
     h4.cancelSingleton(H4P_TRID_HOTA);
-    WiFi.mode(WIFI_OFF);
     H4Service::svcDown();
 }
 

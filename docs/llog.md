@@ -1,4 +1,4 @@
-![H4P Logo](/assets/DiagLogo.jpg)
+![H4P Logo](../assets/DiagLogo.jpg)
 
 # H4P_LocalLogger
 

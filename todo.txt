@@ -1,10 +1,7 @@
-//
-keeper -> Keeper
-long / weird pword prevents mqtt connect?
-fixes:
-youtube subfolder (dodgy)
-//
+remove ondcx unsubs  ... pointless
+
 SHORTTERM
+    lynx slave -> http transport not obvious! ... multi armadillo?
     change old-fashioned warn sb to SYSWARN events
 // ? h4poutput object in vector causes -> illegal x
 // fix crap example for asynhttp

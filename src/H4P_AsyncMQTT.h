@@ -45,7 +45,7 @@ STAG(nDCX);
 class H4P_AsyncMQTT: public H4Service, public PangolinMQTT{
                 bool            _discoDone;
                 bool            autorestart=true;
-                string          device;
+//                string          device;
                 string          prefix=string(h4Tag()).append("/");
                 struct H4P_LWT  _lwt;
                 unordered_set<string> _reportList={binTag(),ipTag(),h4pTag()};

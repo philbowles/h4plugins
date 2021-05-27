@@ -28,7 +28,7 @@ SOFTWARE.
 */
 #pragma once
 
-#define H4P_VERSION "3.0.2"
+#define H4P_VERSION "3.0.3"
 
 // Make sure you read the documentation and have arrangements in place for using AP mode :)
 // If you don't have the H4P_WiFiAP.cpp file, the linker will fail.
@@ -53,7 +53,7 @@ SOFTWARE.
         H4P_UI_HEALTH = 1 adds Heap,Q,nLoops to UI when using heartbeat
 */
 #define SANITY                  0
-#define H4P_LOG_MESSAGES        0
+#define H4P_LOG_MESSAGES        1
 #define H4P_SYS_LEVEL           0
 #define H4P_UI_HEALTH           0
 /*
