@@ -66,7 +66,7 @@ void onMqttConnect(){
     h4mqtt.subscribeDevice("mytopic",myCallback);
 }
 
-void onMqttDisconnect(){ /* do all your unsubscribes in here */ }
+void onMqttDisconnect(){ /* release any resources here */ }
 
 void h4pGlobalEventHandler(const string& svc,H4PE_TYPE t,const string& msg){
     switch(t){

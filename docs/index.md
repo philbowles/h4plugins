@@ -43,7 +43,7 @@
 * [Raising an Issue](docs/issues.md) :heavy_check_mark:
 * :door: Plugins APIs
   * [H4P_AsyncHTTP](h4phttp.md) :heavy_check_mark:
-  * [H4P_AsyncMQTT](h4pmqtt.md) :heavy_check_mark:
+  * [H4P_AsyncMQTT](h4mqtt.md) :heavy_check_mark:
   * [H4P_BinarySwitch](swings.md) :heavy_check_mark:
   * [H4P_BinaryThing](swings.md) :heavy_check_mark:
   * [H4P_ConditionalSwitch](swings.md) :heavy_check_mark:
@@ -55,13 +55,14 @@
   * [H4P_EventListener](ears.md) :heavy_check_mark:
   * [H4P_GateKeeper](gk.md) :heavy_check_mark:
   * [H4P_HeapWarn](h4hw.md) :heavy_check_mark:
-  * [H4P_Heartbeat](beat.md)
+  * [H4P_Heartbeat](beat.md) :heavy_check_mark:
   * [H4P_LinkMaster](h4plink.md) :heavy_check_mark:
-  * [H4P_LocalLogger](llog.md)
-  * [H4P_MQTTLogger](mlog.md)
-  * [H4P_PinMachine](h4pxxxx.md)
+  * [H4P_LocalLogger](llog.md) :heavy_check_mark:
+  * [H4P_MQTTLogger](mlog.md) :heavy_check_mark:
+  * [H4P_PinMachine](h4pm.md):heavy_check_mark:
   * [H4P_QueueWarn](h4qw.md) :heavy_check_mark:
-  * :building_construction: [H4P_RemoteLogger](h4rl.md)
+  * [H4P_RemoteLogger](rlog.md) :heavy_check_mark:
+    * [MySQL event logger webserver](https://github.com/philbowles/mysqlrest) :heavy_check_mark:
   * :building_construction: [H4P_RemoteUpdate](h4pxxxx.md)
   * [H4P_SerialCmd](h4p.md) :heavy_check_mark:
   * [H4P_SerialLogger](ears.md) :heavy_check_mark:

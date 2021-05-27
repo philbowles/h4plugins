@@ -13,13 +13,8 @@ Provides common command / control functions to all other plugins and allows cont
 * [Usage](#usage)
 * [Dependencies](#dependencies)
 * [Commands Added](#commands-added)
-* [Events Emitted](#events-emitted)
-* [Events Listened for](#events-listened-for)
-* [Tasks Run](#tasks-run)
 * [Service Commands](#service-commands)
 * [API](#api)
-    * [Callback functions](#callback-functions)
-    * [Member Functions](#constructor)
 
 ---
 # Usage

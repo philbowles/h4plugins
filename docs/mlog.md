@@ -1,4 +1,4 @@
-![H4P Logo](/assets/DiagLogo.jpg)
+![H4P Logo](../assets/DiagLogo.jpg)
 
 # H4P_MQTTLogger
 
@@ -6,7 +6,7 @@
 
 Registers a handler function with a selected set of events, which publishes the event message to MQTT using a topic name selected by the user.
 
-For information on how to use this plugin, see [Event Listeners, Event Emitters and logging](events.md)
+For information on how to use this plugin, see [Everything is an event: Listeners, Emitters and Handlers](events.md)
 
 ---
 
@@ -37,36 +37,15 @@ H4P_MQTTLogger anyNameYouChoose(...  // internal ref: mlog3
 
 # Dependencies
 
-[H4P_WiFi](h4wifi.md)
 [H4P_AsyncMQTT](h4mqtt)
 
 # Commands Added
 
 N/A
 
-# Events Listened for
-
-Any, depends on filter parameter: see constructor
-
-# Events Emitted
-
-N/A
-
-# Tasks Run
-
-| Symbolic Name | Short Name | Type | Singleton | Purpose |
-| :----------   | :--------- | :--- | :-------: | :---    |
-|N/A| | | | |
-
 # Service Commands
 
 `stop` / `start` have no effect
-
-## Callback functions
-
-N/A
-
----
 
 # API
 
@@ -80,12 +59,13 @@ const string& topic; MQTT topic name the event(s) is published to
 H4P_MQTTLogger(const string& topic,uint32_t filter);
 ```
 
-[Example Sketch](../examples/LOGGING/H4P_MQTTLogger/H4P_MQTTLogger.ino)
+[Example Sketch](../examples/02_LOGGING/H4P_MQTTLogger/H4P_MQTTLogger.ino)
 
 ---
 
 (c) 2021 Phil Bowles h4plugins@gmail.com
 
+* [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)

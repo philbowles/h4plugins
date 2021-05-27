@@ -18,7 +18,7 @@ uint32_t myCallback(vector<string> vs){
 
 void onMqttConnect(){ h4mqtt.subscribeDevice({"a","a/b","a/b/c"},myCallback); }
 
-void onMqttDisconnect(){ h4mqtt.unsubscribeDevice({"a","a/b","a/b/c"}); }
+void onMqttDisconnect(){}
 
 void h4pGlobalEventHandler(const string& svc,H4PE_TYPE t,const string& msg){
     switch(t){

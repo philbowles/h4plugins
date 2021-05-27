@@ -85,18 +85,16 @@ struct H4P_LWT {
     bool     retain;
 };
 //
-// broker = name of server, either "somerserver.com" or "192.168.1.69" formats
-// port = server port, usually 1883
 // user / pass optional if server requires authentication
-// onConnect = user callback when MQTT connects
-// onDisconnect = user callback when MQTT disconnects
-// 
+//
+// url remote server format "http://host:port/path/?a=b..." can start https://. port, path, query all optional
+// e.g. "http://myserver.local:1883"
 // lwt = optional Last Will and Testament for custom LWT message
 //
-H4P_AsyncMQTT(string broker,uint16_t port, string user="",string pass="",H4P_LWT lwt={"","",0,false}):
+H4P_AsyncMQTT(string url, string user="",string pass="",H4P_LWT lwt={"","",0,false});
 //
 void addReportingItem(const string& ri); // adds global config item ri to the list of values oncluded on `report`
-void change(const string& broker,const string& user,const string& passwd); // switch to new MQTT broker
+void change(const string& url,const string& user,const string& passwd);
 void publishDevice(const string& topic,const string& payload,uint8_t qos=0, bool retain=false); // publish <device>/topic with string payload
 void publishDevice(const string& topic,uint32_t payload,uint8_t qos=0, bool retain=false); // publish <device>/topic with numeric payload
 void report(); // publishes golbal config item values as JSON

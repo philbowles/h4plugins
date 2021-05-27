@@ -38,7 +38,4 @@ void onMqttConnect(){
     });
 }
 
-void onMqttDisconnect(){
-    Serial.printf("USER: MQTT Disconnected\n");
-    mqtt.unsubscribeDevice("mytopic");
-}
+void onMqttDisconnect(){}

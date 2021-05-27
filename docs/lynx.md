@@ -4,7 +4,7 @@
 
 ## Shortname link
 
-Manages the Master / Slave linkage of two separate H4 devices. This allows one device to automatically control another (or indeed several), provided they all contain a Switch / Thing plugin (see ["Things" and "Switches"](things.md) ) and use MQTT (see [H4P_AsyncMQTT](h4pmqtt.md))
+Manages the Master / Slave linkage of two separate H4 devices. This allows one device to automatically control another (or indeed several), provided they all contain a Switch / Thing plugin (see ["Things" and "Switches"](things.md) ) and use MQTT (see [H4P_AsyncMQTT](h4mqtt.md))
 
 In that case, the "Master" will need to include the `H4P_LinkMaster` plugin and simply forwards any change of state to all of its "slaves". No extra code is required by the slaves.
 
@@ -43,7 +43,7 @@ H4P_LinkMaster lynx(...);
 
 # Dependencies
 
- [H4P_AsyncMQTT](h4pmqtt.md)
+ [H4P_AsyncMQTT](h4mqtt.md)
 
 # Commands Added
 

@@ -44,7 +44,7 @@ uint32_t arm(vector<string> vs){
 }
 
 void onMqttConnect(){ mqtt.subscribeDevice("arm",arm);}
-void onMqttDisconnect(){ mqtt.unsubscribeDevice("arm"); }
+void onMqttDisconnect(){}
 
 void armingStateChange(bool b){
     if(b) h4fc.flashPin(500,ARMED);

@@ -86,9 +86,9 @@ class h4pGPIO {
                 H4PM_SENSE          _s;
 //
         h4pGPIO(uint8_t p,uint8_t m,H4PM_SENSE s=ACTIVE_LOW,npFLOW flow={});
-        
+#if H4P_LOG_MESSAGES
                 string              dump();
-                msg                 getEvent(){ return _prev; }
+#endif
                 int                 getValue(){ return _prev.load; }
                 msg                 inject(uint32_t metal,bool timer=false);
         virtual bool                isAnalog(){ return HAL_isAnalog(_p); }
@@ -105,14 +105,13 @@ class H4P_PinMachine: public H4Service {
     public:
         H4P_PinMachine(): H4Service(gpioTag()) {}
 #if H4P_LOG_MESSAGES
+        static  msg             dump(uint8_t p);
                 void            info() override;
 #endif
         static  void            all(bool b);
-        static  msg             dump(uint8_t p);
         static  uint8_t         logicalRead(uint8_t p);
         static  void            logicalWrite(uint8_t p,bool b);
-        static  msg             getEvent(uint8_t p);
-        static  uint32_t        getValue(uint8_t p);
+        static  int             getValue(uint8_t p);
         static  msg             inject(uint8_t p,uint32_t metal,bool timer=false);
         static  bool            isAnalog(uint8_t p);
         static  h4pGPIO*        isManaged(uint8_t p){ return h4pPinMap.count(p) ? h4pPinMap[p]:nullptr; }
