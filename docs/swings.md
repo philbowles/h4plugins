@@ -16,6 +16,7 @@ You need to be familiar with the terminology used by these Plugins, you must rea
 * [Commands Added](#commands-added)
 * [Service Commands](#service-commands)
 * [API](#api)
+* [Relevant Youtube Videos](#relevant-youtube-videos)
 
 ---
 
@@ -191,7 +192,10 @@ This should be called whenever the value returned by the predicate function chan
 
 ---
 
-See also  [Youtube video](https://youtu.be/fLUKDAboAU8)
+# Relevant Youtube Videos
+
+ * [11: Internet of Things ain't what they used to be](https://youtu.be/fLUKDAboAU8)
+ * [12: Internet of Things can only get better](https://www.youtube.com/watch?v=sy7xHuKghrM)
 
 ---
 

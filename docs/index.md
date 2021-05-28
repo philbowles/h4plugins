@@ -35,7 +35,8 @@
     * :building_construction: debugging ideas
     * :building_construction: best parctice
     * :building_construction: resource minimisation
-    * :building_construction: generic binaries
+    * :building_construction: [Generic Binaries](generix.md) :heavy_check_mark:
+    * :building_construction: [Running a remote update server](rusrv.md)
     * :building_construction: using NODE-RED as an ecosystem controller
     * :building_construction: optimised board types / 96k FS for sonoffs
     * :building_construction: writing your own plugin
@@ -90,6 +91,7 @@
  * [9: GPIO Analog Inputs](https://www.youtube.com/watch?v=1oxsNVHloqA)
  * [10: Advanced Plumbing](https://youtu.be/yyyAttshSV0)
  * [11: Internet of Things ain't what they used to be](https://youtu.be/fLUKDAboAU8)
+ * [12: Internet of Things can only get better](https://www.youtube.com/watch?v=sy7xHuKghrM)
 
 ---
 

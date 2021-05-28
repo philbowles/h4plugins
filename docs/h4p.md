@@ -39,8 +39,11 @@ N/A
 
 See also [Common Command and Control: H4P_SerialCmd and Services](ccc.md)
 
+* `h4/clear` (erase all global variables USE WITH CAUTION!!!) 
+* `h4/config` (change value of on or more global variables* (see below)) 
 * `h4/dump/x` (payload x = FS file name. Show contents of file.) 
 * `h4/factory` ( "factory resets" the device)
+* `h4/get/x` ( show the value of global variable x)
 * `h4/reboot` ( reboots the device )
 * `h4/show/all` (runs all the commands starting `h4/show/`)
 * `h4/show/config` (internal configuration variables)
@@ -50,6 +53,19 @@ See also [Common Command and Control: H4P_SerialCmd and Services](ccc.md)
 * `h4/show/q` (shows all tasks in the Q waiting to be scheduled)
 * ... service control commands (see above)
 * `help`
+
+*config payload:
+
+For a single variable the payload should be name=value. You may also update several variables at a time by separating those name=value pairs with commas, e.g.
+
+```cpp
+h4/config/myvar=42
+h4/config/myvar=666,life=42,firmware=h4plugins
+```
+
+*** N.B. ***
+
+*The correct operation of the system depends on many of the global variables. Several of those critical values will immediately cause side effects (possibly undwanted, e.g. reboot) if changed. Change only those you created yourself!*
 
 ---
 # Service Commands
@@ -92,6 +108,16 @@ void all();
 Runs all commands from any loaded plugins containing "show", i.e. `h4/show/q` ... etc and also runs `h4/svc/state/...` on all loaded plugins
 
 ### Equivalent command: h4/show/all
+
+---
+
+```cpp
+void clear();
+```
+
+Erases ***all*** global variables. USE AT YOUR PERIL! (if at all)
+
+### Equivalent command: h4/clear
 
 ---
 
