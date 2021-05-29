@@ -38,7 +38,7 @@
     * :building_construction: [Generic Binaries](generix.md) :heavy_check_mark:
     * :building_construction: [Running a remote update server](rusrv.md)
     * :building_construction: using NODE-RED as an ecosystem controller
-    * :building_construction: optimised board types / 96k FS for sonoffs
+    * :building_construction: [Additional board defintions](boards.md)
     * :building_construction: writing your own plugin
 * [Known Issues / FAQs](docs/faq.md) :heavy_check_mark:
 * [Raising an Issue](docs/issues.md) :heavy_check_mark:

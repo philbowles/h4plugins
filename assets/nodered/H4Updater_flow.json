@@ -1,0 +1,143 @@
+[
+    {
+        "id": "d4d66233.2bb16",
+        "type": "tab",
+        "label": "H4 Updater",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "efde794b.1a1958",
+        "type": "http in",
+        "z": "d4d66233.2bb16",
+        "name": "/update/:device",
+        "url": "/update/:device",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 90,
+        "y": 140,
+        "wires": [
+            [
+                "77151001.63046"
+            ]
+        ]
+    },
+    {
+        "id": "77151001.63046",
+        "type": "function",
+        "z": "d4d66233.2bb16",
+        "name": "Get Parameters",
+        "func": "let repo=\"/home/pi/h4/firmware/\"\nlet mode\nlet fname\nlet version\nlet chipsize\n\nlet device=msg.req.params.device\nlet h=msg.req.headers\n\nnode.warn(\"UPD FROM \"+device)\nlet props=global.get(\"device\").get(device)\nif(props){\n    if(h[\"x-esp8266-mode\"]){\n        mode=h[\"x-esp8266-mode\"]\n        chipsize=h['x-esp8266-chip-size']\n        version=h['x-esp8266-version']\n    }\n    else {\n        mode=h[\"x-esp32-mode\"]\n        chipsize=h['x-esp32-chip-size']\n        version=h['x-esp32-version']\n    }\n    if(mode===\"sketch\") {\n        fname=props.bin\n        repo+=\"bin\"\n    }\n    else {\n        let sz=parseInt(chipsize)/1048576;\n        fname=\"fs_\"+sz+\"M.bin\"\n        repo+=\"fs\"\n    }\n    \n    //node.warn(\"repo \"+ repo +\" fname \"+fname+\" ver \"+version)\n    msg.repo=msg.payload=repo\n    msg.currentVersion=version\n    msg.fname=fname\n    return msg\n} else node.warn(\"UNSUPPORTED\");",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 280,
+        "y": 140,
+        "wires": [
+            [
+                "649662b0.c22f6c"
+            ]
+        ]
+    },
+    {
+        "id": "db4fbc87.2de3a",
+        "type": "http response",
+        "z": "d4d66233.2bb16",
+        "name": "Send HTTP Reply",
+        "x": 1040,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "21b33f1c.b1d7c",
+        "type": "comment",
+        "z": "d4d66233.2bb16",
+        "name": "Incoming ESPhttpUpdate",
+        "info": "",
+        "x": 120,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "649662b0.c22f6c",
+        "type": "exec",
+        "z": "d4d66233.2bb16",
+        "command": "ls -r",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "oldrc": false,
+        "name": "",
+        "x": 430,
+        "y": 140,
+        "wires": [
+            [
+                "bdadb180.d36da"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "bdadb180.d36da",
+        "type": "function",
+        "z": "d4d66233.2bb16",
+        "name": "Compare versions",
+        "func": "let versions=msg.payload.split(\"\\n\")\nnode.warn(\"latest version=\"+versions[0])\nif(msg.currentVersion<versions[0]){\n    let fullname=msg.repo+\"/\"+versions[0]+\"/\"+msg.fname\n    node.warn(\"UPDATE REQUIRED TO \"+fullname)\n    msg.filename=fullname\n    return [null,msg]\n}\nelse {\n    node.warn(\"current version \"+msg.currentVersion+\" same as latest \"+versions[0])\n    msg.statusCode=304\n    return [msg,null]\n}",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 593,
+        "y": 127,
+        "wires": [
+            [
+                "db4fbc87.2de3a"
+            ],
+            [
+                "4f900f7c.762ac"
+            ]
+        ]
+    },
+    {
+        "id": "4f900f7c.762ac",
+        "type": "file in",
+        "z": "d4d66233.2bb16",
+        "name": "Serve Latest",
+        "filename": "",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "x": 820,
+        "y": 180,
+        "wires": [
+            [
+                "db4fbc87.2de3a"
+            ]
+        ]
+    },
+    {
+        "id": "7341e5e0.36bdac",
+        "type": "comment",
+        "z": "d4d66233.2bb16",
+        "name": "Find latest version in repo",
+        "info": "",
+        "x": 490,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "2b4a1750.35c968",
+        "type": "comment",
+        "z": "d4d66233.2bb16",
+        "name": "Already latest -> 304",
+        "info": "",
+        "x": 817,
+        "y": 100,
+        "wires": []
+    }
+]itvox?
