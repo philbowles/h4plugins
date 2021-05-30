@@ -9,10 +9,10 @@
 # Contents
 
 * [Introduction](#introduction)
-* [Managing generic binaries](#managing-generic-binaries)
-* [Writing a generic binary](#writing-a-generic-binary)
-* [IMPORTANT IMPLICATIONS](#important-implications)
-* [A "sneaky" way](#a-sneaky-way)
+* [The basic task](#the-basic-task)
+* [Target binary Identifiers](#target-binary-identifiers)
+* [An example Server](#a-server)
+* :door: [H4 Update NodeRed Flow](../assets/nodered/H4Updater_flow.json)
 
 ---
 
@@ -32,16 +32,15 @@ If you are not already familiar with the low level features of what is required 
 
 In its simplest from we would like our bianry to ask the server "Am I running the latest version of *me*?". We can either be told, "Yes, carry on!" or "No, there's a more recent version available".
 
-In practaical terms, to reduce the "handshaking" the call boils down to an HTTP request to "give me the latest binary of me" which will either succed and return xMB of new binary that is pumped straight into the update / reboot-as-newer-version process or an HTTP error 304, meaning "You are already the latest version"
+In practical terms, to reduce the "handshaking" the call boils down to an HTTP request to "give me the latest binary of me" which will either succeed and return the new binary that is pumped straight into the update / reboot-as-newer-version process or an HTTP error 304, meaning "You are already the latest version"
 
-That's really all there is to it...the tricky part is what does "me" mean? How are binaries and their versions named / identified? That has as many answers as there are readers, so w will concentrate on just one: the H4Plugins way.
+That's really all there is to it...the tricky part is what does "*me*" mean? How are binaries and their versions named / identified? That has as many answers as there are readers, so we will concentrate on just one: the H4Plugins way.
 
 ## Classifying binaries
 
-It is fairly self-evident that even with the same / similar source code two different MCU families e.g. ESP8266 and ESP32 will require tow different binaries. WHat is less obvious is that whthether that holds true of similar boards within the same MCU family after all an ESP8266 chip is identical on all boards. The only things that differ between boards are things like the board wirting, flash memory/speed and onboard "peripherals" or features.
+It is fairly self-evident that even with the same / similar source code two different MCU families e.g. ESP8266 and ESP32 will require two different binaries. What is less obvious is that whether that holds true of similar boards within the same MCU family - after all an ESP8266 chip is identical on all boards. The only things that differ between boards are things like the board wiring, flash memory/speed and onboard "peripherals" or features.
 
-For this reason it is quite possible for code compiled for one board to run 100% correctly on a totally different board
-
+For this reason it can be possible for code compiled for one board to run 100% correctly on a totally different board
 
 ### By specific board type
 
@@ -62,13 +61,13 @@ On the other hand, consider the ITEAD "Sonoff" family of cheap and simple IOT sw
 * SV ("safe voltage") 12V version of a Basic, with extra GPIO pins
 * RF 433MHz bolt-on to a Basic
 
-For the moment we will ignore the two LEDs that the S20 has, the extra GPIO pins on the SV and the fancy 433MHz receiver on the RF. Once those differences are removed from the equation, the buiktin relay is always on GPIO 12, the button is always GPIO 0 and the built-in LED is always correctly identified by the arduino build system as LED_BUILTIN.
+For the moment we will ignore the two LEDs that the S20 has, the extra GPIO pins on the SV and the fancy 433MHz receiver on the RF. Once those differences are removed from the equation, the builtin relay is always on GPIO 12, the button is always GPIO 0 and the built-in LED is always correctly identified by the arduino build system as LED_BUILTIN.
 
 This means that if your app only uses those features then a single binary will work in all of those devices, they are all 1MB flash and everything else "just works". In *this* scenario the board only needs to know its own "general board type" i.e. "itead" and current version.
 
 ### By functionality
 
-It may be that the user has a deployment containg only D1 minis, but that half of them perform a lighting role and hold perform a pir-detection role. In this scenario the user might have a "lighting.ino" sketch and a "pir.ino" skecth and the code would need to know its own sketch name to be able to to get its latest version (the MCU type is implicitly understood to be D1 mini)
+It may be that the user has a deployment containg only D1 minis, but that half of them perform a lighting role and half perform a pir-detection role. In this scenario the user might have a "lighting.ino" sketch and a "pir.ino" sketch and the code would need to know its own sketch name to be able to to get its latest version (the MCU type is implicitly understood to be D1 mini)
 
 ### Other methods
 
@@ -94,7 +93,7 @@ The recommended FFS size for H4Plugins deployment is:
 * ESP8266 device with 1MB Flash: 96kB
 * ESP32 devices: 1MB FFS
 
-Devices in the 1MB class requiring 96kB need some special handling as only 64kB and 128kB options are available in the defult settings of the IDE. 64kB is too small for the minimum file set (even though the  total actual file data sizes amount to < 30kB ). 128KB leaves insufficient room to be able to OTA the largest of the H4Plugins apps you may need to build.
+Devices in the 1MB class requiring 96kB need some special handling as only 64kB and 128kB options are available in the default settings of the IDE. 64kB is too small for the minimum file set (even though the  total actual file data sizes amount to < 30kB ). 128KB leaves insufficient room to be able to OTA the largest of the H4Plugins apps you may need to build.
 
 H4Plugins provides a 96kb option via its [Additional board defintions](board.md) and that document should be studied if you wish to deploy any 1MB devices over OTA.
 
@@ -115,7 +114,7 @@ The [SPIFFS folder](../SPIFFS) contains `spiffs.bat` which will build the SPIFFS
 
 We have seen that the data by sketch identifies itself to the update server over and aboce the current version can be many and varied. H4Plugins provides a simple mechanism to collect the data and foward to the the central controller using the MQTT `report` topic.
 
-This concatenates any / all the data items the user chooses and publishes them automatically every time it connects. These, when added to the "basic set" provided by the ESP core must provcie sufficient information for the update server to identify the latest binary of its class and rerung it OTA-style if it is a letr version.
+This concatenates any / all the data items the user chooses and publishes them automatically every time it connects. These, when added to the "basic set" provided by the ESP core must provide sufficient information for the update server to identify the latest binary of its class and return it OTA-style if it is a later version.
 
 ## Built-in basic set
 
@@ -134,11 +133,11 @@ Full documentation of the [ESP8266 update server](https://arduino-esp8266.readth
 [x-ESP8266-mode] => sketch
 ```
 
-Note that we don't get the sketch name of board type... if these items are required we must provide them ourselves.
+Note that we don't get the sketch name or board type... if these items are required we must provide them ourselves.
 
 ## Adding more binary identifiers
 
-As delivered, H4PLugins sends the following data fields in its `report` message:
+As delivered, H4Plugins sends the following data fields in its `report` message:
 
 * sketch binary .ino "terminal" name (i.e. *not* the full path)
 * H4Plugins version number
@@ -165,7 +164,7 @@ The author's own Node-RED / JS implementation is included here as a guide.
 
 The broad synopis is:
 
-1. An HTTP request is received with a path including `.../device/yourdevicename` the value `yourdevicename` is used in the node "Get Parameters" to retrieve the data that was previously saved when `yourdevicename` sent its reporting values at connection time. At this point, the server flow has all the information it needs about the requesting binary.
+1. An HTTP request is received with a path ending `.../update/yourdevicename` the value `yourdevicename` is used in the node "Get Parameters" to retrieve the data that was previously saved when `yourdevicename` sent its reporting values at connection time. At this point, the server flow has all the information it needs about the requesting binary.
 
 2. It must now retrieve from the repo the version number of any binary that matches the identifiers and get its version number. It does this by using the server command `ls -r` which gives a list of names in reverse order, meaning that the highest (i.e. most recent) version is now the first itme in the list.
 
@@ -184,4 +183,4 @@ The exported flow can be found here:
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)
 * [Facebook ESP Developers (moderator)](https://www.facebook.com/groups/ESP8266/)
-* [Support me on Patreon](https://patreon.com/es
+* [Support me on Patreon](https://patreon.com/esparto)

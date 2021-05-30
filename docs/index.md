@@ -31,18 +31,14 @@
 * [WiFi AP mode](apmode.md) :heavy_check_mark:
 * [Handling MQTT topics / commands](mqcmds.md) :heavy_check_mark:
 * [Network Presence Detection](presence.md) :heavy_check_mark:
-* :building_construction: [Advanced Topics](docs/advanced.md)
-    * :building_construction: debugging ideas
-    * :building_construction: best parctice
-    * :building_construction: resource minimisation
-    * :building_construction: [Generic Binaries](generix.md) :heavy_check_mark:
-    * :building_construction: [Running a remote update server](rusrv.md)
-    * :building_construction: using NODE-RED as an ecosystem controller
+* Advanced Topics
+    * [Generic Binaries](generix.md) :heavy_check_mark:
+    * [Running a remote update server](rusrv.md)
     * :building_construction: [Additional board defintions](boards.md)
     * :building_construction: writing your own plugin
 * [Known Issues / FAQs](docs/faq.md) :heavy_check_mark:
 * [Raising an Issue](docs/issues.md) :heavy_check_mark:
-* :door: Plugins APIs
+* Plugins APIs
   * [H4P_AsyncHTTP](h4phttp.md) :heavy_check_mark:
   * [H4P_AsyncMQTT](h4mqtt.md) :heavy_check_mark:
   * [H4P_BinarySwitch](swings.md) :heavy_check_mark:
@@ -64,7 +60,7 @@
   * [H4P_QueueWarn](h4qw.md) :heavy_check_mark:
   * [H4P_RemoteLogger](rlog.md) :heavy_check_mark:
     * [MySQL event logger webserver](https://github.com/philbowles/mysqlrest) :heavy_check_mark:
-  * :building_construction: [H4P_RemoteUpdate](h4pxxxx.md)
+  * [H4P_RemoteUpdate](rupd.md)
   * [H4P_SerialCmd](h4p.md) :heavy_check_mark:
   * [H4P_SerialLogger](ears.md) :heavy_check_mark:
   * [H4P_Signaller](h4fc.md)
