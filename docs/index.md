@@ -33,7 +33,7 @@
 * [Network Presence Detection](presence.md) :heavy_check_mark:
 * Advanced Topics
     * [Generic Binaries](generix.md) :heavy_check_mark:
-    * [Running a remote update server](rusrv.md)
+    * [Running a remote update server](rusrv.md) :heavy_check_mark:
     * :building_construction: [Additional board defintions](boards.md)
     * :building_construction: writing your own plugin
 * [Known Issues / FAQs](docs/faq.md) :heavy_check_mark:
@@ -68,9 +68,10 @@
   * :building_construction: [H4P_TaskSniffer](h4pxxxx.md)
   * :building_construction: [H4P_Timekeeper](h4pxxxx.md)
   * :building_construction: [H4P_ToneController](h4pxxxx.md)
-  * [H4P_UPNPServer](upnp.md)
+  * [H4P_UPNPServer](upnp.md) :heavy_check_mark:
   * [H4P_WiFi](h4pwifi.md) :heavy_check_mark:
   * :building_construction: [H4P_Voice](h4pvox.md)
+  
  ---
 
  # [H4Plugins Youtube channel](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)

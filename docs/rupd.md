@@ -63,6 +63,7 @@ void fs(); // start firmware update process
 void fw(); // start file sytem image update process
 
 ```
+
 Many of the sketches in the [XTRAS folder](../examples/XTRAS) show `H4P_RemoteUpdate` in use.
 
 ---
