@@ -9,8 +9,10 @@ Updates the app with a later version from a remote update server. Before using t
 * [Generic Binaries](generix.md) :heavy_check_mark:
 * [Running a remote update server](rusrv.md)
 
----
+Users may also find this Youtube video helpful, look for the red label "Expert" series [1. Running a remote update server on Nide-RED](https://youtu.be/zNjafa-4QEw)
+helpful
 
+---
 
 ## Contents
 

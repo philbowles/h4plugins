@@ -76,6 +76,8 @@
 
  # [H4Plugins Youtube channel](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 
+ ## "Arduino Turquoise" label tutorials
+
  * [0: Version 3 taster](https://www.youtube.com/watch?v=4ySOh0ukyrc)
  * [1: Blinky on steroids](https://www.youtube.com/watch?v=SRHze-LRvN4)
  * [2: Why you need it](https://www.youtube.com/watch?v=OvOz3QPGoY0)
@@ -90,6 +92,10 @@
  * [11: Internet of Things ain't what they used to be](https://youtu.be/fLUKDAboAU8)
  * [12: Internet of Things can only get better](https://www.youtube.com/watch?v=sy7xHuKghrM)
 
+## Red label "Expert" series
+
+* [1. Running a remote update server on Nide-RED](https://youtu.be/zNjafa-4QEw)
+  
 ---
 
 (c) 2021 Phil Bowles h4plugins@gmail.com

@@ -4,6 +4,9 @@
 
 :gem: Essential background for deploying/updating binaries **O**ver-**T**he-**A**ir. Users should familiar with [Generic Binaries](generix.md) before reading this document.
 
+Users may also find this Youtube video helpful, look for the red label "Expert" series [1. Running a remote update server on Nide-RED](https://youtu.be/zNjafa-4QEw)
+helpful
+
 ---
 
 # Contents

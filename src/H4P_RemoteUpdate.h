@@ -42,6 +42,7 @@ class H4P_RemoteUpdate: public H4Service, public HTTPUpdate {
                 WiFiClient  _c;
                 string endpoint;
                 void        _commonCTOR(){
+                    rebootOnUpdate(false);
                     depend<H4P_WiFi>(wifiTag());
                     _addLocals({
                         {_me,          { H4PC_H4,_pid  , nullptr}},
@@ -71,8 +72,7 @@ class H4P_RemoteUpdate: public H4Service, public HTTPUpdate {
                 }
 
                 void        _updateFromUrl(bool fw,bool reboot){
-                    endpoint=string(h4p[rupdTag()]).append("/").append(h4p[deviceTag()]);
-                    SYSINFO("REMOTE UPDATE %s FROM %s\n",fw ? "Firmware":"FileSystem",CSTR(endpoint));
+                    SYSINFO("START REMOTE UPDATE %s FROM %s v=%s\n",fw ? "Firmware":"FileSystem",CSTR(endpoint),H4P_VERSION);
                     t_httpUpdate_return rv=fw ? update(_c,CSTR(endpoint),H4P_VERSION):updateSpiffs(_c,CSTR(endpoint),h4p.read("/h4UI").data());
                     switch(rv){
                         case HTTP_UPDATE_OK:
@@ -86,7 +86,7 @@ class H4P_RemoteUpdate: public H4Service, public HTTPUpdate {
                     }
                 }
     public:
-        H4P_RemoteUpdate(const string& url=""): H4Service(rupdTag(),H4PE_VIEWERS){
+        H4P_RemoteUpdate(const string& url=""): H4Service("rupd",H4PE_VIEWERS){
             h4p.gvSetstring(rupdTag(),url,true);
             _commonCTOR();
         }
@@ -97,4 +97,6 @@ class H4P_RemoteUpdate: public H4Service, public HTTPUpdate {
 #endif
                 void        fs(){ _entropise([=]{ _updateFromUrl(false,true); }); }
                 void        fw(){ _entropise([=]{ _updateFromUrl(true,true); }); }
+//
+                void        svcUp() override{ endpoint=string(h4p[rupdTag()]).append("/").append(h4p[deviceTag()]); }
 };

@@ -4,6 +4,9 @@
 
 :gem: Essential background for deploying/updating binaries **O**ver-**T**he-**A**ir (OTA) including how to write a binary for use when [Running a remote update server](rusrv.md)
 
+Users may also find this Youtube video helpful, look for the red label "Expert" series [1. Running a remote update server on Nide-RED](https://youtu.be/zNjafa-4QEw)
+helpful
+
 ---
 
 # Contents

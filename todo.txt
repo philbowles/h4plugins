@@ -1,3 +1,6 @@
+3.0.4.
+BUGFIX remodute update shortname fixed
+
 SHORTTERM
     lynx slave -> http transport not obvious! ... multi armadillo?
     change old-fashioned warn sb to SYSWARN events
