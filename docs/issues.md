@@ -16,13 +16,11 @@ If you raise an issue without providing the information outlined here, It will n
 
 # Mandatory steps
 
-1. If you are using PlatformIO and are getting a compile / build error, leave now: it's a PlatformIO problem. Until PlatformIO make their IDE 100% compatible with ArduinoIDE, I am only able to provide support for ArduinoIDE users.
+1. Read *all* of the relevant documentation for the plugins you are using.
 
-2. Read *all* of the relevant documentation for the plugins you are using.
+2. Check the [Known Issues / FAQs](faq.md)
 
-3. Check the [Known Issues / FAQs](faq.md)
-
-4. Provide the type / name of the development board you are using and the major Tools / Build settings from ArduinoIDE. Its not a huge effort, a small screen snip like this will suffice using snip or PrintScreen key ***DO  NOT TAKE PHOTOS OF YOUR SCREEN***. If it's a homebuild, include schematic or circuit diagram.
+3. Provide the type / name of the development board you are using and the major Tools / Build settings from ArduinoIDE. Its not a huge effort, a small screen snip like this will suffice using snip or PrintScreen key ***DO  NOT TAKE PHOTOS OF YOUR SCREEN***. If it's a homebuild, include schematic or circuit diagram.
 
 ![settings](../assets/settings.jpg)
 
