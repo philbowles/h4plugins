@@ -41,41 +41,41 @@ class H4P_UPNPServer: public H4Service {
 
 //                VSCMD(_friendly);
 
-                string          _uuid="uuid:";
-                string          _urn="Belkin:";
-                string          _udn;
+                std::string          _uuid="uuid:";
+                std::string          _urn="Belkin:";
+                std::string          _udn;
 
-                vector<string>  _pups={"",rootTag()};
+                std::vector<std::string>  _pups={"",rootTag()};
 
-                string          _soap;
-                string          _ucom;
-                string          _xml;
+                std::string          _soap;
+                std::string          _ucom;
+                std::string          _xml;
 
-                string          __makeUSN(const string& s);
-                string          __upnpCommon(const string& usn);
-                void            __upnpSend(uint32_t mx,const string s,IPAddress ip,uint16_t port);
+                std::string     __makeUSN(const std::string& s);
+                std::string     __upnpCommon(const std::string& usn);
+                void            __upnpSend(uint32_t mx,const std::string s,IPAddress ip,uint16_t port);
 
-        virtual void            _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override;
-                void            _handlePacket(string p,IPAddress ip,uint16_t port);
+        virtual void            _handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg) override;
+                void            _handlePacket(std::string p,IPAddress ip,uint16_t port);
                 void            _listenUDP();
-                void            _notify(const string& s);
+                void            _notify(const std::string& s);
                 void            _upnp(AsyncWebServerRequest *request);
 
-        static  string 	        replaceParamsFile(const string &f){ return h4preplaceparams(CSTR(H4P_SerialCmd::read(f))); }
+        static  std::string     replaceParamsFile(const std::string &f){ return h4preplaceparams(CSTR(H4P_SerialCmd::read(f))); }
     public:                
-        H4P_UPNPServer(const string& name=""): H4Service(upnpTag(),H4PE_GVCHANGE|H4PE_VIEWERS){
+        H4P_UPNPServer(const std::string& name=""): H4Service(upnpTag(),H4PE_GVCHANGE|H4PE_VIEWERS){
             _pWiFi=depend<H4P_WiFi>(wifiTag());
-            if(!h4p.gvExists(nameTag())) h4p.gvSetstring(nameTag(),(name=="") ? (uppercase(h4Tag())+" "+deviceTag()+" "+string(h4p[chipTag()])):name,true);
+            if(!h4p.gvExists(nameTag())) h4p.gvSetstring(nameTag(),(name=="") ? (uppercase(h4Tag())+" "+deviceTag()+" "+std::string(h4p[chipTag()])):name,true);
             XLOG("UPNP name %s",CSTR(h4p[nameTag()]));
         }
-                void            friendlyName(const string& name){ h4p[nameTag()]=name; }
+                void            friendlyName(const std::string& name){ h4p[nameTag()]=name; }
 #if H4P_LOG_MESSAGES
                 void           info() override;
 #endif
                 void           svcUp() override;
                 void           svcDown() override;
 //          _syscall only
-                void           _broadcast(uint32_t mx,const string s){ __upnpSend(mx,s,_ubIP,1900); }
-        static  void           _listenTag(const string& tag,const string& value);
+                void           _broadcast(uint32_t mx,const std::string s){ __upnpSend(mx,s,_ubIP,1900); }
+        static  void           _listenTag(const std::string& tag,const std::string& value);
                 void           _init() override;
 };

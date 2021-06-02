@@ -33,7 +33,7 @@ SOFTWARE.
 #include <H4P_AsyncHTTP.h>
 
 class H4P_RemoteLogger: public H4P_AsyncHTTP {
-        string          _url;
+        std::string          _url;
 
         VARK_NVP_MAP    _eventdata = {
             {deviceTag(),""},
@@ -42,7 +42,7 @@ class H4P_RemoteLogger: public H4P_AsyncHTTP {
             {"msg",""}
         };
     protected:
-        virtual void        _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override;
+        virtual void        _handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg) override;
     public:
-        H4P_RemoteLogger(const string& url,uint32_t filter=H4PE_ALL); // amount of free SPIFFS space to use
+        H4P_RemoteLogger(const std::string& url,uint32_t filter=H4PE_ALL); // amount of free SPIFFS space to use
 };

@@ -29,11 +29,11 @@ SOFTWARE.
 #include<H4P_RemoteLogger.h>
 #include<H4P_SerialCmd.h>
 
-H4P_RemoteLogger::H4P_RemoteLogger(const string& url,uint32_t filter): _url(url), H4P_AsyncHTTP("rlog",filter) { _eventdata[deviceTag()]=h4p[deviceTag()]; }
+H4P_RemoteLogger::H4P_RemoteLogger(const std::string& url,uint32_t filter): _url(url), H4P_AsyncHTTP("rlog",filter) { _eventdata[deviceTag()]=h4p[deviceTag()]; }
 //
 //      our raison d'etre
 //
-void H4P_RemoteLogger::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg) {
+void H4P_RemoteLogger::_handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg) {
     if(_running && svc!=_me){
         _eventdata["source"]=svc;
         _eventdata["type"]=stringFromInt(static_cast<uint32_t>(t));
@@ -48,7 +48,7 @@ void H4P_RemoteLogger::_handleEvent(const string& svc,H4PE_TYPE t,const string& 
                 for(auto const h:r.responseHeaders) Serial.printf("%s=%s\n",h.first.data(),h.second.data());
                 Serial.printf("\nRaw Data\n");
                 dumphex(r.data,r.length);
-                Serial.printf("\nAs a std::string - BE CAREFUL, IT MAY NOT BE A STRING!!!\n%s\n",r.asStdstring().data()); // Data may NOT be a string -> crash!!!
+                Serial.printf("\nAs a std::string - BE CAREFUL, IT MAY NOT BE A STRING!!!\n%s\n",r.asStdstring().data()); // Data may NOT be a std::string -> crash!!!
             }
 */
         });

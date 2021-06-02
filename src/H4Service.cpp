@@ -35,15 +35,15 @@ void H4Service::_addLocals(H4P_CMDMAP local){
     local.clear();
 }
 
-void H4Service::_envoi(const string& s){
+void H4Service::_envoi(const std::string& s){
     auto pp=h4puncheckedcall<H4Service>(h4pSrc);
     if(pp) pp->_reply(CSTR(s)); // send reply back to originating source
     else Serial.printf("%s\n",CSTR(s));
 }
 
-vector<uint32_t> H4Service::_expectInt(string pl,const char* delim){
-    vector<uint32_t> results;
-    vector<string> tmp=split(pl,delim);
+std::vector<uint32_t> H4Service::_expectInt(std::string pl,const char* delim){
+    std::vector<uint32_t> results;
+    std::vector<std::string> tmp=split(pl,delim);
     for(auto const& t:tmp){
         if(!stringIsNumeric(t)) return {};
         results.push_back(STOI(t));
@@ -51,31 +51,31 @@ vector<uint32_t> H4Service::_expectInt(string pl,const char* delim){
     return results;
 }
 
-uint32_t H4Service::_guard1(vector<string> vs,H4_FN_MSG f){
+uint32_t H4Service::_guard1(std::vector<std::string> vs,H4_FN_MSG f){
     if(!vs.size()) return H4_CMD_TOO_FEW_PARAMS;
     return vs.size()>1 ? H4_CMD_TOO_MANY_PARAMS:f(vs);
 }
 
-uint32_t H4Service::_guardInt1(vector<string> vs,function<void(uint32_t)> f){
-    return _guard1(vs,[f,this](vector<string> vs){
+uint32_t H4Service::_guardInt1(std::vector<std::string> vs,std::function<void(uint32_t)> f){
+    return _guard1(vs,[f,this](std::vector<std::string> vs){
         auto vi=_expectInt(H4PAYLOAD);
         if(vi.size()==1) return ([f](uint32_t v){ f(v); return H4_CMD_OK; })(vi[0]);
         return H4_CMD_NOT_NUMERIC;
     });
 }
 
-uint32_t H4Service::_guardString2(vector<string> vs,function<H4_CMD_ERROR(string,string)> f){
-    return _guard1(vs,[f,this](vector<string> vs){
+uint32_t H4Service::_guardString2(std::vector<std::string> vs,std::function<H4_CMD_ERROR(std::string,std::string)> f){
+    return _guard1(vs,[f,this](std::vector<std::string> vs){
         auto vg=split(H4PAYLOAD,",");
         if(vg.size()<3){ 
-            if(vg.size()>1) return ([f](string s1,string s2){ return f(s1,s2); })(vg[0],vg[1]);
+            if(vg.size()>1) return ([f](std::string s1,std::string s2){ return f(s1,s2); })(vg[0],vg[1]);
             return H4_CMD_TOO_FEW_PARAMS;
         }
         return H4_CMD_TOO_MANY_PARAMS;
     });
 }
 
-void H4Service::_sysHandleEvent(const string& svc,H4PE_TYPE t,const string& msg){
+void H4Service::_sysHandleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg){
     switch(t){
         case H4PE_BOOT:
             if(_filter & H4PE_BOOT) _init();
@@ -88,7 +88,7 @@ void H4Service::_sysHandleEvent(const string& svc,H4PE_TYPE t,const string& msg)
                 if(STOI(msg)) svcUp();
                 else svcDown();
             } 
-            else _handleEvent(svc,H4PE_SYSINFO,string("Svc").append(STOI(msg) ? "Up":"Down"));
+            else _handleEvent(svc,H4PE_SYSINFO,std::string("Svc").append(STOI(msg) ? "Up":"Down"));
             break;
         case H4PE_GVCHANGE:
             if(h4pevt.count(H4PE_BOOT)) return;
@@ -98,8 +98,8 @@ void H4Service::_sysHandleEvent(const string& svc,H4PE_TYPE t,const string& msg)
     }
 }
 
-string H4Service::_uniquify(const string& name,uint32_t uqf){
-    string tmp=name+(uqf ? stringFromInt(uqf):"");
+std::string H4Service::_uniquify(const std::string& name,uint32_t uqf){
+    std::string tmp=name+(uqf ? stringFromInt(uqf):"");
     return h4pmap.count(tmp) ? _uniquify(name,uqf+1):tmp;
 }
 #if H4P_LOG_MESSAGES
@@ -110,7 +110,7 @@ void H4Service::info(){
     reply("SVC: %s PID=%d %sRunning",CSTR(_me),_pid,_running ? "":"Not ");
     if(_parent!="") reply(" Depends on %s",CSTR(_parent));
     //
-    vector<string> dees;
+    std::vector<std::string> dees;
     for(auto const& s:h4pmap) if(s.second->_parent==_me) dees.push_back(s.first);
     if(dees.size()){
         reply(" Dependees");

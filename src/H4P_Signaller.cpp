@@ -64,8 +64,8 @@ std::unordered_map<char,string>	H4P_Signaller::_morse={
 //
 #if H4P_CMDLINE_FLASHERS
 
-uint32_t H4P_Signaller::__validator(vector<string> vs,H4_FN_MSG f){
-    return _guard1(vs,[=](vector<string> V){
+uint32_t H4P_Signaller::__validator(vector<std::string> vs,H4_FN_MSG f){
+    return _guard1(vs,[=](vector<std::string> V){
         auto vs=split(V.back(),",");
         if(vs.size()<3) return H4_CMD_TOO_FEW_PARAMS;
         if(vs.size()>4) return H4_CMD_TOO_MANY_PARAMS;
@@ -79,8 +79,8 @@ uint32_t H4P_Signaller::__validator(vector<string> vs,H4_FN_MSG f){
     });
 }
 
-uint32_t H4P_Signaller::_morse(vector<string> vs){ 
-    return __validator(vs,[=](vector<string> vs){
+uint32_t H4P_Signaller::_morse(vector<std::string> vs){ 
+    return __validator(vs,[=](vector<std::string> vs){
         if(vs.size()<4) return H4_CMD_TOO_FEW_PARAMS;
         if(!all_of(vs[3].cbegin(), vs[3].cend(), [](char c){ return c=='.' || c=='-' || c==' '; })) return H4_CMD_PAYLOAD_FORMAT;
         flashMorse(CSTR(vs[3]),PARAM_INT(2),PARAM_INT(0),static_cast<H4PM_SENSE>(PARAM_INT(1)));
@@ -88,16 +88,16 @@ uint32_t H4P_Signaller::_morse(vector<string> vs){
     });
 }
 
-uint32_t H4P_Signaller::_onof(vector<string> vs){ 
-    return __validator(vs,[=](vector<string> vs){
+uint32_t H4P_Signaller::_onof(vector<std::string> vs){ 
+    return __validator(vs,[=](vector<std::string> vs){
         if(vs.size()>3) return H4_CMD_TOO_MANY_PARAMS;
         flashPin(PARAM_INT(2),PARAM_INT(0),static_cast<H4PM_SENSE>(PARAM_INT(1)));
         return H4_CMD_OK;
     });
 }
 
-uint32_t H4P_Signaller::_patn(vector<string> vs){ 
-    return __validator(vs,[=](vector<string> vs){
+uint32_t H4P_Signaller::_patn(vector<std::string> vs){ 
+    return __validator(vs,[=](vector<std::string> vs){
         if(vs.size()<4) return H4_CMD_TOO_FEW_PARAMS;
         if(!all_of(vs[3].cbegin(), vs[3].cend(), [](char c){ return c=='1' || c=='0'; })) return H4_CMD_PAYLOAD_FORMAT;
         flashPattern(CSTR(vs[3]),PARAM_INT(2),PARAM_INT(0),static_cast<H4PM_SENSE>(PARAM_INT(1)));
@@ -105,8 +105,8 @@ uint32_t H4P_Signaller::_patn(vector<string> vs){
     });
 }
 
-uint32_t H4P_Signaller::_pwm(vector<string> vs){ 
-    return __validator(vs,[=](vector<string> vs){
+uint32_t H4P_Signaller::_pwm(vector<std::string> vs){ 
+    return __validator(vs,[=](vector<std::string> vs){
         if(vs.size()<4) return H4_CMD_TOO_FEW_PARAMS;
         if(!stringIsNumeric(vs[3])) return H4_CMD_NOT_NUMERIC;
         if(PARAM_INT(3) < 0 || PARAM_INT(3) > 100) return H4_CMD_OUT_OF_BOUNDS;
@@ -115,8 +115,8 @@ uint32_t H4P_Signaller::_pwm(vector<string> vs){
     });
 }
 
-uint32_t H4P_Signaller::_stop(vector<string> vs){ 
-    return _guard1(vs,[=](vector<string> vs){
+uint32_t H4P_Signaller::_stop(vector<std::string> vs){ 
+    return _guard1(vs,[=](vector<std::string> vs){
         if(!vs.size()) return H4_CMD_TOO_FEW_PARAMS;
         if(vs.size()>1) return H4_CMD_TOO_MANY_PARAMS;
         if(lowercase(vs[0])==allTag()) stopAll();
@@ -150,11 +150,11 @@ void H4P_Signaller::_flash(uint32_t period,uint8_t duty,uint8_t pin,H4PM_SENSE a
 	}
 }
 
-void H4P_Signaller::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg){
+void H4P_Signaller::_handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg){
     if(t==H4PE_SIGNAL){
     #if H4P_ASSUMED_LED
         if(msg.size()){
-            vector<string> parts=split(msg,",");
+            std::vector<std::string> parts=split(msg,",");
             flashMorse(CSTR(parts[1]),STOI(parts[0]),H4P_ASSUMED_LED,H4P_ASSUMED_SENSE);
         } else stopPin(H4P_ASSUMED_LED);
     #else
@@ -164,8 +164,8 @@ void H4P_Signaller::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg
 }
 
 void H4P_Signaller::flashMorse(const char* pattern,uint32_t timebase,uint8_t pin,H4PM_SENSE active,uint8_t col){// flash arbitrary pattern ... --- ... convert dot / dash into Farnsworth Timing
-	string ms;
-	vector<string> sym=split(pattern," ");
+	std::string ms;
+	std::vector<std::string> sym=split(pattern," ");
 	for(auto const& s:sym) {
 		for(auto const& c:s) ms+=c == '.' ? "10":"1110";
 		ms+="00";
@@ -177,7 +177,7 @@ void H4P_Signaller::flashMorse(const char* pattern,uint32_t timebase,h4pOutput* 
 
 #ifdef H4FC_MORSE_SUPPORT
 void H4P_Signaller::flashMorseText(const char* letters,uint32_t timebase,uint8_t pin,H4PM_SENSE active,uint8_t col){
-	string ditdah;
+	std::string ditdah;
 	for(auto const& c:string(letters)) {
 		char lc=tolower(c);
 		ditdah+=_morse.count(lc) ? _morse[lc]+" ":" ";
@@ -276,11 +276,11 @@ void H4Flasher::stop(){
 H4Flasher::H4Flasher(h4pOutput* opp,uint32_t period,uint32_t valley): _period(period),_valley(valley),_opp(opp){ throb(); }
 
 void H4Flasher::throb(){
-    vector<uint32_t> plan;
+    std::vector<uint32_t> plan;
     uint32_t nSlices=_period/(H4PM_GRANULARITY *2);
     uint32_t thickness=(H4P_ANALOG_MAX - ((H4P_ANALOG_MAX * _valley) / 100)) / nSlices;
     for(int i=0;i<(1+nSlices);i++) plan.push_back(H4P_ANALOG_MAX - (i * thickness));
-    vector<uint32_t> tr=plan;
+    std::vector<uint32_t> tr=plan;
     plan.insert(plan.end(), tr.rbegin(), tr.rend());
 
     _opp->turn(ON);

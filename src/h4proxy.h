@@ -29,25 +29,25 @@ SOFTWARE.
 #pragma once
 
 class h4proxy {
-            h4proxy&    _set(const string& s);
+            h4proxy&    _set(const std::string& s);
     public:
             bool        _save;
-            string      _id="";
-            string      _v="";
+            std::string      _id="";
+            std::string      _v="";
 
         h4proxy(){};
-        h4proxy(const string& name,const string& value,bool save=false): _id(name),_v(value),_save(save){}
-        h4proxy& operator=(const string& s){ return _set(s); }
+        h4proxy(const std::string& name,const std::string& value,bool save=false): _id(name),_v(value),_save(save){}
+        h4proxy& operator=(const std::string& s){ return _set(s); }
         h4proxy& operator=(const h4proxy& s);
         h4proxy& operator=(const int i){ return _set(stringFromInt(i)); }
-        string& operator+(const string& s) const { static string tmp=_v + s; return tmp; }
+        std::string& operator+(const std::string& s) const { static std::string tmp=_v + s; return tmp; }
         const char* c_str() const { return _v.c_str(); }
         const char* data() const { return _v.data(); }
-        operator const string& () const { return _v; }
-        bool operator!=(const string& s) const { return s!=_v; }
-        bool operator==(const string& s) const { return s==_v; }
+        operator const std::string& () const { return _v; }
+        bool operator!=(const std::string& s) const { return s!=_v; }
+        bool operator==(const std::string& s) const { return s==_v; }
 
-        const string get() const { return _id+UNIT_SEPARATOR+_v; }
+        const std::string get() const { return _id+UNIT_SEPARATOR+_v; }
 };
 
 using H4P_PROXY_MAP =std::unordered_map<std::string,h4proxy>;

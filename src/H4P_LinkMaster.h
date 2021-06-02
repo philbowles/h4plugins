@@ -33,13 +33,13 @@ SOFTWARE.
 #include<H4P_AsyncMQTT.h>
 
 class H4P_LinkMaster: public H4Service{
-            H4P_AsyncMQTT*          _pMQTT;
-            unordered_set<string>   _slaves;
+            H4P_AsyncMQTT*                  _pMQTT;
+            std::unordered_set<std::string> _slaves;
             VSCMD(_slave);
     protected:
-        virtual void                _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override;
+        virtual void                _handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg) override;
     public:
-        H4P_LinkMaster(unordered_set<string> slaved={}): _slaves(slaved),H4Service("link",H4PE_GVCHANGE,false) {
+        H4P_LinkMaster(std::unordered_set<std::string> slaved={}): _slaves(slaved),H4Service("link",H4PE_GVCHANGE,false) {
             _pMQTT=depend<H4P_AsyncMQTT>(mqttTag());
             _addLocals({
                 {"slave",    { H4PC_H4,   0 , CMDVS(_slave)}}
@@ -49,5 +49,5 @@ class H4P_LinkMaster: public H4Service{
 #if H4P_LOG_MESSAGES
         virtual void        info() override;
 #endif
-                void        slave(const string& otherh4,bool inout=true);
+                void        slave(const std::string& otherh4,bool inout=true);
 };

@@ -41,7 +41,7 @@ SOFTWARE.
     #include<FS.h>
     #include<SPIFFS.h>
     #define HAL_FS SPIFFS
-    string getTerminalName(const string& s);
+    std::string getTerminalName(const std::string& s);
 #endif
 
 #include<unordered_set>
@@ -131,22 +131,22 @@ enum H4P_UI_TYPE {
     H4P_UI_IMG
 };
 
-using   H4P_NVP_MAP      = unordered_map<string,string>;
+using   H4P_NVP_MAP      = std::unordered_map<std::string,std::string>;
 extern  H4P_PROXY_MAP   h4pGlobal;
-extern  string          h4pSrc;
+extern  std::string     h4pSrc;
 
-using H4P_FN_EVENTHANDLER   = function<void(const string& svc,H4PE_TYPE t,const string& msg)>;
-using H4P_EVENT_LISTENER    = pair<string,H4P_FN_EVENTHANDLER>;
-using H4P_EVENT_LISTENERS   = vector<H4P_EVENT_LISTENER>;
+using H4P_FN_EVENTHANDLER   = std::function<void(const std::string& svc,H4PE_TYPE t,const std::string& msg)>;
+using H4P_EVENT_LISTENER    = std::pair<std::string,H4P_FN_EVENTHANDLER>;
+using H4P_EVENT_LISTENERS   = std::vector<H4P_EVENT_LISTENER>;
 using H4P_EVENT_HANDLERS    = std::map<uint32_t,H4P_EVENT_LISTENERS>;
-using H4P_FN_USEREVENT      = function<void(const string &msg)>;
-using H4P_FN_VB             = function<void(bool)>;
+using H4P_FN_USEREVENT      = std::function<void(const std::string &msg)>;
+using H4P_FN_VB             = std::function<void(bool)>;
 
-using H4P_FN_UIGET          = function<string(void)>;
+using H4P_FN_UIGET          = std::function<std::string(void)>;
 
-void h4pregisterhandler(const string& svc,uint32_t t,H4P_FN_EVENTHANDLER f);
-void h4punregisterhandler(const string& svc,uint32_t t);
-void h4pevent(const string& svc,H4PE_TYPE t,const string& msg="");
+void h4pregisterhandler(const std::string& svc,uint32_t t,H4P_FN_EVENTHANDLER f);
+void h4punregisterhandler(const std::string& svc,uint32_t t);
+void h4pevent(const std::string& svc,H4PE_TYPE t,const std::string& msg="");
 void h4pOnEvent(H4PE_TYPE t,H4P_FN_USEREVENT f);
 
 #if SANITY
@@ -155,18 +155,18 @@ void h4pInventory();
 
 extern H4P_EVENT_HANDLERS   h4pevt;
 //
-extern string h4pGetErrorMessage(uint32_t e);
-extern string h4pGetEventName   (H4PE_TYPE e);
-extern string h4pGetTaskType    (uint32_t e);
-extern string h4pGetTaskName    (uint32_t e);
+extern std::string h4pGetErrorMessage(uint32_t e);
+extern std::string h4pGetEventName   (H4PE_TYPE e);
+extern std::string h4pGetTaskType    (uint32_t e);
+extern std::string h4pGetTaskName    (uint32_t e);
 extern void   h4pClearEvent     (H4PE_TYPE e);
 //
 void    h4pFactoryReset();
 void    h4pReboot();
 
-string  h4preplaceparams(const string& s);
+std::string  h4preplaceparams(const std::string& s);
 
-using 	H4_FN_MSG 		=function<uint32_t(vector<string>)>;
+using 	H4_FN_MSG 		=std::function<uint32_t(std::vector<std::string>)>;
 
 struct command{
 	uint32_t            owner;
@@ -174,7 +174,7 @@ struct command{
 	H4_FN_MSG 			fn;
 };
 
-using 	H4P_CMDMAP		    =std::unordered_multimap<string,command>;
+using 	H4P_CMDMAP		    =std::unordered_multimap<std::string,command>;
 using 	H4P_CMDMAP_I        =H4P_CMDMAP::iterator;
 
 enum H4_CMD_ERROR:uint32_t  {
@@ -227,21 +227,21 @@ enum H4PC_CMD_ID {
 };
 
 class H4Service;
-extern std::unordered_map<string,H4Service*> h4pmap;
+extern std::unordered_map<std::string,H4Service*> h4pmap;
 
 template <typename T>
-T* h4puncheckedcall(const string& svc){ return h4pmap.count(svc) ? static_cast<T*>(h4pmap[svc]):nullptr; }
+T* h4puncheckedcall(const std::string& svc){ return h4pmap.count(svc) ? static_cast<T*>(h4pmap[svc]):nullptr; }
 
 template<typename... Args>
-void h4psysevent(const string& svc,H4PE_TYPE t,const string& fmt, Args... args){
+void h4psysevent(const std::string& svc,H4PE_TYPE t,const std::string& fmt, Args... args){
     char* buff=static_cast<char*>(malloc(H4PE_BUFFER+1));
     snprintf(buff,H4PE_BUFFER,CSTR(fmt),args...);
     h4pevent(svc,t,buff);
     free(buff);
 }
 
-void h4puiAdd(const string& n,H4P_UI_TYPE t,string h="u",const string& v="",uint8_t c=0);
-void h4puiSync(const string& n,const string& v="");
+void h4puiAdd(const std::string& n,H4P_UI_TYPE t,std::string h="u",const std::string& v="",uint8_t c=0);
+void h4puiSync(const std::string& n,const std::string& v="");
 
 #define ON true
 #define OFF false
@@ -250,11 +250,11 @@ void h4puiSync(const string& n,const string& v="");
 #define H4PAYLOAD_INT atoi(CSTR(vs.back()))
 #define STOI(n) atoi(CSTR(n))
 #define PARAM_INT(n) STOI(vs[n])
-#define CHOP_FRONT(vs) (vector<string>(++vs.begin(),vs.end()))
-#define CMD(x) ([this](vector<string>)->uint32_t{ x(); return H4_CMD_OK; })
-#define CMDNULL ([this](vector<string>)->uint32_t{ return H4_CMD_OK; })
-#define CMDVS(x) ([this](vector<string> vs)->uint32_t{ return x(vs); })
-#define VSCMD(x) uint32_t x(vector<string>)
+#define CHOP_FRONT(vs) (std::vector<std::string>(++vs.begin(),vs.end()))
+#define CMD(x) ([this](std::vector<std::string>)->uint32_t{ x(); return H4_CMD_OK; })
+#define CMDNULL ([this](std::vector<std::string>)->uint32_t{ return H4_CMD_OK; })
+#define CMDVS(x) ([this](std::vector<std::string> vs)->uint32_t{ return x(vs); })
+#define VSCMD(x) uint32_t x(std::vector<std::string>)
 
 #define QEVENT(e) h4pevent(_me,e)
 #define XEVENT(e,f,...) h4psysevent(_me,e,f,__VA_ARGS__)
@@ -289,7 +289,7 @@ void h4puiSync(const string& n,const string& v="");
 extern H4P_CMDMAP h4pCmdMap;
 
 template<typename T>
-T* require(const string& svc){
+T* require(const std::string& svc){
     T* dll=h4puncheckedcall<T>(svc);
     if(!dll){
         dll=new T;
@@ -300,25 +300,25 @@ T* require(const string& svc){
 }
 
 class H4Service {
-                void                _envoi(const string& s);
-                string              _uniquify(const string& name,uint32_t uqf=0);
-                void                _sysHandleEvent(const string& svc,H4PE_TYPE t,const string& msg);
+                void                _envoi(const std::string& s);
+                std::string         _uniquify(const std::string& name,uint32_t uqf=0);
+                void                _sysHandleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg);
     protected:
-                string              _me;
+                std::string         _me;
                 uint32_t            _pid;
 
                 void                _addLocals(H4P_CMDMAP local);
-                vector<uint32_t>    _expectInt(string pl,const char* delim=",");
-                uint32_t            _guardInt1(vector<string> vs,function<void(uint32_t)> f);
-                uint32_t            _guardString2(vector<string> vs,function<H4_CMD_ERROR(string,string)> f);
-                uint32_t            _guard1(vector<string> vs,H4_FN_MSG f);
-        virtual void                _handleEvent(const string& svc,H4PE_TYPE t,const string& msg){}
-        virtual void                _reply(string msg) { Serial.println(CSTR(msg)); }
+                std::vector<uint32_t>    _expectInt(std::string pl,const char* delim=",");
+                uint32_t            _guardInt1(std::vector<std::string> vs,std::function<void(uint32_t)> f);
+                uint32_t            _guardString2(std::vector<std::string> vs,std::function<H4_CMD_ERROR(std::string,std::string)> f);
+                uint32_t            _guard1(std::vector<std::string> vs,H4_FN_MSG f);
+        virtual void                _handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg){}
+        virtual void                _reply(std::string msg) { Serial.println(CSTR(msg)); }
 
         template<typename T>
-        T* depend(const string& svc){
+        T* depend(const std::string& svc){
             _filter |= H4PE_SERVICE;
-            h4pregisterhandler(_me,H4PE_SERVICE,[=](const string& s,H4PE_TYPE t,const string& m){ _sysHandleEvent(s,t,m); });
+            h4pregisterhandler(_me,H4PE_SERVICE,[=](const std::string& s,H4PE_TYPE t,const std::string& m){ _sysHandleEvent(s,t,m); });
             _parent=svc;
             return require<T>(svc);
         }
@@ -333,15 +333,15 @@ class H4Service {
     public:
 //      for now
                 uint32_t            _filter=H4PE_NOOP;
-                string              _parent="";
+                std::string              _parent="";
                 bool                _running=false;
 //
-        H4Service(const string& name,uint32_t events=H4PE_NOOP,bool singleton=true): _filter(events | H4PE_BOOT | H4PE_STAGE2){
+        H4Service(const std::string& name,uint32_t events=H4PE_NOOP,bool singleton=true): _filter(events | H4PE_BOOT | H4PE_STAGE2){
             _me=_uniquify(name);
             if(_me==name || (!singleton)){
                 _pid=h4pmap.size()+H4PC_MAX;
                 h4pmap[_me]=this;
-                h4pregisterhandler(_me,_filter,[this](const string& s,H4PE_TYPE t,const string& m){ _sysHandleEvent(s,t,m); });
+                h4pregisterhandler(_me,_filter,[this](const std::string& s,H4PE_TYPE t,const std::string& m){ _sysHandleEvent(s,t,m); });
             } 
             else SYSWARN("Reload %s",CSTR(_me));
         }
@@ -410,22 +410,22 @@ case H4PE_SYSINFO: \
     if(STOI(msg)) H4PSVCUP(s); \
     else H4PSVCDOWN(s); \
 }
-#define H4P_FUNCTION_ADAPTER(e) case H4PEVENTNAME(e): \
+#define H4P_std::function_ADAPTER(e) case H4PEVENTNAME(e): \
     H4PEVENTCALL(e,svc,msg); \
     break;
 
-#define H4P_FUNCTION_ADAPTER_II(e) case H4PEVENTNAME(e): \
+#define H4P_std::function_ADAPTER_II(e) case H4PEVENTNAME(e): \
     H4PEVENTCALL(e,STOI(svc),STOI(msg)); \
     break;
 
-#define H4P_FUNCTION_ADAPTER_SI(e) case H4PEVENTNAME(e): \
+#define H4P_std::function_ADAPTER_SI(e) case H4PEVENTNAME(e): \
     H4PEVENTCALL(e,svc,STOI(msg)); \
     break;
 
-#define H4P_FUNCTION_ADAPTER_VOID(e) case H4PEVENTNAME(e): \
+#define H4P_std::function_ADAPTER_VOID(e) case H4PEVENTNAME(e): \
     H4PGLUE2(on,e)(); \
     break;
 
-#define H4P_FUNCTION_ADAPTER_GPIO H4P_FUNCTION_ADAPTER_II(GPIO)
+#define H4P_std::function_ADAPTER_GPIO H4P_std::function_ADAPTER_II(GPIO)
 
-#define H4P_FUNCTION_ADAPTER_PRESENCE H4P_FUNCTION_ADAPTER_SI(PRESENCE)
+#define H4P_std::function_ADAPTER_PRESENCE H4P_std::function_ADAPTER_SI(PRESENCE)

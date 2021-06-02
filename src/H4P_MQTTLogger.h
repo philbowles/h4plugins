@@ -34,10 +34,10 @@ SOFTWARE.
 
 class H4P_MQTTLogger: public H4Service {
         H4P_AsyncMQTT*  _pMQTT;
-        string          _topic;
-        void            _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override { _pMQTT->publishDevice(_topic,msg); }
+        std::string          _topic;
+        void            _handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg) override { _pMQTT->publishDevice(_topic,msg); }
     public:
-        H4P_MQTTLogger(const string& topic,uint32_t filter=H4PE_ALL): _topic(topic),H4Service("mlog",filter,false){
+        H4P_MQTTLogger(const std::string& topic,uint32_t filter=H4PE_ALL): _topic(topic),H4Service("mlog",filter,false){
             _pMQTT=depend<H4P_AsyncMQTT>(mqttTag());
         }
 #if H4P_LOG_MESSAGES

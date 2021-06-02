@@ -40,8 +40,8 @@ SOFTWARE.
 
 #include<H4P_WiFi.h>
 
-using H4P_DURATION = pair<string,string>;
-using H4P_SCHEDULE = vector<H4P_DURATION>;
+using H4P_DURATION = std::pair<std::string,std::string>;
+using H4P_SCHEDULE = std::vector<H4P_DURATION>;
 /* e.g.
 H4P_SCHEDULE mySchedule={
   {"07:00","09:00"}, // ON @ 0700, OFF @ 0900
@@ -50,56 +50,55 @@ H4P_SCHEDULE mySchedule={
 };
 */
 
-using H4_FN_DST        =function<int(uint32_t)>;
+using H4_FN_DST        =std::function<int(uint32_t)>;
 
 class H4P_Timekeeper: public H4Service {
         VSCMD(_change);
         VSCMD(_tz);
                 H4_FN_DST           _fDST;
-                string              _ntp1;
-                string              _ntp2;
+                std::string         _ntp1;
+                std::string         _ntp2;
                 uint32_t            _mss00=0;
                 struct tm           _timeinfo;
                 int                 _tzo;
 
-                uint32_t    __alarmCore (vector<string> vs,bool daily);
+                uint32_t    __alarmCore (std::vector<std::string> vs,bool daily);
                 void        __HALsetTimezone(int);
-                uint32_t    _at(vector<string> vs);
-                uint32_t    _daily(vector<string> vs);
-                void        _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override;
-                void        _setupSNTP(const string& ntp1, const string& ntp2);
+                uint32_t    _at(std::vector<std::string> vs);
+                uint32_t    _daily(std::vector<std::string> vs);
+                void        _handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg) override;
+                void        _setupSNTP(const std::string& ntp1, const std::string& ntp2);
 
     public:
-        H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzOffset=0,H4_FN_DST fDST=nullptr);
+        H4P_Timekeeper(const std::string& ntp1,const std::string& ntp2,int tzOffset=0,H4_FN_DST fDST=nullptr);
 ///
 // _tzo = Time Zone Offset in +/- minutes from UTC, not hours.
                 uint32_t	clockEPOCH() { time_t now = 0; return _mss00 ? time(&now) : 0; }  // Current number of seconds since EPOCH.
                 uint32_t	clockEPOCHLocal() { return clockEPOCH() + (_tzo * 60); }  // Current number of seconds since EPOCH plus TZ offset.
-                string		clockStrTimeLocal() { return strTime( (clockEPOCHLocal() % 86400) * 1000 ); }  // Current time + TZ as string HH:MM:SS.
-                string 		strfTime(uint32_t t);
-                string 		strfDate(uint32_t t);
-                string 		strfDateTime(char fmt[] = "%a %Y-%m-%d %H:%M:%S", uint32_t t=0);
+                std::string clockStrTimeLocal() { return strTime( (clockEPOCHLocal() % 86400) * 1000 ); }  // Current time + TZ as std::string HH:MM:SS.
+                std::string strfTime(uint32_t t);
+                std::string strfDate(uint32_t t);
+                std::string strfDateTime(char fmt[] = "%a %Y-%m-%d %H:%M:%S", uint32_t t=0);
         static  int 		DST_EU(uint32_t t);  // DST offset for t in EU (inc UK).
         static  int 		DST_USA(uint32_t t);  // DST offset for t in USA.
 ///
-                void        at(const string& when,bool onoff);
-                void        change(const string& ntp1,const string& ntp2);
-                string 		clockTime() { return _mss00 ? strTime(msSinceMidnight()) : "0"; }
-                void        daily(const string& when,bool onoff);
+                void        at(const std::string& when,bool onoff);
+                void        change(const std::string& ntp1,const std::string& ntp2);
+                std::string clockTime() { return _mss00 ? strTime(msSinceMidnight()) : "0"; }
+                void        daily(const std::string& when,bool onoff);
                 uint32_t 	msSinceMidnight() { return _mss00 + millis(); }
-                int      	parseTime(const string& ts);
-                string      minutesFromNow(uint32_t s);
+                int      	parseTime(const std::string& ts);
+                std::string minutesFromNow(uint32_t s);
                 void        setSchedule(H4P_SCHEDULE);
 #if H4P_LOG_MESSAGES
                 void        info() override;
 #endif
-                string 		strTime(uint32_t t);
+                std::string strTime(uint32_t t);
                 void        sync();
                 void        tz(int tzOffset);
-                string 		upTime();
+                std::string upTime();
 // syscall only
         virtual void        _init() override;
         virtual void        svcUp() override;
         virtual void        svcDown() override;
-
 };

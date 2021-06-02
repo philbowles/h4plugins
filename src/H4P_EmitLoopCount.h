@@ -51,7 +51,7 @@ extern __attribute__((weak)) uint32_t h4Nloops;
 #endif
 */
 class H4P_EmitLoopCount: public H4Service {
-        virtual void _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override {
+        virtual void _handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg) override {
                 XEVENT(H4PE_LOOPS,"%u",h4Nloops);
                 h4Nloops=0;
             };

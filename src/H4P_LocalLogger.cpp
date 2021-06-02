@@ -42,16 +42,16 @@ H4P_LocalLogger::H4P_LocalLogger(uint32_t limit,uint32_t filter):  _limit(limit)
 //
 //      our raison d'etre
 //
-void H4P_LocalLogger::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg) {
+void H4P_LocalLogger::_handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg) {
     if(t==H4PE_FACTORY) clear();
     else {
-        vector<string> msgparts={stringFromInt(millis()),h4pGetEventName(t),svc,msg};
+        std::vector<std::string> msgparts={stringFromInt(millis()),h4pGetEventName(t),svc,msg};
         uint32_t size=H4P_SerialCmd::write("/"+_fname,join(msgparts,",")+"\n","a");
         if(size > _limit) flush();
     }
 }
 
-void H4P_LocalLogger::clear(){ HAL_FS.remove(CSTR(string("/"+_fname))); }
+void H4P_LocalLogger::clear(){ HAL_FS.remove(CSTR(std::string("/"+_fname))); }
 
 void H4P_LocalLogger::flush(){
 #if H4P_LOG_MESSAGES
@@ -63,8 +63,8 @@ void H4P_LocalLogger::flush(){
 #if H4P_LOG_MESSAGES
 void H4P_LocalLogger::info(){
     H4Service::info();
-    uint32_t fsz=HAL_FS.open(CSTR(string("/"+_fname)),"r").size();
+    uint32_t fsz=HAL_FS.open(CSTR(std::string("/"+_fname)),"r").size();
     reply("File /%s size=%u (%u %%full) limit=%u",CSTR(_fname),fsz,(fsz*100)/_limit,_limit);
-    h4p._dump(vector<string>{_fname}); // static
+    h4p._dump(std::vector<std::string>{_fname}); // static
 }
 #endif

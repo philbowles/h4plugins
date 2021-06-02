@@ -30,17 +30,17 @@ SOFTWARE.
 #include<H4P_AsyncMQTT.h>
 
 // payload: scheme,broker,uname,pws,port e.g. https,192.168.1.4,,,1883
-uint32_t H4P_AsyncMQTT::_change(vector<string> vs){  // broker,uname,pword,port
-    return _guard1(vs,[this](vector<string> vs){
+uint32_t H4P_AsyncMQTT::_change(std::vector<std::string> vs){  // broker,uname,pword,port
+    return _guard1(vs,[this](std::vector<std::string> vs){
         auto vg=split(H4PAYLOAD,",");
         if(vg.size()!=5) return H4_CMD_PAYLOAD_FORMAT;
-        string url=vg[0]+"://"+vg[1]+":"+vg[4];
+        std::string url=vg[0]+"://"+vg[1]+":"+vg[4];
         change(url,vg[2],vg[3]); // change this to a vs?
         return H4_CMD_OK;
     });
 }
 
-void H4P_AsyncMQTT::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg){ 
+void H4P_AsyncMQTT::_handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg){ 
     switch(t){
         case H4PE_VIEWERS:
             {
@@ -83,9 +83,9 @@ void H4P_AsyncMQTT::_init() {
     h4p.gvSetInt(_me,0,false);
     onMqttError([=](int e,int info){ XEVENT(H4PE_SYSWARN,"%d,%d",e,info); });
 
-    string device=h4p[deviceTag()];
+    std::string device=h4p[deviceTag()];
     if(_lwt.topic=="") {
-        _lwt.topic=CSTR(string(prefix+device+"/offline"));
+        _lwt.topic=CSTR(std::string(prefix+device+"/offline"));
         _lwt.payload=CSTR(h4p[chipTag()]);
     }
 
@@ -93,9 +93,9 @@ void H4P_AsyncMQTT::_init() {
     prefix+=device+"/";
 
     onMqttMessage([=](const char* topic, const uint8_t* payload, size_t length, uint8_t qos, bool retain,bool dup){
-        string top(topic);
-        string pload((const char*) payload,length);
-        h4.queueFunction([top,pload](){ h4p._executeCmd(CSTR(string(mqttTag()).append("/").append(top)),pload); },nullptr,H4P_TRID_MQMS);
+        std::string top(topic);
+        std::string pload((const char*) payload,length);
+        h4.queueFunction([top,pload](){ h4p._executeCmd(CSTR(std::string(mqttTag()).append("/").append(top)),pload); },nullptr,H4P_TRID_MQMS);
     });
 
     onMqttConnect([=](bool b){
@@ -103,10 +103,10 @@ void H4P_AsyncMQTT::_init() {
             _signalOff();
             h4.cancelSingleton(H4P_TRID_MQRC);
             _discoDone=false;
-            subscribe(CSTR(string(allTag()).append(cmdhash())),0);
-            subscribe(CSTR(string(device+cmdhash())),0);
-            subscribe(CSTR(string(h4p[chipTag()]+cmdhash())),0);
-            subscribe(CSTR(string(h4p[boardTag()]+cmdhash())),0);
+            subscribe(CSTR(std::string(allTag()).append(cmdhash())),0);
+            subscribe(CSTR(std::string(device+cmdhash())),0);
+            subscribe(CSTR(std::string(h4p[chipTag()]+cmdhash())),0);
+            subscribe(CSTR(std::string(h4p[boardTag()]+cmdhash())),0);
             report();
             h4p[_me]=stringFromInt(_running=true);
             SYSINFO("CNX %s",CSTR(h4p[brokerTag()]));
@@ -134,7 +134,7 @@ void H4P_AsyncMQTT::_setup(){ // allow for TLS
 //    else SYSWARN("NO MQTT DETAILS","");
 }
 
-void H4P_AsyncMQTT::change(const string& broker,const string& user,const string& passwd){ // add creds
+void H4P_AsyncMQTT::change(const std::string& broker,const std::string& user,const std::string& passwd){ // add creds
     XLOG("MQTT change to %s user=%s",CSTR(broker),CSTR(user));
     h4p[mQuserTag()]=user;
     h4p[mQpassTag()]=passwd;
@@ -145,7 +145,7 @@ void H4P_AsyncMQTT::change(const string& broker,const string& user,const string&
 void H4P_AsyncMQTT::info(){
     H4Service::info();
     reply(" Server: %s, %s",CSTR(h4p[brokerTag()]),connected() ? "CNX":"DCX");
-    string reporting;
+    std::string reporting;
     for(auto const r:_reportList) reporting+=r+",";
     reporting.pop_back();
     reply(" Report: %s",CSTR(reporting));
@@ -153,7 +153,7 @@ void H4P_AsyncMQTT::info(){
 #endif
 
 void H4P_AsyncMQTT::report(){
-    string j="{";
+    std::string j="{";
     for(auto const r:_reportList) {
         j+="\""+r+"\":\"";
         j.append(h4p[r]).append("\",");
@@ -163,8 +163,8 @@ void H4P_AsyncMQTT::report(){
     XLOG("Reporting %s}",CSTR(j));
 }
 
-void H4P_AsyncMQTT::subscribeDevice(string topic,H4_FN_MSG f,H4PC_CMD_ID root){
-    string fullTopic=string(h4p[deviceTag()])+"/"+topic; // refac
+void H4P_AsyncMQTT::subscribeDevice(std::string topic,H4_FN_MSG f,H4PC_CMD_ID root){
+    std::string fullTopic=std::string(h4p[deviceTag()])+"/"+topic; // refac
     if(topic.back()=='#' || topic.back()=='+'){
         topic.pop_back();
         topic.pop_back();
@@ -174,7 +174,7 @@ void H4P_AsyncMQTT::subscribeDevice(string topic,H4_FN_MSG f,H4PC_CMD_ID root){
     XLOG("Subscribed to %s",CSTR(fullTopic));
 }
 
-void H4P_AsyncMQTT::subscribeDevice(initializer_list<string> topic,H4_FN_MSG f,H4PC_CMD_ID root){ for(auto const& t:topic) subscribeDevice(t,f,root); }
+void H4P_AsyncMQTT::subscribeDevice(std::initializer_list<std::string> topic,H4_FN_MSG f,H4PC_CMD_ID root){ for(auto const& t:topic) subscribeDevice(t,f,root); }
 
 void H4P_AsyncMQTT::svcUp(){
 #if H4P_USE_WIFI_AP
@@ -191,8 +191,8 @@ void H4P_AsyncMQTT::svcDown(){
     disconnect();
 }
 
-void H4P_AsyncMQTT::unsubscribeDevice(string topic){
-    string fullTopic=string(h4p[deviceTag()])+"/"+topic; // refac
+void H4P_AsyncMQTT::unsubscribeDevice(std::string topic){
+    std::string fullTopic=std::string(h4p[deviceTag()])+"/"+topic; // refac
     if(topic.back()=='#'){
         topic.pop_back();
         topic.pop_back();
@@ -202,4 +202,4 @@ void H4P_AsyncMQTT::unsubscribeDevice(string topic){
     XLOG("Unsubscribed from %s\n",CSTR(topic));
 }
 
-void H4P_AsyncMQTT::unsubscribeDevice(initializer_list<string> topic){ for(auto const& t:topic) unsubscribeDevice(t); }
+void H4P_AsyncMQTT::unsubscribeDevice(std::initializer_list<std::string> topic){ for(auto const& t:topic) unsubscribeDevice(t); }

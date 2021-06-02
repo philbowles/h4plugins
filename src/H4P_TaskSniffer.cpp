@@ -29,20 +29,20 @@ SOFTWARE.
 #include<H4P_TaskSniffer.h>
 //#include<H4P_SerialCmd.h>
 
-uint32_t H4P_TaskSniffer::__incexc(vector<string> vs,function<void(vector<uint32_t>)> f){
-    return _guard1(vs,[f,this](vector<string> vs){
+uint32_t H4P_TaskSniffer::__incexc(std::vector<std::string> vs,std::function<void(std::vector<uint32_t>)> f){
+    return _guard1(vs,[f,this](std::vector<std::string> vs){
         auto vi=_expectInt(H4PAYLOAD);
-        if(vi.size()) return ([f,this](vector<uint32_t> vu){ 
+        if(vi.size()) return ([f,this](std::vector<uint32_t> vu){ 
             f(vu);
 //            info(); 
             return H4_CMD_OK;
         })(vi);
         else {
-            if((H4PAYLOAD).find_first_of("-")!=string::npos){
-                vector<uint32_t> range=_expectInt(H4PAYLOAD,"-");
+            if((H4PAYLOAD).find_first_of("-")!=std::string::npos){
+                std::vector<uint32_t> range=_expectInt(H4PAYLOAD,"-");
                 if(range.size()==2 && range[0]<range[1]){
                     range[1]=std::min(range[1],(uint32_t) 99);
-                    vector<uint32_t> expanded;
+                    std::vector<uint32_t> expanded;
                     for(uint32_t i=range[0];i<range[1]+1;i++) expanded.push_back(i);
                     f(expanded);
 //                    info();
@@ -71,13 +71,13 @@ void H4P_TaskSniffer::_taskDump(H4_TASK_PTR t,const char c){
     }
 }
 //
-uint32_t H4P_TaskSniffer::_tsExclude(vector<string> vs){ return __incexc(vs,[this](vector<uint32_t> vi){ exclude(vi); }); }
+uint32_t H4P_TaskSniffer::_tsExclude(std::vector<std::string> vs){ return __incexc(vs,[this](std::vector<uint32_t> vi){ exclude(vi); }); }
 
-uint32_t H4P_TaskSniffer::_tsInclude(vector<string> vs){ return __incexc(vs,[this](vector<uint32_t> vi){ include(vi); }); }
+uint32_t H4P_TaskSniffer::_tsInclude(std::vector<std::string> vs){ return __incexc(vs,[this](std::vector<uint32_t> vi){ include(vi); }); }
 
 #if H4P_LOG_MESSAGES
 void H4P_TaskSniffer::info(){
-    vector<uint32_t> sorted;
+    std::vector<uint32_t> sorted;
     reply("ts List: \n");
     for(auto const& h:hitList) sorted.push_back(h);
     sort(sorted.begin(),sorted.end());
@@ -98,7 +98,7 @@ H4P_TaskSniffer::H4P_TaskSniffer(uint32_t i): H4Service(snifTag()){
     _common();
 }
 
-H4P_TaskSniffer::H4P_TaskSniffer(initializer_list<uint32_t> i): H4Service(snifTag()){ 
+H4P_TaskSniffer::H4P_TaskSniffer(std::initializer_list<uint32_t> i): H4Service(snifTag()){ 
     include(i);
     _common();
 }

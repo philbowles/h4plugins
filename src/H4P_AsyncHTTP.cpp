@@ -30,7 +30,7 @@ SOFTWARE.
 #include<H4P_AsyncHTTP.h>
 #include<H4P_WiFi.h>
 
-H4P_AsyncHTTP::H4P_AsyncHTTP(const string& name,uint32_t filter): H4Service(name,filter,false){
+H4P_AsyncHTTP::H4P_AsyncHTTP(const std::string& name,uint32_t filter): H4Service(name,filter,false){
     depend<H4P_WiFi>(wifiTag());
     onHTTPerror([=](int e,int i){ _errorHandler(e,i); });
 }

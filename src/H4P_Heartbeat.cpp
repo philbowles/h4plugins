@@ -28,7 +28,7 @@ SOFTWARE.
 */
 #include<H4P_Heartbeat.h>
 
-void H4P_Heartbeat::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg) {
+void H4P_Heartbeat::_handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg) {
     switch(t){
         case H4PE_VIEWERS:
             if(STOI(msg)){
@@ -57,8 +57,8 @@ void H4P_Heartbeat::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg
     }
 }
 
-string H4P_Heartbeat::secsToTime(uint32_t sex){ 
+std::string H4P_Heartbeat::secsToTime(uint32_t sex){ 
     char buf[15];
     sprintf(buf,"%3d %02d:%02d:%02d",sex/86400,(sex%86400)/3600,(sex/60)%60,sex%60);
-    return string(buf);
+    return std::string(buf);
 }

@@ -40,7 +40,7 @@ SOFTWARE.
 #include<H4P_WiFi.h>
 
 class H4P_Heartbeat: public H4Service {
-                void        _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override;
+                void        _handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg) override;
                 void        _run();
     public: 
 #if H4P_UI_HEALTH
@@ -58,6 +58,6 @@ class H4P_Heartbeat: public H4Service {
 #if H4P_LOG_MESSAGES
                 void        info() override { H4Service::info(); reply(" upTime=%s",CSTR(upTime())); }
 #endif
-        static  string      secsToTime(uint32_t sex);
-        static  string      upTime(){ return h4p.gvGetstring(upTimeTag()); }
+        static  std::string secsToTime(uint32_t sex);
+        static  std::string upTime(){ return h4p.gvGetstring(upTimeTag()); }
 };

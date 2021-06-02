@@ -33,7 +33,7 @@ SOFTWARE.
 #include<pango_config.h>
 //
 
-extern std::unordered_map<string,H4Service*> h4pmap;
+extern std::unordered_map<std::string,H4Service*> h4pmap;
 extern bool h4punlocked;
 
 const char* __attribute__((weak)) giveTaskName(uint32_t id){ return "ANON"; }
@@ -51,9 +51,9 @@ H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Service(cmdTag(),H4PE_FACTORY | H
         {"clear",      { H4PC_H4,   0, CMD(clear)}},
         {"config",     { H4PC_H4,   0, CMDVS(_config)}},
         {"dump",       { H4PC_H4,   0, CMDVS(_dump)}},
-        {"factory",    { H4PC_H4,   0, ([=](vector<string>){ h4psysevent(h4pSrc,H4PE_FACTORY,""); return H4_CMD_OK; }) }},
+        {"factory",    { H4PC_H4,   0, ([=](std::vector<std::string>){ h4psysevent(h4pSrc,H4PE_FACTORY,""); return H4_CMD_OK; }) }},
         {"get",        { H4PC_H4,   0, CMDVS(_get)}},
-        {"reboot",     { H4PC_H4,   0, ([=](vector<string>){ h4psysevent(h4pSrc,H4PE_REBOOT,""); return H4_CMD_OK; }) }},
+        {"reboot",     { H4PC_H4,   0, ([=](std::vector<std::string>){ h4psysevent(h4pSrc,H4PE_REBOOT,""); return H4_CMD_OK; }) }},
         {"svc",        { H4PC_H4,   H4PC_SVC, nullptr}},
         {"restart",    { H4PC_SVC,  0, CMDVS(_svcRestart) }},
         {"start",      { H4PC_SVC,  0, CMDVS(_svcStart) }},
@@ -71,18 +71,18 @@ H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Service(cmdTag(),H4PE_FACTORY | H
         {"help",       { 0,         0, CMD(help) }}
     });
     if(autoStop) h4._unHook(_pid);
-    string ino=h4p[binTag()];
+    std::string ino=h4p[binTag()];
     ino+="."+lowercase(H4_BOARD)+".bin";
     h4p[binTag()]=ino;
 }
 
-H4P_CMDMAP_I H4P_SerialCmd::__exactMatch(const string& cmd,uint32_t owner){
+H4P_CMDMAP_I H4P_SerialCmd::__exactMatch(const std::string& cmd,uint32_t owner){
     auto any=h4pCmdMap.equal_range(cmd);
     for(auto i=any.first;i!=any.second;i++) if(i->second.owner==owner) return i;
     return h4pCmdMap.end();
 }
 
-void H4P_SerialCmd::__flatten(function<void(string)> fn){
+void H4P_SerialCmd::__flatten(std::function<void(std::string)> fn){
     H4P_CMDMAP_I ptr;
     for(ptr=h4pCmdMap.begin();ptr!=h4pCmdMap.end(); ptr++){
         if(!(ptr->second.owner)){
@@ -92,12 +92,12 @@ void H4P_SerialCmd::__flatten(function<void(string)> fn){
     }
 }
 
-uint32_t H4P_SerialCmd::_config(vector<string> vs){
-    return _guard1(vs,[this](vector<string> vs){
-        vector<string> ci=split(H4PAYLOAD,",");
+uint32_t H4P_SerialCmd::_config(std::vector<std::string> vs){
+    return _guard1(vs,[this](std::vector<std::string> vs){
+        std::vector<std::string> ci=split(H4PAYLOAD,",");
         H4P_NVP_MAP pending;
         for(auto const& c:ci){
-            vector<string> parts=split(c,"=");
+            std::vector<std::string> parts=split(c,"=");
             if(parts.size()>2) return H4_CMD_PAYLOAD_FORMAT;
             if(!h4p.gvExists(parts[0])) SYSWARN("CONFIG %s=%s name not known\n",parts[0].data(),parts[1].data());
             else {
@@ -110,10 +110,10 @@ uint32_t H4P_SerialCmd::_config(vector<string> vs){
     });
 }
 
-uint32_t H4P_SerialCmd::_dispatch(vector<string> vs,uint32_t owner=0){
+uint32_t H4P_SerialCmd::_dispatch(std::vector<std::string> vs,uint32_t owner=0){
     if(vs.size()){
         H4P_CMDMAP_I i;
-        string cmd=vs[0];
+        std::string cmd=vs[0];
         i=__exactMatch(cmd,owner);
         if(i!=h4pCmdMap.end()){
             if(i->second.fn) return [=](){ return i->second.fn(CHOP_FRONT(vs)); }();
@@ -122,30 +122,30 @@ uint32_t H4P_SerialCmd::_dispatch(vector<string> vs,uint32_t owner=0){
     } else return H4_CMD_UNKNOWN;
 }
 
-uint32_t H4P_SerialCmd::_executeCmd(string topic, string pload){
-	vector<string> vs=split(CSTR(topic),"/");
+uint32_t H4P_SerialCmd::_executeCmd(std::string topic, std::string pload){
+	std::vector<std::string> vs=split(CSTR(topic),"/");
     h4pSrc=vs[0];
 	vs.push_back(pload);
-    vector<string> cmd(vs.begin()+2,vs.end());
+    std::vector<std::string> cmd(vs.begin()+2,vs.end());
     XLOG("%s %s",CSTR(vs[0]),CSTR(join(cmd,"/")));
-    uint32_t rv=_dispatch(vector<string>(cmd)); // optimise?
+    uint32_t rv=_dispatch(std::vector<std::string>(cmd)); // optimise?
     if(rv) reply("%s",CSTR(h4pGetErrorMessage(rv)));
     return rv;
 }
 
-void H4P_SerialCmd::_flattenCmds(function<void(string)> fn,string cmd,string prefix,uint32_t lev){
+void H4P_SerialCmd::_flattenCmds(std::function<void(std::string)> fn,std::string cmd,std::string prefix,uint32_t lev){
     H4P_CMDMAP_I i=h4pCmdMap.find(cmd);
     for(i=h4pCmdMap.begin();i!=h4pCmdMap.end();i++){
         if(i->second.owner==lev){
-			string trim = prefix+"/"+i->first;
+			std::string trim = prefix+"/"+i->first;
 			if(i->second.levID) _flattenCmds(fn,i->first,trim,i->second.levID);
 			else fn(trim);
         }
     }
 }
 
-uint32_t H4P_SerialCmd::_get(vector<string> vs){
-    return _guard1(vs,[this](vector<string> vs){
+uint32_t H4P_SerialCmd::_get(std::vector<std::string> vs){
+    return _guard1(vs,[this](std::vector<std::string> vs){
         if(h4p.gvExists(H4PAYLOAD)) {
             _showItem(H4PAYLOAD);
             return H4_CMD_OK;
@@ -153,7 +153,7 @@ uint32_t H4P_SerialCmd::_get(vector<string> vs){
     });
 }
 
-void H4P_SerialCmd::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg){
+void H4P_SerialCmd::_handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg){
     switch(t){
         case H4PE_FACTORY:
             clear(); 
@@ -163,7 +163,7 @@ void H4P_SerialCmd::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg
 }
 
 void H4P_SerialCmd::_persist(){
-    string items;
+    std::string items;
     for(auto const& p:h4pGlobal) if(p.second._save) items+=p.second.get()+RECORD_SEPARATOR;
     if(items.size()){
         items.pop_back();
@@ -172,7 +172,7 @@ void H4P_SerialCmd::_persist(){
 }
 
 void H4P_SerialCmd::_run(){
-    static string cmd="";
+    static std::string cmd="";
 	static int	c;
     if((c=Serial.read()) != -1){
         if (c == '\n') {
@@ -184,26 +184,26 @@ void H4P_SerialCmd::_run(){
     }
 }
 
-uint32_t H4P_SerialCmd::_simulatePayload(string flat,const char* src){ // refac
+uint32_t H4P_SerialCmd::_simulatePayload(std::string flat,const char* src){ // refac
     // a bit of hoop-jumping to allow / characters in simulated payloads
-    vector<string> bt=split(flat,"\`");
-    string f2;
+    std::vector<std::string> bt=split(flat,"\`");
+    std::string f2;
     if(bt.size() > 1){
-		string esc=replaceAll(bt.back(),"/","\`");
+		std::string esc=replaceAll(bt.back(),"/","\`");
         bt.pop_back();
         f2=join(bt,"/")+esc;
     } else f2=flat;
-    vector<string> vs=split(f2,"/");
+    std::vector<std::string> vs=split(f2,"/");
     if(vs.size()){
-		string pload=replaceAll(vs.back(),"\`","/");
+		std::string pload=replaceAll(vs.back(),"\`","/");
 		vs.pop_back();
-		string topic=join(vs,"/");
+		std::string topic=join(vs,"/");
 		return invokeCmd(topic,pload,src); // _invoke
 	} else return H4_CMD_TOO_FEW_PARAMS;
 }
 
-uint32_t H4P_SerialCmd::_svcControl(H4P_SVC_CONTROL action,vector<string> vs){
-    return _guard1(vs,[=](vector<string> vs){
+uint32_t H4P_SerialCmd::_svcControl(H4P_SVC_CONTROL action,std::vector<std::string> vs){
+    return _guard1(vs,[=](std::vector<std::string> vs){
         auto p=h4puncheckedcall<H4Service>(H4PAYLOAD);
         if(p) {
             switch(action){
@@ -227,17 +227,17 @@ uint32_t H4P_SerialCmd::_svcControl(H4P_SVC_CONTROL action,vector<string> vs){
     });
 }
 
-uint32_t H4P_SerialCmd::_svcRestart(vector<string> vs){ return _svcControl(H4PSVC_RESTART,vs); }
+uint32_t H4P_SerialCmd::_svcRestart(std::vector<std::string> vs){ return _svcControl(H4PSVC_RESTART,vs); }
 
-uint32_t H4P_SerialCmd::_svcStart(vector<string> vs){ return _svcControl(H4PSVC_START,vs); }
+uint32_t H4P_SerialCmd::_svcStart(std::vector<std::string> vs){ return _svcControl(H4PSVC_START,vs); }
 
-uint32_t H4P_SerialCmd::_svcInfo(vector<string> vs){ return _svcControl(H4PSVC_STATE,vs); }
+uint32_t H4P_SerialCmd::_svcInfo(std::vector<std::string> vs){ return _svcControl(H4PSVC_STATE,vs); }
 
-uint32_t H4P_SerialCmd::_svcStop(vector<string> vs){ return _svcControl(H4PSVC_STOP,vs); }
+uint32_t H4P_SerialCmd::_svcStop(std::vector<std::string> vs){ return _svcControl(H4PSVC_STOP,vs); }
 //
 //
 //
-void H4P_SerialCmd::addCmd(const string& name,uint32_t owner, uint32_t levID,H4_FN_MSG f){
+void H4P_SerialCmd::addCmd(const std::string& name,uint32_t owner, uint32_t levID,H4_FN_MSG f){
     if(__exactMatch(name,owner)==h4pCmdMap.end()) h4pCmdMap.insert(make_pair(name,command {owner,levID,f}));
 }
 
@@ -247,18 +247,18 @@ void H4P_SerialCmd::clear(){
 }
 
 void H4P_SerialCmd::help(){ 
-    vector<string> unsorted={};
-    __flatten([&unsorted](string s){ unsorted.push_back(s); });
+    std::vector<std::string> unsorted={};
+    __flatten([&unsorted](std::string s){ unsorted.push_back(s); });
     sort(unsorted.begin(),unsorted.end());
     for(auto const& s:unsorted) { reply(CSTR(s)); }
 }
 
-uint32_t H4P_SerialCmd::invokeCmd(string topic,string payload,const char* src){ return _executeCmd(string(src)+"/h4/"+CSTR(topic),string(CSTR(payload))); }
+uint32_t H4P_SerialCmd::invokeCmd(std::string topic,std::string payload,const char* src){ return _executeCmd(std::string(src)+"/h4/"+CSTR(topic),std::string(CSTR(payload))); }
 
-uint32_t H4P_SerialCmd::invokeCmd(string topic,uint32_t payload,const char* src){ return invokeCmd(topic,stringFromInt(payload),src); }
+uint32_t H4P_SerialCmd::invokeCmd(std::string topic,uint32_t payload,const char* src){ return invokeCmd(topic,stringFromInt(payload),src); }
 
-string H4P_SerialCmd::read(const string& fn){
-	string rv="";
+std::string H4P_SerialCmd::read(const std::string& fn){
+	std::string rv="";
         File f=HAL_FS.open(CSTR(fn), "r");
         if(f && f.size()) {
             int n=f.size();
@@ -271,18 +271,18 @@ string H4P_SerialCmd::read(const string& fn){
 	return rv;	
 }
 
-void H4P_SerialCmd::removeCmd(const string& s,uint32_t pid){ if(__exactMatch(s,pid)!=h4pCmdMap.end()) h4pCmdMap.erase(s); }
+void H4P_SerialCmd::removeCmd(const std::string& s,uint32_t pid){ if(__exactMatch(s,pid)!=h4pCmdMap.end()) h4pCmdMap.erase(s); }
 
-uint32_t H4P_SerialCmd::write(const string& fn,const string& data,const char* mode){
+uint32_t H4P_SerialCmd::write(const std::string& fn,const std::string& data,const char* mode){
     File b=HAL_FS.open(CSTR(fn), mode);
     b.print(data.data());
     b.close();
     return data.size(); // fix this!!!!!!!!!!!!
 }
 
-uint32_t H4P_SerialCmd::_dump(vector<string> vs){
-    return _guard1(vs,[this](vector<string> vs){
-        return ([this](string h){ 
+uint32_t H4P_SerialCmd::_dump(std::vector<std::string> vs){
+    return _guard1(vs,[this](std::vector<std::string> vs){
+        return ([this](std::string h){ 
             reply("DUMP FILE %s",CSTR(h));
             reply("%s",CSTR(read("/"+h)));
             return H4_CMD_OK;
@@ -290,7 +290,7 @@ uint32_t H4P_SerialCmd::_dump(vector<string> vs){
     });
 }
 
-string H4P_SerialCmd::_dumpTask(task* t){
+std::string H4P_SerialCmd::_dumpTask(task* t){
     char buf[128];
     uint32_t type=t->uid/100;
     uint32_t id=t->uid%100;
@@ -303,12 +303,12 @@ string H4P_SerialCmd::_dumpTask(task* t){
         t->rmin,
         t->rmax,
         t->nrq);
-    return string(buf);
+    return std::string(buf);
 }
 
-void H4P_SerialCmd::_createProxy(const string& name,bool save){ if(!h4pGlobal.count(name)) h4pGlobal[name]=h4proxy(name,"",save); }
+void H4P_SerialCmd::_createProxy(const std::string& name,bool save){ if(!h4pGlobal.count(name)) h4pGlobal[name]=h4proxy(name,"",save); }
 
-void H4P_SerialCmd::_adjust(const string& name,int value){ 
+void H4P_SerialCmd::_adjust(const std::string& name,int value){ 
     _createProxy(name);
     if(stringIsNumeric(h4p[name])){
         auto cv=atoi(CSTR(h4pGlobal[name]));
@@ -316,9 +316,9 @@ void H4P_SerialCmd::_adjust(const string& name,int value){
     }
 }
 
-void H4P_SerialCmd::gvDec(const string& name){ _adjust(name,-1); }
+void H4P_SerialCmd::gvDec(const std::string& name){ _adjust(name,-1); }
 
-void H4P_SerialCmd::gvErase(initializer_list<const char*> nil){ 
+void H4P_SerialCmd::gvErase(std::initializer_list<const char*> nil){ 
     bool    anypersistent=false;
     for(auto n:nil) {
         auto mts=h4pGlobal[n];
@@ -328,28 +328,28 @@ void H4P_SerialCmd::gvErase(initializer_list<const char*> nil){
     if(anypersistent) _persist();
 }
 
-string H4P_SerialCmd::gvGetstring(const string& name){ 
+std::string H4P_SerialCmd::gvGetstring(const std::string& name){ 
     if(h4pGlobal.count(name)) return h4pGlobal[name];
     return {};
 }
 
-int H4P_SerialCmd::gvGetInt(const string& name){ return atoi(CSTR(gvGetstring(name))); }
+int H4P_SerialCmd::gvGetInt(const std::string& name){ return atoi(CSTR(gvGetstring(name))); }
 
-void H4P_SerialCmd::gvInc(const string& name){ _adjust(name,1); }
+void H4P_SerialCmd::gvInc(const std::string& name){ _adjust(name,1); }
 
-void H4P_SerialCmd::gvSave(initializer_list<const char*> save){ for(auto s:save) if(gvExists(s)) h4pGlobal[s]._save=true; }
+void H4P_SerialCmd::gvSave(std::initializer_list<const char*> save){ for(auto s:save) if(gvExists(s)) h4pGlobal[s]._save=true; }
 
-void H4P_SerialCmd::gvSetstring(const string& name,const string& value,bool save){
+void H4P_SerialCmd::gvSetstring(const std::string& name,const std::string& value,bool save){
     _createProxy(name,save);
     if(h4p[name]!=value) h4p[name]=value;
 }
 
-void H4P_SerialCmd::gvSetInt(const string& name,int value,bool save){ gvSetstring(name,stringFromInt(value),save); }
+void H4P_SerialCmd::gvSetInt(const std::string& name,int value,bool save){ gvSetstring(name,stringFromInt(value),save); }
 //
 #if H4P_LOG_MESSAGES
 void H4P_SerialCmd::all(){
-    __flatten([this](string s){ 
-        vector<string> candidates=split(s,"/");
+    __flatten([this](std::string s){ 
+        std::vector<std::string> candidates=split(s,"/");
         if(candidates.size()>1 && candidates[1]==showTag() && candidates[2]!=allTag()) {
             reply(CSTR(s));
             invokeCmd(s,"",CSTR(h4pSrc)); // snake / tail etc
@@ -419,7 +419,7 @@ void H4P_SerialCmd::showFS(){
 
 void H4P_SerialCmd::showQ(){
 	reply("           Due @tick Type              Min       Max       nRQ");  
-    vector<task*> tlist=h4._copyQ();
+    std::vector<task*> tlist=h4._copyQ();
     sort(tlist.begin(),tlist.end(),[](const task* a, const task* b){ return a->at < b->at; });
     for(auto const& t:tlist) reply(CSTR(_dumpTask(t)));
 }
@@ -438,7 +438,7 @@ void H4P_SerialCmd::svcDown(){
 //
 //      h4proxy
 //
-h4proxy& h4proxy::_set(const string& s){
+h4proxy& h4proxy::_set(const std::string& s){
     if(_v!=s){
         _v=s;
         if(_save) H4P_SerialCmd::_persist();

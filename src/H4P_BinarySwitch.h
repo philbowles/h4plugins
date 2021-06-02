@@ -54,7 +54,7 @@ class H4P_BinarySwitch: public H4P_BinaryThing{
 class H4P_ConditionalSwitch: public H4P_BinarySwitch{
                 H4_FN_CPRED _predicate;
     protected:
-        virtual void        _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override;
+        virtual void        _handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg) override;
     public:
         H4P_ConditionalSwitch(H4_FN_CPRED predicate,uint8_t pin,H4PM_SENSE sense,uint8_t color=H4P_UILED_BI,uint32_t initial=OFF,uint32_t timer=0):
             _predicate(predicate), 

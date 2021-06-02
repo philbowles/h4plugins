@@ -34,7 +34,7 @@ SOFTWARE.
 
 extern bool HAL_isAnalog(uint8_t);
 
-using H4PM_STAGE_MAP = vector<uint32_t>;
+using H4PM_STAGE_MAP = std::vector<uint32_t>;
 
 class h4pGPIO;
 using H4P_PINMAP = std::map<uint8_t,h4pGPIO*>;
@@ -51,7 +51,7 @@ struct msg {
     uint32_t        sigE;
 };
 
-using H4P_MSG_FLOW      = function<msg(msg)>;
+using H4P_MSG_FLOW      = std::function<msg(msg)>;
 
 class npNODE {
     public:
@@ -61,13 +61,13 @@ class npNODE {
 
 using npFLOW  = std::vector<npNODE*>;
 
-using H4PM_COMPARE=function<bool(uint32_t,uint32_t)>;
+using H4PM_COMPARE=std::function<bool(uint32_t,uint32_t)>;
 #define H4PM_LESS std::less<uint32_t>()
 #define H4PM_GREATER std::greater<uint32_t>()
 
 class h4pGPIO {
     friend  class H4P_PinMachine;
-        virtual void                _handleEvent(const string& s,H4PE_TYPE t,const string& msg);
+        virtual void                _handleEvent(const std::string& s,H4PE_TYPE t,const std::string& msg);
     protected:
                 uint32_t            _r; // to cope with analog values
 //
@@ -87,7 +87,7 @@ class h4pGPIO {
 //
         h4pGPIO(uint8_t p,uint8_t m,H4PM_SENSE s=ACTIVE_LOW,npFLOW flow={});
 #if H4P_LOG_MESSAGES
-                string              dump();
+                std::string              dump();
 #endif
                 int                 getValue(){ return _prev.load; }
                 msg                 inject(uint32_t metal,bool timer=false);

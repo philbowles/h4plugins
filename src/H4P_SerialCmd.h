@@ -47,44 +47,44 @@ class H4P_SerialCmd: public H4Service {
                 VSCMD(_svcStart);
                 VSCMD(_svcStop);
 
-                H4P_CMDMAP_I    __exactMatch(const string& cmd,uint32_t owner);
-                void            __flatten(function<void(string)> fn);
+                H4P_CMDMAP_I    __exactMatch(const std::string& cmd,uint32_t owner);
+                void            __flatten(std::function<void(std::string)> fn);
 
-                void            _adjust(const string& name,int value);
-                void            _createProxy(const string& name,bool save=false);
-                uint32_t        _dispatch(vector<string> vs,uint32_t owner);
-                void            _flattenCmds(function<void(string)> fn,string cmd="",string prefix="",uint32_t owner=0);
-                void            _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override;
+                void            _adjust(const std::string& name,int value);
+                void            _createProxy(const std::string& name,bool save=false);
+                uint32_t        _dispatch(std::vector<std::string> vs,uint32_t owner);
+                void            _flattenCmds(std::function<void(std::string)> fn,std::string cmd="",std::string prefix="",uint32_t owner=0);
+                void            _handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg) override;
                 void            _run();
-                void            _showItem(const string& name){ reply("  %s %s=%s",(h4pGlobal[name]._save) ? "P":" ",CSTR(name),CSTR(h4pGlobal[name])); }
-                uint32_t        _svcControl(H4P_SVC_CONTROL svc,vector<string> vs);
+                void            _showItem(const std::string& name){ reply("  %s %s=%s",(h4pGlobal[name]._save) ? "P":" ",CSTR(name),CSTR(h4pGlobal[name])); }
+                uint32_t        _svcControl(H4P_SVC_CONTROL svc,std::vector<std::string> vs);
     protected:
                 void            svcUp() override;
                 void            svcDown() override;
     public:
         VSCMD(_dump);   // public so logger can use it
-        static  string          _dumpTask(task*);
+        static  std::string          _dumpTask(task*);
 
         H4P_SerialCmd(bool autoStop=false);
 
-                h4proxy&        operator[](const string& name) {
+                h4proxy&        operator[](const std::string& name) {
                     _createProxy(name);
                     return h4pGlobal[name];
                 }
 
-                void            gvDec(const string& name);
-                void            gvErase(const string& name){ gvErase({CSTR(name)}); }
-                void            gvErase(initializer_list<const char*> nil);
-                bool            gvExists(const string& name){ return h4pGlobal.count(name); }
-                int             gvGetInt(const string& name);
-                string          gvGetstring(const string& name);
-                void            gvInc(const string& name);
-                void            gvSave(const string& name){ gvSave({CSTR(name)}); }
-                void            gvSave(initializer_list<const char*> sav);
-                void            gvSetInt(const string& name,int value,bool save=false);
-                void            gvSetstring(const string& name,const string& value,bool save=false);
+                void            gvDec(const std::string& name);
+                void            gvErase(const std::string& name){ gvErase({CSTR(name)}); }
+                void            gvErase(std::initializer_list<const char*> nil);
+                bool            gvExists(const std::string& name){ return h4pGlobal.count(name); }
+                int             gvGetInt(const std::string& name);
+                std::string     gvGetstring(const std::string& name);
+                void            gvInc(const std::string& name);
+                void            gvSave(const std::string& name){ gvSave({CSTR(name)}); }
+                void            gvSave(std::initializer_list<const char*> sav);
+                void            gvSetInt(const std::string& name,int value,bool save=false);
+                void            gvSetstring(const std::string& name,const std::string& value,bool save=false);
 //
-                void            addCmd(const string& name,uint32_t owner, uint32_t levID,H4_FN_MSG f=nullptr);
+                void            addCmd(const std::string& name,uint32_t owner, uint32_t levID,H4_FN_MSG f=nullptr);
                 void            clear();
                 void            help();
 
@@ -96,15 +96,15 @@ class H4P_SerialCmd: public H4Service {
                 void            showFS();
                 void            showQ();
 #endif
-                uint32_t        invokeCmd(string,string="",const char* src=userTag());
-                uint32_t        invokeCmd(string,uint32_t,const char* src=userTag()); 
-        static  string          read(const string& fn);
-                void            removeCmd(const string& name,uint32_t pid=0);
-        static  uint32_t        write(const string& fn,const string& data,const char* mode="w");
+                uint32_t        invokeCmd(std::string,std::string="",const char* src=userTag());
+                uint32_t        invokeCmd(std::string,uint32_t,const char* src=userTag()); 
+        static  std::string     read(const std::string& fn);
+                void            removeCmd(const std::string& name,uint32_t pid=0);
+        static  uint32_t        write(const std::string& fn,const std::string& data,const char* mode="w");
 //      syscall only
-                uint32_t        _executeCmd(string topic, string pload);
+                uint32_t        _executeCmd(std::string topic, std::string pload);
         static  void            _persist();
-                uint32_t        _simulatePayload(string flat,const char* src=cmdTag());
+                uint32_t        _simulatePayload(std::string flat,const char* src=cmdTag());
 };
 
 extern H4P_SerialCmd h4p;

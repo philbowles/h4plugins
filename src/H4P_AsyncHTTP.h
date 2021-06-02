@@ -36,7 +36,7 @@ class H4P_AsyncHTTP: public H4Service, public ArmadilloHTTP {
     protected:
         virtual void    _errorHandler(int e,int i){ h4psysevent(_me,H4PE_SYSWARN,"e=%d i=%d",e,i); }
     public:
-        H4P_AsyncHTTP(const string& name="http",uint32_t filter=H4PE_NOOP);
+        H4P_AsyncHTTP(const std::string& name="http",uint32_t filter=H4PE_NOOP);
 
         virtual void    DELETE(const std::string& url,ARMA_FN_HTTP rx,const uint8_t* fingerprint=nullptr,uint32_t phase=ARMA_PHASE_EXECUTE) override;
         virtual void    GET(const std::string& url,ARMA_FN_HTTP rx,const uint8_t* fingerprint=nullptr,uint32_t phase=ARMA_PHASE_EXECUTE) override;

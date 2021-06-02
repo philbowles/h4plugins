@@ -39,13 +39,13 @@ SOFTWARE.
 #endif
 
 class H4Flasher{
-	        string          _dots;
+	        std::string          _dots;
             H4_TASK_PTR     _timer=nullptr;
             H4_TASK_PTR	    _off=nullptr;
             h4pOutput*      _opp;
 
             uint32_t        _duty=0;
-            string          _pattern;
+            std::string          _pattern;
             uint32_t        _period=0;
             uint32_t        _timebase=0;
             uint32_t        _valley=0;
@@ -64,26 +64,26 @@ class H4Flasher{
 #endif
 //      syscall
 #if H4P_LOG_MESSAGES
-                string      _dump(){
+                std::string      _dump(){
                     char* buff=static_cast<char*>(malloc(H4P_REPLY_BUFFER+1));
                     snprintf(buff,H4P_REPLY_BUFFER,"D/P/V %d,%d,%d P/T '%s',%d",_duty,_period,_valley,CSTR(_pattern),_timebase);
-                    string rv(buff);
+                    std::string rv(buff);
                     free(buff);
                     return rv;
                 }
 #endif
 };
 
-using H4FC_FN_F1        = function<void(H4Flasher*)>;
-using H4FC_FN_F2        = function<H4Flasher*(h4pOutput*)>;
-using H4P_FLASHMAP      = unordered_map<uint8_t,H4Flasher*>;
+using H4FC_FN_F1        = std::function<void(H4Flasher*)>;
+using H4FC_FN_F2        = std::function<H4Flasher*(h4pOutput*)>;
+using H4P_FLASHMAP      = std::unordered_map<uint8_t,H4Flasher*>;
 
 extern H4P_FLASHMAP h4pFlashMap;
 class H4P_Signaller: public H4Service {     
             void            _dynaLoad(uint8_t pin,H4PM_SENSE active,uint8_t col,H4FC_FN_F1 f1,H4FC_FN_F2 f2);
             void            _flash(uint32_t period,uint8_t duty,uint8_t pin,H4PM_SENSE active=ACTIVE_HIGH,uint8_t col=H4P_ASSUMED_COLOR);
 #if H4P_CMDLINE_FLASHERS
-            uint32_t        __validator(vector<string> vs,H4_FN_MSG f);
+            uint32_t        __validator(vector<std::string> vs,H4_FN_MSG f);
             VSCMD(_morse);
             VSCMD(_onof);
             VSCMD(_patn);
@@ -91,7 +91,7 @@ class H4P_Signaller: public H4Service {
             VSCMD(_stop);
 #endif
     protected:
-        virtual void        _handleEvent(const string& svc,H4PE_TYPE t,const string& msg);
+        virtual void        _handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg);
     public:
         H4P_Signaller(): H4Service(winkTag(),H4PE_SIGNAL){
             require<H4P_PinMachine>(gpioTag());

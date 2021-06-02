@@ -29,8 +29,8 @@ SOFTWARE.
 #include<H4P_WiFi.h>
 #include<H4P_PinMachine.h>
 
-H4P_UI_LIST         h4pUserItems;
-vector<string>      h4pUIorder;
+H4P_UI_LIST                     h4pUserItems;
+std::vector<std::string>        h4pUIorder;
 /*
                                              H / W - D E P E N D E N T   F U N C T I O N S
 */
@@ -40,7 +40,7 @@ vector<string>      h4pUIorder;
 //
 void H4P_WiFi::HAL_WIFI_disconnect(){ WiFi.disconnect(false); }
 
-void H4P_WiFi::HAL_WIFI_setHost(const string& host){ WiFi.hostname(CSTR(host)); }
+void H4P_WiFi::HAL_WIFI_setHost(const std::string& host){ WiFi.hostname(CSTR(host)); }
 
 void H4P_WiFi::HAL_WIFI_startSTA(){
     WiFi.mode(WIFI_STA); // poss lose?
@@ -87,7 +87,7 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
 //
 void H4P_WiFi::HAL_WIFI_disconnect(){ WiFi.disconnect(false,false); }
 
-void H4P_WiFi::HAL_WIFI_setHost(const string& host){ WiFi.setHostname(CSTR(host)); }
+void H4P_WiFi::HAL_WIFI_setHost(const std::string& host){ WiFi.setHostname(CSTR(host)); }
 
 void H4P_WiFi::HAL_WIFI_startSTA(){
     WiFi.setSleep(false);
@@ -130,17 +130,17 @@ void H4P_WiFi::_coreStart(){
 //
 //              common
 //
-void H4P_WiFi::__uiAdd(const string& msg) {
-    vector<string> m=split(msg,",");
+void H4P_WiFi::__uiAdd(const std::string& msg) {
+    std::vector<std::string> m=split(msg,",");
     _uiAdd(m[0],static_cast<H4P_UI_TYPE>(STOI(m[1])),m[3],m[2],STOI(m[4]));    
 }
 
 String H4P_WiFi::_aswsReplace(const String& var){
-    string v=CSTR(var);
+    std::string v=CSTR(var);
     return h4p.gvExists(v) ? String(CSTR(h4p[v])):"?";
 }
 
-uint32_t H4P_WiFi::_change(vector<string> vs){ return _guardString2(vs,[this](string a,string b){ change(a,b); return H4_CMD_OK; }); }
+uint32_t H4P_WiFi::_change(std::vector<std::string> vs){ return _guardString2(vs,[this](std::string a,std::string b){ change(a,b); return H4_CMD_OK; }); }
 
 void H4P_WiFi::_clearUI(){ 
     h4pUserItems.clear();
@@ -154,7 +154,7 @@ void H4P_WiFi::_commonStartup(){
     require<H4P_PinMachine>(gpioTag());
     require<H4P_Signaller>(winkTag());
 #endif
-    if(h4p[deviceTag()]=="") h4p[deviceTag()]=string("H4-").append(h4p[chipTag()]);
+    if(h4p[deviceTag()]=="") h4p[deviceTag()]=std::string("H4-").append(h4p[chipTag()]);
     XLOG("Device: %s Chip: %s",CSTR(h4p[deviceTag()]),CSTR(h4p[chipTag()]));
     _addLocals({
         {_me,           { H4PC_H4, _pid, nullptr}},
@@ -163,9 +163,9 @@ void H4P_WiFi::_commonStartup(){
     });
 }
 
-void H4P_WiFi::_defaultSync(const string& svc,const string& msg) {
+void H4P_WiFi::_defaultSync(const std::string& svc,const std::string& msg) {
     if(h4pUserItems.count(svc)) {
-        string sync;
+        std::string sync;
         switch(h4pUserItems[svc].type){
             case H4P_UI_DROPDOWN:
                 sync=h4pUserItems[svc].f();
@@ -187,7 +187,7 @@ void H4P_WiFi::_gotIP(){
     h4p[ssidTag()]=CSTR(WiFi.SSID());
     h4p[pskTag()]=CSTR(WiFi.psk());
 
-    string host=h4p[deviceTag()];
+    std::string host=h4p[deviceTag()];
     h4.every(H4WF_OTA_RATE,[](){ ArduinoOTA.handle(); },nullptr,H4P_TRID_HOTA,true);
     HAL_WIFI_setHost(host);
 
@@ -207,7 +207,7 @@ void H4P_WiFi::_gotIP(){
     H4Service::svcUp();
 }
 
-void H4P_WiFi::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg) {
+void H4P_WiFi::_handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg) {
     switch(t){
         case H4PE_UIMSG:
             uiMessage("%s",CSTR(msg));
@@ -249,8 +249,8 @@ void H4P_WiFi::_lostIP(){
     if(!_discoDone) _stopWebserver();
 }
 
-uint32_t H4P_WiFi::_msg(vector<string> vs){
-    return _guard1(vs,[this](vector<string> vs){
+uint32_t H4P_WiFi::_msg(std::vector<std::string> vs){
+    return _guard1(vs,[this](std::vector<std::string> vs){
         uiMessage(H4PAYLOAD);
         return H4_CMD_OK;
     });
@@ -259,12 +259,12 @@ uint32_t H4P_WiFi::_msg(vector<string> vs){
 void H4P_WiFi::_rest(AsyncWebServerRequest *request){
 	h4.queueFunction([=](){
         XLOG("_rest %s",request->client()->remoteIP().toString().c_str());
-		string chop=replaceAll(CSTR(request->url()),"/rest/","");
-        string msg="";
+		std::string chop=replaceAll(CSTR(request->url()),"/rest/","");
+        std::string msg="";
         uint32_t res=h4puncheckedcall<H4P_SerialCmd>(cmdTag())->_simulatePayload(CSTR(chop),wifiTag());
         msg=h4pGetErrorMessage(res);
-        string j="{\"res\":"+stringFromInt(res)+",\"msg\":\""+msg+"\",\"lines\":[";
-        string fl;
+        std::string j="{\"res\":"+stringFromInt(res)+",\"msg\":\""+msg+"\",\"lines\":[";
+        std::string fl;
         if(!res){
             for(auto &l:_lines){
                 if(l.back()=='\n') l.pop_back();
@@ -285,7 +285,7 @@ void H4P_WiFi::_restart(){
     HAL_WIFI_startSTA();
 }
 
-void H4P_WiFi::_sendSSE(const string& name,const string& msg){
+void H4P_WiFi::_sendSSE(const std::string& name,const std::string& msg){
     static bool bakov=false;
 
     if(_evts && _evts->count()) {
@@ -349,7 +349,7 @@ void H4P_WiFi::_startWebserver(){
                 }
                 for(auto const& ui:h4pUIorder){
                     auto i=h4pUserItems[ui];
-                    _sendSSE("ui",CSTR(string(ui+","+stringFromInt(i.type)+","+i.h+",0,"+stringFromInt(i.color)+","+i.f())));
+                    _sendSSE("ui",CSTR(std::string(ui+","+stringFromInt(i.type)+","+i.h+",0,"+stringFromInt(i.color)+","+i.f())));
                 }
                 h4.repeatWhile([this]{ return _evts->count(); },
                     ((H4WF_EVT_TIMEOUT*3)/4),
@@ -380,9 +380,9 @@ void H4P_WiFi::_stopWebserver(){
     svcDown();
 }
 
-void H4P_WiFi::_uiAdd(const string& name,H4P_UI_TYPE t,const string& h,const string& value,uint8_t color){
-    function<string(void)>  f;
-    string v=value;
+void H4P_WiFi::_uiAdd(const std::string& name,H4P_UI_TYPE t,const std::string& h,const std::string& value,uint8_t color){
+    std::function<std::string(void)>  f;
+    std::string v=value;
     switch(t){
         case H4P_UI_GPIO:
             f=[=](){ return stringFromInt(H4P_PinMachine::logicalRead(STOI(name))); };
@@ -406,7 +406,7 @@ void H4P_WiFi::_uiAdd(const string& name,H4P_UI_TYPE t,const string& h,const str
         PUBLICS
 
 */
-void H4P_WiFi::change(string ssid,string psk){ // add device / name?
+void H4P_WiFi::change(std::string ssid,std::string psk){ // add device / name?
     h4p[pskTag()]=psk;
     h4p[ssidTag()]=ssid;
     _restart();
@@ -434,6 +434,6 @@ void H4P_WiFi::svcDown(){
     H4Service::svcDown();
 }
 
-void H4P_WiFi::uiAddAllUsrFields(const string& section){ for(auto const& g:h4pGlobal) if(g.first.rfind("usr_")!=string::npos) _uiAdd(replaceAll(g.first,"usr_",""),H4P_UI_TEXT,section,g.second); }
+void H4P_WiFi::uiAddAllUsrFields(const std::string& section){ for(auto const& g:h4pGlobal) if(g.first.rfind("usr_")!=std::string::npos) _uiAdd(replaceAll(g.first,"usr_",""),H4P_UI_TEXT,section,g.second); }
 
-void H4P_WiFi::uiAddDropdown(const string& name,H4P_NVP_MAP options,const string& section){ _uiAdd(name,H4P_UI_DROPDOWN,section,flattenMap(options)); }
+void H4P_WiFi::uiAddDropdown(const std::string& name,H4P_NVP_MAP options,const std::string& section){ _uiAdd(name,H4P_UI_DROPDOWN,section,flattenMap(options)); }

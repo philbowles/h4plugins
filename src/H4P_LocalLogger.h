@@ -32,10 +32,10 @@ SOFTWARE.
 #include <H4Service.h>
 
 class H4P_LocalLogger: public H4Service {
-        string      _fname;
+        std::string      _fname;
         uint32_t    _limit;
 
-                void        _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override;
+                void        _handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg) override;
     public:
         H4P_LocalLogger(uint32_t limit=10000,uint32_t filter=H4PE_ALL); // amount of free SPIFFS space to use
 

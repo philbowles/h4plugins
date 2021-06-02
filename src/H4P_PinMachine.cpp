@@ -98,10 +98,10 @@ h4pGPIO::h4pGPIO(uint8_t p,uint8_t m,H4PM_SENSE s,npFLOW flow): _p(p),_s(s),_pip
 
 void h4pGPIO::_announce(){
     _prev=(*npPublishValue)(_prev);
-    h4pregisterhandler(stringFromInt(_p,"%02d"),H4PE_VIEWERS,[=](const string& s,H4PE_TYPE t,const string& m){ _handleEvent(s,t,m); });
+    h4pregisterhandler(stringFromInt(_p,"%02d"),H4PE_VIEWERS,[=](const std::string& s,H4PE_TYPE t,const std::string& m){ _handleEvent(s,t,m); });
 }
 
-void h4pGPIO::_handleEvent(const string& s,H4PE_TYPE t,const string& msg){
+void h4pGPIO::_handleEvent(const std::string& s,H4PE_TYPE t,const std::string& msg){
     switch(t){
         case H4PE_VIEWERS:
         {
@@ -117,10 +117,10 @@ void h4pGPIO::_handleEvent(const string& s,H4PE_TYPE t,const string& msg){
 }
 
 #if H4P_LOG_MESSAGES
-string h4pGPIO::dump(){
+std::string h4pGPIO::dump(){
     char* buff=static_cast<char*>(malloc(H4P_REPLY_BUFFER+1));
     snprintf(buff,H4P_REPLY_BUFFER," P%02d S=%d P=%d L=%d C=%d V=%d O=%d A=%d",_p,_s,digitalRead(_p),logicalRead(),_c,getValue(),isOutput(),isAnalog());
-    string rv(buff);
+    std::string rv(buff);
     free(buff);
     return rv;
 }

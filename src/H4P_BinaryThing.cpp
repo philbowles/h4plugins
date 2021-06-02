@@ -35,7 +35,7 @@ void H4P_BinaryThing::_onChange(bool b){
     if(off) h4.once(off,[=]{ h4p.gvSetInt(stateTag(),OFF); });
 }
 
-void H4P_BinaryThing::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg){ 
+void H4P_BinaryThing::_handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg){ 
     switch(t){
         case H4PE_VIEWERS:
             {
@@ -63,7 +63,7 @@ void H4P_BinaryThing::svcDown() {
 //
 //      H4P_ConditionalThing
 //
-void H4P_ConditionalThing::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg){
+void H4P_ConditionalThing::_handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg){
     switch(t){
         case H4PE_VIEWERS:
             {

@@ -31,7 +31,7 @@ SOFTWARE.
 #include<H4P_ToneController.h>
 #include<H4.h>
 
-unordered_map<string,uint32_t> H4P_ToneController::notes={
+std::unordered_map<std::string,uint32_t> H4P_ToneController::notes={
             {"R  ",0}, // REST
 
             {"GN2",100},
@@ -106,12 +106,12 @@ unordered_map<string,uint32_t> H4P_ToneController::notes={
             {"BN7",3951}
         };
 
-vector<uint32_t> H4P_ToneController::xpose;
-unordered_map<char,uint32_t> H4P_ToneController::timing;
+std::vector<uint32_t> H4P_ToneController::xpose;
+std::unordered_map<char,uint32_t> H4P_ToneController::timing;
 
 #define H4P_STAVE_STAGGER 5
 
-unordered_map<uint32_t,pair<uint32_t,string>> H4P_ToneController::sirens={
+std::unordered_map<uint32_t,std::pair<uint32_t,std::string>> H4P_ToneController::sirens={
     {H4P_SIREN_HILO,{50,"GN5q EN4q "}},
     {H4P_SIREN_SCREECH,{750,"CN3d CN7d "}},
     {H4P_SIREN_CHIRP,{400,"BN7d A#7d AN7d G#7d GN7d F#7d FN7d R  M R  M "}},
@@ -129,7 +129,7 @@ H4P_ToneController::H4P_ToneController(uint32_t tempo): H4Service("tune"){
     metronome(tempo);
 }
 
-void H4P_ToneController::_repeat(const string& siren,uint8_t pin,uint32_t speed,uint32_t duration){
+void H4P_ToneController::_repeat(const std::string& siren,uint8_t pin,uint32_t speed,uint32_t duration){
     metronome(speed);       
     H4P_Voice* v=new H4P_Voice(pin);
     uint32_t t=length(siren);
@@ -142,9 +142,9 @@ void H4P_ToneController::_repeat(const string& siren,uint8_t pin,uint32_t speed,
     });
 }
 
-uint32_t H4P_ToneController::length(const string& tune){
+uint32_t H4P_ToneController::length(const std::string& tune){
     uint32_t L=0;
-    string t=_cleanTune(tune);
+    std::string t=_cleanTune(tune);
     if(!(t.size()%5)) for(int i=3;i<t.size();i+=5) L+=timing[t[i]];
     return L;
 }
@@ -152,7 +152,7 @@ uint32_t H4P_ToneController::length(const string& tune){
 void H4P_ToneController::metronome(uint32_t tempo){
     if(tempo){
         uint16_t bpm=(7880/tempo);
-        string order="dDsSqQcCmMbB";
+        std::string order="dDsSqQcCmMbB";
         timing['d']=bpm;
         timing['D']=(bpm*3)/2;
         for(int i=2;i<12;i+=2) {
@@ -168,8 +168,8 @@ void H4P_ToneController::multiVox(H4P_TUNE tune,uint32_t tempo,int transpose){
     for(auto const& t:tune) h4.once((H4P_STAVE_STAGGER * (i--)),[t,transpose]{ t.first.play(t.second,transpose); });
 }
 
-string H4P_ToneController::setVolume(const string& s,uint8_t volume){
-    string t=_cleanTune(s);
+std::string H4P_ToneController::setVolume(const std::string& s,uint8_t volume){
+    std::string t=_cleanTune(s);
     if(!(t.size()%5)){
         for(int i=4;i<t.size();i+=5) t[i]=volume+0x30;
         return t;
@@ -178,7 +178,7 @@ string H4P_ToneController::setVolume(const string& s,uint8_t volume){
 }
 
 void H4P_ToneController::siren(H4P_SIREN S,uint8_t pin,uint32_t duration){
-    pair<uint32_t,string> def=sirens[S];
+    std::pair<uint32_t,std::string> def=sirens[S];
     _repeat(def.second,pin,def.first,duration);
 }
 
@@ -189,43 +189,43 @@ void H4P_ToneController::tone(uint8_t pin,uint32_t freq,uint32_t duration,uint8_
 //
 //      Voice
 //
-void H4P_Voice::_play(const string& tune,int transpose,H4_FN_VOID chain){
+void H4P_Voice::_play(const std::string& tune,int transpose,H4_FN_VOID chain){
     if(tune.size()){
-        _decompose(string(tune.begin(),tune.begin()+5),transpose,[this,tune,transpose,chain](){
-            _play(string(tune.begin()+5,tune.end()),transpose,chain);
+        _decompose(std::string(tune.begin(),tune.begin()+5),transpose,[this,tune,transpose,chain](){
+            _play(std::string(tune.begin()+5,tune.end()),transpose,chain);
         });
     } else if(chain) chain();
     else analogWrite(_pin,0);
 }
 
-void H4P_Voice::_decompose(const string& n,int transpose,H4_FN_VOID chain){//,uint8_t pin,H4P_NOTE* p){
-    string note(n);
+void H4P_Voice::_decompose(const std::string& n,int transpose,H4_FN_VOID chain){//,uint8_t pin,H4P_NOTE* p){
+    std::string note(n);
     char effect=note.back();note.pop_back();
     char duration=note.back();note.pop_back();
     if(H4P_ToneController::notes.count(note)) _tone(H4P_ToneController::_transpose(note,transpose),effect,H4P_ToneController::timing[duration],chain);
 }
 
-void  H4P_Voice::chromaticRun(const string& nStart,const string& nFinish,const char duration){
+void  H4P_Voice::chromaticRun(const std::string& nStart,const std::string& nFinish,const char duration){
     if(H4P_ToneController::notes.count(nStart) && H4P_ToneController::notes.count(nFinish)){
-        vector<string> run;
+        std::vector<std::string> run;
         bool swapped=false;
         uint32_t i1=H4P_ToneController::notes[nStart];
         uint32_t i2=H4P_ToneController::notes[nFinish];
         if(i1>i2) {
-            swap(i1,i2);
+            std::swap(i1,i2);
             swapped=true;
         }
         for(int j=i1;j<=i2;j++){
-            auto note=find_if(H4P_ToneController::notes.begin(),H4P_ToneController::notes.end(),[&j](pair<string,uint32_t> const& p){ return j==p.second; });
-            run.push_back((string(note->first)).append(1,duration).append(1,'8'));
+            auto note=std::find_if(H4P_ToneController::notes.begin(),H4P_ToneController::notes.end(),[&j](std::pair<std::string,uint32_t> const& p){ return j==p.second; });
+            run.push_back((std::string(note->first)).append(1,duration).append(1,'8'));
         }
         if(swapped) reverse(run.begin(),run.end());
         play(join(run,""));
     }
 }
 
-void H4P_Voice::play(const string& tune,int transpose){
-    string choon=H4P_ToneController::_cleanTune(tune);
+void H4P_Voice::play(const std::string& tune,int transpose){
+    std::string choon=H4P_ToneController::_cleanTune(tune);
     if(!(choon.size()%5)) _play(choon,transpose,[]{});
 }
 

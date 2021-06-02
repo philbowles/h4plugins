@@ -33,7 +33,7 @@ void H4P_BinarySwitch::_init() {
     H4P_BinaryThing::_init();
 }
 
-void H4P_ConditionalSwitch::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg){
+void H4P_ConditionalSwitch::_handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg){
     switch(t){
         case H4PE_VIEWERS:
             {

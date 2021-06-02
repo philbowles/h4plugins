@@ -34,27 +34,27 @@ SOFTWARE.
 class H4P_TaskSniffer: public H4Service{
     protected:
 //
-        uint32_t            __incexc(vector<string> vs,function<void(vector<uint32_t>)> f);
+        uint32_t            __incexc(std::vector<std::string> vs,std::function<void(std::vector<uint32_t>)> f);
 
         VSCMD(_tsInclude);
         VSCMD(_tsExclude);
 //         
-        unordered_set<uint32_t> hitList;
+        std::unordered_set<uint32_t> hitList;
 
                 void        _common();
                 void        _taskDump(H4_TASK_PTR t,char c);
     public:
         H4P_TaskSniffer();
         H4P_TaskSniffer(uint32_t i);
-        H4P_TaskSniffer(initializer_list<uint32_t> i);
+        H4P_TaskSniffer(std::initializer_list<uint32_t> i);
 
-                void        include(initializer_list<uint32_t> i){ hitList.insert(i); }
+                void        include(std::initializer_list<uint32_t> i){ hitList.insert(i); }
                 void        include(uint32_t i){ include({i}); }
-                void        include(vector<uint32_t> i){ for(auto const& l:i)include(l); }
+                void        include(std::vector<uint32_t> i){ for(auto const& l:i)include(l); }
                 
                 void        exclude(uint32_t i){ exclude({i}); }
-                void        exclude(initializer_list<uint32_t> i){ for(auto const& l:i) hitList.erase(l); }
-                void        exclude(vector<uint32_t> i){ for(auto const& l:i) hitList.erase(l); }
+                void        exclude(std::initializer_list<uint32_t> i){ for(auto const& l:i) hitList.erase(l); }
+                void        exclude(std::vector<uint32_t> i){ for(auto const& l:i) hitList.erase(l); }
 #if H4P_LOG_MESSAGES
                 void        info() override;
 #endif

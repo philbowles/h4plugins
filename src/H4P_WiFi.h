@@ -57,10 +57,10 @@ struct H4P_UI_ITEM { // add title and/or props?
     H4P_UI_TYPE     type;
     H4P_FN_UIGET    f;
     uint8_t         color;
-    string          h;
+    std::string          h;
 };
 
-using H4P_UI_LIST       = std::map<string,H4P_UI_ITEM>;
+using H4P_UI_LIST       = std::map<std::string,H4P_UI_ITEM>;
 class H4P_WiFi: public H4Service, public AsyncWebServer {
 #if H4P_USE_WIFI_AP
             DNSServer*          _dns53=nullptr;
@@ -69,22 +69,22 @@ class H4P_WiFi: public H4Service, public AsyncWebServer {
             bool                _discoDone;
             uint32_t            _evtID=0;
             AsyncEventSource*   _evts;
-            vector<string>      _lines={};
+            std::vector<std::string>      _lines={};
 //
                 VSCMD(_change);
                 VSCMD(_msg);
 
                 void            HAL_WIFI_disconnect();
-                void            HAL_WIFI_setHost(const string& host);
+                void            HAL_WIFI_setHost(const std::string& host);
 //
-                void            __uiAdd(const string& msg);
+                void            __uiAdd(const std::string& msg);
 
         static  String          _aswsReplace(const String& var);
                 void            _clearUI();
                 bool            _cannotConnectSTA(){ return WiFi.SSID()==h4Tag() || WiFi.psk()==h4Tag() || WiFi.SSID()=="" || WiFi.psk()==""; }
                 void            _commonStartup();
                 void            _coreStart();
-                void            _defaultSync(const string& svc,const string& msg);
+                void            _defaultSync(const std::string& svc,const std::string& msg);
                 void            _gotIP();
                 void            _lostIP();
                 void            _rest(AsyncWebServerRequest *request);
@@ -95,7 +95,7 @@ class H4P_WiFi: public H4Service, public AsyncWebServer {
         static  void            _wifiEvent(WiFiEvent_t event);
 //      service essentials
     protected:
-        virtual void            _handleEvent(const string& s,H4PE_TYPE t,const string& msg) override;
+        virtual void            _handleEvent(const std::string& s,H4PE_TYPE t,const std::string& msg) override;
     public:
                 void            HAL_WIFI_startSTA(); // Has to be static for bizarre start sequence on ESP32 FFS
 
@@ -110,7 +110,7 @@ class H4P_WiFi: public H4Service, public AsyncWebServer {
 #else
         explicit H4P_WiFi(): H4Service(wifiTag()),AsyncWebServer(H4P_WEBSERVER_PORT){}
 
-        H4P_WiFi(string ssid,string psk,string device=""):
+        H4P_WiFi(std::string ssid,std::string psk,std::string device=""):
             H4Service(wifiTag(),H4PE_FACTORY | H4PE_GPIO | H4PE_GVCHANGE | H4PE_UIADD | H4PE_UISYNC | H4PE_UIMSG),
             AsyncWebServer(H4P_WEBSERVER_PORT){
                 h4p.gvSetstring(ssidTag(),ssid,true);
@@ -119,7 +119,7 @@ class H4P_WiFi: public H4Service, public AsyncWebServer {
 #endif
                 _commonStartup();
             }
-                void            change(string ssid,string psk);
+                void            change(std::string ssid,std::string psk);
 #if H4P_LOG_MESSAGES
                 void            info() override;
 #endif
@@ -127,21 +127,21 @@ class H4P_WiFi: public H4Service, public AsyncWebServer {
         virtual void            svcDown() override;
         virtual void            svcUp() override;
 //
-                void            uiAddBoolean(const string& name,const string& section="u"){ _uiAdd(name,H4P_UI_BOOL,section); }
-                void            uiAddDropdown(const string& name,H4P_NVP_MAP options,const string& section="u");
-                void            uiAddGlobal(const string& name,const string& section="u"){ _uiAdd(name,H4P_UI_TEXT,section); }
-                void            uiAddImg(const string& name,const string& url,const string& section="u"){ _uiAdd(name,H4P_UI_IMG,section,url); }
-                void            uiAddImgButton(const string& name,const string& section="u"){ _uiAdd(name,H4P_UI_IMGBTN,section); }
-                void            uiAddInput(const string& name,const string& section="u"){ _uiAdd(name,H4P_UI_INPUT,section); }
-                void            uiAddText(const string& name,const string& v,const string& section="u"){ _uiAdd(name,H4P_UI_TEXT,section,v); }
-                void            uiAddText(const string& name,int v,const string& section="u"){ _uiAdd(name,H4P_UI_TEXT,section,stringFromInt(v)); }
-                void            uiAddAllUsrFields(const string& section="u");
+                void            uiAddBoolean(const std::string& name,const std::string& section="u"){ _uiAdd(name,H4P_UI_BOOL,section); }
+                void            uiAddDropdown(const std::string& name,H4P_NVP_MAP options,const std::string& section="u");
+                void            uiAddGlobal(const std::string& name,const std::string& section="u"){ _uiAdd(name,H4P_UI_TEXT,section); }
+                void            uiAddImg(const std::string& name,const std::string& url,const std::string& section="u"){ _uiAdd(name,H4P_UI_IMG,section,url); }
+                void            uiAddImgButton(const std::string& name,const std::string& section="u"){ _uiAdd(name,H4P_UI_IMGBTN,section); }
+                void            uiAddInput(const std::string& name,const std::string& section="u"){ _uiAdd(name,H4P_UI_INPUT,section); }
+                void            uiAddText(const std::string& name,const std::string& v,const std::string& section="u"){ _uiAdd(name,H4P_UI_TEXT,section,v); }
+                void            uiAddText(const std::string& name,int v,const std::string& section="u"){ _uiAdd(name,H4P_UI_TEXT,section,stringFromInt(v)); }
+                void            uiAddAllUsrFields(const std::string& section="u");
 
-                void            uiSetValue(const string& ui,const int f){ _sendSSE(ui,CSTR(stringFromInt(f))); }
-                void            uiSetValue(const string& ui,const string& value){ _sendSSE(ui,CSTR(value)); }
+                void            uiSetValue(const std::string& ui,const int f){ _sendSSE(ui,CSTR(stringFromInt(f))); }
+                void            uiSetValue(const std::string& ui,const std::string& value){ _sendSSE(ui,CSTR(value)); }
 //
                 template<typename... Args>
-                void            uiMessage(const string& msg, Args... args){ // variadic T<>
+                void            uiMessage(const std::string& msg, Args... args){ // variadic T<>
                     char* buff=static_cast<char*>(malloc(H4P_REPLY_BUFFER+1));
                     snprintf(buff,H4P_REPLY_BUFFER,CSTR(msg),args...);
                     _sendSSE("",buff);
@@ -149,8 +149,8 @@ class H4P_WiFi: public H4Service, public AsyncWebServer {
                 }
 //          syscall only        
         virtual void            _init() override;
-                void            _reply(string msg) override { _lines.push_back(msg); }
-                void            _sendSSE(const string& name,const string& msg);
+                void            _reply(std::string msg) override { _lines.push_back(msg); }
+                void            _sendSSE(const std::string& name,const std::string& msg);
                 void            _signalOff(){ YEVENT(H4PE_SIGNAL,""); }
-                void            _uiAdd(const string& name,H4P_UI_TYPE t,const string& h="u",const string& v="",uint8_t c=H4P_UILED_BI);
+                void            _uiAdd(const std::string& name,H4P_UI_TYPE t,const std::string& h="u",const std::string& v="",uint8_t c=H4P_UILED_BI);
 };

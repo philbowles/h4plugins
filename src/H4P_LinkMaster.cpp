@@ -28,14 +28,14 @@ SOFTWARE.
 */
 #include<H4P_LinkMaster.h>
 
-void H4P_LinkMaster::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg){
+void H4P_LinkMaster::_handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg){
     if(_running && svc==stateTag()) for(auto s:_slaves) _pMQTT->xPublish(CSTR((s+"/h4/switch")),msg);
 }
 
-uint32_t H4P_LinkMaster::_slave(vector<string> vs){
+uint32_t H4P_LinkMaster::_slave(std::vector<std::string> vs){
     if(vs.size()<1) return H4_CMD_TOO_FEW_PARAMS;
     if(vs.size()>1) return H4_CMD_TOO_MANY_PARAMS;
-    vector<string> parts=split(vs[0],",");
+    std::vector<std::string> parts=split(vs[0],",");
     if(parts.size()!=2) return H4_CMD_PAYLOAD_FORMAT;
     if(!stringIsNumeric(parts[1])) return H4_CMD_NOT_NUMERIC;
     uint32_t action=STOI(parts[1]);
@@ -59,7 +59,7 @@ void H4P_LinkMaster::info(){
     }
 #endif
 
-void H4P_LinkMaster::slave(const string& otherh4,bool inout){ 
+void H4P_LinkMaster::slave(const std::string& otherh4,bool inout){ 
     SYSINFO("slave %s %s",CSTR(otherh4),inout ? "Added":"Removed");
     if(inout) _slaves.insert(otherh4);
     else _slaves.erase(otherh4);

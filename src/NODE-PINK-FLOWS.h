@@ -87,9 +87,9 @@ class h4pMultistage: public h4pGPIO {
 };
 
 class h4pMultifunctionButton: public h4pMultistage {
-        string          _me="mfnb";  // ease of interop w/other event handlers
+        std::string          _me="mfnb";  // ease of interop w/other event handlers
     protected:
-            void        _handleEvent(const string& s,H4PE_TYPE t,const string& m);
+            void        _handleEvent(const std::string& s,H4PE_TYPE t,const std::string& m);
     public:
         h4pMultifunctionButton(uint8_t p,uint8_t m,H4PM_SENSE s,uint32_t t);
 };

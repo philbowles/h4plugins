@@ -31,12 +31,11 @@ SOFTWARE.
 #include<H4P_Timekeeper.h>
 #include<H4P_EmitTick.h>
 #include<H4P_WiFi.h>
-//#include<H4P_SerialCmd.h>
 
 constexpr uint32_t secsInDay(){ return 86400; }
 constexpr uint32_t msInDay(){ return 1000*secsInDay(); }
 
-H4P_Timekeeper::H4P_Timekeeper(const string& ntp1,const string& ntp2,int tzo,H4_FN_DST fDST): _fDST(fDST), H4Service(timeTag(),H4PE_HEARTBEAT){
+H4P_Timekeeper::H4P_Timekeeper(const std::string& ntp1,const std::string& ntp2,int tzo,H4_FN_DST fDST): _fDST(fDST), H4Service(timeTag(),H4PE_HEARTBEAT){
     depend<H4P_EmitTick>(tickTag());
     depend<H4P_WiFi>(wifiTag());
     _addLocals({
@@ -65,14 +64,14 @@ void H4P_Timekeeper::sync(){
     XLOG("TK sync 8266 stamp=%lu",stamp);
 	if(stamp > 30000){ // 28800 +leeway: default is GMT+8
         stamp+=(_tzo*60);
-		vector<string> dp=split(replaceAll(sntp_get_real_time(stamp + _fDST(stamp)),"  "," ")," ");
+		std::vector<std::string> dp=split(replaceAll(sntp_get_real_time(stamp + _fDST(stamp)),"  "," ")," ");
         _mss00=parseTime(dp[3])-millis();
 	}
 }
 #else 
 void H4P_Timekeeper::__HALsetTimezone(int tzo){
     _tzo=tzo;
-    string tz="GMT"+stringFromInt((-1*tzo),"%+02d");
+    std::string tz="GMT"+stringFromInt((-1*tzo),"%+02d");
     setenv("TZ", CSTR(tz), 1);
     tzset();
  }
@@ -87,13 +86,13 @@ void H4P_Timekeeper::sync(){
 }
 #endif
 
-uint32_t H4P_Timekeeper::__alarmCore (vector<string> vs,bool daily){
-    vector<string> vg=split(H4PAYLOAD,",");
+uint32_t H4P_Timekeeper::__alarmCore (std::vector<std::string> vs,bool daily){
+    std::vector<std::string> vg=split(H4PAYLOAD,",");
     if(vg.size()>2) return H4_CMD_TOO_MANY_PARAMS;
     if(vg.size()<2) return H4_CMD_TOO_FEW_PARAMS;
     int T=parseTime(vg[0]);
     if(T<0) return H4_CMD_PAYLOAD_FORMAT;
-    string b=vg[1];
+    std::string b=vg[1];
     if(!stringIsNumeric(b)) return H4_CMD_NOT_NUMERIC;
     int onoff=atoi(CSTR(b));
     if(_mss00){ // onRTC
@@ -107,17 +106,17 @@ uint32_t H4P_Timekeeper::__alarmCore (vector<string> vs,bool daily){
     return H4_CMD_NOT_NOW; 
 }
 
-uint32_t H4P_Timekeeper::_at(vector<string> vs){ return __alarmCore(vs,false); }
+uint32_t H4P_Timekeeper::_at(std::vector<std::string> vs){ return __alarmCore(vs,false); }
 
-uint32_t H4P_Timekeeper::_change(vector<string> vs){ return _guardString2(vs,[this](string a,string b){ change(a,b); return H4_CMD_OK; }); }
+uint32_t H4P_Timekeeper::_change(std::vector<std::string> vs){ return _guardString2(vs,[=](std::string a,std::string b){ change(a,b); return H4_CMD_OK; }); }
 
-uint32_t H4P_Timekeeper::_daily(vector<string> vs){ return __alarmCore(vs,true); }
+uint32_t H4P_Timekeeper::_daily(std::vector<std::string> vs){ return __alarmCore(vs,true); }
 
-void H4P_Timekeeper::_handleEvent(const string& svc,H4PE_TYPE t,const string& msg){
+void H4P_Timekeeper::_handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg){
     if(t==H4PE_HEARTBEAT){
         h4p[timeTag()]=clockTime();
         h4p[upTimeTag()]=upTime();
-    } // else Serial.printf("ooh me old ticker %s\n",CSTR(h4pGetEventName(t)));
+    }
 }
 
 void H4P_Timekeeper::_init(){
@@ -130,7 +129,7 @@ void H4P_Timekeeper::_init(){
     }
 }
 
-void H4P_Timekeeper::_setupSNTP(const string& ntp1, const string& ntp2){
+void H4P_Timekeeper::_setupSNTP(const std::string& ntp1, const std::string& ntp2){
     sntp_stop();
     _ntp1=ntp1;
     _ntp2=ntp2;
@@ -138,7 +137,7 @@ void H4P_Timekeeper::_setupSNTP(const string& ntp1, const string& ntp2){
     sntp_setservername(1,(char*) _ntp2.c_str());
 }
 
-uint32_t H4P_Timekeeper::_tz(vector<string> vs){
+uint32_t H4P_Timekeeper::_tz(std::vector<std::string> vs){
     return _guardInt1(vs,[this](int v){
         tz(v); 
         return H4_CMD_OK;
@@ -147,11 +146,11 @@ uint32_t H4P_Timekeeper::_tz(vector<string> vs){
 //
 //
 //
-void H4P_Timekeeper::at(const string& when,bool onoff){ __alarmCore({when+","+stringFromInt(onoff)},false); }
+void H4P_Timekeeper::at(const std::string& when,bool onoff){ __alarmCore({when+","+stringFromInt(onoff)},false); }
 
-void H4P_Timekeeper::change(const string& ntp1,const string& ntp2){ _setupSNTP(ntp1,ntp2); }
+void H4P_Timekeeper::change(const std::string& ntp1,const std::string& ntp2){ _setupSNTP(ntp1,ntp2); }
 
-void H4P_Timekeeper::daily(const string& when,bool onoff){ __alarmCore({when+","+stringFromInt(onoff)},true); }
+void H4P_Timekeeper::daily(const std::string& when,bool onoff){ __alarmCore({when+","+stringFromInt(onoff)},true); }
 
 #if H4P_LOG_MESSAGES
 void H4P_Timekeeper::info(){
@@ -163,13 +162,13 @@ void H4P_Timekeeper::info(){
 }
 #endif
 
-string H4P_Timekeeper::minutesFromNow(uint32_t m){
-    string longtime=strTime((msSinceMidnight())+(m*60000));  
-    return string(longtime.begin(),longtime.end()-3); 
+std::string H4P_Timekeeper::minutesFromNow(uint32_t m){
+    std::string longtime=strTime((msSinceMidnight())+(m*60000));  
+    return std::string(longtime.begin(),longtime.end()-3); 
 }
 
-int H4P_Timekeeper::parseTime(const string& ts){ // in milliseconds!
-	vector<string> parts=split(ts,":");
+int H4P_Timekeeper::parseTime(const std::string& ts){ // in milliseconds!
+	std::vector<std::string> parts=split(ts,":");
     uint32_t    h,m,s=0;
     switch(parts.size()){
         case 3:
@@ -194,38 +193,38 @@ void H4P_Timekeeper::setSchedule(H4P_SCHEDULE shed){
   }
 }
 
-string H4P_Timekeeper::strTime(uint32_t t){ // milliseconds!
+std::string H4P_Timekeeper::strTime(uint32_t t){ // milliseconds!
 	char buf[9];
     uint32_t sex=t/1000;
 	sprintf(buf,"%02d:%02d:%02d",(sex%secsInDay())/3600,(sex/60)%60,sex%60);
-	return string(buf);
+	return std::string(buf);
 }
 
-string H4P_Timekeeper::strfTime(uint32_t t) { // This one uses seconds :)
+std::string H4P_Timekeeper::strfTime(uint32_t t) { // This one uses seconds :)
 	char buf[9];
 	struct tm ts;
 	time_t rt = t;
 	ts = *gmtime(&rt);
 	strftime( buf, sizeof(buf), "%X", &ts );
-	return string(buf);
+	return std::string(buf);
 }
 
-string H4P_Timekeeper::strfDate(uint32_t t) { // This one uses seconds :)
+std::string H4P_Timekeeper::strfDate(uint32_t t) { // This one uses seconds :)
 	char buf[11];
 	struct tm ts;
 	time_t rt = t;
 	ts = *gmtime(&rt);
 	strftime( buf, sizeof(buf), "%Y-%m-%d", &ts );
-	return string(buf);
+	return std::string(buf);
 }
 
-string H4P_Timekeeper::strfDateTime(char fmt[], uint32_t t) { // This one uses seconds :)
+std::string H4P_Timekeeper::strfDateTime(char fmt[], uint32_t t) { // This one uses seconds :)
 	char buf[40];
 	struct tm ts;
 	time_t rt = t;
 	ts = *gmtime(&rt);
 	strftime( buf, sizeof(buf), fmt, &ts );
-	return string(buf);
+	return std::string(buf);
 }
 
 void H4P_Timekeeper::svcUp(){
@@ -362,7 +361,7 @@ void H4P_Timekeeper::tz(int tzOffset){
     svcUp();
 }
 
-string H4P_Timekeeper::upTime(){
+std::string H4P_Timekeeper::upTime(){
 	uint32_t t=millis();
 	return stringFromInt(t / msInDay(),"%02d:")+strTime(t);
 }

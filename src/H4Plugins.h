@@ -136,15 +136,15 @@ H4P_PINMAP          h4pPinMap;
 
     extern const char* giveTaskName(uint32_t id);
 
-    string h4pGetErrorMessage(uint32_t e){ return cmdErrors.count(e) ? cmdErrors[e]:string("No such error (")+stringFromInt(e)+")"; }
-    string h4pGetEventName   (H4PE_TYPE e){ return eventTypes.count(e) ? eventTypes[e]:""; }
-    string h4pGetTaskType    (uint32_t e){ return taskTypes.count(e) ? taskTypes[e]:stringFromInt(e,"?%02d?"); }
-    string h4pGetTaskName    (uint32_t e){ return taskNames.count(e) ? taskNames[e]:giveTaskName(e); }
-    void   h4pClearEvent     (H4PE_TYPE e){ eventTypes.erase(e); }
+    std::string h4pGetErrorMessage(uint32_t e){ return cmdErrors.count(e) ? cmdErrors[e]:std::string("No such error (")+stringFromInt(e)+")"; }
+    std::string h4pGetEventName   (H4PE_TYPE e){ return eventTypes.count(e) ? eventTypes[e]:""; }
+    std::string h4pGetTaskType    (uint32_t e){ return taskTypes.count(e) ? taskTypes[e]:stringFromInt(e,"?%02d?"); }
+    std::string h4pGetTaskName    (uint32_t e){ return taskNames.count(e) ? taskNames[e]:giveTaskName(e); }
+    void        h4pClearEvent     (H4PE_TYPE e){ eventTypes.erase(e); }
 #else
-    string h4pGetErrorMessage(uint32_t e){ return string("Err:"+stringFromInt(e)); }
-    string h4pGetEventName   (H4PE_TYPE e){ return stringFromInt(e,"0x%08x"); }
-    string h4pGetTaskType    (uint32_t e){ return stringFromInt(e,"%04d"); }
-    string h4pGetTaskName    (uint32_t e){ return stringFromInt(e,"%04d"); }
-    void   h4pClearEvent     (H4PE_TYPE e){}
+    std::string h4pGetErrorMessage(uint32_t e){ return std::string("Err:"+stringFromInt(e)); }
+    std::string h4pGetEventName   (H4PE_TYPE e){ return stringFromInt(e,"0x%08x"); }
+    std::string h4pGetTaskType    (uint32_t e){ return stringFromInt(e,"%04d"); }
+    std::string h4pGetTaskName    (uint32_t e){ return stringFromInt(e,"%04d"); }
+    void        h4pClearEvent     (H4PE_TYPE e){}
 #endif

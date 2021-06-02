@@ -36,7 +36,7 @@ SOFTWARE.
 
 class h4pRoamer;
 
-using H4P_ROAMER_MAP        = vector<h4pRoamer*>;
+using H4P_ROAMER_MAP        = std::vector<h4pRoamer*>;
 
 extern "C" {  
     #include <ping.h>
@@ -72,68 +72,68 @@ class H4P_GateKeeper: public H4Service{
 //
 class h4pRoamer {
     public:
-            string      _ip;
-            string      _id;
-            string      _name;
+            std::string      _ip;
+            std::string      _id;
+            std::string      _name;
 
-        h4pRoamer(const string& name,const string& id);
+        h4pRoamer(const std::string& name,const std::string& id);
 //syscall
-        virtual void        _announce(const string& ip);
-        virtual string      _describe(){ return string(_name)+" "+_type()+" "+_id+" "+_ip.data(); }
-        virtual void        _startSniffing(){};
-        virtual void        _stopSniffing(){};
-        virtual string      _type()=0;
+        virtual void            _announce(const std::string& ip);
+        virtual std::string     _describe(){ return std::string(_name)+" "+_type()+" "+_id+" "+_ip.data(); }
+        virtual void            _startSniffing(){};
+        virtual void            _stopSniffing(){};
+        virtual std::string     _type()=0;
 
-        virtual string      getIP(){ return _ip; }
+        virtual std::string      getIP(){ return _ip; }
 };
 //
 //      IP
 //
 class h4pRoamingIP: public h4pRoamer{
     public:
-        h4pRoamingIP(const string& name,const string& id);
-        h4pRoamingIP(const string& name,const IPAddress& ip);
+        h4pRoamingIP(const std::string& name,const std::string& id);
+        h4pRoamingIP(const std::string& name,const IPAddress& ip);
 
-        virtual string  getIP() override { return _id; }
-        virtual string  _type() override { return uppercase(ipTag()); }
+        virtual std::string  getIP() override { return _id; }
+        virtual std::string  _type() override { return uppercase(ipTag()); }
 };
 //
 //      MDNS (.local)
 //
 class h4pRoamingDotLocal: public h4pRoamer{
-        string      _service;
-        string      _protocol;
+        std::string      _service;
+        std::string      _protocol;
 
         MDNSResponder::hMDNSServiceQuery hsq = 0;
     public:
-        static unordered_map<string,h4pRoamingDotLocal*> localList;
-        h4pRoamingDotLocal(const string& name,const string& service,const string& protocol);
+        static std::unordered_map<std::string,h4pRoamingDotLocal*> localList;
+        h4pRoamingDotLocal(const std::string& name,const std::string& service,const std::string& protocol);
 //      syscall
-        virtual string  _describe(){ return string(_name)+" "+_type()+" _"+_service+"._"+_protocol+".local "+_ip.data(); } 
-        virtual void    _startSniffing() override;
-        virtual void    _stopSniffing() override;
-        virtual string  _type() override { return "MDNS"; }
+        virtual std::string _describe(){ return std::string(_name)+" "+_type()+" _"+_service+"._"+_protocol+".local "+_ip.data(); } 
+        virtual void        _startSniffing() override;
+        virtual void        _stopSniffing() override;
+        virtual std::string _type() override { return "MDNS"; }
 };
 //
 //      UPNP
 //
 class h4pRoamingUPNP: public h4pRoamer{
-        string          _tag;
+        std::string          _tag;
     public:
-        h4pRoamingUPNP(const string& name,const string& tag,const string& id);
+        h4pRoamingUPNP(const std::string& name,const std::string& tag,const std::string& id);
 //      syscall
-        virtual string  _describe(){ return string(_name)+" "+_type()+" "+_tag+" "+_id+" "+_ip.data(); } 
+        virtual std::string  _describe(){ return std::string(_name)+" "+_type()+" "+_tag+" "+_id+" "+_ip.data(); } 
         virtual void    _startSniffing() override;
-        virtual string  _type() override { return uppercase(ipTag()); }
+        virtual std::string  _type() override { return uppercase(ipTag()); }
 };
 //
 //      H4
 //
 class h4pRoamingH4: public h4pRoamingUPNP{
     public:
-        h4pRoamingH4(const string& name): h4pRoamingUPNP(name,"X-H4-Device",name){}
-        virtual string  _describe(){ return string(_name)+" "+_type()+" "+_ip.data(); } 
-        virtual string _type() override { return uppercase(h4Tag()); }
+        h4pRoamingH4(const std::string& name): h4pRoamingUPNP(name,"X-H4-Device",name){}
+        virtual std::string  _describe(){ return std::string(_name)+" "+_type()+" "+_ip.data(); } 
+        virtual std::string _type() override { return uppercase(h4Tag()); }
 };
 
 #endif

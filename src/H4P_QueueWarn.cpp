@@ -46,7 +46,7 @@ void H4P_QueueWarn::pcent(uint32_t pc){
 #endif
 }
 
-uint32_t H4P_QueueWarn::_qwPcent(vector<string> vs){ return _guardInt1(vs,[this](uint32_t && i){ pcent(i); }); }
+uint32_t H4P_QueueWarn::_qwPcent(std::vector<std::string> vs){ return _guardInt1(vs,[this](uint32_t && i){ pcent(i); }); }
 //
 H4P_QueueWarn::H4P_QueueWarn(H4P_FN_VB _f,uint32_t _limit): H4Service("qwrn"){
     _addLocals({

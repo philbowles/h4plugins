@@ -50,7 +50,7 @@ void H4P_HeapWarn::_run(){
     warned=state;
 }
 
-uint32_t H4P_HeapWarn::_hwPcent(vector<string> vs){ return _guardInt1(vs,[this](uint32_t && i){ pcent(i); }); }
+uint32_t H4P_HeapWarn::_hwPcent(std::vector<std::string> vs){ return _guardInt1(vs,[this](uint32_t && i){ pcent(i); }); }
 
 uint32_t H4P_HeapWarn::_setLimit(uint32_t v){ return (_initial*v)/100; }
 #define H4P_ABSMIN_HPCNT    5

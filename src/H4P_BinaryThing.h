@@ -38,13 +38,12 @@ STAG(condition);
 extern bool h4punlocked;
 
 class H4P_BinaryThing: public H4Service{
-        H4P_FN_VB        _thing;
+                H4P_FN_VB           _thing;
                 void                _onChange(bool b);
-//                bool                _iv;
     protected:
-                uint32_t            _autoOff(vector<string> vs){ return _guardInt1(vs,[this](uint32_t t){ autoOff(t); }); }
-        virtual void                _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override;
-                uint32_t            _switch(vector<string> vs){ return _guardInt1(vs,[this](bool b){ turn(b); }); }
+                uint32_t            _autoOff(std::vector<std::string> vs){ return _guardInt1(vs,[this](uint32_t t){ autoOff(t); }); }
+        virtual void                _handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg) override;
+                uint32_t            _switch(std::vector<std::string> vs){ return _guardInt1(vs,[this](bool b){ turn(b); }); }
 
     public:
         H4P_BinaryThing(H4P_FN_VB thingFunction,bool initial=OFF,uint32_t timer=0): _thing(thingFunction),H4Service(onofTag(),H4PE_GVCHANGE|H4PE_VIEWERS) {
@@ -79,12 +78,12 @@ class H4P_BinaryThing: public H4Service{
         virtual void        svcDown() override;
 };
 
-using H4_FN_CPRED      = function<bool()>;
+using H4_FN_CPRED      = std::function<bool()>;
 
 class H4P_ConditionalThing: public H4P_BinaryThing{
                 H4_FN_CPRED _predicate;
     protected:
-        virtual void        _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override;
+        virtual void        _handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg) override;
     public:
         H4P_ConditionalThing(H4P_FN_VB thingFunction,H4_FN_CPRED predicate,bool initial=OFF,uint32_t timer=0): 
             _predicate(predicate),

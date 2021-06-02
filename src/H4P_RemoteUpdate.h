@@ -40,7 +40,7 @@ class H4P_RemoteUpdate: public H4Service, public ESP8266HTTPUpdate {
 class H4P_RemoteUpdate: public H4Service, public HTTPUpdate {
 #endif
                 WiFiClient  _c;
-                string endpoint;
+                std::string endpoint;
                 void        _commonCTOR(){
                     rebootOnUpdate(false);
                     depend<H4P_WiFi>(wifiTag());
@@ -53,7 +53,7 @@ class H4P_RemoteUpdate: public H4Service, public HTTPUpdate {
                 }
                 void        _entropise(H4_FN_VOID f){ h4.onceRandom(H4P_PJ_LO,H4P_PJ_HI * H4P_RUPD_STRETCH,f); }
 
-                void _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override {
+                void _handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg) override {
                     switch(t){
                         case H4PE_VIEWERS:
                             {
@@ -86,7 +86,7 @@ class H4P_RemoteUpdate: public H4Service, public HTTPUpdate {
                     }
                 }
     public:
-        H4P_RemoteUpdate(const string& url=""): H4Service("rupd",H4PE_VIEWERS){
+        H4P_RemoteUpdate(const std::string& url=""): H4Service("rupd",H4PE_VIEWERS){
             h4p.gvSetstring(rupdTag(),url,true);
             _commonCTOR();
         }
@@ -98,5 +98,5 @@ class H4P_RemoteUpdate: public H4Service, public HTTPUpdate {
                 void        fs(){ _entropise([=]{ _updateFromUrl(false,true); }); }
                 void        fw(){ _entropise([=]{ _updateFromUrl(true,true); }); }
 //
-                void        svcUp() override{ endpoint=string(h4p[rupdTag()]).append("/").append(h4p[deviceTag()]); }
+                void        svcUp() override{ endpoint=std::string(h4p[rupdTag()]).append("/").append(h4p[deviceTag()]); }
 };

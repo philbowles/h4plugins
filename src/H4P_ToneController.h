@@ -43,26 +43,26 @@ enum H4P_SIREN {
 
 class H4P_Voice;
 
-using H4P_STAVE         = pair<H4P_Voice&,const string&>;
-using H4P_TUNE          = vector<H4P_STAVE>;
+using H4P_STAVE         = std::pair<H4P_Voice&,const std::string&>;
+using H4P_TUNE          = std::vector<H4P_STAVE>;
 
 class H4P_ToneController: public H4Service {
         friend class H4P_Voice;
 
-        static unordered_map<char,uint32_t> timing;
-        static unordered_map<string,uint32_t> notes;
-        static unordered_map<uint32_t,pair<uint32_t,string>> sirens;
-        static vector<uint32_t> xpose;
+        static std::unordered_map<char,uint32_t> timing;
+        static std::unordered_map<std::string,uint32_t> notes;
+        static std::unordered_map<uint32_t,std::pair<uint32_t,std::string>> sirens;
+        static std::vector<uint32_t> xpose;
 
-        static  string      _cleanTune(const string& tune){ return replaceAll(replaceAll(tune,"     ",""),"|",""); }
-        static  void        _repeat(const string& siren,uint8_t pin,uint32_t bpm,uint32_t duration);
-        static  uint32_t    _transpose(const string& note,int transpose){ return note[0]=='R' ? 0:xpose[notes[note]+transpose]; }
+        static  std::string _cleanTune(const std::string& tune){ return replaceAll(replaceAll(tune,"     ",""),"|",""); }
+        static  void        _repeat(const std::string& siren,uint8_t pin,uint32_t bpm,uint32_t duration);
+        static  uint32_t    _transpose(const std::string& note,int transpose){ return note[0]=='R' ? 0:xpose[notes[note]+transpose]; }
     public:
         H4P_ToneController(uint32_t tempo=60);
-        static uint32_t     length(const string& tune);
+        static uint32_t     length(const std::string& tune);
         static void         metronome(uint32_t tempo);
         static void         multiVox(H4P_TUNE tune,uint32_t tempo,int transpose=0);
-        static string       setVolume(const string& s,uint8_t volume);
+        static std::string  setVolume(const std::string& s,uint8_t volume);
         static void         siren(H4P_SIREN S,uint8_t pin,uint32_t duration);
         static void         tone(uint8_t pin,uint32_t freq,uint32_t duration=0,uint8_t volume=8);
 };
@@ -71,14 +71,14 @@ class H4P_Voice {
         friend class H4P_ToneController;
                 uint8_t         _pin;
 
-                void        _decompose(const string& note,int transpose,H4_FN_VOID chain);
-                void        _play(const string& tune,int transpose,H4_FN_VOID chain);
+                void        _decompose(const std::string& note,int transpose,H4_FN_VOID chain);
+                void        _play(const std::string& tune,int transpose,H4_FN_VOID chain);
                 void        _tone(uint32_t f,uint8_t effect,uint32_t d,H4_FN_VOID chain);
     public:
         H4P_Voice(uint8_t pin): _pin(pin){ pinMode(pin,OUTPUT); }
-        void         chromaticRun(const string& nStart,const string& nFinish,const char duration);
-        void         play(const string& tune,int transpose=0);
-        void         rest(const char duration){ play(string("R  ").append(1,duration).append(1,' ')); }
+        void         chromaticRun(const std::string& nStart,const std::string& nFinish,const char duration);
+        void         play(const std::string& tune,int transpose=0);
+        void         rest(const char duration){ play(std::string("R  ").append(1,duration).append(1,' ')); }
 };
 
 #define H4P_sirenBuzz(p,d) h4tc.siren(H4P_SIREN_BUZZ,p,d)

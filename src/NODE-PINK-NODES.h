@@ -58,7 +58,7 @@ class npAVERAGE: public npNODE { // aritmetic mean
 };
 
 class npAVGWINDOW: public npNODE { // aritmetic mean
-        vector<uint32_t>    _window;
+        std::vector<uint32_t>    _window;
     public:
         npAVGWINDOW(size_t n){
             for(int i=0;i<n;i++) _window.push_back(0);
@@ -308,9 +308,9 @@ class npUPDATEINT: public npNODE {
 };
 
 class npUPDATEGLOBAL: public npNODE {
-        string        _gv;
+        std::string        _gv;
     public:    
-        npUPDATEGLOBAL(const string& name): _gv(name){ h4p.gvSetInt(name,0,false); }
+        npUPDATEGLOBAL(const std::string& name): _gv(name){ h4p.gvSetInt(name,0,false); }
 
         msg operator()(msg m) override;
 };

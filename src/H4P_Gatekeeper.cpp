@@ -37,18 +37,18 @@ H4_TIMER                    H4P_GateKeeper::_chunker=nullptr;
 H4P_ROAMER_MAP::iterator    H4P_GateKeeper::_matched;
 struct  ping_option         H4P_GateKeeper::_pop;
 
-unordered_map<string,h4pRoamingDotLocal*> h4pRoamingDotLocal::localList;
+std::unordered_map<std::string,h4pRoamingDotLocal*> h4pRoamingDotLocal::localList;
 
-h4pRoamer::h4pRoamer(const string& name,const string& id): _name(name),_id(id){
+h4pRoamer::h4pRoamer(const std::string& name,const std::string& id): _name(name),_id(id){
     require<H4P_GateKeeper>("gate");
     h4pRoamers.push_back(this);
 }
 
 void h4pMDNScb(MDNSResponder::MDNSServiceInfo serviceInfo, MDNSResponder::AnswerType answerType, bool p_bSetContent) {
     if(answerType ==  MDNSResponder::AnswerType::IP4Address){
-        vector<string> vs=split(string(serviceInfo.serviceDomain()),".");
-        string who=vs[0];
-        string ip=p_bSetContent ? serviceInfo.IP4Adresses()[0].toString().c_str():"";
+        std::vector<std::string> vs=split(std::string(serviceInfo.serviceDomain()),".");
+        std::string who=vs[0];
+        std::string ip=p_bSetContent ? serviceInfo.IP4Adresses()[0].toString().c_str():"";
         if(h4pRoamingDotLocal::localList.count(who)){ h4.queueFunction([=]{ h4pRoamingDotLocal::localList[who]->_announce(ip); }); }
     }
 }
@@ -73,7 +73,7 @@ void H4P_GateKeeper::_scavenge() {
         []{
             if(_matched!=h4pRoamers.end()){
                 auto p=*_matched;
-                string mip=p->getIP();
+                std::string mip=p->getIP();
                 if(mip.size()){
                     _pop.ip = ipaddr_addr(mip.data());
                     _pop.reverse=p;
@@ -113,7 +113,7 @@ void H4P_GateKeeper::svcDown(){
 //
 //extern H4P_ROAMER_MAP          h4pRoamers;
 
-void  h4pRoamer::_announce(const string& ip){
+void  h4pRoamer::_announce(const std::string& ip){
     if(ip!=_ip){
         _ip=ip;
         h4psysevent(_name,H4PE_PRESENCE,"%d",_ip.size());
@@ -122,13 +122,13 @@ void  h4pRoamer::_announce(const string& ip){
 //
 //      IP
 //
-h4pRoamingIP::h4pRoamingIP(const string& name,const string& id): h4pRoamer(name,id){}
+h4pRoamingIP::h4pRoamingIP(const std::string& name,const std::string& id): h4pRoamer(name,id){}
 
-h4pRoamingIP::h4pRoamingIP(const string& name,const IPAddress& ip): h4pRoamer(name,ip.toString().c_str()){}
+h4pRoamingIP::h4pRoamingIP(const std::string& name,const IPAddress& ip): h4pRoamer(name,ip.toString().c_str()){}
 //
 //      MDNS
 //
-h4pRoamingDotLocal::h4pRoamingDotLocal(const string& name,const string& service,const string& protocol):
+h4pRoamingDotLocal::h4pRoamingDotLocal(const std::string& name,const std::string& service,const std::string& protocol):
     _service(service),
     _protocol(protocol),
     h4pRoamer(name,name){ 
@@ -144,9 +144,9 @@ void h4pRoamingDotLocal::_stopSniffing(){
 //
 //      UPNP
 //
-h4pRoamingUPNP::h4pRoamingUPNP(const string& name,const string& tag,const string& id): _tag(tag), h4pRoamer(name,id){ 
+h4pRoamingUPNP::h4pRoamingUPNP(const std::string& name,const std::string& tag,const std::string& id): _tag(tag), h4pRoamer(name,id){ 
     require<H4P_UPNPServer>(upnpTag());
-    h4pregisterhandler(name,H4PE_UPNP,[=](const string& svc,H4PE_TYPE t,const string& msg){ if(svc==_id) _announce(msg); });
+    h4pregisterhandler(name,H4PE_UPNP,[=](const std::string& svc,H4PE_TYPE t,const std::string& msg){ if(svc==_id) _announce(msg); });
 }
 
 void h4pRoamingUPNP::_startSniffing(){ H4P_UPNPServer::_listenTag(_tag,_id); }
