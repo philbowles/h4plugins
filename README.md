@@ -4,7 +4,7 @@
 
 ### Most of the above is achieved with only a few lines of code, with many features requiring on the inclusion of only a single line
 
-[Release Notes v3.0.3](docs/rn300.md)
+[Release Notes v3.0.4](docs/rn300.md)
 ## Watch the videos
 
   ![youtube](assets/h4cover1blinkyonsteroids.jpg) 

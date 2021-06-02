@@ -96,6 +96,10 @@
 
 * [1. Running a remote update server on Nide-RED](https://youtu.be/zNjafa-4QEw)
   
+## Gray label "H4 plain and simple" series
+
+* [1. Fundamentals of multitasking](https://www.youtube.com/watch?v=iUuqJJwOmvg&t=11s)
+  
 ---
 
 (c) 2021 Phil Bowles h4plugins@gmail.com
