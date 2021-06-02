@@ -2,7 +2,7 @@
 #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCmd autostop
 
-void h4pGlobalEventHandler(const string& svc,H4PE_TYPE t,const string& msg){
+void h4pGlobalEventHandler(const std::string& svc,H4PE_TYPE t,const std::string& msg){
   switch(t){
     // provides default actions for H4PE_SYSINFO, H4PE_SYSWARN, H4PE_SYSFATAL
     H4P_DEFAULT_SYSTEM_HANDLER

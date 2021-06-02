@@ -5,7 +5,7 @@ H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCm
 H4P_SerialLogger h4sl; // defaults to H4PE_ALL
 
 class myLogger: public H4Service {
-        void _handleEvent(const string& svc,H4PE_TYPE t,const string& msg) override {
+        void _handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg) override {
             uint32_t msgvalue=atoi(msg.c_str());
             if(msgvalue%2) Serial.printf("That's odd! Type=%s from %s msg=%s\n",h4pGetEventName(t).c_str(),svc.c_str(),msg.c_str());
         }

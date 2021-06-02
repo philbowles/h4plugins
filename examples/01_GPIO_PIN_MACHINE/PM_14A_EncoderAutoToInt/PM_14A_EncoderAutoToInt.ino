@@ -8,7 +8,7 @@ H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false)
 h4pEncoderAuto rotary(D1,D2,INPUT,ACTIVE_HIGH,-10,10,1,50,true,new npUPDATEGLOBAL{"eaValue"});
 h4pDebounced centerbutton(USER_BTN,INPUT,UB_ACTIVE,UB_MS); // 15 ms debounce time
 
-H4P_EventListener gpio(H4PE_GPIO | H4PE_GVCHANGE,[](const string& svc,H4PE_TYPE t,const string& msg){
+H4P_EventListener gpio(H4PE_GPIO | H4PE_GVCHANGE,[](const std::string& svc,H4PE_TYPE t,const std::string& msg){
     switch(t){
         case H4PE_GPIO:
           {

@@ -12,14 +12,14 @@ IPAddress htcIP(192,168,1,252);
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","detector");
 H4P_BinarySwitch h4onof(D6,ACTIVE_HIGH);
 
-void onPRESENCE(const string& who,bool b){
+void onPRESENCE(const std::string& who,bool b){
   if(b) occupancy++;
   else occupancy--; 
   Serial.printf("%s has %s the building - occupancy now %d\n",CSTR(who),b ? "entered":"left",occupancy);
   h4onof.turn(occupancy); // will the last person to leave please turn off the lights... :)
 }
 
-H4P_EventListener chchchanges(H4PE_PRESENCE,[](const string& svc,H4PE_TYPE t,const string& msg){ 
+H4P_EventListener chchchanges(H4PE_PRESENCE,[](const std::string& svc,H4PE_TYPE t,const std::string& msg){ 
   switch(t){
     H4P_FUNCTION_ADAPTER_PRESENCE
   }

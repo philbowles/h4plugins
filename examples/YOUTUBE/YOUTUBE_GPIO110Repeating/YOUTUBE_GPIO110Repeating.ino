@@ -7,7 +7,7 @@ void onGPIO(int pin,int value){
     Serial.printf("P%d V%d\n",pin,value);
 }
 
-void h4pGlobalEventHandler(const string& svc,H4PE_TYPE t,const string& msg){
+void h4pGlobalEventHandler(const std::string& svc,H4PE_TYPE t,const std::string& msg){
     switch(t){
         H4P_FUNCTION_ADAPTER_GPIO;
     }

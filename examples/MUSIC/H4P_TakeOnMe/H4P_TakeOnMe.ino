@@ -12,18 +12,18 @@ H4P_Voice vox_b(BASS);
 // Take On Me - Aha
 //
 // treble clef - melody
-string tom_tc="F#4q |F#4q |DN4q |BN3q |R  q |BN3q |R  q |EN4q " \
+std::string tom_tc="F#4q |F#4q |DN4q |BN3q |R  q |BN3q |R  q |EN4q " \
               "R  q |EN4q |R  q |EN4q |G#4q |G#4q |AN4q |BN4q " \
               "AN4q |AN4q |AN4q |EN4q |R  q |DN4q |R  q |F#4q " \
               "R  q |F#4q |R  q |F#4q |EN4q |EN4q |F#4q |EN4q "; 
 // bass clef left-hand accompaniment
-string tom_bc="BN2c2|BN3c2|R  q |BN2q2|BN3c2|EN3c2|EN4c2|R  q |EN3q2|EN4c2" \
+std::string tom_bc="BN2c2|BN3c2|R  q |BN2q2|BN3c2|EN3c2|EN4c2|R  q |EN3q2|EN4c2" \
               "AN2c2|AN3c2|R  q |AN2q2|AN3c2|DN3c2|DN4c2|     |C#3c2|C#4c2"; 
 // double up the strings (we play it twice)
-string tom_t=tom_tc.append(tom_tc); 
-string tom_b=tom_bc.append(tom_bc);
+std::string tom_t=tom_tc.append(tom_tc); 
+std::string tom_b=tom_bc.append(tom_bc);
 
-string bLouder=h4tc.setVolume(tom_b,4);  // too quiet as written (vol=2) crank it up to 5
+std::string bLouder=h4tc.setVolume(tom_b,4);  // too quiet as written (vol=2) crank it up to 5
 
 H4P_TUNE  takeOnMe={
     {vox_t,tom_t}, // use voice vox_t to play right-hand melody part (treble clef) on D8

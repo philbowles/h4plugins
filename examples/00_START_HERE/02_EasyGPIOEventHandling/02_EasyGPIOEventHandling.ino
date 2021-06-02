@@ -15,7 +15,7 @@ void onGPIO(int pin,int value){ // int, int: use H4P_FUNCTION_ADAPTER_II
 
 h4pOutput builtin(LED_BUILTIN,H4P_ASSUMED_SENSE,OFF);
 
-void h4pGlobalEventHandler(const string& svc,H4PE_TYPE t,const string& msg){
+void h4pGlobalEventHandler(const std::string& svc,H4PE_TYPE t,const std::string& msg){
   switch(t){
     H4P_FUNCTION_ADAPTER_GPIO;
   }   

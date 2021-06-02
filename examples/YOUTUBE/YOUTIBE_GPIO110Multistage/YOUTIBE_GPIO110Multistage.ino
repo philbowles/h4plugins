@@ -40,7 +40,7 @@ H4PM_STAGE_MAP breaks{ 2000 , 5000 };
 
 h4pMultistage ms(0,INPUT_PULLUP,ACTIVE_LOW,20,breaks);
 
-void h4pGlobalEventHandler(const string& svc,H4PE_TYPE t,const string& msg){
+void h4pGlobalEventHandler(const std::string& svc,H4PE_TYPE t,const std::string& msg){
     switch(t){
         H4P_FUNCTION_ADAPTER_GPIO;
     }

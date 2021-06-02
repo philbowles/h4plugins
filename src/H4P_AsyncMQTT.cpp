@@ -117,13 +117,17 @@ void H4P_AsyncMQTT::_init() {
     onMqttDisconnect([this](int8_t reason){
         if(!_discoDone){
             h4.queueFunction([this,reason](){
-                _signalBad();
+//                _signalBad();
                 _discoDone=true;
                 h4p[_me]=stringFromInt(_running=false);
                 h4p.gvInc(nDCXTag());
                 SYSINFO("DCX %d",reason);
                 H4Service::svcDown();
-                if(autorestart && WiFi.status()==WL_CONNECTED) { h4.every(H4MQ_RETRY,[this](){ Serial.printf("attempt reconnect %s\n",h4p[deviceTag()].data()); connect(h4p[deviceTag()]); },nullptr,H4P_TRID_MQRC,true); }// MUST be > 18sec due to shit lib ESpAsynTCP
+                if(autorestart && WiFi.status()==WL_CONNECTED) { h4.every(H4MQ_RETRY,[this](){
+                    Serial.printf("MQTT RCNX!!!\n");
+                    _signalBad(); // have to repeat to overrode hb if present: easiest to NIKE
+                    connect(h4p[deviceTag()]); },nullptr,H4P_TRID_MQRC,true); 
+                }// MUST be > 18sec due to shit lib ESpAsynTCP
             });
         }
     });

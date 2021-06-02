@@ -51,7 +51,7 @@ void onGoButton(){ h4wifi.uiMessage("Do NOT COLLECT £200!\n"); }
 
 void onpinkButton(bool b){ h4wifi.uiMessage("Wish you were%s here...\n",b ? "":"n't"); }
 
-H4P_EventListener allexceptmsg(H4PE_VIEWERS | H4PE_GVCHANGE,[](const string& svc,H4PE_TYPE t,const string& msg){
+H4P_EventListener allexceptmsg(H4PE_VIEWERS | H4PE_GVCHANGE,[](const std::string& svc,H4PE_TYPE t,const std::string& msg){
   switch(t){
     case H4PE_VIEWERS:
       H4P_SERVICE_ADAPTER(Viewers);

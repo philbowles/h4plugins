@@ -40,17 +40,27 @@ SOFTWARE.
 #include<H4P_WiFi.h>
 
 class H4P_Heartbeat: public H4Service {
+                H4_TIMER    _hbLED;
+                size_t      _period=0;
+
                 void        _handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg) override;
                 void        _run();
     public: 
 #if H4P_UI_HEALTH
-        H4P_Heartbeat(): H4Service("beat",H4PE_VIEWERS | H4PE_HEARTBEAT | H4PE_HEAP | H4PE_LOOPS | H4PE_Q){
+        explicit H4P_Heartbeat(): H4Service("beat",H4PE_VIEWERS | H4PE_HEARTBEAT | H4PE_HEAP | H4PE_LOOPS | H4PE_Q){
             require<H4P_EmitHeap>(heapTag());
             require<H4P_EmitQ>("Q");
             require<H4P_EmitLoopCount>("LPS");
 #else
-        H4P_Heartbeat(): H4Service("beat",H4PE_VIEWERS | H4PE_HEARTBEAT){
+        explicit H4P_Heartbeat(): H4Service("beat",H4PE_VIEWERS | H4PE_HEARTBEAT){
 #endif
+            require<H4P_EmitTick>(tickTag());
+            depend<H4P_WiFi>(wifiTag());
+        }
+
+        H4P_Heartbeat(size_t period): // ASSUMED ONLY
+            _period(period),
+            H4Service("beat",H4PE_VIEWERS | H4PE_HEARTBEAT){
             require<H4P_EmitTick>(tickTag());
             depend<H4P_WiFi>(wifiTag());
         }
@@ -60,4 +70,13 @@ class H4P_Heartbeat: public H4Service {
 #endif
         static  std::string secsToTime(uint32_t sex);
         static  std::string upTime(){ return h4p.gvGetstring(upTimeTag()); }
+//
+                void        svcDown() override{
+                    if(_period) h4.cancel(_hbLED);
+                    H4Service::svcDown();
+                }
+                void        svcUp() override{
+                    if(_period) _hbLED=h4.every(_period,[=]{ YEVENT(H4PE_SIGNAL,"50,p"); }); // p = pulse pin
+                    H4Service::svcUp();
+                }
 };

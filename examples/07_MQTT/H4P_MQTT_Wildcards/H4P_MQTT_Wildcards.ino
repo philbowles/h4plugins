@@ -34,10 +34,10 @@ H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCm
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","testbed");
 H4P_AsyncMQTT h4mqtt("http://192.168.1.4:1883"); // no username / pword
 
-uint32_t myCallback(vector<string> vs){
+uint32_t myCallback(std::vector<std::string> vs){
   for(auto const& v:vs) Serial.printf("v: %s\n",CSTR(v)); // show input
   if(vs.size()==2){
-    string suit=vs[0];
+    std::string suit=vs[0];
     Serial.printf("Wildcard handler suit is %s, card is %s\n",(CSTR(suit)),CSTR(vs.back()));
     if(suit=="hearts" || suit=="clubs" || suit=="diamonds" || suit=="spades"){
       Serial.printf("You chose the %s of %s\n",CSTR(vs.back()),CSTR(suit));
@@ -59,7 +59,7 @@ void onMqttConnect(){ h4mqtt.subscribeDevice("cards/#",myCallback); }
 
 void onMqttDisconnect(){}
 
-void h4pGlobalEventHandler(const string& svc,H4PE_TYPE t,const string& msg){
+void h4pGlobalEventHandler(const std::string& svc,H4PE_TYPE t,const std::string& msg){
     switch(t){
         H4P_DEFAULT_SYSTEM_HANDLER
         case H4PE_SERVICE:

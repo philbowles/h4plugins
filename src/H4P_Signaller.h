@@ -125,7 +125,7 @@ class H4P_Signaller: public H4Service {
             void            info() override;
 #endif
             bool 			isFlashing(uint8_t pin);
-            void 			pulsePin(uint32_t period,uint8_t pin,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);
+            void 			pulsePin(uint32_t period,uint8_t pin=H4P_ASSUMED_LED,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);
             void 			pulsePin(uint32_t period,h4pOutput*);
             void            stopAll();
             void            stopPin(uint8_t pin);

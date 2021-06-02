@@ -4,7 +4,7 @@ H4P_Signaller sig; // needed by mfnb
 h4pOutput* redLED=new h4pOutput(D6, ACTIVE_HIGH);
 
 h4pMultifunctionButton mfb(0,INPUT_PULLUP,ACTIVE_LOW,20);
-void h4pGlobalEventHandler(const string& svc,H4PE_TYPE t,const string& msg){
+void h4pGlobalEventHandler(const std::string& svc,H4PE_TYPE t,const std::string& msg){
     switch(t){
       case H4PE_REBOOT:
         Serial.printf("REBOOT: As Arnie said: I'll be back!\n");

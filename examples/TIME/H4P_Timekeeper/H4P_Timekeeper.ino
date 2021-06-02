@@ -34,7 +34,7 @@ void onRTC(){
   h4tk.setSchedule(mySchedule);
 }
 
-H4P_EventListener clok(H4PE_RTC | H4PE_ALARM,[](const string& svc,H4PE_TYPE t,const string& msg){
+H4P_EventListener clok(H4PE_RTC | H4PE_ALARM,[](const std::string& svc,H4PE_TYPE t,const std::string& msg){
   switch(t){
     H4P_FUNCTION_ADAPTER_VOID(RTC);      
     H4P_ONOFF_CONNECTOR(ALARM); // connect alarm to default H4P_Binary[Switch|Thing]

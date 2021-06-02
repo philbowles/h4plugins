@@ -5,6 +5,10 @@
 ### Most of the above is achieved with only a few lines of code, with many features requiring on the inclusion of only a single line
 
 [Release Notes v3.0.4](docs/rn300.md)
+
+** KNOWN ERROR ** - you may get compile errors in the examples complaining about stdlib types `string`, `vector` etc being undefined - 
+if so just insert the `std::` I'm working my way through them, but there's 80+ of them and I may have missed one or two.
+
 ## Watch the videos
 
   ![youtube](assets/h4cover1blinkyonsteroids.jpg) 

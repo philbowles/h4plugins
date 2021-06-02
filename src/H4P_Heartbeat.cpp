@@ -41,6 +41,7 @@ void H4P_Heartbeat::_handleEvent(const std::string& svc,H4PE_TYPE t,const std::s
             }
             break;
         case H4PE_HEARTBEAT:
+//            Serial.printf("T=%d YOU ONLY HAD ONE JOB! %s\n",millis(),secsToTime(STOI(msg)),data());
             h4p[upTimeTag()]=secsToTime(STOI(msg));
             break;
 #if H4P_UI_HEALTH

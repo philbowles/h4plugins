@@ -6,9 +6,9 @@ H4P_ToneController h4tc;
 H4P_Voice vox(D8);
 
 uint32_t  T;
-string fsharp_d="F#3d "; // demissemiquaver, dotted = D
-string fsharp_s="F#3S "; // dotted semiquaver, normal = s
-string fsharp_c="F#3c "; // crotchet = 1/4 note = 250mS @ 60 bpm
+std::string fsharp_d="F#3d "; // demissemiquaver, dotted = D
+std::string fsharp_s="F#3S "; // dotted semiquaver, normal = s
+std::string fsharp_c="F#3c "; // crotchet = 1/4 note = 250mS @ 60 bpm
 
 void h4setup(){
   Serial.printf("You should now hear 'Concert A'  (440Hz) for5 seconds \n",_HAL_freeHeap());

@@ -6,7 +6,7 @@ H4P_BinarySwitch h4onof(D6,ACTIVE_HIGH);
 
 h4pRoamingDotLocal dot("H3","smb","tcp");
 
-H4P_EventListener chchchanges(H4PE_PRESENCE | H4PE_GRID,[](const string& svc,H4PE_TYPE t,const string& msg){ 
+H4P_EventListener chchchanges(H4PE_PRESENCE | H4PE_GRID,[](const std::string& svc,H4PE_TYPE t,const std::string& msg){ 
   switch(t){
     H4P_ONOFF_CONNECTOR(PRESENCE) // will make h4onof follow in/out status
   }

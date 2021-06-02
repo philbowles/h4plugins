@@ -83,7 +83,7 @@ void ShowTime( void ) {
 h4pOutput builtin(LED_BUILTIN,H4P_ASSUMED_SENSE,OFF,H4P_ASSUMED_COLOR);
 
 
-H4P_EventListener clok(H4PE_RTC | H4PE_ALARM,[](const string& svc,H4PE_TYPE t,const string& msg){
+H4P_EventListener clok(H4PE_RTC | H4PE_ALARM,[](const std::string& svc,H4PE_TYPE t,const std::string& msg){
   switch(t){
     H4P_SERVICE_ADAPTER(WiFi);
     H4P_FUNCTION_ADAPTER_VOID(RTC);

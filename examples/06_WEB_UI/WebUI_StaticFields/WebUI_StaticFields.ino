@@ -33,7 +33,7 @@ void onViewersConnect(){
 
 void onViewersDisconnect(){ h4.cancel({TIM0,TIM1}); }
 
-H4P_EventListener allexceptmsg(H4PE_VIEWERS | H4PE_GVCHANGE,[](const string& svc,H4PE_TYPE t,const string& msg){
+H4P_EventListener allexceptmsg(H4PE_VIEWERS | H4PE_GVCHANGE,[](const std::string& svc,H4PE_TYPE t,const std::string& msg){
   switch(t){
     case H4PE_VIEWERS:
       H4P_SERVICE_ADAPTER(Viewers);

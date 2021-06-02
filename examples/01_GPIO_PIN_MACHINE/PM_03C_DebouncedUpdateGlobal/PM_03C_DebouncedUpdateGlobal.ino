@@ -8,7 +8,7 @@ H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false)
 
 h4pDebounced flat(USER_BTN,INPUT_PULLUP,UB_ACTIVE,UB_MS,new npUPDATEGLOBAL{"dbValue"});
 
-H4P_EventListener allexceptmsg(H4PE_VIEWERS | H4PE_GVCHANGE,[](const string& svc,H4PE_TYPE t,const string& msg){
+H4P_EventListener allexceptmsg(H4PE_VIEWERS | H4PE_GVCHANGE,[](const std::string& svc,H4PE_TYPE t,const std::string& msg){
   switch(t){
     case H4PE_GVCHANGE:
       if(svc=="dbValue") Serial.printf("dbValue now value=%s\n",CSTR(msg));    

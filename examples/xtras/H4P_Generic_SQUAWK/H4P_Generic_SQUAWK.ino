@@ -35,7 +35,7 @@ H4P_RemoteUpdate h4ru;
 
 h4pPolled ark(LIGHT,INPUT,ACTIVE_HIGH,5000);
 
-uint32_t arm(vector<string> vs){
+uint32_t arm(std::vector<std::string> vs){
     if(vs.size()){
         bool b=H4PAYLOAD_INT;
         if(b!=armed) armingStateChange(b); 
@@ -58,7 +58,7 @@ void armingStateChange(bool b){
 
 void onGPIO(int pin,int value){ if(pin==LIGHT) armingStateChange(value); }
 
-void h4pGlobalEventHandler(const string& svc,H4PE_TYPE t,const string& msg){
+void h4pGlobalEventHandler(const std::string& svc,H4PE_TYPE t,const std::string& msg){
     switch(t){
 //        H4P_DEFAULT_SYSTEM_HANDLER
         H4P_FUNCTION_ADAPTER_GPIO;

@@ -16,7 +16,7 @@ H4P_HeapWarn h4hw(heapIsLow,50); // call heapIsLow when free Heap drops below 50
     * h4/hwrn/pcent/< some sensible percentage>
 */
 
-vector<void*> chunks;
+std::vector<void*> chunks;
 
 void h4setup() { // H4 constructor starts Serial
     Serial.println("H4P_HeapWarn example v"H4P_VERSION);

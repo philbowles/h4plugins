@@ -8,7 +8,7 @@ h4pRoamingIP elvis("Elvis","192.168.1.31");
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","detector");
 H4P_BinarySwitch h4onof(D6,ACTIVE_HIGH,H4P_UILED_BI,ON);
 
-H4P_EventListener chchchanges(H4PE_PRESENCE,[](const string& svc,H4PE_TYPE t,const string& msg){ 
+H4P_EventListener chchchanges(H4PE_PRESENCE,[](const std::string& svc,H4PE_TYPE t,const std::string& msg){ 
   switch(t){
     H4P_ONOFF_CONNECTOR_INVERTED(PRESENCE)
   }

@@ -1,4 +1,5 @@
 SHORTTERM
+// 3.0.5 new hb(led)
     lynx slave -> http transport not obvious! ... multi armadillo?
     change old-fashioned warn sb to SYSWARN events
 // ? h4poutput object in vector causes -> illegal x
@@ -7,6 +8,7 @@ SHORTTERM
     fix dump / locallogger to avoid large file crash
     adv docs + / example creating your own commands
 MEDIUMTERM
+    outfactor signal functions to H4PE_SIGNAL:
     grid??
     ESp32 MDNS detector
     ESp32 tonecontroller

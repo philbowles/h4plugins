@@ -15,7 +15,7 @@ H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, Q size, SerialCm
 #define UB_ACTIVE ACTIVE_LOW
 #define U_DEBOUNCE  15
 
-void h4pGlobalEventHandler(const string& svc,H4PE_TYPE t,const string& msg){
+void h4pGlobalEventHandler(const std::string& svc,H4PE_TYPE t,const std::string& msg){
   switch(t){
     case H4PE_REBOOT:
       Serial.printf("App is about to reboot: save config (if any) etc\n");

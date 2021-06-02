@@ -13,7 +13,7 @@ class DIYpulseWidth: public h4pGPIO {
         }
 };
 
-H4P_EventListener gpio(H4PE_GPIO,[](const string& pin,H4PE_TYPE t,const string& msg){
+H4P_EventListener gpio(H4PE_GPIO,[](const std::string& pin,H4PE_TYPE t,const std::string& msg){
     int p=atoi(pin.c_str());
     int v=atoi(msg.c_str());
     Serial.printf("P%d Delta = %d\n",p,v);
