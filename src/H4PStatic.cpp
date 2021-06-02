@@ -67,14 +67,14 @@ void h4pOnEvent(H4PE_TYPE t,H4P_FN_USEREVENT e){ h4pregisterhandler(userTag(),st
 [[noreturn]] void h4pReboot(){ h4psysevent(userTag(),H4PE_REBOOT,""); }
 
 #ifdef ARDUINO_ARCH_ESP32
-string getTerminalName(const std::string& s) {
+std::string getTerminalName(const std::string& s) {
 //#if platform?
    char sep = '\\';
 //#else
 //   char sep = '/';
 //#endif
    size_t i = s.rfind(sep, s.length());
-   if (i != string::npos) return(s.substr(i+1, s.length() - i));
+   if (i != std::string::npos) return(s.substr(i+1, s.length() - i));
    return("");
 }
 #endif
