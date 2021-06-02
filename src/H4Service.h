@@ -410,22 +410,22 @@ case H4PE_SYSINFO: \
     if(STOI(msg)) H4PSVCUP(s); \
     else H4PSVCDOWN(s); \
 }
-#define H4P_std::function_ADAPTER(e) case H4PEVENTNAME(e): \
+#define H4P_FUNCTION_ADAPTER(e) case H4PEVENTNAME(e): \
     H4PEVENTCALL(e,svc,msg); \
     break;
 
-#define H4P_std::function_ADAPTER_II(e) case H4PEVENTNAME(e): \
+#define H4P_FUNCTION_ADAPTER_II(e) case H4PEVENTNAME(e): \
     H4PEVENTCALL(e,STOI(svc),STOI(msg)); \
     break;
 
-#define H4P_std::function_ADAPTER_SI(e) case H4PEVENTNAME(e): \
+#define H4P_FUNCTION_ADAPTER_SI(e) case H4PEVENTNAME(e): \
     H4PEVENTCALL(e,svc,STOI(msg)); \
     break;
 
-#define H4P_std::function_ADAPTER_VOID(e) case H4PEVENTNAME(e): \
+#define H4P_FUNCTION_ADAPTER_VOID(e) case H4PEVENTNAME(e): \
     H4PGLUE2(on,e)(); \
     break;
 
-#define H4P_std::function_ADAPTER_GPIO H4P_std::function_ADAPTER_II(GPIO)
+#define H4P_FUNCTION_ADAPTER_GPIO H4P_FUNCTION_ADAPTER_II(GPIO)
 
-#define H4P_std::function_ADAPTER_PRESENCE H4P_std::function_ADAPTER_SI(PRESENCE)
+#define H4P_FUNCTION_ADAPTER_PRESENCE H4P_FUNCTION_ADAPTER_SI(PRESENCE)
