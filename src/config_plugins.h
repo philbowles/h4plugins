@@ -28,7 +28,7 @@ SOFTWARE.
 */
 #pragma once
 
-#define H4P_VERSION "3.0.5"
+#define H4P_VERSION "3.0.6"
 
 // Make sure you read the documentation and have arrangements in place for using AP mode :)
 // If you don't have the H4P_WiFiAP.cpp file, the linker will fail.

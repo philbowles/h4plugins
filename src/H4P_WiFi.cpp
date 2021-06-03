@@ -420,7 +420,7 @@ void H4P_WiFi::info() {
     H4Service::info();
     reply(" Device %s Mode=%d Status: %d IP=%s",CSTR(h4p[deviceTag()]),WiFi.getMode(),WiFi.status(),WiFi.localIP().toString().c_str());
     reply(" SSID %s PSK=%s",CSTR(WiFi.SSID()),CSTR(WiFi.psk()));
-    #if H4P_ASSUMED_LED
+    #ifdef H4P_ASSUMED_LED
         reply(" Signal Pin GPIO%d active=%d",H4P_ASSUMED_LED,H4P_ASSUMED_SENSE);
     #else
         reply(" ** NO Signal Pin! **");

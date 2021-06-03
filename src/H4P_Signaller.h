@@ -33,7 +33,6 @@ SOFTWARE.
 #include<H4P_PinMachine.h>
 
 #ifndef H4P_ASSUMED_LED
-    #define H4P_ASSUMED_LED      LED_BUILTIN
     #define H4P_ASSUMED_SENSE     ACTIVE_LOW
     #define H4P_ASSUMED_COLOR H4P_UILED_BLUE
 #endif
@@ -125,7 +124,11 @@ class H4P_Signaller: public H4Service {
             void            info() override;
 #endif
             bool 			isFlashing(uint8_t pin);
+#ifdef H4P_ASSUMED_LED
             void 			pulsePin(uint32_t period,uint8_t pin=H4P_ASSUMED_LED,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);
+#else
+            void 			pulsePin(uint32_t period,uint8_t pin,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);
+#endif
             void 			pulsePin(uint32_t period,h4pOutput*);
             void            stopAll();
             void            stopPin(uint8_t pin);

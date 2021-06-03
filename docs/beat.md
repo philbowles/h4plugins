@@ -52,7 +52,7 @@ N/A
 ```cpp
 // constructors
 H4P_Heartbeat();
-H4P_Heartbeat(size_t period); // ms at which LED_BUILTIN will be pulsed to show "online" 
+H4P_Heartbeat(size_t period); // ms at which LED_BUILTIN will be pulsed to show "online" NB ONLY ON MCU with LED_BUILTIN defined
 
 static string secsToTime(uint32_t secs; // returns human readable D HH:MM:SS of arbitray seconds value
 static string upTime(); // returns human readable D HH:MM:SS of time since boot

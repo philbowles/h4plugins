@@ -152,14 +152,10 @@ void H4P_Signaller::_flash(uint32_t period,uint8_t duty,uint8_t pin,H4PM_SENSE a
 
 void H4P_Signaller::_handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg){
     if(t==H4PE_SIGNAL){
-    #if H4P_ASSUMED_LED
+    #ifdef H4P_ASSUMED_LED
         if(msg.size()){
             std::vector<std::string> parts=split(msg,",");
-            if(parts[1]=="p") {
-//                Serial.printf("T=%d H4PE_SIGNAL pulse pin %d N=%d s=%d col=%d \n,",millis(),H4P_ASSUMED_LED,STOI(parts[0]),H4P_ASSUMED_SENSE,H4P_ASSUMED_COLOR);
-            //void 			pulsePin(uint32_t period,uint8_t pin=H4P_ASSUMED_LED,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);
-                pulsePin(STOI(parts[0]));
-            }
+            if(parts[1]=="p") pulsePin(STOI(parts[0]));
             else flashMorse(CSTR(parts[1]),STOI(parts[0]),H4P_ASSUMED_LED,H4P_ASSUMED_SENSE);
         } else stopPin(H4P_ASSUMED_LED);
     #else
