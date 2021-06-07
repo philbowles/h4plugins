@@ -30,7 +30,8 @@ SOFTWARE.
 #pragma once
 
 #include<H4P_PinMachine.h>
-#include<H4P_WiFi.h>
+
+//extern std::string h4pGetLedColor(uint8_t c);
 
 void H4P_PinMachine::_run(){ 
     for(auto const& p:h4pPinMap) {
@@ -50,7 +51,10 @@ void H4P_PinMachine::info(){
 #endif
 
 void H4P_PinMachine::svcUp(){
-    for(auto const& p:h4pPinMap) p.second->_announce();
+    for(auto const& p:h4pPinMap) {
+        Serial.printf("START PINS: %s\n",p.second->dump().data());
+        p.second->_announce();
+    }
     h4._hookLoop([this](){ _run(); },_pid);
     H4Service::svcUp();
 }
@@ -102,24 +106,17 @@ void h4pGPIO::_announce(){
 }
 
 void h4pGPIO::_handleEvent(const std::string& s,H4PE_TYPE t,const std::string& msg){
-    switch(t){
+    switch(t){ // refactor? signaller?
         case H4PE_VIEWERS:
-        {
-            uint32_t mode=STOI(msg);
-            if(mode) {
-            #if H4P_USE_WIFI_AP
-                if(mode==WIFI_AP) return;
-            #endif
-                h4puiAdd(stringFromInt(_p,"%02d"),H4P_UI_GPIO,"g","",_c);
-            }
-        }
+            if(STOI(msg)) h4puiAdd(stringFromInt(_p,"%02d"),H4P_UI_GPIO,"g","",_c);
+
     }
 }
 
 #if H4P_LOG_MESSAGES
 std::string h4pGPIO::dump(){
     char* buff=static_cast<char*>(malloc(H4P_REPLY_BUFFER+1));
-    snprintf(buff,H4P_REPLY_BUFFER," P%02d S=%d P=%d L=%d C=%d V=%d O=%d A=%d",_p,_s,digitalRead(_p),logicalRead(),_c,getValue(),isOutput(),isAnalog());
+    snprintf(buff,H4P_REPLY_BUFFER," P%02d S=%s P=%d L=%d C=%s V=%d O=%d A=%d",_p,_s ? "HI":"LO",digitalRead(_p),logicalRead(),h4pGetLedColor(_c).data(),getValue(),isOutput(),isAnalog());
     std::string rv(buff);
     free(buff);
     return rv;

@@ -27,6 +27,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_Signaller.h>
+//#include<H4P_PinMachine.h>
 
 #ifdef H4FC_MORSE_SUPPORT 
 std::unordered_map<char,string>	H4P_Signaller::_morse={
@@ -135,6 +136,7 @@ void H4P_Signaller::_dynaLoad(uint8_t pin,H4PM_SENSE active,uint8_t col,H4FC_FN_
     auto opp=static_cast<h4pOutput*>(H4P_PinMachine::isManaged(pin));
     if(opp && opp->isOutput()) h4pFlashMap[pin]=f2(opp);
     else {
+        Serial.printf("new h4pOutput %d %s %s\n",pin,active ? "HI":"LO",h4pGetLedColor(col).data());
         new h4pOutput(pin,active,OFF,col);
         _dynaLoad(pin,active,col,f1,f2);
     }
@@ -143,6 +145,7 @@ void H4P_Signaller::_dynaLoad(uint8_t pin,H4PM_SENSE active,uint8_t col,H4FC_FN_
 void H4P_Signaller::_flash(uint32_t period,uint8_t duty,uint8_t pin,H4PM_SENSE active,uint8_t col){
     stopPin(pin);
 	if(duty < 100){
+        Serial.printf("_flash %d %s %s\n",pin,active ? "HI":"LO",h4pGetLedColor(col).data());
         _dynaLoad(pin,active,col,
             [](H4Flasher* fp){ fp->PWM(); },
             [period,duty](h4pOutput* opp){ return new H4Flasher(opp,period,duty); }
@@ -151,17 +154,42 @@ void H4P_Signaller::_flash(uint32_t period,uint8_t duty,uint8_t pin,H4PM_SENSE a
 }
 
 void H4P_Signaller::_handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg){
-    if(t==H4PE_SIGNAL){
-    #ifdef H4P_ASSUMED_LED
-        if(msg.size()){
+    switch(t){
+        case H4PE_VIEWERS:
+            if(STOI(msg)) for(auto const& f:h4pFlashMap){ h4puiAdd(stringFromInt(f.first,"%02d"),H4P_UI_GPIO,"g","",f.second->_opp->_c); }
+            break;
+        case H4PE_SIGNAL:
+            if(!_signalPin) return;
             std::vector<std::string> parts=split(msg,",");
-            if(parts[1]=="p") pulsePin(STOI(parts[0]));
-            else flashMorse(CSTR(parts[1]),STOI(parts[0]),H4P_ASSUMED_LED,H4P_ASSUMED_SENSE);
-        } else stopPin(H4P_ASSUMED_LED);
-    #else
-        YEVENT(H4PE_SYSWARN,"NO SIGNAL LED DEFINED");
-    #endif
-    }    
+            size_t scheme;
+            if(parts.size()){
+                scheme=STOI(parts[0]);
+                switch(scheme){
+                    case H4P_SIG_STOP:
+                        stopPin(_signalPin);
+                        break;
+                    case H4P_SIG_PIN: // period
+                        if(parts.size() == 2) flashPin(STOI(parts[1]),_signalPin);
+                        break;
+                    case H4P_SIG_PWM:
+                        if(parts.size() == 3) flashPWM(STOI(parts[1]),STOI(parts[2]),_signalPin);
+                        break;
+                    case H4P_SIG_PATTERN:
+                        if(parts.size() == 3) flashPattern(parts[1].data(),STOI(parts[2]),_signalPin);
+                        break;
+                    case H4P_SIG_MORSE:
+                        if(parts.size() == 3) flashMorse(parts[1].data(),STOI(parts[2]),_signalPin);
+                        break;
+                    case H4P_SIG_PULSE:
+                        if(parts.size() == 2) pulsePin(STOI(parts[1]),_signalPin);
+                        break;
+#ifdef ARDUINO_ARCH_ESP8266
+                    case H4P_SIG_THROB:
+                        if(parts.size() == 3) throbPin(STOI(parts[1]),STOI(parts[2]),_signalPin);
+#endif
+                }
+            }
+    }
 }
 
 void H4P_Signaller::flashMorse(const char* pattern,uint32_t timebase,uint8_t pin,H4PM_SENSE active,uint8_t col){// flash arbitrary pattern ... --- ... convert dot / dash into Farnsworth Timing
@@ -197,11 +225,11 @@ void H4P_Signaller::flashPattern(const char* pattern,uint32_t timebase,uint8_t p
 }
 void H4P_Signaller::flashPattern(const char* pattern,uint32_t timebase,h4pOutput* p){ flashPattern(pattern,timebase,p->_p,p->_s,p->_c); }
 
-void H4P_Signaller::flashPin(uint32_t period,uint8_t pin,H4PM_SENSE active,uint8_t col){ _flash(period*2,50,pin,active,col); }// simple symmetric SQ wave on/off
+void H4P_Signaller::flashPin(uint32_t period,uint8_t pin,H4PM_SENSE active,uint8_t col){ _flash(period*2,50,pin,active,col); }
 
 void H4P_Signaller::flashPin(uint32_t period,h4pOutput* p){ flashPin(period,p->_p,p->_s,p->_c); }
 
-void H4P_Signaller::flashPWM(uint32_t period,uint8_t duty,uint8_t pin,H4PM_SENSE active,uint8_t col){ _flash(period,duty,pin,active,col);	}// flash "PWM"
+void H4P_Signaller::flashPWM(uint32_t period,uint8_t duty,uint8_t pin,H4PM_SENSE active,uint8_t col){ _flash(period,duty,pin,active,col); }
 
 void H4P_Signaller::flashPWM(uint32_t period,uint8_t duty,h4pOutput* p){ _flash(period,duty,p->_p,p->_s,p->_c); }
 

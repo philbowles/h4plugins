@@ -30,6 +30,7 @@ SOFTWARE.
 #pragma once
 
 #include<H4Service.h>
+#include<H4P_Signaller.h>
 #include<H4P_WiFi.h>
 #include<PangolinMQTT.h>
 
@@ -61,8 +62,8 @@ class H4P_AsyncMQTT: public H4Service, public PangolinMQTT{
                     });
                 }
                 void        _setup();
-                void        _signalBad(){ YEVENT(H4PE_SIGNAL,"100,..   "); }
-                void        _signalOff(){ YEVENT(H4PE_SIGNAL,""); }
+                void        _signalBad(){ H4P_Signaller::signal(H4P_SIG_MORSE,"..   ,150"); }
+                void        _signalOff(){ H4P_Signaller::signal(H4P_SIG_STOP); }
     protected:
         virtual void        _handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg) override;
     public:

@@ -33,24 +33,26 @@ SOFTWARE.
 #include<H4P_PinMachine.h>
 
 #ifndef H4P_ASSUMED_LED
+    #define H4P_ASSUMED_LED       255
     #define H4P_ASSUMED_SENSE     ACTIVE_LOW
-    #define H4P_ASSUMED_COLOR H4P_UILED_BLUE
+    #define H4P_ASSUMED_COLOR     H4P_UILED_BI
 #endif
 
 class H4Flasher{
-	        std::string          _dots;
+	        std::string     _dots;
             H4_TASK_PTR     _timer=nullptr;
             H4_TASK_PTR	    _off=nullptr;
-            h4pOutput*      _opp;
 
             uint32_t        _duty=0;
-            std::string          _pattern;
+            std::string     _pattern;
             uint32_t        _period=0;
             uint32_t        _timebase=0;
             uint32_t        _valley=0;
 
             void      		_pulse(uint32_t width);	
     public:  
+            h4pOutput*      _opp;
+
         H4Flasher(h4pOutput*  opp,uint32_t period,uint8_t duty);
         H4Flasher(h4pOutput*  opp,const char* pattern,uint32_t timebase);
 
@@ -78,7 +80,9 @@ using H4FC_FN_F2        = std::function<H4Flasher*(h4pOutput*)>;
 using H4P_FLASHMAP      = std::unordered_map<uint8_t,H4Flasher*>;
 
 extern H4P_FLASHMAP h4pFlashMap;
-class H4P_Signaller: public H4Service {     
+class H4P_Signaller: public H4Service {  
+            h4pOutput*      _signalPin=nullptr;
+
             void            _dynaLoad(uint8_t pin,H4PM_SENSE active,uint8_t col,H4FC_FN_F1 f1,H4FC_FN_F2 f2);
             void            _flash(uint32_t period,uint8_t duty,uint8_t pin,H4PM_SENSE active=ACTIVE_HIGH,uint8_t col=H4P_ASSUMED_COLOR);
 #if H4P_CMDLINE_FLASHERS
@@ -92,9 +96,10 @@ class H4P_Signaller: public H4Service {
     protected:
         virtual void        _handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg);
     public:
-        H4P_Signaller(): H4Service(winkTag(),H4PE_SIGNAL){
+        H4P_Signaller(uint8_t pin=H4P_ASSUMED_LED,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR): H4Service(winkTag(),H4PE_SIGNAL | H4PE_VIEWERS){
             require<H4P_PinMachine>(gpioTag());
-            _running=true; // earliest possible start
+            if(pin < 255)_signalPin=new h4pOutput(pin,active,OFF,col);
+            _running=true; // earliest posible start
 #if H4P_CMDLINE_FLASHERS
             _addLocals({
                 {_me,       { H4PC_H4, _pid, nullptr }}, 
@@ -105,7 +110,7 @@ class H4P_Signaller: public H4Service {
                 {stopTag(), { _pid, 0, CMDVS(_stop) }}
             });
 #endif
-        }
+            }
              
             void 			flashMorse(const char *pattern, uint32_t timebase, uint8_t pin,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);	
             void 			flashMorse(const char *pattern, uint32_t timebase,h4pOutput*);	
@@ -124,12 +129,9 @@ class H4P_Signaller: public H4Service {
             void            info() override;
 #endif
             bool 			isFlashing(uint8_t pin);
-#ifdef H4P_ASSUMED_LED
-            void 			pulsePin(uint32_t period,uint8_t pin=H4P_ASSUMED_LED,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);
-#else
             void 			pulsePin(uint32_t period,uint8_t pin,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);
-#endif
             void 			pulsePin(uint32_t period,h4pOutput*);
+    static  void            signal(size_t scheme,const std::string& fmt=""){ h4psysevent(winkTag(),H4PE_SIGNAL,"%d,%s",scheme,fmt.data()); }
             void            stopAll();
             void            stopPin(uint8_t pin);
             void            stopPin(h4pOutput*);

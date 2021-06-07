@@ -3,9 +3,9 @@
 
 ## Shortname hwrn
 
-Calls a user-defined function when H4P's free heap drops below a safe level (determined as a percentage of its starting value).
+Send `H4PE_SYSWARN` event ("Heap,[1|0],N") when H4P's free heap drops below a safe level (determined as a percentage of its starting value).
 
-The function is called with a boolean parameter of `true` when the limit is exceeded and `false` when it returns to a safe level.
+Where 1=limit exceeded, 0=return below limit and N=current value
 
 It is intended purely for debugging and is not normally required. It could typically be used to light/extinguish a warning LED to show a fault status.
 
@@ -46,9 +46,7 @@ N/A
 
 # Callback functions
 
-```cpp
-void onHeapWarning(bool) // called after switch state changes
-```
+N/A
 
 ---
 

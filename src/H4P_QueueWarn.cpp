@@ -48,12 +48,11 @@ void H4P_QueueWarn::pcent(uint32_t pc){
 
 uint32_t H4P_QueueWarn::_qwPcent(std::vector<std::string> vs){ return _guardInt1(vs,[this](uint32_t && i){ pcent(i); }); }
 //
-H4P_QueueWarn::H4P_QueueWarn(H4P_FN_VB _f,uint32_t _limit): H4Service("qwrn"){
+H4P_QueueWarn::H4P_QueueWarn(uint32_t _limit): H4Service("qwrn"){
     _addLocals({
-        {_me,      {H4PC_H4, _pid, nullptr}},
-        {pcentTag(),  {_pid,   0, CMDVS(_qwPcent)}}
+        {_me,           {H4PC_H4, _pid, nullptr}},
+        {pcentTag(),    {_pid,   0, CMDVS(_qwPcent)}}
     });
-    f=_f;  
     limit=__setLimit(_limit);
 }
 
@@ -62,9 +61,6 @@ void H4P_QueueWarn::_run(){
     uint32_t qsize=h4.size();
     if(qsize > maxq) maxq=qsize;
     bool state=qsize > limit;
-    if(state ^ warned){
-        SYSWARN("Q,%d,%d",state,qsize);
-        f(state);
-    }
+    if(state ^ warned) SYSWARN("Q,%d,%d",state,qsize);
     warned=state;
 }

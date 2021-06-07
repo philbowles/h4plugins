@@ -39,8 +39,6 @@ class H4P_UPNPServer: public H4Service {
             AsyncUDP 	        _udp;
             IPAddress		    _ubIP=IPAddress(239,255,255,250);;
 
-//                VSCMD(_friendly);
-
                 std::string          _uuid="uuid:";
                 std::string          _urn="Belkin:";
                 std::string          _udn;

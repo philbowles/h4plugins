@@ -1,7 +1,6 @@
+
 SHORTTERM
-// 3.0.5 new hb(led)
     lynx slave -> http transport not obvious! ... multi armadillo?
-    change old-fashioned warn sb to SYSWARN events
 // ? h4poutput object in vector causes -> illegal x
 // fix crap example for asynhttp
     fix write length return for 32/8266

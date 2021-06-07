@@ -21,6 +21,20 @@ Unfortunately many boards (e.g. ESP8266 and ESP32 have their onboard LEDs wired 
   
 (*The output device does not have to be an LED - it is just that this is the most common and easiest to understand. It can be any GPIO-driven device that does react badly to rapid switching*)
 
+## "Signalling"
+
+Many boards have built-in LED. This is very handy for providing a vsiaul status for system evetns, for example when using `H4P_WiFi` it will flash in an S-O-S pattern to show when connection is lost.
+
+The details of the BUILTIN_LED are assumed, they are found in [`config_plugins.h`](../src/config_plugins.h)
+
+```cpp
+#define H4P_ASSUMED_LED      LED_BUILTIN
+#define H4P_ASSUMED_SENSE     ACTIVE_LOW
+#define H4P_ASSUMED_COLOR H4P_UILED_BLUE
+```
+
+If it is not practical to edit this for the netire installation, H4P_Signaller can be given the relevant details on a sketch-by-sketch basis.
+
 ---
 
 ## Contents
@@ -89,34 +103,80 @@ All times in milliseconds
 
 ```cpp
 // Constructor
-H4P_Signaller();
+H4P_Signaller(uint8_t pin=H4P_ASSUMED_LED,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);
+/*
+If an h4pOutput object is already defined, this can be used in most of the following calls in place of repreatings its parameters
 
-// Simple flash, 50% square wave: ON for rate ms, OFF for rate ms
-flashLED(uint32_t rate, uint8_t pin = LED_BUILTIN,uint8_t active=HIGH);
+pin gpio number
+active = pin "sense" ACTIVE_HIGH or ACTIVE_LOW
+col = the color the LED will appear in the webUI
+
+pattern (morse) = string of "." "-" or space eg. "... --- ..." for S-O-S
+pattern (binary) = string of "1" or "0" eg. "101100" representing on/off states
+timebase = the rate in mS at which the patern is fed to the pin
+*/
 
 // Takes pattern of dots dashes and spaces: "... --- ..." ("SOS") and a timebase which controls repetition speed
 // 200ms is a good starting point for the right "feel"
-flashMorse(const char *pattern, uint32_t timebase, uint8_t pin = LED_BUILTIN,uint8_t active=HIGH);
+void flashMorse(const char *pattern, uint32_t timebase, uint8_t pin,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);	
+void flashMorse(const char *pattern, uint32_t timebase,h4pOutput*);
 
 // NB only available if you edit the config_plugins.h file and uncomment the define for H4F_MORSE_SUPPORT
 // Translates text (no numerals or punctuation, [A-z a-z] only)
-flashMorseText(const char * pattern,uint32_t timebase,uint8_t pin=LED_BUILTIN,uint8_t active=HIGH);
+void 	        flashMorseText(const char * pattern,uint32_t timebase,uint8_t pin,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);
+void 	        flashMorseText(const char * pattern,uint32_t timebase,h4pOutput*);
 
 // Arbitray pattern of 1 and zero, = ON / OFF, irrespective of active-HIGH/LOW using timebase to set rate
 // e.g. flashPattern("1000001001",250,MY_LED); // default of active-HIGH assumed
-flashPattern(const char * pattern,uint32_t timebase,uint8_t pin=LED_BUILTIN,uint8_t active=HIGH);
+void flashPattern(const char * pattern,uint32_t timebase,uint8_t pin,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);
+void flashPattern(const char * pattern,uint32_t timebase,h4pOutput*);
+
+// Simple flash, 50% square wave: ON for rate ms, OFF for rate ms
+void flashPin(uint32_t rate, uint8_t pin,H4PM_SENSE active=ACTIVE_HIGH,uint8_t col=H4P_ASSUMED_COLOR);
+void flashPin(uint32_t rate,h4pOutput*);
 
 // PWM-style flash of duty% of period. 1000,25 gives ON 250ms OFF 750ms, ON 250ms etc
-flashPWM(uint32_t period,uint8_t duty,uint8_t pin=LED_BUILTIN,uint8_t active=HIGH);
+void flashPWM(uint32_t period,uint8_t duty,uint8_t pin,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);	
+void flashPWM(uint32_t period,uint8_t duty,h4pOutput*);	
 
 // Utility function which returns true if pin has a flasher attached (NOT whether its actually glowing!)
-isFlashing(uint8_t pin=LED_BUILTIN);
+bool isFlashing(uint8_t pin);
 
-// Single short blip of period ms: best when kept very short e.g. sub 100ms. Great for debugging!
-pulseLED(uint32_t period,uint8_t pin=LED_BUILTIN,uint8_t active=HIGH);
+//Single "blip" of length mS
+void pulsePin(uint32_t length,uint8_t pin,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);
+void pulsePin(uint32_t length,h4pOutput*);
 
-// Have a guess! Sets the LED to the opposite of its active state and cleans up any timers, patterns etc
-stopLED(uint8_t pin=LED_BUILTIN);
+/*
+    attaches flasher to the default signal pin the fmt string will vary for each flasher type, e.g.
+
+scheme:          format example
+
+H4P_SIG_PIN     "500"  // same as flashPin(500)
+H4P_SIG_PWM     "1000,50"
+H4P_SIG_PATTERN "101001,125"
+H4P_SIG_MORSE   "... --- ... ,125"
+H4P_SIG_THROB   "5000,25"
+H4P_SIG_PULSE   "100"
+
+*/
+static void signal(size_t scheme,const std::string& fmt=""){ h4psysevent(winkTag(),H4PE_SIGNAL,"%d,%s",scheme,fmt.data()); }
+
+// stops activity on all flashers
+void stopAll();
+
+// stop activity on specified flasher
+void stopPin(uint8_t pin);
+void stopPin(h4pOutput*);
+
+// (ESP8266 only) "throb" pattern: intensity is varied in a sawtooth wavefore. rate is the HALF-WAVE period
+// valley is the lowest % analog PWM of the waveform, eg. 100,25 gives:
+//  100     100    100
+//      \25/   \25/
+// 
+//<-rate->
+void throbPin(uint32_t rate, uint32_t valley, uint8_t pin,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);
+void throbPin(uint32_t rate, uint32_t valley,h4pOutput*);
+
 ```
 
 ## Example sketches
@@ -132,8 +192,9 @@ stopLED(uint8_t pin=LED_BUILTIN);
 
 (c) 2021 Phil Bowles h4plugins@gmail.com
 
+* [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)
 * [Facebook ESP Developers (moderator)](https://www.facebook.com/groups/ESP8266/)
-* [Support me on Patreon](https://patreon.com/esparto)
+* [Support me on Patreon](https://patreon.com/es/esparto)

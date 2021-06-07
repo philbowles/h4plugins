@@ -134,16 +134,27 @@ H4P_PINMAP          h4pPinMap;
         {H4PE_HEARTBEAT,"PING"}
     };
 
+    H4_INT_MAP ledColors={
+        {H4P_UILED_RED,"RED"},
+        {H4P_UILED_ORANGE,"ORANGE"},
+        {H4P_UILED_YELLOW,"YELLOW"},
+        {H4P_UILED_GREEN,"GREEN"},
+        {H4P_UILED_BLUE,"BLUE"},
+        {H4P_UILED_BI,"RED/GREEN"}
+    };
+
     extern const char* giveTaskName(uint32_t id);
 
     std::string h4pGetErrorMessage(uint32_t e){ return cmdErrors.count(e) ? cmdErrors[e]:std::string("No such error (")+stringFromInt(e)+")"; }
     std::string h4pGetEventName   (H4PE_TYPE e){ return eventTypes.count(e) ? eventTypes[e]:""; }
+    std::string h4pGetLedColor    (uint8_t c){ return ledColors.count(c) ? ledColors[c]:"BLACK"; }
     std::string h4pGetTaskType    (uint32_t e){ return taskTypes.count(e) ? taskTypes[e]:stringFromInt(e,"?%02d?"); }
     std::string h4pGetTaskName    (uint32_t e){ return taskNames.count(e) ? taskNames[e]:giveTaskName(e); }
     void        h4pClearEvent     (H4PE_TYPE e){ eventTypes.erase(e); }
 #else
     std::string h4pGetErrorMessage(uint32_t e){ return std::string("Err:"+stringFromInt(e)); }
     std::string h4pGetEventName   (H4PE_TYPE e){ return stringFromInt(e,"0x%08x"); }
+    std::string h4pGetLedColor    (uint8_t c){ return "BLACK"; }
     std::string h4pGetTaskType    (uint32_t e){ return stringFromInt(e,"%04d"); }
     std::string h4pGetTaskName    (uint32_t e){ return stringFromInt(e,"%04d"); }
     void        h4pClearEvent     (H4PE_TYPE e){}

@@ -28,14 +28,13 @@ SOFTWARE.
 */
 #include<H4P_HeapWarn.h>
 
-H4P_HeapWarn::H4P_HeapWarn(H4P_FN_VB f,uint32_t pc): _f(f),H4Service("hwrn"){
+H4P_HeapWarn::H4P_HeapWarn(uint32_t pc): H4Service("hwrn"){
     _addLocals({
-        {_me,      {H4PC_H4, _pid, nullptr}},
-        {pcentTag(),  {_pid,   0, CMDVS(_hwPcent)}}
+        {_me,           {H4PC_H4, _pid, nullptr}},
+        {pcentTag(),    {_pid,   0, CMDVS(_hwPcent)}}
     });
     _minh=_initial=_HAL_freeHeap();
     _limit=_setLimit(pc);
-//    info();
 }
 
 void H4P_HeapWarn::_run(){
@@ -43,10 +42,7 @@ void H4P_HeapWarn::_run(){
     uint32_t hsize=_HAL_freeHeap();
     if(hsize < _minh) _minh=hsize;
     bool state=hsize < _limit;
-    if(state ^ warned) {
-        SYSWARN("Heap,%d,%d",state,hsize);
-        _f(state);
-    }
+    if(state ^ warned) SYSWARN("Heap,%d,%d",state,hsize);
     warned=state;
 }
 

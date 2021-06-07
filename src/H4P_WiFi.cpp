@@ -28,6 +28,7 @@ SOFTWARE.
 */
 #include<H4P_WiFi.h>
 #include<H4P_PinMachine.h>
+#include<H4P_Signaller.h>
 
 H4P_UI_LIST                     h4pUserItems;
 std::vector<std::string>        h4pUIorder;
@@ -310,7 +311,8 @@ void H4P_WiFi::_sendSSE(const std::string& name,const std::string& msg){
 
 void H4P_WiFi::_signalBad(){ 
     h4p[ipTag()]="";
-    YEVENT(H4PE_SIGNAL,"175,...   ---   ...   ");
+    //YEVENT(H4PE_SIGNAL,"175,...   ---   ...   ");
+    H4P_Signaller::signal(H4P_SIG_MORSE,"...   ---   ...   ,150");
 }
 
 void H4P_WiFi::_startWebserver(){
@@ -421,7 +423,7 @@ void H4P_WiFi::info() {
     reply(" Device %s Mode=%d Status: %d IP=%s",CSTR(h4p[deviceTag()]),WiFi.getMode(),WiFi.status(),WiFi.localIP().toString().c_str());
     reply(" SSID %s PSK=%s",CSTR(WiFi.SSID()),CSTR(WiFi.psk()));
     #ifdef H4P_ASSUMED_LED
-        reply(" Signal Pin GPIO%d active=%d",H4P_ASSUMED_LED,H4P_ASSUMED_SENSE);
+//        reply(" Signal Pin GPIO%d active=%d",H4P_ASSUMED_LED,H4P_ASSUMED_SENSE);
     #else
         reply(" ** NO Signal Pin! **");
     #endif

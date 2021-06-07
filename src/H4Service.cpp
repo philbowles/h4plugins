@@ -107,7 +107,7 @@ std::string H4Service::_uniquify(const std::string& name,uint32_t uqf){
         extern H4_INT_MAP eventTypes;
     #endif
 void H4Service::info(){ 
-    reply("SVC: %s PID=%d %sRunning",CSTR(_me),_pid,_running ? "":"Not ");
+    reply("\nSVC: %s PID=%d %sRunning",CSTR(_me),_pid,_running ? "":"Not ");
     if(_parent!="") reply(" Depends on %s",CSTR(_parent));
     //
     std::vector<std::string> dees;

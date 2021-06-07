@@ -46,7 +46,6 @@ SOFTWARE.
 #include<DNSServer.h>
 #include<ArduinoOTA.h>
 #include<H4P_SerialCmd.h>
-#include<H4P_Signaller.h>
 #include<ESPAsyncWebServer.h>
 //
 #if H4P_USE_WIFI_AP

@@ -37,8 +37,8 @@ SOFTWARE.
 #else
     #include<H4P_EmitTick.h>
 #endif
+#include<H4P_Signaller.h>
 #include<H4P_WiFi.h>
-
 class H4P_Heartbeat: public H4Service {
 #ifdef H4P_ASSUMED_LED
                 H4_TIMER    _hbLED;
@@ -78,7 +78,7 @@ class H4P_Heartbeat: public H4Service {
                     H4Service::svcDown();
                 }
                 void        svcUp() override{
-                    if(_period) _hbLED=h4.every(_period,[=]{ YEVENT(H4PE_SIGNAL,"50,p"); }); // p = pulse pin
+                    if(_period) _hbLED=h4.every(_period,[=]{ H4P_Signaller::signal(H4P_SIG_PULSE,"50"); }); // p = pulse pin
                     H4Service::svcUp();
                 }
 #endif

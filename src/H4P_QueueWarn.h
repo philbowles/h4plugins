@@ -37,12 +37,10 @@ class H4P_QueueWarn: public H4Service {
         uint32_t                limit;
         uint32_t                maxq=0;
 
-        H4P_FN_VB    f;
-
         uint32_t        __setLimit(uint32_t v);
         void            _run();
     public:
-        H4P_QueueWarn(H4P_FN_VB _f,uint32_t _limit=50);
+        H4P_QueueWarn(uint32_t _limit=50);
 
 #if H4P_LOG_MESSAGES
         void        info() override;

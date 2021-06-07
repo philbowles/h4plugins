@@ -34,7 +34,6 @@ SOFTWARE.
 class H4P_HeapWarn: public H4Service {
         VSCMD(_hwPcent);
 
-        H4P_FN_VB    _f;
         uint32_t                _initial;
         uint32_t                _limit;
         uint32_t                _minh=0;
@@ -42,7 +41,7 @@ class H4P_HeapWarn: public H4Service {
             void        _run();
             uint32_t    _setLimit(uint32_t v);
     public:
-        H4P_HeapWarn(H4P_FN_VB f,uint32_t pc=50);
+        H4P_HeapWarn(uint32_t pc=50);
 
 #if H4P_LOG_MESSAGES
         void        info() override;

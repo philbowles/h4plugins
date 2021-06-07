@@ -226,6 +226,16 @@ enum H4PC_CMD_ID {
     H4PC_MAX
 };
 
+enum H4P_SIG_SCHEME {
+    H4P_SIG_STOP,
+    H4P_SIG_PIN,
+    H4P_SIG_PWM,
+    H4P_SIG_PATTERN,
+    H4P_SIG_MORSE,
+    H4P_SIG_THROB,
+    H4P_SIG_PULSE
+};
+
 class H4Service;
 extern std::unordered_map<std::string,H4Service*> h4pmap;
 
@@ -242,6 +252,13 @@ void h4psysevent(const std::string& svc,H4PE_TYPE t,const std::string& fmt, Args
 
 void h4puiAdd(const std::string& n,H4P_UI_TYPE t,std::string h="u",const std::string& v="",uint8_t c=0);
 void h4puiSync(const std::string& n,const std::string& v="");
+
+std::string h4pGetErrorMessage(uint32_t e);
+std::string h4pGetEventName   (H4PE_TYPE e);
+std::string h4pGetLedColor    (uint8_t c);
+std::string h4pGetTaskType    (uint32_t e);
+std::string h4pGetTaskName    (uint32_t e);
+void        h4pClearEvent     (H4PE_TYPE e);
 
 #define ON true
 #define OFF false
