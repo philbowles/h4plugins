@@ -31,8 +31,6 @@ SOFTWARE.
 
 #include<H4P_PinMachine.h>
 
-//extern std::string h4pGetLedColor(uint8_t c);
-
 void H4P_PinMachine::_run(){ 
     for(auto const& p:h4pPinMap) {
         auto ptr=p.second;
@@ -109,7 +107,6 @@ void h4pGPIO::_handleEvent(const std::string& s,H4PE_TYPE t,const std::string& m
     switch(t){ // refactor? signaller?
         case H4PE_VIEWERS:
             if(STOI(msg)) h4puiAdd(stringFromInt(_p,"%02d"),H4P_UI_GPIO,"g","",_c);
-
     }
 }
 

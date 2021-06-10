@@ -207,7 +207,7 @@ vs.size() == 3
 If the message was `a/b` with a payload of "sub-standard", `vs` would look like:
 
 ```cpp
-vs[0]="c"
+vs[0]="b"
 vs[1]="sub-standard"
 //
 vs.size() == 2
@@ -227,7 +227,7 @@ As you can see, this could get complicated when multiple subtopics are required,
 
 ### Wildcard topics
 
-**N.B.** *[H4P_AsyncMQTT](h4mqtt.md)Supports ONLY `#` wildcards. It does NOT support `+` wildcards**
+**N.B.** *[H4P_AsyncMQTT](h4mqtt.md)Supports ONLY `#` wildcards. It does NOT support `+` wildcards
 
 When handling wildcard topics, your callback needs to take care to validate *everything* after the "#" since neither you nor [H4P_AsyncMQTT](h4mqtt.md)- by defintion - can predict what it will be and MQTT itself will allow anything (including *nothing*). Assume for example you subscribe to `cards/#` but you are only really interested in `cards/hearts`, `cards/clubs`, `cards/diamonds` and `cards/spades`.
 

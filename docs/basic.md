@@ -23,7 +23,7 @@ The simplest NODE-PINK flows and GPIO strategies - read [GPIO Handling and "NODE
 * [h4pPolled](#h4pPolled)
 * [h4pRetriggering](#h4pRetriggering)
 * [h4pMultistage](#h4pMultistage)
-* [h4pMultifunctionButton](#h4h4pMultifunctionButtonpraw)
+* [h4pMultifunctionButton](#h4pmultifunctionbutton)
 
 # Essential further reading:
 

@@ -35,7 +35,7 @@ It may be instantiated as any name the user chooses, prefix all API calls below 
 
 # Dependencies
 
-[H4P_WiFi](h4pwifi.md)
+[H4P_WiFi](h4wifi.md)
 
 # Commands Added
 

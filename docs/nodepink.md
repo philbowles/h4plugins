@@ -55,7 +55,7 @@ Putting it all together what we want is:
 
 Which then allow us simply to react to the value of the H4PE_GPIO `msg` knowing it can only happen *once* per transition - *as long as we choose the correct value of milliseconds* for the particular switch we have attached to the GPIO pin, which can take some trial-end-error.
 
-In the code, NODE-PINK calls the flow a "pipeline" and the pipeline for `hp4Debounced` looks like:
+In the code, NODE-PINK calls the flow a "pipeline" and the pipeline for `h4pDebounced` looks like:
 
 ```cpp
 npSMOOTH{ms} -> npPUBLISHVALUE; // ms = milliseconds debounce time

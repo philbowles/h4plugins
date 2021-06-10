@@ -1,4 +1,4 @@
-![H4P Logo](../assets/WifiLogo.jpg)
+![H4P Logo](../assets/WiFiLogo.jpg)
 
 # Network Presence Detection
 
@@ -12,7 +12,7 @@ There is a plugin called [H4P_GateKeeper](gk.md). Your sketch lists identifying 
 
 The [H4P_GateKeeper](gk.md) emits an `H4PE_PRESENCE` event whenever one of the named roaming devices enters (msg==1) or leaves (msg=0) the network. 
 
-This can be used for example to implement a self-arming alarm system which will switch one whenever your personal phone leaves the network and switches off when your phone is detected again as you arrive back home. It could turn on the outsiude lights at the same time when it is dark.
+This can be used for example to implement a self-arming alarm system which will switch on whenever your personal phone leaves the network and switches off when your phone is detected again as you arrive back home. It could turn on the outsiude lights at the same time when it is dark.
 
 # What can be detected?
 

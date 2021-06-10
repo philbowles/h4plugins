@@ -81,7 +81,7 @@ It may be that the user has a deployment containg only D1 minis, but that half o
 The possibilities are many - it depends entirely on the users own ecosystem / infrastructure, but the summary is the code need to pass to the update server:
 
 * Current version
-* target binary indentifiers, whatever they may be
+* target binary identifiers, whatever they may be
 
 
 ## Flash File system images SPIFFS(32) and LittleFS(8266)
@@ -98,7 +98,7 @@ The recommended FFS size for H4Plugins deployment is:
 
 Devices in the 1MB class requiring 96kB need some special handling as only 64kB and 128kB options are available in the default settings of the IDE. 64kB is too small for the minimum file set (even though the  total actual file data sizes amount to < 30kB ). 128KB leaves insufficient room to be able to OTA the largest of the H4Plugins apps you may need to build.
 
-H4Plugins provides a 96kb option via its [Additional board defintions](board.md) and that document should be studied if you wish to deploy any 1MB devices over OTA.
+H4Plugins provides a 96kb option via its :building_construction: [Additional board defintions](board.md) and that document should be studied if you wish to deploy any 1MB devices over OTA.
 
 Obviously then, the update server also needs to mainatain a version-controlled FFS image repo, and binaries must be able to report the desired FFS size.
 
@@ -115,7 +115,7 @@ The [SPIFFS folder](../SPIFFS) contains `spiffs.bat` which will build the SPIFFS
 
 # Target binary Identifiers
 
-We have seen that the data by sketch identifies itself to the update server over and aboce the current version can be many and varied. H4Plugins provides a simple mechanism to collect the data and foward to the the central controller using the MQTT `report` topic.
+We have seen that the data by sketch identifies itself to the update server over and above the current version can be many and varied. H4Plugins provides a simple mechanism to collect the data and foward to the the central controller using the MQTT `report` topic.
 
 This concatenates any / all the data items the user chooses and publishes them automatically every time it connects. These, when added to the "basic set" provided by the ESP core must provide sufficient information for the update server to identify the latest binary of its class and return it OTA-style if it is a later version.
 

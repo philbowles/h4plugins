@@ -25,7 +25,7 @@ The default operating mode is Station Mode (`WIFI_STA`) requiring an SSID and a 
 
 ## Automatic reconnection
 
-[H4P_WiFi](h4pwifi.md) continually monitors connection to the AP and will shut down all dependent services, e.g. MQTT, UPNP if the connection breaks. It will automatically restart those services once the APP connection is restored.
+[H4P_WiFi](h4wifi.md) continually monitors connection to the AP and will shut down all dependent services, e.g. MQTT, UPNP if the connection breaks. It will automatically restart those services once the APP connection is restored.
 
 In the nmeanwhile, the app can continue as normal, servicing hardware, readong sensors etc: a poor connection will *not* cause or require a reboot (as many other libaries / firmwares do - who knows why?)
 
@@ -33,7 +33,7 @@ Because of this the user should be careful to structure her app so that it does 
 
 ## Signalling
 
-[H4P_WiFi](h4pwifi.md) tries to give a visual indication of the current connection state. If the board has a builtin LED, it will flash that in a Morse code S-O-S pattern (... --- ...) when the connection is lost. To do that, it needs to make assumptions about the LED such as its pin number, whether it is active high or low and what colour it is (for the UI visualisation). These can all be changed by editing [config_plugins.h](../src/config_plugins.h) and changing:
+[H4P_WiFi](h4wifi.md) tries to give a visual indication of the current connection state. If the board has a builtin LED, it will flash that in a Morse code S-O-S pattern (... --- ...) when the connection is lost. To do that, it needs to make assumptions about the LED such as its pin number, whether it is active high or low and what colour it is (for the UI visualisation). These can all be changed by editing [config_plugins.h](../src/config_plugins.h) and changing:
 
 * `#define H4P_ASSUMED_LED      LED_BUILTIN`
 * `#define H4P_ASSUMED_SENSE     ACTIVE_LOW`
@@ -128,7 +128,7 @@ h4wifi.uiAddText("Author","Phil Bowles");
 
 ## Content display
 
-Apart from fairly static `Text` fields already discussed, the UI values are taken from the current value of the global variable of the same name. The magic of this is that when anything changes that value, the `H4PE_GVCHANGE` event is generated, and [H4P_WiFi](h4pwifi.md) listen for those and - of course - then updates the disply to show the current value in real-time.
+Apart from fairly static `Text` fields already discussed, the UI values are taken from the current value of the global variable of the same name. The magic of this is that when anything changes that value, the `H4PE_GVCHANGE` event is generated, and [H4P_WiFi](h4wifi.md) listen for those and - of course - then updates the disply to show the current value in real-time.
 
 In *some* situations, only the user knows when the UI needs to change. The main case is when using [H4P_ConditionalSwitch](swings.md) or [H4P_ConditionalThing](swings.md) whose condition may depend on external factors like a GPIO state or some complex calculation that cannot be reduced to, or stored in, a global variable.
 
@@ -177,7 +177,7 @@ If you send messages faster than the net can forward them to the user's browser,
 
 So while your pattern of sending can be quite "bursty" at times, it needs to back off occasionally too. You need to keep your *average* bandwidth this side of the problem zone. That value can only be found by experiment with *your* app as it is not only net-dependent but also heap-dependent. If your app use a lot of heap, then the safe UI bandwidth will be greatly reduced.
 
-The only thing [H4P_WiFi](h4pwifi.md) can do is stop sending your data when that limit is getting close. That will allow the pipeline to drain, and when it comes back down to a safe level, [H4P_WiFi](h4pwifi.md) will again allow your UI updates to get through, taking the current value from the matching global variable so the final view as the dust settles should still match reality. :cherry_blossom: And *that* dear reader, is *why* user fields need to have a global associated with them.  
+The only thing [H4P_WiFi](h4wifi.md) can do is stop sending your data when that limit is getting close. That will allow the pipeline to drain, and when it comes back down to a safe level, [H4P_WiFi](h4wifi.md) will again allow your UI updates to get through, taking the current value from the matching global variable so the final view as the dust settles should still match reality. :cherry_blossom: And *that* dear reader, is *why* user fields need to have a global associated with them.  
 
 ---
 # Input Fields
@@ -275,7 +275,7 @@ void h4pGlobalEventHandler(const string& svc,H4PE_TYPE t,const string& msg){
 
 ![remote](../assets/remote.jpg)
 
-You normally wouldn't monitor the `H4PE_SERVICE` event of [H4P_AsyncHTTP](h4phttp.md) (service shortname is "http") but we only ever want to do this the very first time the app gets a connection to the net. Now I cheated a little as I knew in advance that there is a field in the JSON data called "country" so once we have had a successful call to the remote site, "usr_country" will exists and we don't need to make the call again. This just happened to be the quickest and most obvious (to me, at least) way of making the call one-time-only
+You normally wouldn't monitor the `H4PE_SERVICE` event of [H4P_AsyncHTTP](h4http.md) (service shortname is "http") but we only ever want to do this the very first time the app gets a connection to the net. Now I cheated a little as I knew in advance that there is a field in the JSON data called "country" so once we have had a successful call to the remote site, "usr_country" will exists and we don't need to make the call again. This just happened to be the quickest and most obvious (to me, at least) way of making the call one-time-only
 
 ---
 

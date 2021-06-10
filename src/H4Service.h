@@ -37,6 +37,7 @@ SOFTWARE.
 #ifdef ARDUINO_ARCH_ESP8266
     #include<LittleFS.h>
     #define HAL_FS LittleFS
+
 #else
     #include<FS.h>
     #include<SPIFFS.h>

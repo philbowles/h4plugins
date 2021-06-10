@@ -1,10 +1,10 @@
-//#define H4P_VERBOSE 1
+#define H4P_VERBOSE 1
 #include<H4Plugins.h>
-//H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
-H4_USE_PLUGINS(0,20,true) // Serial baud rate, Q size, SerialCmd autostop
+H4_USE_PLUGINS(115200,20,false) // Serial baud rate, Q size, SerialCmd autostop
+//H4_USE_PLUGINS(0,20,true) // Serial baud rate, Q size, SerialCmd autostop
 //
 //  This is designed for an external alarm box, which will only "arm" itself after dark
-//  (it can be manually overridden nd armed via MQTT, command line etc)
+//  (it can be manually overridden and armed via MQTT, command line etc)
 //  Hardware pins:
 //      D1 Light Sensor, D2 "Armed" flashing LED, D3 Siren
 //
@@ -23,7 +23,7 @@ const char* MQTT_PASS="";
 
 boolean armed=false;
 
-//H4P_SerialLogger slog;
+H4P_SerialLogger slog;
 H4P_PinMachine h4gm;
 H4P_Signaller h4fc;
 H4P_WiFi h4wifi(WIFI_SSID,WIFI_PASS);
@@ -34,6 +34,7 @@ H4P_UPNPServer h4upnp;
 H4P_RemoteUpdate h4ru;
 
 h4pPolled ark(LIGHT,INPUT,ACTIVE_HIGH,5000);
+h4pOutput alert(ARMED,ACTIVE_HIGH,H4P_UILED_RED);
 
 uint32_t arm(std::vector<std::string> vs){
     if(vs.size()){
@@ -47,9 +48,9 @@ void onMqttConnect(){ mqtt.subscribeDevice("arm",arm);}
 void onMqttDisconnect(){}
 
 void armingStateChange(bool b){
-    if(b) h4fc.flashPin(500,ARMED);
+    if(b) h4fc.flashPin(500,alert);
     else {
-        h4fc.stopPin(ARMED);
+        h4fc.stopPin(alert);
         h4onof.turn(OFF); 
     }
     mqtt.publishDevice("armed",armed=b);

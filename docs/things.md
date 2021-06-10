@@ -38,10 +38,9 @@ You should already be familiar with [Serial Commands](ccc.md), [MQTT](h4mqtt.md)
 In addition, you may also link *any* H4Plugins event to the default device using `H4P_ONOFF_CONNECTOR(e)` (read [Everything is an event: Listeners, Emitters and Handlers](events.md)). 
 ## Other Thing/Switch drivers
 
-* [h4pMultifunctionButton](h4mfnb.md) [Example Code](../examples/XTRAS/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
-* [UPNPServer](upnp.md)
+* [h4pMultifunctionButton](basic.md#h4pmultifunctionbutton) [Example Code](../examples/XTRAS/H4P_SONOFF_Basic/H4P_SONOFF_Basic.ino)
 
-The [h4pMultifunctionButton](h4mfnb.md) provides an easy way to switch your Thing/Switch with a physical button. The "Multi-function" aspect of it also allows you to reboot the device or factory reset it, depending on how long you hold the button down. A simple short "stab" though serves as your device's on/off button.
+The [h4pMultifunctionButton](basic.md#h4pmultifunctionbutton) provides an easy way to switch your Thing/Switch with a physical button. The "Multi-function" aspect of it also allows you to reboot the device or factory reset it, depending on how long you hold the button down. A simple short "stab" though serves as your device's on/off button.
 
 The [UPNPServer](upnp.md) provides (among other things) the abiity to detect Amazon "Alexa" voice commands an pass them to the Thing/Switch but also makes the device appear on the user's Windows desktop where it can also be switched on/off 
 

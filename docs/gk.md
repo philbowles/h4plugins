@@ -31,7 +31,7 @@ H4P_GateKeeper youcantcomeinwithoutabelton();
 
 # Dependencies
 
-[H4P_WiFi](h4pwifi.md)
+[H4P_WiFi](h4wifi.md)
 
 # Commands Added
 

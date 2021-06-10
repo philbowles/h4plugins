@@ -22,7 +22,7 @@ NODE-PINK solves the problem with two simple flows, either of which is declared 
 
 The simple encoder (`h4pEncoder`) then sends an `H4PE_EVENT` with `msg` of +1 every time the encoder clicks clockwise or -1 every time its clicks anti-clockwise, it's that simple.
 
-The automatic encoder (`h4pEncoder`) is a much cleverer beast, but just as easy to use. When you declare it you give it:
+The automatic encoder (`h4pEncoderAuto`) is a much cleverer beast, but just as easy to use. When you declare it you give it:
 
 * A minimum value (default = 1)
 * A maximum value (default = 100)

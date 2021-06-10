@@ -136,7 +136,6 @@ void H4P_Signaller::_dynaLoad(uint8_t pin,H4PM_SENSE active,uint8_t col,H4FC_FN_
     auto opp=static_cast<h4pOutput*>(H4P_PinMachine::isManaged(pin));
     if(opp && opp->isOutput()) h4pFlashMap[pin]=f2(opp);
     else {
-        Serial.printf("new h4pOutput %d %s %s\n",pin,active ? "HI":"LO",h4pGetLedColor(col).data());
         new h4pOutput(pin,active,OFF,col);
         _dynaLoad(pin,active,col,f1,f2);
     }
@@ -145,7 +144,6 @@ void H4P_Signaller::_dynaLoad(uint8_t pin,H4PM_SENSE active,uint8_t col,H4FC_FN_
 void H4P_Signaller::_flash(uint32_t period,uint8_t duty,uint8_t pin,H4PM_SENSE active,uint8_t col){
     stopPin(pin);
 	if(duty < 100){
-        Serial.printf("_flash %d %s %s\n",pin,active ? "HI":"LO",h4pGetLedColor(col).data());
         _dynaLoad(pin,active,col,
             [](H4Flasher* fp){ fp->PWM(); },
             [period,duty](h4pOutput* opp){ return new H4Flasher(opp,period,duty); }
@@ -202,7 +200,6 @@ void H4P_Signaller::flashMorse(const char* pattern,uint32_t timebase,uint8_t pin
 	ms+="00000";
 	flashPattern(CSTR(ms),timebase,pin,active,col);
 }
-void H4P_Signaller::flashMorse(const char* pattern,uint32_t timebase,h4pOutput* p){ flashMorse(pattern,timebase,p->_p,p->_s,p->_c); }
 
 #ifdef H4FC_MORSE_SUPPORT
 void H4P_Signaller::flashMorseText(const char* letters,uint32_t timebase,uint8_t pin,H4PM_SENSE active,uint8_t col){
@@ -213,7 +210,6 @@ void H4P_Signaller::flashMorseText(const char* letters,uint32_t timebase,uint8_t
 	}
 	flashMorse(CSTR(ditdah),timebase,pin,active,col);
 }
-void H4P_Signaller::flashMorseText(const char* letters,uint32_t timebase,h4pOutput* p){ flashMorseText(letters,timebase,p->_p,p->_s,p->_c); }
 #endif
 
 void H4P_Signaller::flashPattern(const char* pattern,uint32_t timebase,uint8_t pin,H4PM_SENSE active,uint8_t col){
@@ -223,15 +219,10 @@ void H4P_Signaller::flashPattern(const char* pattern,uint32_t timebase,uint8_t p
         [pattern, timebase](h4pOutput* opp){ return new H4Flasher(opp,pattern,timebase); }
     );
 }
-void H4P_Signaller::flashPattern(const char* pattern,uint32_t timebase,h4pOutput* p){ flashPattern(pattern,timebase,p->_p,p->_s,p->_c); }
 
 void H4P_Signaller::flashPin(uint32_t period,uint8_t pin,H4PM_SENSE active,uint8_t col){ _flash(period*2,50,pin,active,col); }
 
-void H4P_Signaller::flashPin(uint32_t period,h4pOutput* p){ flashPin(period,p->_p,p->_s,p->_c); }
-
 void H4P_Signaller::flashPWM(uint32_t period,uint8_t duty,uint8_t pin,H4PM_SENSE active,uint8_t col){ _flash(period,duty,pin,active,col); }
-
-void H4P_Signaller::flashPWM(uint32_t period,uint8_t duty,h4pOutput* p){ _flash(period,duty,p->_p,p->_s,p->_c); }
 
 #if H4P_LOG_MESSAGES
 void H4P_Signaller::info(){
@@ -247,8 +238,6 @@ bool H4P_Signaller::isFlashing(uint8_t pin){ return h4pFlashMap.count(pin); }
 
 void H4P_Signaller::pulsePin(uint32_t period,uint8_t pin,H4PM_SENSE active,uint8_t col){ _flash(period,0,pin,active,col); }
 
-void H4P_Signaller::pulsePin(uint32_t period,h4pOutput* p){ _flash(period,0,p->_p,p->_s,p->_c); }
-
 void H4P_Signaller::stopAll(){
     H4P_FLASHMAP tmp=h4pFlashMap; // else we will potentially delete from interated map
     for(auto const& f:tmp) stopPin(f.first);
@@ -262,8 +251,6 @@ void H4P_Signaller::stopPin(uint8_t pin){
         h4pFlashMap.erase(pin);
 	}
 }
-void H4P_Signaller::stopPin(h4pOutput* p){ stopPin(p->_p); }
-
 //
 //      H4Flasher
 //
@@ -327,8 +314,6 @@ void H4P_Signaller::throbPin(uint32_t rate, uint32_t valley, uint8_t pin,H4PM_SE
         [rate,valley](h4pOutput* opp){ return new H4Flasher(opp,rate,valley); }
     );
 }
-
-void H4P_Signaller::throbPin(uint32_t rate, uint32_t valley,h4pOutput* p){ throbPin(rate,valley,p->_p,p->_s,p->_c); }
 #else
 void H4Flasher::stop(){
 	h4.cancel({_timer,_off});

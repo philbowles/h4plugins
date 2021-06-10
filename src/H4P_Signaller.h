@@ -113,31 +113,45 @@ class H4P_Signaller: public H4Service {
             }
              
             void 			flashMorse(const char *pattern, uint32_t timebase, uint8_t pin,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);	
-            void 			flashMorse(const char *pattern, uint32_t timebase,h4pOutput*);	
+            void 			flashMorse(const char *pattern, uint32_t timebase,h4pOutput* p){ flashMorse(pattern,timebase,*p); }
+            void 			flashMorse(const char *pattern, uint32_t timebase,h4pOutput& p){ flashMorse(pattern,timebase,p._p,p._s,p._c); }
+            
 #ifdef H4FC_MORSE_SUPPORT
             static std::unordered_map<char,string> _morse; // tidy
             void 	        flashMorseText(const char * pattern,uint32_t timebase,uint8_t pin,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);
-            void 	        flashMorseText(const char * pattern,uint32_t timebase,h4pOutput*);
+            void 	        flashMorseText(const char * pattern,uint32_t timebase,h4pOutput* p){ flashMorseText(pattern,timebase,*p); }
+            void 	        flashMorseText(const char * pattern,uint32_t timebase,h4pOutput& p){ flashMorseText(pattern,timebase,p._p,p._s,p._c); }
 #endif
             void 			flashPattern(const char * pattern,uint32_t timebase,uint8_t pin,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);
-            void 			flashPattern(const char * pattern,uint32_t timebase,h4pOutput*);
-            void 			flashPin(uint32_t rate, uint8_t pin,H4PM_SENSE active=ACTIVE_HIGH,uint8_t col=H4P_ASSUMED_COLOR);
-            void 			flashPin(uint32_t rate,h4pOutput*);
+            void 			flashPattern(const char * pattern,uint32_t timebase,h4pOutput* p){ flashPattern(pattern,timebase,*p); }
+            void 			flashPattern(const char * pattern,uint32_t timebase,h4pOutput& p){ flashPattern(pattern,timebase,p._p,p._s,p._c); }
+
+            void 			flashPin(uint32_t period, uint8_t pin,H4PM_SENSE active=ACTIVE_HIGH,uint8_t col=H4P_ASSUMED_COLOR);
+            void 			flashPin(uint32_t period,h4pOutput* p){ flashPin(period,*p); }
+            void 			flashPin(uint32_t period,h4pOutput& p){ flashPin(period,p._p,p._s,p._c); }
+
             void 			flashPWM(uint32_t period,uint8_t duty,uint8_t pin,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);	
-            void 			flashPWM(uint32_t period,uint8_t duty,h4pOutput*);	
+            void 			flashPWM(uint32_t period,uint8_t duty,h4pOutput* p){ flashPWM(period,duty,*p); }	
+            void 			flashPWM(uint32_t period,uint8_t duty,h4pOutput& p){ _flash(period,duty,p._p,p._s,p._c); }	
 #if H4P_LOG_MESSAGES
             void            info() override;
 #endif
             bool 			isFlashing(uint8_t pin);
+
             void 			pulsePin(uint32_t period,uint8_t pin,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);
-            void 			pulsePin(uint32_t period,h4pOutput*);
+            void 			pulsePin(uint32_t period,h4pOutput* p){ pulsePin(period,*p); }
+            void 			pulsePin(uint32_t period,h4pOutput& p){ _flash(period,0,p._p,p._s,p._c); }
+
     static  void            signal(size_t scheme,const std::string& fmt=""){ h4psysevent(winkTag(),H4PE_SIGNAL,"%d,%s",scheme,fmt.data()); }
             void            stopAll();
+
             void            stopPin(uint8_t pin);
-            void            stopPin(h4pOutput*);
+            void            stopPin(h4pOutput* p){ stopPin(*p); }
+            void            stopPin(h4pOutput& p){ stopPin(p._p); }
 #ifdef ARDUINO_ARCH_ESP8266
             void 			throbPin(uint32_t rate, uint32_t valley, uint8_t pin,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);
-            void 			throbPin(uint32_t rate, uint32_t valley,h4pOutput*);
+            void 			throbPin(uint32_t rate, uint32_t valley,h4pOutput* p){ throbPin(rate,valley,*p); }
+            void 			throbPin(uint32_t rate, uint32_t valley,h4pOutput& p){ throbPin(rate,valley,p._p,p._s,p._c); }
 #endif
 //          syscall only
 };

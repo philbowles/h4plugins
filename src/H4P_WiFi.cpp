@@ -151,8 +151,8 @@ void H4P_WiFi::_clearUI(){
 
 void H4P_WiFi::_commonStartup(){
 #ifdef LED_BUILTIN
-    new h4pOutput(LED_BUILTIN,H4P_ASSUMED_SENSE,OFF,H4P_ASSUMED_COLOR);
-    require<H4P_PinMachine>(gpioTag());
+//    new h4pOutput(H4P_ASSUMED_SENSE,H4P_ASSUMED_SENSE,OFF,H4P_ASSUMED_COLOR);
+//    require<H4P_PinMachine>(gpioTag());
     require<H4P_Signaller>(winkTag());
 #endif
     if(h4p[deviceTag()]=="") h4p[deviceTag()]=std::string("H4-").append(h4p[chipTag()]);

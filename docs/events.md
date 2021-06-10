@@ -677,7 +677,7 @@ H4Plugins comes with some pre-defined event emitters which are useful during tes
 |[H4P_EmitTick](tick.md)|H4PE_HEARTBEAT|Integer number of seconds uptime||
 
 Notes:
-1. May require reconfiguration of [H4](https://github.com/philbowles/H4) config_plugins.h
+1. May require reconfiguration of [H4](https://github.com/philbowles/H4) 
 
 ---
 

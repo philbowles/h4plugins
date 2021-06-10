@@ -139,7 +139,7 @@ Seeing these type of IDs on your network means there is a device that has not ye
 
 ## The configuration mechanism
 
-We have already seen this in [H4P_WiFi](h4pwifi.md)
+We have already seen this in [H4P_WiFi](h4wifi.md)
 
 * `h4/config` (change value of on or more global variables* (see below)) 
 
