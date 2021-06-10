@@ -14,6 +14,8 @@ The [H4P_GateKeeper](gk.md) emits an `H4PE_PRESENCE` event whenever one of the n
 
 This can be used for example to implement a self-arming alarm system which will switch on whenever your personal phone leaves the network and switches off when your phone is detected again as you arrive back home. It could turn on the outsiude lights at the same time when it is dark.
 
+See Youtube video: [13: Target in Range!: Network Presence Detection](https://www.youtube.com/watch?v=tLeptP3D5fw)
+
 # What can be detected?
 
 |Type of device|Identifying features|Example|H4Plugins "Roamer" type|

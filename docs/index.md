@@ -91,6 +91,7 @@
  * [10: Advanced Plumbing](https://youtu.be/yyyAttshSV0)
  * [11: Internet of Things ain't what they used to be](https://youtu.be/fLUKDAboAU8)
  * [12: Internet of Things can only get better](https://www.youtube.com/watch?v=sy7xHuKghrM)
+ * [13: Target in Range!: Network Presence Detection](https://www.youtube.com/watch?v=tLeptP3D5fw)
 
 ## Red label "Expert" series
 
