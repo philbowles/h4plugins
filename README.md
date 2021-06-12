@@ -74,7 +74,7 @@ You will modules (and over **80** example sketches) for WiFi + OTA, Webserver, M
 
 ## Watch the video
 
-[[/images/h4cover1blinkyonsteroids.jpg|watch video 1]](https://www.youtube.com/watch?v=SRHze-LRvN4)
+[1. "Blinky on Steroids"](https://www.youtube.com/watch?v=SRHze-LRvN4)
 
 ---
 
