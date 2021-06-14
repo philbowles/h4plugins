@@ -33,7 +33,7 @@ It may be instantiated as any name the user chooses, prefix all API calls below 
 
 ## Commands Added
 
-* `h4/mqtt/change/w,x,y,z` (payload: w=newbroker, x=newport, y=newusername, z=newpassword)
+* `h4/mqtt/change/v,w,x,y,z` (payload: v=scheme [http|https], w=broker,x=uname,y=passwd,z=port) e.g. https,192.168.1.4,,,1883
 * `h4/mqtt/report` // display basic details about the device
 
 # Service Commands

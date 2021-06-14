@@ -24,7 +24,7 @@ void onRTC(){
   Serial.println("Clock valid!");
   
   ClockValid = true;
-  Serial.printf("\nReceived NTP time: %s (UTC)\n\n", CSTR(h4tk.strfDateTime( "%a %Y-%m-%d %H:%M:%S", h4tk.clockEPOCHLocal()+ h4tk.DST_EU( h4tk.clockEPOCHLocal() )) ));
+  Serial.printf("\nReceived NTP time: %s (UTC)\n\n", CSTR(h4tk.strfDateTime( "%a %Y-%m-%d %H:%M:%S", h4tk.clockEPOCHLocal()+ h4tk.H4P_DST_EU( h4tk.clockEPOCHLocal() )) ));
 
 }
 
@@ -62,15 +62,15 @@ void ShowTime( void ) {
     Serial.printf("\nEPOCH Time: %d = %s (UTC)\n", h4tk.clockEPOCH(), CSTR(h4tk.strfDateTime( "%a %Y-%m-%d %H:%M:%S", h4tk.clockEPOCH() )) );
     Serial.printf(  "Local Time: %d = %s\n", h4tk.clockEPOCHLocal(), CSTR(h4tk.strfDateTime( "%a %Y-%m-%d %H:%M:%S", h4tk.clockEPOCHLocal() )) );
 #ifdef DSTEU
-    Serial.printf(  "  DST Offset: %d (seconds) for EU/UK\n", h4tk.DST_EU( h4tk.clockEPOCHLocal() ));
-    Serial.printf(  "DST Time  : %d = %s\n", h4tk.clockEPOCHLocal(), CSTR(h4tk.strfDateTime( "%a %Y-%m-%d %H:%M:%S", h4tk.clockEPOCHLocal() + h4tk.DST_EU( h4tk.clockEPOCHLocal() ) )) );
+    Serial.printf(  "  DST Offset: %d (seconds) for EU/UK\n", h4tk.H4P_DST_EU( h4tk.clockEPOCHLocal() ));
+    Serial.printf(  "DST Time  : %d = %s\n", h4tk.clockEPOCHLocal(), CSTR(h4tk.strfDateTime( "%a %Y-%m-%d %H:%M:%S", h4tk.clockEPOCHLocal() + h4tk.H4P_DST_EU( h4tk.clockEPOCHLocal() ) )) );
 #endif
 #ifdef DSTUSA
-    Serial.printf(  "  DST Offset: %d (minutes) for USA\n", h4tk.DST_USA( h4tk.clockEPOCHLocal() ));
-    Serial.printf(  "DST Time  : %d = %s\n", h4tk.clockEPOCHLocal(), CSTR(h4tk.strfDateTime( "%a %Y-%m-%d %H:%M:%S", h4tk.clockEPOCHLocal() + h4tk.DST_USA( h4tk.clockEPOCHLocal() ) )) );
+    Serial.printf(  "  DST Offset: %d (minutes) for USA\n", h4tk.H4P_DST_USA( h4tk.clockEPOCHLocal() ));
+    Serial.printf(  "DST Time  : %d = %s\n", h4tk.clockEPOCHLocal(), CSTR(h4tk.strfDateTime( "%a %Y-%m-%d %H:%M:%S", h4tk.clockEPOCHLocal() + h4tk.H4P_DST_USA( h4tk.clockEPOCHLocal() ) )) );
 #endif
       
-//    Serial.printf("Clock time: %d - %d - %s - %s\n", h4tk.clockEPOCH(), h4tk.clockEPOCHLocal(), CSTR(h4tk.strfDateTime( "%a %Y-%m-%d %H:%M:%S", h4tk.clockEPOCHLocal()) ), CSTR(h4tk.strfDateTime( "%H:%M:%S", h4tk.clockEPOCHLocal()+ h4tk.DST_EU( h4tk.clockEPOCHLocal() )) ));
+//    Serial.printf("Clock time: %d - %d - %s - %s\n", h4tk.clockEPOCH(), h4tk.clockEPOCHLocal(), CSTR(h4tk.strfDateTime( "%a %Y-%m-%d %H:%M:%S", h4tk.clockEPOCHLocal()) ), CSTR(h4tk.strfDateTime( "%H:%M:%S", h4tk.clockEPOCHLocal()+ h4tk.H4P_DST_EU( h4tk.clockEPOCHLocal() )) ));
   } else {
     Serial.println("No NTP!");
   }

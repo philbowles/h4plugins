@@ -4,7 +4,7 @@
 
 ### Most of the above is achieved with only a few lines of code, with many features requiring on the inclusion of only a single line
 
-[Release Notes v3.0.8](docs/rn300.md)
+13/06/2021 [Release Notes v3.1.0](docs/rn300.md)
 
 ** KNOWN ERROR ** - you may get compile errors in the examples complaining about stdlib types `string`, `vector` etc being undefined - 
 if so just insert the `std::` I'm working my way through them, but there's 80+ of them and I may have missed one or two.
@@ -166,8 +166,8 @@ H4Plugins sits at the top of a structure of underlying libraries with strange na
 
 || Name | Provides | Notes |
 | :---: | :----------  | :--- | :--- |
-||[Forked AsyncTCP](https://github.com/philbowles/AsyncTCP-master)|"Glue" to LwIP (ESP8266)| Important bugfixes |
-||[Forked ESPAsyncTCP](https://github.com/philbowles/ESPAsyncTCP-master)|"Glue" to LwIP(ESP32)| Missing features added |
+||[Forked AsyncTCP](https://github.com/philbowles/AsyncTCP-master)|"Glue" to LwIP (ESP32)| Important bugfixes |
+||[Forked ESPAsyncTCP](https://github.com/philbowles/ESPAsyncTCP-master)|"Glue" to LwIP(ESP8266)| Missing features added |
 ||[Forked ESPAsyncWebserver](https://github.com/philbowles/ESPAsyncWebServer)| Basis of webUI in H4Plugins| Several major bugfixes |
 |![roadmap](assets/common/tools_icon.jpg)|[PMB Tools](https://github.com/philbowles/pmbtools)|'32/'8266 HAL and utility functions| |
 |![roadmap](assets/common/aardvark_icon.jpg)|[AardvarkTCP](https://github.com/philbowles/AardvarkTCP)|Simple Large-payload Async TCP| API-compatible with ESPAsyncTCP, seamless TLS/SSL |

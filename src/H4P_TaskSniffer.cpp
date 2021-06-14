@@ -27,7 +27,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_TaskSniffer.h>
-//#include<H4P_SerialCmd.h>
+#include<H4P_SerialCmd.h>
 
 uint32_t H4P_TaskSniffer::__incexc(std::vector<std::string> vs,std::function<void(std::vector<uint32_t>)> f){
     return _guard1(vs,[f,this](std::vector<std::string> vs){
@@ -64,8 +64,8 @@ void H4P_TaskSniffer::_common(){
 
 void H4P_TaskSniffer::_taskDump(H4_TASK_PTR t,const char c){
     if(hitList.count((t->uid)%100)) {
-        reply("%d:%u:%c: ",h4.size(),micros(),c);
-#if H4P_LOG_EVENTS        
+        reply("%d:0x%08x:%04d:%c: ",h4.size(),t,t->uid,c);
+#if H4P_LOG_MESSAGES       
         reply(CSTR(H4P_SerialCmd::_dumpTask(t)));
 #endif
     }

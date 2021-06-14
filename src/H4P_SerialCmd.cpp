@@ -290,22 +290,6 @@ uint32_t H4P_SerialCmd::_dump(std::vector<std::string> vs){
     });
 }
 
-std::string H4P_SerialCmd::_dumpTask(task* t){
-    char buf[128];
-    uint32_t type=t->uid/100;
-    uint32_t id=t->uid%100;
-    sprintf(buf,"0x%08x %09lu %s/%s %s %9d %9d %9d",
-        (void*) t,
-        t->at,
-        CSTR(h4pGetTaskType(type)),
-        CSTR(h4pGetTaskName(id)),
-        t->singleton ? "S":" ",
-        t->rmin,
-        t->rmax,
-        t->nrq);
-    return std::string(buf);
-}
-
 void H4P_SerialCmd::_createProxy(const std::string& name,bool save){ if(!h4pGlobal.count(name)) h4pGlobal[name]=h4proxy(name,"",save); }
 
 void H4P_SerialCmd::_adjust(const std::string& name,int value){ 
@@ -417,10 +401,27 @@ void H4P_SerialCmd::showFS(){
 }
 #endif // 8266/32 spiffs
 
+std::string H4P_SerialCmd::_dumpTask(task* t){
+    char buf[128];
+    uint32_t type=t->uid/100;
+    uint32_t id=t->uid%100;
+//    Serial.printf("SANITY 0x%08x %d %d/%d\n",t,t-> uid,type,id);
+    sprintf(buf,"0x%08x %10lu %s/%s %s %10d %10d %10d",
+        (void*) t,
+        t->at,
+        CSTR(h4pGetTaskType(type)),
+        CSTR(h4pGetTaskName(id)),
+        t->singleton ? "S":" ",
+        t->rmin,
+        t->rmax,
+        t->nrq);
+    return std::string(buf);
+}
+
 void H4P_SerialCmd::showQ(){
-	reply("           Due @tick Type              Min       Max       nRQ");  
+	reply("           Due @tick Type                Min        Max        nRQ");  
     std::vector<task*> tlist=h4._copyQ();
-    sort(tlist.begin(),tlist.end(),[](const task* a, const task* b){ return a->at < b->at; });
+    std::sort(tlist.begin(),tlist.end(),[](const task* a, const task* b){ return a->at < b->at; });
     for(auto const& t:tlist) reply(CSTR(_dumpTask(t)));
 }
 #endif // logmessages

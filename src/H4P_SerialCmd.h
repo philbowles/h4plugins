@@ -63,7 +63,6 @@ class H4P_SerialCmd: public H4Service {
                 void            svcDown() override;
     public:
         VSCMD(_dump);   // public so logger can use it
-        static  std::string          _dumpTask(task*);
 
         H4P_SerialCmd(bool autoStop=false);
 
@@ -89,6 +88,7 @@ class H4P_SerialCmd: public H4Service {
                 void            help();
 
 #if H4P_LOG_MESSAGES
+        static  std::string     _dumpTask(task*);
                 void            all();
                 void            heap(){ reply("Heap=%u",_HAL_freeHeap()); } // NEEDS TO BE HAL'd
                 void            info() override;

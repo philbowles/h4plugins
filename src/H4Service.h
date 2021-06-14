@@ -162,8 +162,8 @@ extern std::string h4pGetTaskType    (uint32_t e);
 extern std::string h4pGetTaskName    (uint32_t e);
 extern void   h4pClearEvent     (H4PE_TYPE e);
 //
-void    h4pFactoryReset();
-void    h4pReboot();
+[[noreturn]] void    h4pFactoryReset();
+[[noreturn]] void    h4pReboot();
 
 std::string  h4preplaceparams(const std::string& s);
 
@@ -196,22 +196,22 @@ enum trustedIds {
   H4P_TRID_PP1x,
   H4P_TRID_PWM1,
   H4P_TRID_DBNC,
-  H4P_TRID_RPTP, // 55
+  H4P_TRID_RPTP,
   H4P_TRID_POLL,
-  H4P_TRID_HOTA, // 60
+  H4P_TRID_HOTA,
   H4P_TRID_MQMS,
   H4P_TRID_MQRC,
   H4P_TRID_REST,
-  H4P_TRID_SOAP, // 65
+  H4P_TRID_SOAP,
   H4P_TRID_UDPS,
   H4P_TRID_NTFY,
-  H4P_TRID_SCMD, // 70
+  H4P_TRID_SCMD,
   H4P_TRID_HLOG,
   H4P_TRID_QLOG,
   H4P_TRID_BTTO,
-  H4P_TRID_IPPD, // 75
+  H4P_TRID_IPPD,
   H4P_TRID_DALY,
-  H4P_TRID_SHOT, // 80
+  H4P_TRID_SHOT,
   H4P_TRID_SSET,
   H4P_TRID_SYNC,
   H4P_TRID_TIME,

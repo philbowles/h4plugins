@@ -11,7 +11,7 @@ H4P_SCHEDULE mySchedule={
 //H4P_SerialLogger slog(H4PE_ALMOST_ALL &~ H4PE_HEARTBEAT &~ H4PE_GVCHANGE);
 //H4P_Signaller h4fc;
 H4P_WiFi h4wifi("XXXXXXXX","XXXXXXXX","ticker"); // device defaults to "H4-<chip id>"
-H4P_Timekeeper h4tk("192.168.1.4","0.fr.pool.ntp.org",60,H4P_Timekeeper::DST_EU); // 60 minutes cos France is GMT+1
+H4P_Timekeeper h4tk("192.168.1.4","0.fr.pool.ntp.org",60,H4P_Timekeeper::H4P_DST_EU); // 60 minutes cos France is GMT+1
 H4P_AsyncMQTT h4mqtt("http://192.168.1.4:1883");
 H4P_BinarySwitch h4onof(D6,ACTIVE_HIGH);
 H4P_UPNPServer h4upnp("Timekeeper tester");

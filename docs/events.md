@@ -657,7 +657,7 @@ More importantly it can be "compiled out"
 If you edit [config_plugins.h](../src/config_plugins.h) and set:
 
 ```cpp
-#define H4P_LOG_EVENTS      0
+#define H4P_LOG_MESSAGES      0
 ```
 
 Then all `h4pUserEvent` calls in your code effecitvely disappear, making you code leaner, meaner and a lot less chatty. This is great for "production" but not very helpful while testing and/or debugging, so until you are 100% happy with your code, leave it set to 1.

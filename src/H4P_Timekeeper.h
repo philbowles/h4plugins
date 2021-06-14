@@ -79,8 +79,8 @@ class H4P_Timekeeper: public H4Service {
                 std::string strfTime(uint32_t t);
                 std::string strfDate(uint32_t t);
                 std::string strfDateTime(char fmt[] = "%a %Y-%m-%d %H:%M:%S", uint32_t t=0);
-        static  int 		DST_EU(uint32_t t);  // DST offset for t in EU (inc UK).
-        static  int 		DST_USA(uint32_t t);  // DST offset for t in USA.
+        static  int 		H4P_DST_EU(uint32_t t);  // DST offset for t in EU (inc UK).
+        static  int 		H4P_DST_USA(uint32_t t);  // DST offset for t in USA.
 ///
                 void        at(const std::string& when,bool onoff);
                 void        change(const std::string& ntp1,const std::string& ntp2);

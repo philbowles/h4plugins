@@ -121,12 +121,13 @@ class H4P_PinMachine: public H4Service {
 // syscall only
                 void            svcUp() override;
                 void            svcDown() override;
+
+        template <typename T,typename F, typename... Args>
+        static  T               delegate(uint8_t p, F f,Args... args) {
+            auto ptr = H4P_PinMachine::isManaged(p);
+            return ptr ? (ptr->*f)(args...):T{};
+        }
 };
 
-template <typename T,typename F, typename... Args>
-T delegate(uint8_t p, F f,Args... args) {
-    auto ptr = H4P_PinMachine::isManaged(p);
-    return ptr ? (ptr->*f)(args...):T{};
-}
 #include<NODE-PINK-NODES.h>
 #include<NODE-PINK-FLOWS.h>

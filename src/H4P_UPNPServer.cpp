@@ -123,11 +123,18 @@ void H4P_UPNPServer::_listenUDP(){
 }
 
 void H4P_UPNPServer::_notify(const std::string& phase){
+    /*
     h4Chunker<std::vector<std::string>>(_pups,[=](std::vector<std::string>::iterator i){ 
         std::string NT=(*i).size() ? (*i):__makeUSN("");
         std::string nfy="NOTIFY * HTTP/1.1\r\nHOST:"+std::string(_ubIP.toString().c_str())+":1900\r\nNTS:ssdp:"+phase+"\r\nNT:"+NT+"\r\n"+__upnpCommon((*i));
         _broadcast(H4P_UDP_JITTER,CSTR(nfy));
     },H4_JITTER_LO,H4_JITTER_HI,[=]{ h4p.gvErase("usn"); });
+    */
+    h4.worker<std::vector<std::string>>(_pups,[=](std::string s){
+        std::string NT=s.size() ? s:__makeUSN("");
+        std::string nfy="NOTIFY * HTTP/1.1\r\nHOST:"+std::string(_ubIP.toString().c_str())+":1900\r\nNTS:ssdp:"+phase+"\r\nNT:"+NT+"\r\n"+__upnpCommon(s);
+        _broadcast(H4P_UDP_JITTER,CSTR(nfy));
+    },[]{ return (uint32_t) random(H4_JITTER_LO,H4_JITTER_HI); },[=]{ h4p.gvErase("usn"); });
 }
 
 void H4P_UPNPServer::_upnp(AsyncWebServerRequest *request){ // redo

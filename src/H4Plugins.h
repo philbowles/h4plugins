@@ -72,7 +72,11 @@ H4P_PINMAP          h4pPinMap;
         {10,"rntx"}, // 10
         {11,"rnrn"}, // 11
         {12,"rptw"}, // 12
-        {13,"rpwe"}  // 13
+        {13,"rpwe"},
+        {14,"work"},
+        {15,"seqn"},
+        {16,"naev"},
+        {17,"naer"}
     };
         
     H4_INT_MAP taskNames{

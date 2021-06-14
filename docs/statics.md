@@ -107,7 +107,7 @@ void h4puiSync(const string& n,const string& v); // force webUI sync of field n 
 
 # Logging Macros
 
-The following `H4PE_MSG` emitters will be compiled out unless `H4P_LOG_EVENTS` is set to 1 in [`config_plugins.h`](../src/config_plugins.h)
+The following `H4PE_MSG` emitters will be compiled out unless `H4P_LOG_MESSAGES` is set to 1 in [`config_plugins.h`](../src/config_plugins.h)
 
 ```cpp
 QLOG(f); // Emit simple message event from within code of H4Service with no parameters 

@@ -256,7 +256,7 @@ void H4P_Timekeeper::svcDown(){
     H4Service::svcDown();
 }
 
-int H4P_Timekeeper::DST_EU(uint32_t t) {
+int H4P_Timekeeper::H4P_DST_EU(uint32_t t) {
 
 	//*Test
 //	struct tm x = {0, 0, 2, 25, 9, 120};
@@ -298,7 +298,7 @@ int H4P_Timekeeper::DST_EU(uint32_t t) {
 	
 }
 
-int H4P_Timekeeper::DST_USA(uint32_t t) {
+int H4P_Timekeeper::H4P_DST_USA(uint32_t t) {
 
 	//*Test
 //	struct tm x = {0, 0, 2, 25, 9, 120};
