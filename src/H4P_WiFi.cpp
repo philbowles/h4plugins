@@ -100,14 +100,15 @@ void H4P_WiFi::svcUp(){
     _signalBad();
     WiFi.begin();
 };
-
+//WIFI_EVENT_STA_DISCONNECTED
 void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
     switch(event) {
         case SYSTEM_EVENT_WIFI_READY:
 			h4.queueFunction([](){ h4puncheckedcall<H4P_WiFi>(wifiTag())->_coreStart(); });
             break;
-        case SYSTEM_EVENT_STA_STOP:
-        case SYSTEM_EVENT_STA_LOST_IP:
+//        case SYSTEM_EVENT_STA_STOP:
+//        case SYSTEM_EVENT_STA_LOST_IP:
+        case SYSTEM_EVENT_STA_DISCONNECTED:
 			h4.queueFunction([](){ h4puncheckedcall<H4P_WiFi>(wifiTag())->_lostIP(); });
             break;
 		case SYSTEM_EVENT_STA_GOT_IP:
@@ -151,8 +152,6 @@ void H4P_WiFi::_clearUI(){
 
 void H4P_WiFi::_commonStartup(){
 #ifdef LED_BUILTIN
-//    new h4pOutput(H4P_ASSUMED_SENSE,H4P_ASSUMED_SENSE,OFF,H4P_ASSUMED_COLOR);
-//    require<H4P_PinMachine>(gpioTag());
     require<H4P_Signaller>(winkTag());
 #endif
     if(h4p[deviceTag()]=="") h4p[deviceTag()]=std::string("H4-").append(h4p[chipTag()]);
@@ -182,6 +181,7 @@ void H4P_WiFi::_defaultSync(const std::string& svc,const std::string& msg) {
 }
 
 void H4P_WiFi::_gotIP(){
+    Serial.printf("\nGOT IP %s\n",WiFi.localIP().toString().c_str());
     _signalOff();
     _discoDone=false;
     h4p[ipTag()]=WiFi.localIP().toString().c_str();
@@ -295,10 +295,7 @@ void H4P_WiFi::_sendSSE(const std::string& name,const std::string& msg){
             if(bakov && (fh > H4P_THROTTLE_HI)){
                 SYSINFO("SSE BACKOFF RECOVERY H=%lu nQ=%d",fh,_evts->avgPacketsWaiting());
                 bakov=false;
-                for(auto const& ui:h4pUserItems){
-//                    Serial.printf("REALIGN %s => %s\n",CSTR(ui.first),CSTR(ui.second.f()));
-                    _evts->send(CSTR(ui.second.f()),CSTR(ui.first),_evtID++); // hook to sse event q size
-                }
+                for(auto const& ui:h4pUserItems) _evts->send(CSTR(ui.second.f()),CSTR(ui.first),_evtID++); // hook to sse event q size
             }
             _evts->send(CSTR(msg),CSTR(name),_evtID++); // hook to sse event q size
         } 
@@ -311,7 +308,6 @@ void H4P_WiFi::_sendSSE(const std::string& name,const std::string& msg){
 
 void H4P_WiFi::_signalBad(){ 
     h4p[ipTag()]="";
-    //YEVENT(H4PE_SIGNAL,"175,...   ---   ...   ");
     H4P_Signaller::signal(H4P_SIG_MORSE,"...   ---   ...   ,150");
 }
 
@@ -376,6 +372,11 @@ void H4P_WiFi::_startWebserver(){
 }
 
 void H4P_WiFi::_stopWebserver(){ 
+    Serial.printf("\nLOST IP\n");
+#if defined ARDUINO_ARCH_ESP32
+    ArduinoOTA.end(); // WHYYYYYYYYYY???? FFS
+    MDNS.end();
+#endif
     end();
     _discoDone=true;
     _clearUI();
@@ -422,9 +423,7 @@ void H4P_WiFi::info() {
     H4Service::info();
     reply(" Device %s Mode=%d Status: %d IP=%s",CSTR(h4p[deviceTag()]),WiFi.getMode(),WiFi.status(),WiFi.localIP().toString().c_str());
     reply(" SSID %s PSK=%s",CSTR(WiFi.SSID()),CSTR(WiFi.psk()));
-    #ifdef H4P_ASSUMED_LED
-//        reply(" Signal Pin GPIO%d active=%d",H4P_ASSUMED_LED,H4P_ASSUMED_SENSE);
-    #else
+    #ifndef H4P_ASSUMED_LED
         reply(" ** NO Signal Pin! **");
     #endif
 }
