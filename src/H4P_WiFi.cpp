@@ -106,8 +106,6 @@ void H4P_WiFi::_wifiEvent(WiFiEvent_t event) {
         case SYSTEM_EVENT_WIFI_READY:
 			h4.queueFunction([](){ h4puncheckedcall<H4P_WiFi>(wifiTag())->_coreStart(); });
             break;
-//        case SYSTEM_EVENT_STA_STOP:
-//        case SYSTEM_EVENT_STA_LOST_IP:
         case SYSTEM_EVENT_STA_DISCONNECTED:
 			h4.queueFunction([](){ h4puncheckedcall<H4P_WiFi>(wifiTag())->_lostIP(); });
             break;
@@ -181,7 +179,6 @@ void H4P_WiFi::_defaultSync(const std::string& svc,const std::string& msg) {
 }
 
 void H4P_WiFi::_gotIP(){
-    Serial.printf("\nGOT IP %s\n",WiFi.localIP().toString().c_str());
     _signalOff();
     _discoDone=false;
     h4p[ipTag()]=WiFi.localIP().toString().c_str();
@@ -247,7 +244,10 @@ void H4P_WiFi::_init(){
 
 void H4P_WiFi::_lostIP(){
     h4.cancelSingleton(H4P_TRID_HOTA);
-    if(!_discoDone) _stopWebserver();
+    if(!_discoDone) {
+        _coreStart(); // ESP32 is well and truly fucked
+        _stopWebserver();
+    }
 }
 
 uint32_t H4P_WiFi::_msg(std::vector<std::string> vs){
@@ -372,7 +372,6 @@ void H4P_WiFi::_startWebserver(){
 }
 
 void H4P_WiFi::_stopWebserver(){ 
-    Serial.printf("\nLOST IP\n");
 #if defined ARDUINO_ARCH_ESP32
     ArduinoOTA.end(); // WHYYYYYYYYYY???? FFS
     MDNS.end();
@@ -421,7 +420,7 @@ void H4P_WiFi::change(std::string ssid,std::string psk){ // add device / name?
 #if H4P_LOG_MESSAGES
 void H4P_WiFi::info() { 
     H4Service::info();
-    reply(" Device %s Mode=%d Status: %d IP=%s",CSTR(h4p[deviceTag()]),WiFi.getMode(),WiFi.status(),WiFi.localIP().toString().c_str());
+    reply("Radio is %s Device %s Mode=%d Status: %d IP=%s",WiFi.getMode()==WIFI_OFF ? "OFF":"ON",CSTR(h4p[deviceTag()]),WiFi.getMode(),WiFi.status(),WiFi.localIP().toString().c_str());
     reply(" SSID %s PSK=%s",CSTR(WiFi.SSID()),CSTR(WiFi.psk()));
     #ifndef H4P_ASSUMED_LED
         reply(" ** NO Signal Pin! **");
