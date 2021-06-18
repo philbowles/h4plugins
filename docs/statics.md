@@ -58,11 +58,9 @@ If `#define H4P_VERBOSE 1` is included at the very top of the sketch, then the f
 ```cpp
 std::string h4pgetErrorMessage(uint32_t e); // command errors
 std::string h4pgetEventName   (H4PE_TYPE e);
-std::string h4pgetTaskType    (uint32_t e); // H4 Timer Task Type e.g. every, once, nTimes etc
-std::string h4pgetTaskName    (uint32_t e); // H4 Timer Task name
 ```
 
-Users can name their own tasks: see `giveTaskName` callback [above](#global-callbacks) and [Example Sketch](../examples/03_DIAGNOSTICS/H4_TaskNames/H4_TaskNames.ino) showing it in use
+Users can name their own tasks: see [Example Sketch](../examples/03_DIAGNOSTICS/H4_TaskNames/H4_TaskNames.ino) showing it in use
 
 ### Templating
 

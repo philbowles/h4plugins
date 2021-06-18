@@ -1,3 +1,13 @@
+3.1.0
+esp32 RCX fixed
+
+givetaskname
+example tasknames
+
+showQ -? HOOK_EVENTS
+
+Task sniffer
+
 
 SHORTTERM
     lynx slave -> http transport not obvious! ... multi armadillo?

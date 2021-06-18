@@ -88,13 +88,14 @@ class H4P_SerialCmd: public H4Service {
                 void            help();
 
 #if H4P_LOG_MESSAGES
-        static  std::string     _dumpTask(task*);
                 void            all();
                 void            heap(){ reply("Heap=%u",_HAL_freeHeap()); } // NEEDS TO BE HAL'd
                 void            info() override;
                 void            plugins();
                 void            showFS();
-                void            showQ();
+    #if H4_HOOK_TASKS
+        static  void            showQ(){ H4::dumpQ(); };
+    #endif
 #endif
                 uint32_t        invokeCmd(std::string,std::string="",const char* src=userTag());
                 uint32_t        invokeCmd(std::string,uint32_t,const char* src=userTag()); 

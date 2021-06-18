@@ -66,7 +66,9 @@ H4P_SerialCmd::H4P_SerialCmd(bool autoStop): H4Service(cmdTag(),H4PE_FACTORY | H
         {"globals",    { H4PC_SHOW, 0, CMD(info)}},
         {heapTag(),    { H4PC_SHOW, 0, CMD(heap) }},
         {"plugins",    { H4PC_SHOW, 0, CMD(plugins) }},
+    #if H4_HOOK_TASKS
         {"q",          { H4PC_SHOW, 0, CMD(showQ) }},
+    #endif
 #endif
         {"help",       { 0,         0, CMD(help) }}
     });
@@ -401,29 +403,6 @@ void H4P_SerialCmd::showFS(){
 }
 #endif // 8266/32 spiffs
 
-std::string H4P_SerialCmd::_dumpTask(task* t){
-    char buf[128];
-    uint32_t type=t->uid/100;
-    uint32_t id=t->uid%100;
-//    Serial.printf("SANITY 0x%08x %d %d/%d\n",t,t-> uid,type,id);
-    sprintf(buf,"0x%08x %10lu %s/%s %s %10d %10d %10d",
-        (void*) t,
-        t->at,
-        CSTR(h4pGetTaskType(type)),
-        CSTR(h4pGetTaskName(id)),
-        t->singleton ? "S":" ",
-        t->rmin,
-        t->rmax,
-        t->nrq);
-    return std::string(buf);
-}
-
-void H4P_SerialCmd::showQ(){
-	reply("           Due @tick Type                Min        Max        nRQ");  
-    std::vector<task*> tlist=h4._copyQ();
-    std::sort(tlist.begin(),tlist.end(),[](const task* a, const task* b){ return a->at < b->at; });
-    for(auto const& t:tlist) reply(CSTR(_dumpTask(t)));
-}
 #endif // logmessages
 
 void H4P_SerialCmd::svcUp(){

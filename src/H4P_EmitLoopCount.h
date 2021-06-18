@@ -28,8 +28,9 @@ SOFTWARE.
 
 */
 #pragma once
+#if H4_COUNT_LOOPS
 
-extern __attribute__((weak)) uint32_t h4Nloops;
+extern uint32_t h4Nloops;
 
 #include<H4Service.h>
 #include<H4P_EmitTick.h>
@@ -45,11 +46,6 @@ extern __attribute__((weak)) uint32_t h4Nloops;
         but h4UserLoop will not get called!
 
 */
-/*
-#if H4_COUNT_LOOPS
-    #pragma message("COUNTING LOOPS")
-#endif
-*/
 class H4P_EmitLoopCount: public H4Service {
         virtual void _handleEvent(const std::string& svc,H4PE_TYPE t,const std::string& msg) override {
                 XEVENT(H4PE_LOOPS,"%u",h4Nloops);
@@ -62,3 +58,6 @@ class H4P_EmitLoopCount: public H4Service {
             depend<H4P_EmitTick>(tickTag());
         }
 };
+#else
+struct H4P_EmitLoopCount {};
+#endif

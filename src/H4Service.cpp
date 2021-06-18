@@ -28,6 +28,47 @@ SOFTWARE.
 */
 #include<H4Service.h>
 //
+#if H4_HOOK_TASKS
+    H4_INT_MAP h4TaskNames{
+        {H4P_TRID_THRB,"THRB"},
+        {H4P_TRID_PATN,"PATN"},
+        {H4P_TRID_PP1x,"PP1X"},
+        {H4P_TRID_PWM1,"PWM1"},
+        {H4P_TRID_DBNC,"DBNC"},
+        {H4P_TRID_RPTP,"RPTP"},
+        {H4P_TRID_POLL,"POLL"},
+        {H4P_TRID_HOTA,"HOTA"},
+        {H4P_TRID_MQMS,"MQMS"},
+        {H4P_TRID_MQRC,"MQRC"},
+        {H4P_TRID_REST,"REST"},
+        {H4P_TRID_SOAP,"SOAP"},
+        {H4P_TRID_UDPS,"UDPS"},
+        {H4P_TRID_NTFY,"UNFY"},
+        {H4P_TRID_SCMD,cmdTag()},
+        {H4P_TRID_HLOG,"HLOG"},
+        {H4P_TRID_QLOG,"QLOG"},
+        {H4P_TRID_BTTO,"BTTO"},
+        {H4P_TRID_IPPD,"IPPD"},
+        {H4P_TRID_DALY,"DALY"},
+        {H4P_TRID_SHOT,"AT_T"},
+        {H4P_TRID_SSET,"SSET"},
+        {H4P_TRID_SYNC,"SYNC"},
+        {H4P_TRID_TIME,uppercase(timeTag())},
+        {H4P_TRID_GATE,"GATE"},
+        {H4P_TRID_BOOT,"BOOT"},
+        {H4P_TRID_D0,"D000"},
+        {H4P_TRID_D1,"D001"},
+        {H4P_TRID_D2,"D002"},
+        {H4P_TRID_D3,"D003"},
+        {H4P_TRID_UPKT,"UPKT"},
+        {H4P_TRID_D5,"D005"},
+        {H4P_TRID_D6,"D006"},
+        {H4P_TRID_D7,"D007"},
+        {H4P_TRID_D8,"D008"},
+        {H4P_TRID_D9,"D009"}
+    };
+#endif
+
 H4P_EVENT_HANDLERS h4pevt;
 
 void H4Service::_addLocals(H4P_CMDMAP local){
@@ -87,8 +128,7 @@ void H4Service::_sysHandleEvent(const std::string& svc,H4PE_TYPE t,const std::st
             if(_parent==svc){
                 if(STOI(msg)) svcUp();
                 else svcDown();
-            } 
-            else _handleEvent(svc,H4PE_SYSINFO,std::string("Svc").append(STOI(msg) ? "Up":"Down"));
+            } else _handleEvent(svc,H4PE_SYSINFO,std::string("Svc").append(STOI(msg) ? "Up":"Down"));
             break;
         case H4PE_GVCHANGE:
             if(h4pevt.count(H4PE_BOOT)) return;

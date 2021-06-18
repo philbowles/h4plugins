@@ -13,7 +13,7 @@ void h4pGlobalEventHandler(const std::string& svc,H4PE_TYPE t,const std::string&
 }
 
 void onGPIO(int pin,int value){ // int, int: use H4P_FUNCTION_ADAPTER_II
-    switch(p){
+    switch(pin){
       case USER_BTN:
         Serial.printf("RAW P%d V%d\n",pin,value);
         builtinLED.logicalWrite(value); // make LED match state of pin

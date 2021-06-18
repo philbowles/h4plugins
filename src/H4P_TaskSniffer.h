@@ -31,9 +31,8 @@ SOFTWARE.
 
 #include<H4Service.h>
 
+#if H4_HOOK_TASKS
 class H4P_TaskSniffer: public H4Service{
-    protected:
-//
         uint32_t            __incexc(std::vector<std::string> vs,std::function<void(std::vector<uint32_t>)> f);
 
         VSCMD(_tsInclude);
@@ -42,7 +41,6 @@ class H4P_TaskSniffer: public H4Service{
         std::unordered_set<uint32_t> hitList;
 
                 void        _common();
-                void        _taskDump(H4_TASK_PTR t,char c);
     public:
         H4P_TaskSniffer();
         H4P_TaskSniffer(uint32_t i);
@@ -59,3 +57,6 @@ class H4P_TaskSniffer: public H4Service{
                 void        info() override;
 #endif
 };
+#else
+struct H4P_TaskSniffer{};
+#endif

@@ -26,6 +26,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#include<H4.h>
+#if H4_HOOK_TASKS
+
 #include<H4P_TaskSniffer.h>
 #include<H4P_SerialCmd.h>
 
@@ -52,23 +55,17 @@ uint32_t H4P_TaskSniffer::__incexc(std::vector<std::string> vs,std::function<voi
         }
     });    
 }
-
+extern H4_INT_MAP h4TaskNames;
 void H4P_TaskSniffer::_common(){
     _addLocals({
         {_me,       {H4PC_H4, _pid, nullptr}},
         {"include", {_pid, 0, CMDVS(_tsInclude)}},
         {"exclude", {_pid, 0, CMDVS(_tsExclude)}}
     });
-    h4._hookEvent([this](H4_TASK_PTR && a, const char && b){ _taskDump(a,b); });
-}
-
-void H4P_TaskSniffer::_taskDump(H4_TASK_PTR t,const char c){
-    if(hitList.count((t->uid)%100)) {
-        reply("%d:0x%08x:%04d:%c: ",h4.size(),t,t->uid,c);
-#if H4P_LOG_MESSAGES       
-        reply(CSTR(H4P_SerialCmd::_dumpTask(t)));
-#endif
-    }
+    h4._hookTask([=](H4_TASK_PTR t,uint32_t faze){
+        //reply("TS HOOK TASK 0x%08x F=%d nC=%d",t,faze,h4TaskNames.size());
+        if(hitList.count((t->uid)%100)) reply("%s",H4::dumpTask(t,faze).data());
+        });
 }
 //
 uint32_t H4P_TaskSniffer::_tsExclude(std::vector<std::string> vs){ return __incexc(vs,[this](std::vector<uint32_t> vi){ exclude(vi); }); }
@@ -102,3 +99,4 @@ H4P_TaskSniffer::H4P_TaskSniffer(std::initializer_list<uint32_t> i): H4Service(s
     include(i);
     _common();
 }
+#endif

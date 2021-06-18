@@ -61,53 +61,6 @@ H4P_PINMAP          h4pPinMap;
         {H4_CMD_NOT_NOW,"Can't do now"}
     };
 
-    H4_INT_MAP taskTypes={
-        {3,"evry"}, // 3
-        {4,"evrn"}, // 4
-        {5,"ntim"}, // 5
-        {6,"ntrn"}, // 6
-        {7,"once"}, // 7
-        {8,"1xrn"}, // 8
-        {9,"qfun"}, // 9
-        {10,"rntx"}, // 10
-        {11,"rnrn"}, // 11
-        {12,"rptw"}, // 12
-        {13,"rpwe"},
-        {14,"work"},
-        {15,"seqn"},
-        {16,"naev"},
-        {17,"naer"}
-    };
-        
-    H4_INT_MAP taskNames{
-        {H4P_TRID_THRB,"THRB"},
-        {H4P_TRID_PATN,"PATN"},
-        {H4P_TRID_PP1x,"PP1X"},
-        {H4P_TRID_PWM1,"PWM1"},
-        {H4P_TRID_DBNC,"DBNC"},
-        {H4P_TRID_RPTP,"RPTP"},
-        {H4P_TRID_POLL,"POLL"},
-        {H4P_TRID_HOTA,"HOTA"},
-        {H4P_TRID_MQMS,"MQMS"},
-        {H4P_TRID_MQRC,"MQRC"},
-        {H4P_TRID_REST,"REST"},
-        {H4P_TRID_SOAP,"SOAP"},
-        {H4P_TRID_UDPS,"UDPS"},
-        {H4P_TRID_NTFY,"UNFY"},
-        {H4P_TRID_SCMD,cmdTag()},
-        {H4P_TRID_HLOG,"HLOG"},
-        {H4P_TRID_QLOG,"QLOG"},
-        {H4P_TRID_BTTO,"BTTO"},
-        {H4P_TRID_IPPD,"IPPD"},
-        {H4P_TRID_DALY,"DALY"},
-        {H4P_TRID_SHOT,"AT_T"},
-        {H4P_TRID_SSET,"SSET"},
-        {H4P_TRID_SYNC,"SYNC"},
-        {H4P_TRID_TIME,uppercase(timeTag())},
-        {H4P_TRID_GATE,"GATE"},
-        {H4P_TRID_BOOT,"BOOT"}
-    };
-
     H4_INT_MAP eventTypes={
         {H4PE_NOOP,"NO-OP"},
         {H4PE_SYSINFO,"INFO"},
@@ -147,19 +100,15 @@ H4P_PINMAP          h4pPinMap;
         {H4P_UILED_BI,"RED/GREEN"}
     };
 
-    extern const char* giveTaskName(uint32_t id);
+//    extern const char* giveTaskName(uint32_t id);
 
     std::string h4pGetErrorMessage(uint32_t e){ return cmdErrors.count(e) ? cmdErrors[e]:std::string("No such error (")+stringFromInt(e)+")"; }
     std::string h4pGetEventName   (H4PE_TYPE e){ return eventTypes.count(e) ? eventTypes[e]:""; }
     std::string h4pGetLedColor    (uint8_t c){ return ledColors.count(c) ? ledColors[c]:"BLACK"; }
-    std::string h4pGetTaskType    (uint32_t e){ return taskTypes.count(e) ? taskTypes[e]:stringFromInt(e,"?%02d?"); }
-    std::string h4pGetTaskName    (uint32_t e){ return taskNames.count(e) ? taskNames[e]:giveTaskName(e); }
     void        h4pClearEvent     (H4PE_TYPE e){ eventTypes.erase(e); }
 #else
     std::string h4pGetErrorMessage(uint32_t e){ return std::string("Err:"+stringFromInt(e)); }
     std::string h4pGetEventName   (H4PE_TYPE e){ return stringFromInt(e,"0x%08x"); }
     std::string h4pGetLedColor    (uint8_t c){ return "BLACK"; }
-    std::string h4pGetTaskType    (uint32_t e){ return stringFromInt(e,"%04d"); }
-    std::string h4pGetTaskName    (uint32_t e){ return stringFromInt(e,"%04d"); }
     void        h4pClearEvent     (H4PE_TYPE e){}
 #endif

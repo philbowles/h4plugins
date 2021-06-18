@@ -34,5 +34,5 @@ h4pAnalogPolled ap(A0,U_POLL_FREQ,U_HYSTERESIS);
 // Converts analog value to Celsius temperature assuming TMP36 is connected
 //h4pAnalogTMP36 tmp236(A0,U_POLL_FREQ,U_HYSTERESIS);
 //
-// Reports every F mSec if value is > (H4GM_GREATER) or < (H4GM_LESS) (+/- hysteresis) chosen value. Here it's 100
-//h4pAnalogThreshold aat(A0,U_POLL_FREQ,H4GM_GREATER,100,U_HYSTERESIS);
+// Reports every F mSec if value is > (H4PM_GREATER) or < (H4PM_LESS) (+/- hysteresis) chosen value. Here it's 100
+//h4pAnalogThreshold aat(A0,U_POLL_FREQ,H4PM_GREATER,100,U_HYSTERESIS);
