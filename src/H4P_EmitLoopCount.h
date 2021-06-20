@@ -37,11 +37,11 @@ extern uint32_t h4Nloops;
 /*
         This will only work if you edit inc/H4.h in the H4 library to include:
 
-        #define H4_COUNT_LOOPS true
+        #define H4_COUNT_LOOPS 1
 
         You will get a slightly better performance if you also include
 
-        #define H4_NO_USERLOOP      // improves performance
+        #define H4_USERLOOP     0 // improves performance
 
         but h4UserLoop will not get called!
 

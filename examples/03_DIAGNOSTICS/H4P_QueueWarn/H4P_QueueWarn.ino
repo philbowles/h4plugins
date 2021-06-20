@@ -1,19 +1,29 @@
+/*
+ *     YOU MUST SET #define H4P_SYS_LEVEL 2
+ *     IN config_plugins.h!!!
+ */
+#define H4P_VERBOSE 1
+
 #define SMALL_Q       10
 #define Q_WARN_PCENT  50
 
 #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,SMALL_Q,false) // Serial baud rate, Q size, SerialCmd autostop
 
-void qIsLow(bool inDanger){ 
-    Serial.print("Q capacity is ");Serial.println(SMALL_Q);
-    Serial.print("Q current size is ");Serial.println(h4.size());
-    Serial.print("Warning when size > ");Serial.println((SMALL_Q*Q_WARN_PCENT)/100);
+H4P_EventListener qtips(H4PE_SYSWARN,[](const std::string& svc,H4PE_TYPE t,const std::string& msg){
+    // comes in as Q,1,N or Q,0,N
+    std::vector<std::string> vs=split(msg,",");
+    if(vs[0]=="Q"){
+        Serial.printf("Q capacity is %u\n",SMALL_Q);
+        Serial.printf("Q current size is %u\n",PARAM_INT(2));
+        Serial.printf("Warning when size > %u\n",(SMALL_Q*Q_WARN_PCENT)/100);
 
-    if(inDanger) Serial.println("Warning, Will Robinson - low Q!!!"); // See 1960s TV SciFi series "Lost in Space" :)
-    else Serial.println("Disaster Averted"); 
-}
+        if(PARAM_INT(1)) Serial.println("Warning, Will Robinson - low Q!!!"); // See 1960s TV SciFi series "Lost in Space" :)
+        else Serial.println("Disaster Averted"); 
+    }
+});
 
-H4P_QueueWarn h4qw(qIsLow,50); // call qIsLow when free Q drops below 50%
+H4P_QueueWarn h4qw(50); // call qIsLow when free Q drops below 50%
 
 void h4setup() { // H4 constructor starts Serial
     Serial.println("H4P_QueueWarn example v"H4P_VERSION);

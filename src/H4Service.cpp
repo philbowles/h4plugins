@@ -29,7 +29,8 @@ SOFTWARE.
 #include<H4Service.h>
 //
 #if H4_HOOK_TASKS
-    H4_INT_MAP h4TaskNames{
+
+    H4_INT_MAP h4TaskNames={
         {H4P_TRID_THRB,"THRB"},
         {H4P_TRID_PATN,"PATN"},
         {H4P_TRID_PP1x,"PP1X"},

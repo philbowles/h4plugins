@@ -6,9 +6,6 @@
 
 13/06/2021 [Release Notes v3.1.0](docs/rn300.md)
 
-** KNOWN ERROR ** - you may get compile errors in the examples complaining about stdlib types `string`, `vector` etc being undefined - 
-if so just insert the `std::` I'm working my way through them, but there's 80+ of them and I may have missed one or two.
-
 ## Watch the videos
 
   ![youtube](assets/h4cover1blinkyonsteroids.jpg) 

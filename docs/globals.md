@@ -81,7 +81,7 @@ h4p["MyCounter"]=666;
 std::string MessageOfTheDay=h4p["MOTD"];
 ```
 
-To retrive a value you can also use:
+To retrieve a value you can also use:
 
 ```cpp
 int gvGetInt(const string& name);

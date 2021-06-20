@@ -54,7 +54,7 @@ SOFTWARE.
 */
 #define SANITY                  0
 #define H4P_LOG_MESSAGES        1
-#define H4P_SYS_LEVEL           0
+#define H4P_SYS_LEVEL           2
 #define H4P_UI_HEALTH           0
 /*
         HARDWARE ASSUMPTIONS

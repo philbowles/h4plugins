@@ -10,16 +10,16 @@ Optional: Allows you to "tag" your tasks with a name* so that you can find them
 
 */
 
-H4_INT_MAP h4TaskNames={
+H4_INT_MAP myTaskNames={
     {1,"Tick"},
     {4,"Rude"},
     {13,"Link"}, // don't have to be in order (but why not?)
     {6,"1Tim"}, // don't have to be used (but why not?)
     {49,"10GB"} // Keep them below 50 - IDs 50-99 are used by the system
 };
-// if you don't want task naming, just delete the above
 
 void h4setup() {
+    H4::addTaskNames(myTaskNames);
     h4.everyRandom(5000,10000,[](){ 
     Serial.print(millis());Serial.println(" RUDE INTERRUPTION");
     h4p.showQ();
