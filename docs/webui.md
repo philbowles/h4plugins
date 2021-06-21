@@ -149,7 +149,7 @@ This is the *only* place you should perform these actions: if you do it anywhere
 
 ### Keeping the noise down
 
-It is a sadly unavoidable truth that some of the 3rd-party libraries required for a webserver are not as stable as they ought to be, even when we use our own versions of [Forked ESPAsyncTCP](https://github.com/philbowles/ESPAsyncTCP-master) and [Forked ESPAsyncWebserver](https://github.com/philbowles/ESPAsyncWebServer). We must however live in the real world and manage that problem.
+It is a sadly unavoidable truth that some of the 3rd-party libraries required for a webserver are not as stable as they ought to be, even when we use our own versions of [Forked ESPAsyncTCP](https://github.com/philbowles/ESPAsyncTCP) and [Forked ESPAsyncWebserver](https://github.com/philbowles/ESPAsyncWebServer). We must however live in the real world and manage that problem.
 
 Even if those libraries were rock-solid there are still limits to the number of fields you can add before running out of memory and there are also limits on the amount and rate of data you can safely send to / from the UI. WiFI networks do not have infinite speed or capacity!
 
