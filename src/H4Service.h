@@ -386,7 +386,7 @@ class H4Service {
     Serial.printf("\n************** FATAL ERROR ***********************\n*\n"); \
     Serial.printf("*    %s %s \n",CSTR(svc),CSTR(msg)); \ 
     Serial.printf("*\n**************************************************\n"); \
-    pinMode(LED_BUILTIN,OUTPUT); while(1){ digitalWrite(LED_BUILTIN,LOW);delay(25);digitalWrite(LED_BUILTIN,HIGH);delay(25); }  \
+    pinMode(H4P_ASSUMED_LED,OUTPUT); while(1){ digitalWrite(H4P_ASSUMED_LED,LOW);delay(25);digitalWrite(H4P_ASSUMED_LED,HIGH);delay(25); }  \
 case H4PE_SYSWARN: \
     Serial.printf("\n****************** WARNING ***********************\n*\n"); \
     Serial.printf("*    %s %s \n",CSTR(svc),CSTR(msg)); \ 
