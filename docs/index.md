@@ -92,15 +92,13 @@
  * [11: Internet of Things ain't what they used to be](https://youtu.be/fLUKDAboAU8)
  * [12: Internet of Things can only get better](https://www.youtube.com/watch?v=sy7xHuKghrM)
  * [13: Target in Range!: Network Presence Detection](https://www.youtube.com/watch?v=tLeptP3D5fw)
+ * [14: Running the installer](https://youtu.be/Q1givForuEQ) :new:
 
 ## Red label "Expert" series
 
 * [1. Running a remote update server on Nide-RED](https://youtu.be/zNjafa-4QEw)
-  
-## Gray label "H4 plain and simple" series
+* [2. Slaying C++ myths](https://youtu.be/0BFs84V5Kxg)
 
-* [1. Fundamentals of multitasking](https://www.youtube.com/watch?v=iUuqJJwOmvg&t=11s)
-  
 ---
 
 (c) 2021 Phil Bowles h4plugins@gmail.com
