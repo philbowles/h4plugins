@@ -6,6 +6,12 @@
 
 24/06/2021 [Release Notes v3.1.1](docs/rn300.md)
 
+---
+
+## If you are able, please [Support me on Patreon](https://patreon.com/esparto) and/or subscribe to my [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
+
+---
+
 ## Watch the videos
 
   ![youtube](assets/h4cover1blinkyonsteroids.jpg) 
@@ -47,9 +53,8 @@ Key
 * :door: [Documentation Master Index](docs/index.md)
 * :door: [Youtube Channel](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [What Next?](#what-next)
-* [Problems / issues](#problems--issues)
-
-See foot of page for contacts
+* [Installation](#installation)
+* [Issues](#issues)
 
 ---
 
@@ -122,7 +127,7 @@ You can also switch the device using MQTT, HTTP, serial monitor, Alexa voice com
 
 If you hold down the uswr button for longer than 5 seconds, the device will "factory reset" and clear any saved values, such as the Auto-off timer if you have ever changed it from zero.
 
-You also get a "web console" that allows yout to control the device in the same way as if you were connected via a Serial link. It is also visible to your PC's Network Explorer: double click jumps you straight to the builtin webserver seen above.
+You also get a "web console" that allows yout to control the device in the same way as if you were connected via a Serial link. On Windows, it is also visible to your PC's Network Explorer and you can control the device with the right-click menu:
 
 ![sonoffbasic](assets/upnp2.jpg)
 
@@ -156,6 +161,8 @@ Also please prefer the [Facebook H4  Support / Discussion](https://www.facebook.
 # Installation and the "menagerie" roadmap
 
 H4Plugins sits at the top of a structure of underlying libraries with strange names, whihc we like to call "the menagerie". Each of them can be used in its own right without needing H4Plugins, but they all work best when H4Plugins pulls them all together and manages them.
+
+SEE [Installation](#installation)
 
 ![roadmap](assets/common/menagerieroadmap.jpg)
 
@@ -247,22 +254,28 @@ After you have finished reading this file, the recommended path you should follo
 
 ---
 
-# Problems / Issues
+# Installation
 
-H4 / H4Plugins are designed to be easy to use, but the price of that is that the project is large and complex "under the hood". Its flexibility means that there are as many ways to do things as there are different programming styles. Because my resources are limited, I must insist that all reports provide at least enough information for me to replicate the problem. What you need to provide is described fully in [Raising an Issue](docs/issues.md)
+Please see [H4 Installer](https://github.com/philbowles/h4installer)
+# Issues
 
-In terms of speed of response, you are *far* more likely to get a rapid answer if you "ping" me on one of the social media links below: I'm on those every day at some point; I may only visit GitHub once a week or so.
- ### N.B. No problem report / issue will be considered or dealt with unless it complies FULLY with the requirements laid out in [Raising an Issue](docs/issues.md) . 
- 
- ### Help me to help YOU by providing all the information required in the relevant format
+## If you want a *quick* resolution, please follow these rules:
+
+1. As with all H4 and H4Plugins libraries, please make sure you have read *all* the relevant documentation relating to the issue and watched any videos on the [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g). Please also subscribe to the channel for notifications of news and updates.
+
+2. If you still think there is a problem, then join the [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/) group and report the issue briefly there. This is because I visit the group every day, whereas I do not have time to visit 11 github repos every day. Furthermore, it alerts other users to potential problems and allows an initial assessment. 
+
+3. If there is a genuine issue then you will be referred to [Raising H4/H4Plugins issues](https://github.com/philbowles/h4plugins/blob/master/docs/issues.md) after which you are advised to create a full github issue report.
+
+4. Failing to make an initial report in the [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/) group and simply starting with a github issue, or failing to include all of the information required in [Raising H4/H4Plugins issues](https://github.com/philbowles/h4plugins/blob/master/docs/issues.md) is likely to result in a ***long*** delay before it gets picked up.
 
 ---
 
 (c) 2021 Phil Bowles h4plugins@gmail.com
 
+* [Support me on Patreon](https://patreon.com/esparto)
 * [Youtube channel (instructional videos)](https://www.youtube.com/channel/UCYi-Ko76_3p9hBUtleZRY6g)
 * [Facebook H4  Support / Discussion](https://www.facebook.com/groups/444344099599131/)
 * [Facebook General ESP8266 / ESP32](https://www.facebook.com/groups/2125820374390340/)
 * [Facebook ESP8266 Programming Questions](https://www.facebook.com/groups/esp8266questions/)
 * [Facebook ESP Developers (moderator)](https://www.facebook.com/groups/ESP8266/)
-* [Support me on Patreon](https://patreon.com/esparto)
