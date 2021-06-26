@@ -48,6 +48,7 @@ using H4P_TUNE          = std::vector<H4P_STAVE>;
 
 class H4P_ToneController: public H4Service {
         friend class H4P_Voice;
+        static void         analogWrite(uint8_t pin, uint32_t value);
 
         static std::unordered_map<char,uint32_t> timing;
         static std::unordered_map<std::string,uint32_t> notes;
@@ -68,14 +69,21 @@ class H4P_ToneController: public H4Service {
 };
 
 class H4P_Voice {
+        static uint32_t     channel;
+
         friend class H4P_ToneController;
-                uint8_t         _pin;
+
+                void        _HAL_analogFrequency(size_t f);
+                void        _HAL_initPin(uint8_t pin);
+
+                uint8_t     _pin;
 
                 void        _decompose(const std::string& note,int transpose,H4_FN_VOID chain);
                 void        _play(const std::string& tune,int transpose,H4_FN_VOID chain);
                 void        _tone(uint32_t f,uint8_t effect,uint32_t d,H4_FN_VOID chain);
     public:
-        H4P_Voice(uint8_t pin): _pin(pin){ pinMode(pin,OUTPUT); }
+        static std::unordered_map<uint8_t , uint8_t> channelmap; // pin, channel
+        H4P_Voice(uint8_t pin);
         void         chromaticRun(const std::string& nStart,const std::string& nFinish,const char duration);
         void         play(const std::string& tune,int transpose=0);
         void         rest(const char duration){ play(std::string("R  ").append(1,duration).append(1,' ')); }

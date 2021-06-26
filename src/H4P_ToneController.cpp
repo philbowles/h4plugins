@@ -27,14 +27,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifdef ARDUINO_ARCH_ESP8266
-#include<H4P_ToneController.h>
 #include<H4.h>
+#include<H4P_ToneController.h>
+struct midi {
+    uint8_t note;
+};
 
 std::unordered_map<std::string,uint32_t> H4P_ToneController::notes={
             {"R  ",0}, // REST
 
-            {"GN2",100},
+            {"GN2",100}, // MDI 31
             {"G#2",104},
             {"AN2",110},
             {"A#2",117},
@@ -62,7 +64,7 @@ std::unordered_map<std::string,uint32_t> H4P_ToneController::notes={
             {"F#4",370},
             {"GN4",392},
             {"G#4",415},
-            {"AN4",440},
+            {"AN4",440}, // 69
             {"A#4",466},
             {"BN4",494},
 
@@ -105,6 +107,20 @@ std::unordered_map<std::string,uint32_t> H4P_ToneController::notes={
             {"A#7",3729},
             {"BN7",3951}
         };
+
+#ifdef ARDUINO_ARCH_ESP8266
+    void        H4P_ToneController::analogWrite(uint8_t pin, uint32_t value){ analogWrite(pin,value); }
+    void        H4P_Voice::_HAL_analogFrequency(size_t f){ analogWriteFreq(f); }
+    void        H4P_Voice::_HAL_initPin(uint8_t pin){} // dfa
+#else
+    #define PWMRANGE 1023
+    void        H4P_ToneController::analogWrite(uint8_t pin, uint32_t value, uint32_t valueMax){ ledcWrite(H4P_Voice::channelmap[pin], value); }
+    void        H4P_Voice::_HAL_analogFrequency(size_t f){ ledcSetup(H4P_Voice::channelmap[_pin], f, 8); }
+    void        H4P_Voice::_HAL_initPin(uint8_t pin){
+        channelmap[pin]=channel;
+        ledcAttachPin(pin, channel);
+    } // dfa
+#endif
 
 std::vector<uint32_t> H4P_ToneController::xpose;
 std::unordered_map<char,uint32_t> H4P_ToneController::timing;
@@ -189,13 +205,16 @@ void H4P_ToneController::tone(uint8_t pin,uint32_t freq,uint32_t duration,uint8_
 //
 //      Voice
 //
+uint32_t            H4P_Voice::channel=0;
+std::unordered_map<uint8_t , uint8_t> H4P_Voice::channelmap; // pin, channel
+
 void H4P_Voice::_play(const std::string& tune,int transpose,H4_FN_VOID chain){
     if(tune.size()){
         _decompose(std::string(tune.begin(),tune.begin()+5),transpose,[this,tune,transpose,chain](){
             _play(std::string(tune.begin()+5,tune.end()),transpose,chain);
         });
     } else if(chain) chain();
-    else analogWrite(_pin,0);
+    else H4P_ToneController::analogWrite(_pin,0);
 }
 
 void H4P_Voice::_decompose(const std::string& n,int transpose,H4_FN_VOID chain){//,uint8_t pin,H4P_NOTE* p){
@@ -223,6 +242,10 @@ void  H4P_Voice::chromaticRun(const std::string& nStart,const std::string& nFini
         play(join(run,""));
     }
 }
+H4P_Voice::H4P_Voice(uint8_t pin): _pin(pin){ 
+    pinMode(pin,OUTPUT);
+    _HAL_initPin(pin);
+}
 
 void H4P_Voice::play(const std::string& tune,int transpose){
     std::string choon=H4P_ToneController::_cleanTune(tune);
@@ -231,14 +254,14 @@ void H4P_Voice::play(const std::string& tune,int transpose){
 
 void H4P_Voice::_tone(uint32_t f,uint8_t effect,uint32_t d,H4_FN_VOID chain){
     if(f){ // sound it
-        analogWriteFreq(f);
+        _HAL_analogFrequency(f);
         int8_t fx=effect-0x30;
         if(fx < 0 || fx >8) fx=8;
-        analogWrite(_pin,(512/(1 << (9-fx)))-1);
+//        H4P_ToneController::analogWrite(_pin,((PWMRANGE/2)/(1 << (9-fx)))-1); // pwmrange 1023 on '8266
+        H4P_ToneController::analogWrite(_pin,(512/(1 << (9-fx)))-1); // pwmrange 1023 on '8266
     }
     h4.once(d,[this,effect,chain](){
-        if(effect!='-') analogWrite(_pin,0);
+        if(effect!='-') H4P_ToneController::analogWrite(_pin,0);
         h4.queueFunction(chain); // recurse on main loop!
     });
 }
-#endif
