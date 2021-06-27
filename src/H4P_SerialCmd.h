@@ -38,8 +38,7 @@ enum H4P_SVC_CONTROL {
     H4PSVC_STOP
 };
 
-class H4P_SerialCmd: public H4Service {        
-
+class H4P_SerialCmd: public H4Service {
                 VSCMD(_config);
                 VSCMD(_get);
                 VSCMD(_svcRestart);
@@ -62,6 +61,9 @@ class H4P_SerialCmd: public H4Service {
                 void            svcUp() override;
                 void            svcDown() override;
     public:
+//        static  uint32_t         channel;
+//        static  std::unordered_map<uint8_t , uint8_t> channelmap; // pin, channel
+
         VSCMD(_dump);   // public so logger can use it
 
         H4P_SerialCmd(bool autoStop=false);

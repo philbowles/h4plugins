@@ -29,9 +29,7 @@ SOFTWARE.
 */
 #include<H4.h>
 #include<H4P_ToneController.h>
-struct midi {
-    uint8_t note;
-};
+#include<pmbtools.h>
 
 std::unordered_map<std::string,uint32_t> H4P_ToneController::notes={
             {"R  ",0}, // REST
@@ -109,17 +107,10 @@ std::unordered_map<std::string,uint32_t> H4P_ToneController::notes={
         };
 
 #ifdef ARDUINO_ARCH_ESP8266
-    void        H4P_ToneController::analogWrite(uint8_t pin, uint32_t value){ analogWrite(pin,value); }
-    void        H4P_Voice::_HAL_analogFrequency(size_t f){ analogWriteFreq(f); }
-    void        H4P_Voice::_HAL_initPin(uint8_t pin){} // dfa
+    void        H4P_Voice::initPin(){} // dfa
 #else
     #define PWMRANGE 1023
-    void        H4P_ToneController::analogWrite(uint8_t pin, uint32_t value, uint32_t valueMax){ ledcWrite(H4P_Voice::channelmap[pin], value); }
-    void        H4P_Voice::_HAL_analogFrequency(size_t f){ ledcSetup(H4P_Voice::channelmap[_pin], f, 8); }
-    void        H4P_Voice::_HAL_initPin(uint8_t pin){
-        channelmap[pin]=channel;
-        ledcAttachPin(pin, channel);
-    } // dfa
+    void        H4P_Voice::initPin(){ _HAL_attachAnalogPin(_pin); } 
 #endif
 
 std::vector<uint32_t> H4P_ToneController::xpose;
@@ -152,7 +143,7 @@ void H4P_ToneController::_repeat(const std::string& siren,uint8_t pin,uint32_t s
     v->play(siren);
     H4_TIMER h=h4.every(t+H4P_STAVE_STAGGER,[v,siren]{ v->_play(siren,0,[]{}); });
     if(duration) h4.once(duration,[v,h,pin]{ 
-        analogWrite(pin,0);
+        _HAL_analogWrite(pin,0);
         h4.cancel(h); 
         delete v;
     });
@@ -205,25 +196,23 @@ void H4P_ToneController::tone(uint8_t pin,uint32_t freq,uint32_t duration,uint8_
 //
 //      Voice
 //
-uint32_t            H4P_Voice::channel=0;
-std::unordered_map<uint8_t , uint8_t> H4P_Voice::channelmap; // pin, channel
-
 void H4P_Voice::_play(const std::string& tune,int transpose,H4_FN_VOID chain){
     if(tune.size()){
         _decompose(std::string(tune.begin(),tune.begin()+5),transpose,[this,tune,transpose,chain](){
             _play(std::string(tune.begin()+5,tune.end()),transpose,chain);
         });
     } else if(chain) chain();
-    else H4P_ToneController::analogWrite(_pin,0);
+    else { _analogWrite(0); }
 }
 
 void H4P_Voice::_decompose(const std::string& n,int transpose,H4_FN_VOID chain){//,uint8_t pin,H4P_NOTE* p){
+    Serial.printf("PIN %u NOTE=%s\n",_pin,n.data());
     std::string note(n);
     char effect=note.back();note.pop_back();
     char duration=note.back();note.pop_back();
     if(H4P_ToneController::notes.count(note)) _tone(H4P_ToneController::_transpose(note,transpose),effect,H4P_ToneController::timing[duration],chain);
 }
-
+/*
 void  H4P_Voice::chromaticRun(const std::string& nStart,const std::string& nFinish,const char duration){
     if(H4P_ToneController::notes.count(nStart) && H4P_ToneController::notes.count(nFinish)){
         std::vector<std::string> run;
@@ -242,10 +231,11 @@ void  H4P_Voice::chromaticRun(const std::string& nStart,const std::string& nFini
         play(join(run,""));
     }
 }
-H4P_Voice::H4P_Voice(uint8_t pin): _pin(pin){ 
-    pinMode(pin,OUTPUT);
-    _HAL_initPin(pin);
-}
+*/
+//H4P_Voice::H4P_Voice(uint8_t pin): _pin(pin){ 
+//    pinMode(_pin,OUTPUT);
+//    initPin();
+//}
 
 void H4P_Voice::play(const std::string& tune,int transpose){
     std::string choon=H4P_ToneController::_cleanTune(tune);
@@ -253,15 +243,10 @@ void H4P_Voice::play(const std::string& tune,int transpose){
 }
 
 void H4P_Voice::_tone(uint32_t f,uint8_t effect,uint32_t d,H4_FN_VOID chain){
-    if(f){ // sound it
-        _HAL_analogFrequency(f);
-        int8_t fx=effect-0x30;
-        if(fx < 0 || fx >8) fx=8;
-//        H4P_ToneController::analogWrite(_pin,((PWMRANGE/2)/(1 << (9-fx)))-1); // pwmrange 1023 on '8266
-        H4P_ToneController::analogWrite(_pin,(512/(1 << (9-fx)))-1); // pwmrange 1023 on '8266
-    }
+    _HAL_analogFrequency(_pin,f);
+    _analogWrite(0x3ff >> (effect < 0x30 ? 1:10-(effect-0x30))); // pwmrange 1023 on '8266
     h4.once(d,[this,effect,chain](){
-        if(effect!='-') H4P_ToneController::analogWrite(_pin,0);
+        if(effect!='-') _analogWrite(0);
         h4.queueFunction(chain); // recurse on main loop!
     });
 }

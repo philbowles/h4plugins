@@ -37,13 +37,15 @@ SOFTWARE.
 #ifdef ARDUINO_ARCH_ESP8266
     #include<LittleFS.h>
     #define HAL_FS LittleFS
-
 #else
     #include<FS.h>
     #include<SPIFFS.h>
     #define HAL_FS SPIFFS
     std::string getTerminalName(const std::string& s);
 #endif
+
+void  _HAL_analogWrite(uint8_t pin, uint32_t value);
+void  _HAL_analogFrequency(uint8_t pin,size_t f);
 
 #include<unordered_set>
 #include<map>
