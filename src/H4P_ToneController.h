@@ -81,15 +81,13 @@ class H4P_Voice {
                 void        _play(const std::string& tune,int transpose,H4_FN_VOID chain);
                 void        _tone(uint32_t f,uint8_t effect,uint32_t d,H4_FN_VOID chain);
     public:
-        static std::unordered_map<uint8_t , uint8_t> channelmap; // pin, channel
         H4P_Voice(uint8_t pin): _pin(pin){ initPin(); }
-//        void         chromaticRun(const std::string& nStart,const std::string& nFinish,const char duration);
         void         play(const std::string& tune,int transpose=0);
         void         rest(const char duration){ play(std::string("R  ").append(1,duration).append(1,' ')); }
 };
 
-#define H4P_sirenBuzz(p,d) h4tc.siren(H4P_SIREN_BUZZ,p,d)
-#define H4P_sirenChirp(p,d) h4tc.siren(H4P_SIREN_CHIRP,p,d)
-#define H4P_sirenHiLo(p,d) h4tc.siren(H4P_SIREN_HILO,p,d)
-#define H4P_sirenScreech(p,d) h4tc.siren(H4P_SIREN_SCREECH,p,d)
-#define H4P_sirenWoopWoop(p,d) h4tc.siren(H4P_SIREN_WOOPWOOP,p,d)
+#define sirenBuzz(p,d) siren(H4P_SIREN_BUZZ,p,d)
+#define sirenChirp(p,d) siren(H4P_SIREN_CHIRP,p,d)
+#define sirenHiLo(p,d) siren(H4P_SIREN_HILO,p,d)
+#define sirenScreech(p,d) siren(H4P_SIREN_SCREECH,p,d)
+#define sirenWoopWoop(p,d) siren(H4P_SIREN_WOOPWOOP,p,d)

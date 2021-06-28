@@ -130,11 +130,9 @@ enum H4P_UILED_COLOR {
 #define H4PM_GRANULARITY        50
 
 #ifdef ARDUINO_ARCH_ESP8266
-    #define H4P_ANALOG_MAX    PWMRANGE
     #define H4P_THROTTLE_LO       6000
     #define H4P_THROTTLE_HI       9000
 #else
-    #define H4P_ANALOG_MAX        4096
     #define H4P_THROTTLE_LO     100000
     #define H4P_THROTTLE_HI     125000
 #endif

@@ -27,7 +27,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include<H4P_Signaller.h>
-//#include<H4P_PinMachine.h>
+
+const std::vector<size_t> H4Flasher::sinwav={0,5,15,60,150,300,475,680,850,980,1023,980,850,680,475,300,150,60,15,5};
+//const std::vector<size_t> H4Flasher::sinwav={15,60,150,300,475,680,850,980,1023,980,850,680,475,300,150,60};
 
 #ifdef H4FC_MORSE_SUPPORT 
 std::unordered_map<char,string>	H4P_Signaller::_morse={
@@ -181,10 +183,8 @@ void H4P_Signaller::_handleEvent(const std::string& svc,H4PE_TYPE t,const std::s
                     case H4P_SIG_PULSE:
                         if(parts.size() == 2) pulsePin(STOI(parts[1]),_signalPin);
                         break;
-#ifdef ARDUINO_ARCH_ESP8266
                     case H4P_SIG_THROB:
-                        if(parts.size() == 3) throbPin(STOI(parts[1]),STOI(parts[2]),_signalPin);
-#endif
+                        if(parts.size() == 2) throbPin(STOI(parts[1]),_signalPin);
                 }
             }
     }
@@ -282,41 +282,32 @@ void H4Flasher::flashPattern(){
 }
 
 
-#ifdef ARDUINO_ARCH_ESP8266
 void H4Flasher::stop(){
 	h4.cancel({_timer,_off});
-    analogWrite(_opp->_p,H4P_ANALOG_MAX);
+    _HAL_analogWrite(_opp->_p,0);
 	_opp->turn(OFF);
 }
 
-H4Flasher::H4Flasher(h4pOutput* opp,uint32_t period,uint32_t valley): _period(period),_valley(valley),_opp(opp){ throb(); }
+H4Flasher::H4Flasher(h4pOutput* opp,uint32_t period): _period(period),_opp(opp){ throb(); }
 
 void H4Flasher::throb(){
-    std::vector<uint32_t> plan;
-    uint32_t nSlices=_period/(H4PM_GRANULARITY *2);
-    uint32_t thickness=(H4P_ANALOG_MAX - ((H4P_ANALOG_MAX * _valley) / 100)) / nSlices;
-    for(int i=0;i<(1+nSlices);i++) plan.push_back(H4P_ANALOG_MAX - (i * thickness));
-    std::vector<uint32_t> tr=plan;
-    plan.insert(plan.end(), tr.rbegin(), tr.rend());
-
-    _opp->turn(ON);
-    _timer=h4.every(H4PM_GRANULARITY,[=]{
-        static int i=0;
-        analogWrite(_opp->_p,plan[i++]);
-        if(i==plan.size()) i=0;
+    _HAL_analogFrequency(_opp->_p,4400);//2*sinwav[_cycle%sinwav.size()]);
+    _timer=h4.every(_period/sinwav.size(),[=]{
+//        _HAL_analogFrequency(_opp->_p,2*sinwav[_cycle%sinwav.size()]);
+        _HAL_analogWrite(_opp->_p,sinwav[_cycle%sinwav.size()]);
+        _cycle++;
     },nullptr,H4P_TRID_THRB);
 }
 
-void H4P_Signaller::throbPin(uint32_t rate, uint32_t valley, uint8_t pin,H4PM_SENSE active,uint8_t col){
-    stopPin(pin);
-    _dynaLoad(pin,active,col,
-        [=](H4Flasher* fp){ fp->throb(); },
-        [rate,valley](h4pOutput* opp){ return new H4Flasher(opp,rate,valley); }
-    );
+void H4P_Signaller::throbPin(uint32_t rate, uint8_t pin,H4PM_SENSE active,uint8_t col){
+    #ifdef ARDUINO_ARCH_ESP32
+        _HAL_attachAnalogPin(pin);
+    #endif
+    if(_HAL_isAnalogOutput(pin)){
+        stopPin(pin);
+        _dynaLoad(pin,active,col,
+            [=](H4Flasher* fp){ fp->throb(); },
+            [=](h4pOutput* opp){ return new H4Flasher(opp,rate); }
+        );
+    } else SYSWARN("PIN %d is not Analog O/P",pin);
 }
-#else
-void H4Flasher::stop(){
-	h4.cancel({_timer,_off});
-	_opp->turn(OFF);
-}
-#endif

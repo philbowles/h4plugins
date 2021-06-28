@@ -39,6 +39,8 @@ SOFTWARE.
 #endif
 
 class H4Flasher{
+        static  const std::vector<size_t> sinwav;
+        
 	        std::string     _dots;
             H4_TASK_PTR     _timer=nullptr;
             H4_TASK_PTR	    _off=nullptr;
@@ -47,27 +49,24 @@ class H4Flasher{
             std::string     _pattern;
             uint32_t        _period=0;
             uint32_t        _timebase=0;
-            uint32_t        _valley=0;
-
+            uint32_t        _cycle=0;
             void      		_pulse(uint32_t width);	
     public:  
             h4pOutput*      _opp;
 
         H4Flasher(h4pOutput*  opp,uint32_t period,uint8_t duty);
         H4Flasher(h4pOutput*  opp,const char* pattern,uint32_t timebase);
+        H4Flasher(h4pOutput*  opp,uint32_t period);
 
                 void        flashPattern();
                 void        PWM();
                 void        stop();
-#ifdef ARDUINO_ARCH_ESP8266
-        H4Flasher(h4pOutput*  opp,uint32_t period,uint32_t valley);
                 void        throb();
-#endif
 //      syscall
 #if H4P_LOG_MESSAGES
                 std::string      _dump(){
                     char* buff=static_cast<char*>(malloc(H4P_REPLY_BUFFER+1));
-                    snprintf(buff,H4P_REPLY_BUFFER,"D/P/V %d,%d,%d P/T '%s',%d",_duty,_period,_valley,CSTR(_pattern),_timebase);
+                    snprintf(buff,H4P_REPLY_BUFFER,"D/P/V %d,%d,%d P/T '%s',%d",_duty,_period,_cycle,CSTR(_pattern),_timebase);
                     std::string rv(buff);
                     free(buff);
                     return rv;
@@ -148,10 +147,9 @@ class H4P_Signaller: public H4Service {
             void            stopPin(uint8_t pin);
             void            stopPin(h4pOutput* p){ stopPin(*p); }
             void            stopPin(h4pOutput& p){ stopPin(p._p); }
-#ifdef ARDUINO_ARCH_ESP8266
-            void 			throbPin(uint32_t rate, uint32_t valley, uint8_t pin,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);
-            void 			throbPin(uint32_t rate, uint32_t valley,h4pOutput* p){ throbPin(rate,valley,*p); }
-            void 			throbPin(uint32_t rate, uint32_t valley,h4pOutput& p){ throbPin(rate,valley,p._p,p._s,p._c); }
-#endif
+
+            void 			throbPin(uint32_t rate, uint8_t pin,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);
+            void 			throbPin(uint32_t rate, h4pOutput* p){ throbPin(rate,*p); }
+            void 			throbPin(uint32_t rate, h4pOutput& p){ throbPin(rate,p._p,p._s,p._c); }
 //          syscall only
 };

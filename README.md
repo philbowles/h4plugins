@@ -4,7 +4,7 @@
 
 ### Most of the above is achieved with only a few lines of code, with many features requiring on the inclusion of only a single line
 
-24/06/2021 [Release Notes v3.1.1](docs/rn300.md)
+28/06/2021 [Release Notes v3.2.0](docs/rn300.md)
 
 ---
 

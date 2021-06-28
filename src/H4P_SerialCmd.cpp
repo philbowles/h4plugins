@@ -32,8 +32,6 @@ SOFTWARE.
 #include<dillo_config.h>
 #include<pango_config.h>
 //
-//uint32_t            H4P_SerialCmd::channel=0;
-//std::unordered_map<uint8_t , uint8_t> H4P_SerialCmd::channelmap; // pin, channel
 extern std::unordered_map<std::string,H4Service*> h4pmap;
 extern bool h4punlocked;
 

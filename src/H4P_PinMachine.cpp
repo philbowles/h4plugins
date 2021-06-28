@@ -34,7 +34,7 @@ SOFTWARE.
 void H4P_PinMachine::_run(){ 
     for(auto const& p:h4pPinMap) {
         auto ptr=p.second;
-        uint32_t metal=ptr->isAnalog() ? analogRead(p.first):digitalRead(p.first);
+        uint32_t metal=ptr->isAnalogInput() ? analogRead(p.first):digitalRead(p.first);
         if(metal!=ptr->_r) ptr->inject(metal,false);
     }
 }
@@ -62,29 +62,20 @@ void H4P_PinMachine::svcDown(){
     H4Service::svcDown();
 }
 
-uint8_t     H4P_PinMachine::logicalRead (uint8_t p)                     { return delegate<uint8_t> (p,&h4pGPIO::logicalRead); }
-int         H4P_PinMachine::getValue    (uint8_t p)                     { return delegate<uint32_t>(p,&h4pGPIO::getValue); }
-msg         H4P_PinMachine::inject      (uint8_t p,uint32_t r,bool t)   { return delegate<msg>     (p,&h4pGPIO::inject,r,t); }
-bool        H4P_PinMachine::isAnalog    (uint8_t p)                     { return delegate<bool>    (p,&h4pGPIO::isAnalog); }
-bool        H4P_PinMachine::isOutput    (uint8_t p)                     { return delegate<bool>    (p,&h4pGPIO::isOutput); }
-void        H4P_PinMachine::logicalWrite(uint8_t p,bool b){ 
+uint8_t     H4P_PinMachine::logicalRead  (uint8_t p)                     { return delegate<uint8_t> (p,&h4pGPIO::logicalRead); }
+int         H4P_PinMachine::getValue     (uint8_t p)                     { return delegate<uint32_t>(p,&h4pGPIO::getValue); }
+msg         H4P_PinMachine::inject       (uint8_t p,uint32_t r,bool t)   { return delegate<msg>     (p,&h4pGPIO::inject,r,t); }
+bool        H4P_PinMachine::isAnalogInput(uint8_t p)                     { return delegate<bool>    (p,&h4pGPIO::isAnalogInput); }
+bool        H4P_PinMachine::isOutput     (uint8_t p)                     { return delegate<bool>    (p,&h4pGPIO::isOutput); }
+void        H4P_PinMachine::logicalWrite (uint8_t p,bool b){ 
     auto ptr = isManaged(p); // do the others too
     if(ptr && ptr->isOutput()) static_cast<h4pOutput*>(ptr)->logicalWrite(b);
 }
-H4_TIMER    H4P_PinMachine::periodicRead(uint8_t p,uint32_t f)          {
-    return h4.every(f,[=]{ H4P_PinMachine::inject(p,H4P_PinMachine::isAnalog(p) ? analogRead(p):digitalRead(p),true); },nullptr,H4P_TRID_POLL);
+H4_TIMER    H4P_PinMachine::periodicRead (uint8_t p,uint32_t f)          {
+    return h4.every(f,[=]{ H4P_PinMachine::inject(p,H4P_PinMachine::isAnalogInput(p) ? analogRead(p):digitalRead(p),true); },nullptr,H4P_TRID_POLL);
 }
-msg         H4P_PinMachine::runFlow     (uint8_t p,msg m)               { return delegate<msg>     (p,&h4pGPIO::runFlow,m); }
+msg         H4P_PinMachine::runFlow      (uint8_t p,msg m)               { return delegate<msg>     (p,&h4pGPIO::runFlow,m); }
 //==============================================================================================================================================
-
-#ifdef ARDUINO_ARCH_ESP8266
-    bool HAL_isAnalog(uint8_t p){ return p==A0; }
-#else
-    bool HAL_isAnalog(uint8_t p){
-        std::unordered_set<uint8_t> analogPins={5,8,10,11,12,13};
-        return analogPins.count(p);
-    }
-#endif
 //
 //      PIN STUFF
 //
@@ -113,7 +104,7 @@ void h4pGPIO::_handleEvent(const std::string& s,H4PE_TYPE t,const std::string& m
 #if H4P_LOG_MESSAGES
 std::string h4pGPIO::dump(){
     char* buff=static_cast<char*>(malloc(H4P_REPLY_BUFFER+1));
-    snprintf(buff,H4P_REPLY_BUFFER," P%02d S=%s P=%d L=%d C=%s V=%d O=%d A=%d",_p,_s ? "HI":"LO",digitalRead(_p),logicalRead(),h4pGetLedColor(_c).data(),getValue(),isOutput(),isAnalog());
+    snprintf(buff,H4P_REPLY_BUFFER," P%02d S=%s P=%d L=%d C=%s V=%d O=%d A=%d",_p,_s ? "HI":"LO",digitalRead(_p),logicalRead(),h4pGetLedColor(_c).data(),getValue(),isOutput(),isAnalogInput());
     std::string rv(buff);
     free(buff);
     return rv;

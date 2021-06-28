@@ -13,23 +13,23 @@ instead of going OFF
 
 void h4setup() { // H4 constructor starts Serial
     Serial.println("H4P_Signaller Throb Example v"H4P_VERSION);
-    h4fc.throbPin(1000,1,LED_BUILTIN,H4P_ASSUMED_SENSE); // LED depends on platform
+    h4fc.throbPin(500,H4P_ASSUMED_LED,H4P_ASSUMED_SENSE); // LED depends on platform
 
     h4.once(10000,[](){ 
-      h4fc.throbPin(2000,25,LED_BUILTIN,H4P_ASSUMED_SENSE); // LED depends on platform
+      h4fc.throbPin(750,H4P_ASSUMED_LED,H4P_ASSUMED_SENSE); // LED depends on platform
     });
     
     h4.once(20000,[](){ 
-      h4fc.throbPin(3000,50,LED_BUILTIN,H4P_ASSUMED_SENSE); // LED depends on platform
+      h4fc.throbPin(1000,H4P_ASSUMED_LED,H4P_ASSUMED_SENSE); // LED depends on platform
     });
     h4.once(30000,[](){ 
-      h4fc.throbPin(5000,75,LED_BUILTIN,H4P_ASSUMED_SENSE); // LED depends on platform
+      h4fc.throbPin(1500,H4P_ASSUMED_LED,H4P_ASSUMED_SENSE); // LED depends on platform
     });
     h4.once(40000,[](){ 
-      h4fc.throbPin(10000,10,LED_BUILTIN,H4P_ASSUMED_SENSE); // LED depends on platform
+      h4fc.throbPin(2000,H4P_ASSUMED_LED,H4P_ASSUMED_SENSE); // LED depends on platform
     });
     h4.once(60000,[](){ 
-        h4fc.stopPin(LED_BUILTIN);
+        h4fc.stopPin(H4P_ASSUMED_LED);
         Serial.print(millis());Serial.println(" LED_SHOULD BE OFF");
         h4p.all();
     });

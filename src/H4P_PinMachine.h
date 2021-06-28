@@ -32,8 +32,6 @@ SOFTWARE.
 #include<H4Service.h>
 #include<H4P_SerialCmd.h>
 
-extern bool HAL_isAnalog(uint8_t);
-
 using H4PM_STAGE_MAP = std::vector<uint32_t>;
 
 class h4pGPIO;
@@ -72,7 +70,7 @@ class h4pGPIO {
                 uint32_t            _r; // to cope with analog values
 //
         virtual void                _announce();
-                uint32_t inline     _normalise(uint32_t x){ return isAnalog() ? x:!(x^_s); }
+                uint32_t inline     _normalise(uint32_t x){ return isAnalogInput() ? x:!(x^_s); }
         virtual void                _syncValue(){ 
                     _r=digitalRead(_p);
                     _prev={_p,0,0,_normalise(_r),_r,false,false,0};
@@ -91,7 +89,7 @@ class h4pGPIO {
 #endif
                 int                 getValue(){ return _prev.load; }
                 msg                 inject(uint32_t metal,bool timer=false);
-        virtual bool                isAnalog(){ return HAL_isAnalog(_p); }
+        virtual bool                isAnalogInput(){ return _HAL_isAnalogInput(_p); }
         virtual bool                isOutput(){ return false; }
                 uint8_t             logicalRead(){ return _normalise(_r); }
                 uint8_t             pin(){ return _p; }
@@ -113,7 +111,7 @@ class H4P_PinMachine: public H4Service {
         static  void            logicalWrite(uint8_t p,bool b);
         static  int             getValue(uint8_t p);
         static  msg             inject(uint8_t p,uint32_t metal,bool timer=false);
-        static  bool            isAnalog(uint8_t p);
+        static  bool            isAnalogInput(uint8_t p);
         static  h4pGPIO*        isManaged(uint8_t p){ return h4pPinMap.count(p) ? h4pPinMap[p]:nullptr; }
         static  bool            isOutput(uint8_t p);
         static  H4_TIMER        periodicRead(uint8_t p,uint32_t f);
