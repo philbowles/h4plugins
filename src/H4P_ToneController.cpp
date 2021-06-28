@@ -234,7 +234,7 @@ void H4P_Voice::_tone(uint32_t f,uint8_t effect,uint32_t d,H4_FN_VOID chain){
         analogWriteFreq(f);
         int8_t fx=effect-0x30;
         if(fx < 0 || fx >8) fx=8;
-        analogWrite(_pin,(512/(1 << (9-fx)))-1);
+        analogWrite(_pin,((PWMRANGE+1)/(1 << (9-fx)))-1);
     }
     h4.once(d,[this,effect,chain](){
         if(effect!='-') analogWrite(_pin,0);
