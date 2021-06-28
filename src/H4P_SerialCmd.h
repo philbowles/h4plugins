@@ -38,8 +38,7 @@ enum H4P_SVC_CONTROL {
     H4PSVC_STOP
 };
 
-class H4P_SerialCmd: public H4Service {        
-
+class H4P_SerialCmd: public H4Service {
                 VSCMD(_config);
                 VSCMD(_get);
                 VSCMD(_svcRestart);

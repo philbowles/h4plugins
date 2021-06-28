@@ -32,7 +32,6 @@ SOFTWARE.
 #include<dillo_config.h>
 #include<pango_config.h>
 //
-
 extern std::unordered_map<std::string,H4Service*> h4pmap;
 extern bool h4punlocked;
 

@@ -68,21 +68,26 @@ class H4P_ToneController: public H4Service {
 };
 
 class H4P_Voice {
+        static uint32_t     channel;
+
         friend class H4P_ToneController;
-                uint8_t         _pin;
+
+                void        _analogWrite(uint32_t value){ _HAL_analogWrite(_pin,value); }
+                void        initPin();
+
+                uint8_t     _pin;
 
                 void        _decompose(const std::string& note,int transpose,H4_FN_VOID chain);
                 void        _play(const std::string& tune,int transpose,H4_FN_VOID chain);
                 void        _tone(uint32_t f,uint8_t effect,uint32_t d,H4_FN_VOID chain);
     public:
-        H4P_Voice(uint8_t pin): _pin(pin){ pinMode(pin,OUTPUT); }
-        void         chromaticRun(const std::string& nStart,const std::string& nFinish,const char duration);
+        H4P_Voice(uint8_t pin): _pin(pin){ initPin(); }
         void         play(const std::string& tune,int transpose=0);
         void         rest(const char duration){ play(std::string("R  ").append(1,duration).append(1,' ')); }
 };
 
-#define H4P_sirenBuzz(p,d) h4tc.siren(H4P_SIREN_BUZZ,p,d)
-#define H4P_sirenChirp(p,d) h4tc.siren(H4P_SIREN_CHIRP,p,d)
-#define H4P_sirenHiLo(p,d) h4tc.siren(H4P_SIREN_HILO,p,d)
-#define H4P_sirenScreech(p,d) h4tc.siren(H4P_SIREN_SCREECH,p,d)
-#define H4P_sirenWoopWoop(p,d) h4tc.siren(H4P_SIREN_WOOPWOOP,p,d)
+#define sirenBuzz(p,d) siren(H4P_SIREN_BUZZ,p,d)
+#define sirenChirp(p,d) siren(H4P_SIREN_CHIRP,p,d)
+#define sirenHiLo(p,d) siren(H4P_SIREN_HILO,p,d)
+#define sirenScreech(p,d) siren(H4P_SIREN_SCREECH,p,d)
+#define sirenWoopWoop(p,d) siren(H4P_SIREN_WOOPWOOP,p,d)

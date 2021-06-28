@@ -155,7 +155,7 @@ H4P_SIG_PIN     "500"  // same as flashPin(500)
 H4P_SIG_PWM     "1000,50"
 H4P_SIG_PATTERN "101001,125"
 H4P_SIG_MORSE   "... --- ... ,125"
-H4P_SIG_THROB   "5000,25"
+H4P_SIG_THROB   "5000"
 H4P_SIG_PULSE   "100"
 
 */
@@ -168,14 +168,14 @@ void stopAll();
 void stopPin(uint8_t pin);
 void stopPin(h4pOutput*);
 
-// (ESP8266 only) "throb" pattern: intensity is varied in a sawtooth wavefore. rate is the HALF-WAVE period
+// "throb" pattern: intensity is varied in a sawtooth wavefore. rate is the HALF-WAVE period
 // valley is the lowest % analog PWM of the waveform, eg. 100,25 gives:
 //  100     100    100
 //      \25/   \25/
 // 
 //<-rate->
-void throbPin(uint32_t rate, uint32_t valley, uint8_t pin,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);
-void throbPin(uint32_t rate, uint32_t valley,h4pOutput*);
+void throbPin(uint32_t rate, uint8_t pin,H4PM_SENSE active=H4P_ASSUMED_SENSE,uint8_t col=H4P_ASSUMED_COLOR);
+void throbPin(uint32_t rate, h4pOutput*);
 
 ```
 

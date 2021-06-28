@@ -52,7 +52,7 @@ SOFTWARE.
 
         H4P_UI_HEALTH = 1 adds Heap,Q,nLoops to UI when using heartbeat
 */
-#define SANITY                  0
+#define SANITY                  1
 #define H4P_LOG_MESSAGES        1
 #define H4P_SYS_LEVEL           2
 #define H4P_UI_HEALTH           0
@@ -130,11 +130,9 @@ enum H4P_UILED_COLOR {
 #define H4PM_GRANULARITY        50
 
 #ifdef ARDUINO_ARCH_ESP8266
-    #define H4P_ANALOG_MAX    PWMRANGE
     #define H4P_THROTTLE_LO       6000
     #define H4P_THROTTLE_HI       9000
 #else
-    #define H4P_ANALOG_MAX        4096
     #define H4P_THROTTLE_LO     100000
     #define H4P_THROTTLE_HI     125000
 #endif

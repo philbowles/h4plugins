@@ -98,7 +98,8 @@ class h4pOutput: public h4pGPIO {
     public:
         h4pOutput(uint8_t p,H4PM_SENSE s,uint8_t initial=OFF,uint8_t c=H4P_UILED_RED,npNODE* d=new npPUBLISHVALUE);
 
-    virtual bool        isAnalog() override { return false; }
+    virtual bool        isAnalogInput() override { return false; }
+    virtual bool        isAnalogOutput() { return _HAL_isAnalogOutput(_p); }
     virtual bool        isOutput() override { return true; }
             void        logicalWrite(bool b){ turn(b); }
             void        turnOff(){ turn(false); }

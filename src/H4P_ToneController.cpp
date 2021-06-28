@@ -27,14 +27,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifdef ARDUINO_ARCH_ESP8266
-#include<H4P_ToneController.h>
 #include<H4.h>
+#include<H4P_ToneController.h>
+#include<pmbtools.h>
 
 std::unordered_map<std::string,uint32_t> H4P_ToneController::notes={
             {"R  ",0}, // REST
 
-            {"GN2",100},
+            {"GN2",100}, // MDI 31
             {"G#2",104},
             {"AN2",110},
             {"A#2",117},
@@ -62,7 +62,7 @@ std::unordered_map<std::string,uint32_t> H4P_ToneController::notes={
             {"F#4",370},
             {"GN4",392},
             {"G#4",415},
-            {"AN4",440},
+            {"AN4",440}, // 69
             {"A#4",466},
             {"BN4",494},
 
@@ -106,6 +106,13 @@ std::unordered_map<std::string,uint32_t> H4P_ToneController::notes={
             {"BN7",3951}
         };
 
+#ifdef ARDUINO_ARCH_ESP8266
+    void        H4P_Voice::initPin(){} // dfa
+#else
+    #define PWMRANGE 1023
+    void        H4P_Voice::initPin(){ _HAL_attachAnalogPin(_pin); } 
+#endif
+
 std::vector<uint32_t> H4P_ToneController::xpose;
 std::unordered_map<char,uint32_t> H4P_ToneController::timing;
 
@@ -116,7 +123,7 @@ std::unordered_map<uint32_t,std::pair<uint32_t,std::string>> H4P_ToneController:
     {H4P_SIREN_SCREECH,{750,"CN3d CN7d "}},
     {H4P_SIREN_CHIRP,{400,"BN7d A#7d AN7d G#7d GN7d F#7d FN7d R  M R  M "}},
     {H4P_SIREN_BUZZ,{750,"CN3d R  d "}},
-    {H4P_SIREN_WOOPWOOP,{450,"AN3d AN3d AN3d AN3d CN4d CN4d EN4d AN4d BN5d GN5d C#6d R  M "}}
+    {H4P_SIREN_WOOPWOOP,{450,"AN2d AN2d AN2d AN2d CN4d CN4d EN5d AN5d BN6d GN6d C#7d R  M "}}
 };
 
 H4P_ToneController::H4P_ToneController(uint32_t tempo): H4Service("tune"){
@@ -130,13 +137,13 @@ H4P_ToneController::H4P_ToneController(uint32_t tempo): H4Service("tune"){
 }
 
 void H4P_ToneController::_repeat(const std::string& siren,uint8_t pin,uint32_t speed,uint32_t duration){
-    metronome(speed);       
+    metronome(speed);
     H4P_Voice* v=new H4P_Voice(pin);
     uint32_t t=length(siren);
     v->play(siren);
-    H4_TIMER h=h4.every(t+H4P_STAVE_STAGGER,[v,siren]{ v->_play(siren,0,[]{}); });
-    if(duration) h4.once(duration,[v,h,pin]{ 
-        analogWrite(pin,0);
+    H4_TIMER h=h4.every(t+H4P_STAVE_STAGGER,[=]{ v->_play(siren,0,[]{}); });
+    if(duration) h4.once(duration,[=]{ 
+        _HAL_analogWrite(pin,0);
         h4.cancel(h); 
         delete v;
     });
@@ -184,7 +191,7 @@ void H4P_ToneController::siren(H4P_SIREN S,uint8_t pin,uint32_t duration){
 
 void H4P_ToneController::tone(uint8_t pin,uint32_t freq,uint32_t duration,uint8_t volume){
     H4P_Voice* v=new H4P_Voice(pin);
-    v->_tone(freq,duration ? volume+0x30:'-',duration,[v]{ delete v; });
+    v->_tone(freq,0x30+volume,duration,[v]{ delete v; });
 }
 //
 //      Voice
@@ -195,7 +202,7 @@ void H4P_Voice::_play(const std::string& tune,int transpose,H4_FN_VOID chain){
             _play(std::string(tune.begin()+5,tune.end()),transpose,chain);
         });
     } else if(chain) chain();
-    else analogWrite(_pin,0);
+    else { _analogWrite(0); }
 }
 
 void H4P_Voice::_decompose(const std::string& n,int transpose,H4_FN_VOID chain){//,uint8_t pin,H4P_NOTE* p){
@@ -205,40 +212,27 @@ void H4P_Voice::_decompose(const std::string& n,int transpose,H4_FN_VOID chain){
     if(H4P_ToneController::notes.count(note)) _tone(H4P_ToneController::_transpose(note,transpose),effect,H4P_ToneController::timing[duration],chain);
 }
 
-void  H4P_Voice::chromaticRun(const std::string& nStart,const std::string& nFinish,const char duration){
-    if(H4P_ToneController::notes.count(nStart) && H4P_ToneController::notes.count(nFinish)){
-        std::vector<std::string> run;
-        bool swapped=false;
-        uint32_t i1=H4P_ToneController::notes[nStart];
-        uint32_t i2=H4P_ToneController::notes[nFinish];
-        if(i1>i2) {
-            std::swap(i1,i2);
-            swapped=true;
-        }
-        for(int j=i1;j<=i2;j++){
-            auto note=std::find_if(H4P_ToneController::notes.begin(),H4P_ToneController::notes.end(),[&j](std::pair<std::string,uint32_t> const& p){ return j==p.second; });
-            run.push_back((std::string(note->first)).append(1,duration).append(1,'8'));
-        }
-        if(swapped) reverse(run.begin(),run.end());
-        play(join(run,""));
-    }
-}
-
 void H4P_Voice::play(const std::string& tune,int transpose){
     std::string choon=H4P_ToneController::_cleanTune(tune);
     if(!(choon.size()%5)) _play(choon,transpose,[]{});
 }
 
 void H4P_Voice::_tone(uint32_t f,uint8_t effect,uint32_t d,H4_FN_VOID chain){
+<<<<<<< HEAD
     if(f){ // sound it
         analogWriteFreq(f);
         int8_t fx=effect-0x30;
         if(fx < 0 || fx >8) fx=8;
         analogWrite(_pin,((PWMRANGE+1)/(1 << (9-fx)))-1);
+=======
+//    Serial.printf("PIN %u f=%u e=%u PWM=%u d=%d\n",_pin,f,0x3ff >> (effect < 0x30 ? 1:10-(effect-0x30)),d);
+    _HAL_analogFrequency(_pin,f);
+    _analogWrite(0x3ff >> (effect < 0x30 ? 1:10-(effect-0x30))); // pwmrange 1023 on '8266
+    if(d){
+        h4.once(d,[this,effect,chain](){
+            _analogWrite(0);
+            h4.queueFunction(chain); // recurse on main loop!
+        });
+>>>>>>> xp32-tonecontroller
     }
-    h4.once(d,[this,effect,chain](){
-        if(effect!='-') analogWrite(_pin,0);
-        h4.queueFunction(chain); // recurse on main loop!
-    });
 }
-#endif

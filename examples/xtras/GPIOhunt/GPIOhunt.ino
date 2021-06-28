@@ -52,7 +52,7 @@ void onGPIO(uint8_t pin,int value){
           pulsar=h4.everyRandom(75,500,[=]{ fc.pulsePin(random(15,35),LEDS[value]); });
           break;
         case 3:
-          fc.throbPin(500,15,LEDS[value]);
+          fc.throbPin(500,LEDS[value]);
           break;
         default:
           style=0;
