@@ -218,21 +218,13 @@ void H4P_Voice::play(const std::string& tune,int transpose){
 }
 
 void H4P_Voice::_tone(uint32_t f,uint8_t effect,uint32_t d,H4_FN_VOID chain){
-<<<<<<< HEAD
-    if(f){ // sound it
-        analogWriteFreq(f);
-        int8_t fx=effect-0x30;
-        if(fx < 0 || fx >8) fx=8;
-        analogWrite(_pin,((PWMRANGE+1)/(1 << (9-fx)))-1);
-=======
 //    Serial.printf("PIN %u f=%u e=%u PWM=%u d=%d\n",_pin,f,0x3ff >> (effect < 0x30 ? 1:10-(effect-0x30)),d);
     _HAL_analogFrequency(_pin,f);
     _analogWrite(0x3ff >> (effect < 0x30 ? 1:10-(effect-0x30))); // pwmrange 1023 on '8266
     if(d){
-        h4.once(d,[this,effect,chain](){
+        h4.once(d,[=](){
             _analogWrite(0);
             h4.queueFunction(chain); // recurse on main loop!
         });
->>>>>>> xp32-tonecontroller
     }
 }
