@@ -49,7 +49,8 @@ void H4P_PinMachine::info(){
 #endif
 
 void H4P_PinMachine::svcUp(){
-    for(auto const& p:h4pPinMap) {
+   Serial.printf("H4P_PinMachine::svcUp %d\n",h4pPinMap.size());
+   for(auto const& p:h4pPinMap) {
         Serial.printf("START PINS: %s\n",p.second->dump().data());
         p.second->_announce();
     }

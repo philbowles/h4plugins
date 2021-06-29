@@ -81,7 +81,7 @@ class H4P_Voice {
                 void        _play(const std::string& tune,int transpose,H4_FN_VOID chain);
                 void        _tone(uint32_t f,uint8_t effect,uint32_t d,H4_FN_VOID chain);
     public:
-        H4P_Voice(uint8_t pin): _pin(pin){ initPin(); }
+        H4P_Voice(uint8_t pin,uint8_t col=H4P_UILED_BI);
         void         play(const std::string& tune,int transpose=0);
         void         rest(const char duration){ play(std::string("R  ").append(1,duration).append(1,' ')); }
 };

@@ -297,6 +297,7 @@ void H4P_WiFi::_sendSSE(const std::string& name,const std::string& msg){
                 bakov=false;
                 for(auto const& ui:h4pUserItems) _evts->send(CSTR(ui.second.f()),CSTR(ui.first),_evtID++); // hook to sse event q size
             }
+//            Serial.printf("%s %s id=%d\n",name.data(),msg.data(),_evtID);
             _evts->send(CSTR(msg),CSTR(name),_evtID++); // hook to sse event q size
         } 
         else {

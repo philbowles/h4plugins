@@ -29,7 +29,7 @@ SOFTWARE.
 */
 #include<H4.h>
 #include<H4P_ToneController.h>
-#include<pmbtools.h>
+#include<H4P_PinMachine.h>
 
 std::unordered_map<std::string,uint32_t> H4P_ToneController::notes={
             {"R  ",0}, // REST
@@ -110,7 +110,9 @@ std::unordered_map<std::string,uint32_t> H4P_ToneController::notes={
     void        H4P_Voice::initPin(){} // dfa
 #else
     #define PWMRANGE 1023
-    void        H4P_Voice::initPin(){ _HAL_attachAnalogPin(_pin); } 
+    void        H4P_Voice::initPin(){ 
+        _HAL_attachAnalogPin(_pin);
+    } 
 #endif
 
 std::vector<uint32_t> H4P_ToneController::xpose;
@@ -196,6 +198,11 @@ void H4P_ToneController::tone(uint8_t pin,uint32_t freq,uint32_t duration,uint8_
 //
 //      Voice
 //
+H4P_Voice::H4P_Voice(uint8_t pin,uint8_t col): _pin(pin){ 
+    initPin();
+    new h4pOutput(_pin,ACTIVE_HIGH,OFF,col);
+}
+
 void H4P_Voice::_play(const std::string& tune,int transpose,H4_FN_VOID chain){
     if(tune.size()){
         _decompose(std::string(tune.begin(),tune.begin()+5),transpose,[this,tune,transpose,chain](){

@@ -1,0 +1,46 @@
+BEFORE:
+13:13:28.809 -> YAFB send _len=51 _sent=0 len=51
+13:13:28.809 -> YAFB client added l=51 sent=51
+13:13:28.809 -> YAFB client sent
+13:13:28.809 -> YAFB _sent=51, return 51
+13:13:28.809 -> 
+13:13:28.809 -> YAFB send _len=52 _sent=104 len=-52
+13:13:28.809 -> RECURSION COUNT=2 _runQueue overlapped - EXPECT A CRASH SOON!
+13:13:28.809 -> WE ARE GOING TO CRASH VERY SOON!!!!
+13:13:28.856 -> YAFB cant send cs 5744 < l=-52
+13:13:28.856 -> 
+13:13:28.856 -> YAFB send _len=45 _sent=0 len=45
+13:13:28.856 -> YAFB client added l=45 sent=45
+13:13:28.856 -> YAFB client sent
+13:13:28.856 -> YAFB _sent=45, return 45
+13:13:28.856 -> Guru Meditation Error: Core  1 panic'ed (LoadProhibited). Exception was unhandled.
+13:13:28.856 -> Core 1 register dump:
+13:13:28.856 -> PC      : 0x400e799c  PS      : 0x00060a30  A0      : 0x800e7a24  A1      : 0x3ffb1c50  
+13:13:28.856 -> A2      : 0x3ffd2618  A3      : 0x01900306  A4      : 0x3ffc25cc  A5      : 0x0000002d  
+13:13:28.856 -> A6      : 0x0000000a  A7      : 0x332c352c  A8      : 0x800e79ad  A9      : 0x3ffb1c30  
+13:13:28.856 -> A10     : 0x0000002d  A11     : 0x3ffd2e64  A12     : 0x3ffc2704  A13     : 0x0000002d  
+13:13:28.903 -> A14     : 0x0000002d  A15     : 0x332c352c  SAR     : 0x00000004  EXCCAUSE: 0x0000001c  
+13:13:28.903 -> EXCVADDR: 0x01900306  LBEG    : 0x400014fd  LEND    : 0x4000150d  LCOUNT  : 0xffffffff  
+13:13:28.903 ->
+
+AFTER:
+13:19:49.045 -> YAFB send _len=32 _sent=0 len=32
+13:19:49.045 -> DISASTROUS ASYNC OVERLAP AVOIDED
+13:19:49.045 -> YAFB client added l=32 sent=32
+13:19:49.045 -> YAFB client sent
+13:19:49.091 -> YAFB _sent=32, return 32
+
+ESPAsyncWebServer fails YET AGAIN...it seems like many authors of so-called "async" libraries either don't fully understand async or lack the experience to write/test them properly. The appalling swiss cheese of a library that is ESPAsyncWebserver has provided YAFB (Yet Another Bug) - this being the 4th fatal one I have fixed, 3 of them (including this) to do with the inability to cope with rapid requests (a.k.a "timing error") - which is kinda the fundamental thing a lib should do: either send it, queue it or refuse it with a reason, end of. And the ONLY valid reason for not doing 1 or 2 is "totally out of memory" and THAT should fail gracefully.
+
+Sadly, I'm getting much better at finding the author's bugs - this one only took me about 45 mins to track down - mostly because they seem to be rooted in the same inability to grasp how async code runs. If only fixing it were to be as easy... I have PARTLY fixed it, i.e I have reduced the incidence of crash during VERY fast sending (real-time "music" playback) from 1:1 (absolutely certain) to about 1:100, so there's STILL a similar (or even the same) bug hidden elsewhere, or called from somewhere I missed etc...anyway, here it is:
+
+An ASYNC library - by definition, must allow multiple overlapping calls, each having its own callback. Thus EVERYTHING in its code path need to be re-entrant (i.e. not use static or global variables)  or at least "survive being called a second time without having yet exited the first".
+
+The swiss cheese however seems to have ZERO code paths where this is true - its as if the author either a) didn't actually realise his code could get called multiple time before a previous exit or b) just didn't take enough care / didn't know how to design for it. The reason I say this is  that this is the SECOND of his libs that I have had to patch for this same conceptual failure, the other being ESPAsyncTCP.
+
+Long story short time - even simple testing ought to spot things like when a value such as "bytes sent" is NEGATIVE wouldn't you think? This is the *symptom*of the poor programming  (obvs I still haven't  yet found ALL the causes) as during the "overlap", the second call decrements "bytes sent", then exits and obvs the first instance it exits back into runs the same code which decrements it again, sending it -ve, thus when the next access is made, buffer minus bytes sent is a massive +ve (thus invalid) address, and BANG! MCU objects and crashes...
+
+My temp and partial fix is to serialise access to the queue, making the async lib not very async...but preventing the recursion that causes the problem. A dirty hack, I know, but otherwise its a total rewrite :(. The whole thing puts stuff in a Q if it can't send (well it does NOW since i fxed bug #3 a few months back...) so exiting if its recursing just means the "failed" send will get Qd and picked up next time around... so it "kinda" works...
+
+I guess the rest of my day will be tracking down that one last call I missed to get the success ratio up to 1:infinity. Then the next 6 weeks rewriting an AsyncWebserver for ESP8266 / ESP32 that actually works and does what it says on the tin. For free - of course - unlike the Espressif-salaried author of the current abomination :)
+
