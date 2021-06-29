@@ -1,4 +1,4 @@
-//#define H4P_VERBOSE 1
+#define H4P_VERBOSE 1
 #include<H4Plugins.h>
 H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, larger Q size for scheduling, SerialCmd autostop
 
@@ -6,7 +6,7 @@ H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, larger Q size fo
   #define TREBLE    27
   #define BASS      26
   #define L_TREBLE  17
-  #define L_BASS     5
+  #define L_BASS    18
   #define FAKE_GND  16 
 #else
   #define TREBLE    D7
@@ -14,14 +14,18 @@ H4_USE_PLUGINS(115200,H4_Q_CAPACITY,false) // Serial baud rate, larger Q size fo
   #define L_TREBLE  D4
   #define L_BASS    D3
 #endif
+H4P_SerialLogger h4sl(H4PE_ALMOST_ALL &~H4PE_GPIO);
 
+H4P_Voice vox_t(TREBLE,H4P_UILED_ORANGE);
+H4P_Voice vox_b(BASS,H4P_UILED_ORANGE);
+H4P_Voice lux_t(L_TREBLE,H4P_UILED_RED);
+H4P_Voice lux_b(L_BASS,H4P_UILED_GREEN);
+
+H4P_PinMachine skyjump;
 H4P_ToneController h4tc; // defaults to metronome = 60 b.p.m.
-//H4P_SerialLogger h4sl;
+H4P_WiFi wiffy("XXXXXXXX","XXXXXXXX");
 
-H4P_Voice vox_t(TREBLE);
-H4P_Voice vox_b(BASS);
-H4P_Voice lux_t(L_TREBLE);
-H4P_Voice lux_b(L_BASS);
+
 //
 // Take On Me - Aha
 //
