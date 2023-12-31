@@ -160,7 +160,7 @@ Also please prefer the [Facebook H4  Support / Discussion](https://www.facebook.
 
 # Installation and the "menagerie" roadmap
 
-H4Plugins sits at the top of a structure of underlying libraries with strange names, whihc we like to call "the menagerie". Each of them can be used in its own right without needing H4Plugins, but they all work best when H4Plugins pulls them all together and manages them.
+H4Plugins sits at the top of a structure of underlying libraries with strange names, which we like to call "the menagerie". Each of them can be used in its own right without needing H4Plugins, but they all work best when H4Plugins pulls them all together and manages them.
 
 SEE [Installation](#installation)
 
