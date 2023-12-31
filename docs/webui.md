@@ -27,7 +27,7 @@ The default operating mode is Station Mode (`WIFI_STA`) requiring an SSID and a 
 
 [H4P_WiFi](h4wifi.md) continually monitors connection to the AP and will shut down all dependent services, e.g. MQTT, UPNP if the connection breaks. It will automatically restart those services once the APP connection is restored.
 
-In the nmeanwhile, the app can continue as normal, servicing hardware, readong sensors etc: a poor connection will *not* cause or require a reboot (as many other libaries / firmwares do - who knows why?)
+In the meanwhile, the app can continue as normal, servicing hardware, readong sensors etc: a poor connection will *not* cause or require a reboot (as many other libaries / firmwares do - who knows why?)
 
 Because of this the user should be careful to structure her app so that it does not request such services when they are not actualyy available. In 99% of cases those services will simply do nothing, return zero etc if they are called when there is no connection, but it is pointless and inefficient to do so. This is just a reminder that the user should never write code (in *any* situation, not just in H4Plugins) that relies on, is dependent upon or expects there always to be a live and valid connection to the net.
 
