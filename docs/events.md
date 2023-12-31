@@ -220,7 +220,7 @@ Here is a simple truism: If your app's code structure *doesn't* look like the ab
 1. You are using the library incorrectly, expect plenty of trouble
 2. Because of the above, don't expect much sympathetic support.
 
-Use the library the way it was designed, look at the 80+ examples, copy / steal / repurpose them for your own needs. Copy theri structure / style. The more *your* code looks like one of the exmples, the more likely it is to work cotrrectly.
+Use the library the way it was designed, look at the 80+ examples, copy / steal / repurpose them for your own needs. Copy theri structure / style. The more *your* code looks like one of the exmples, the more likely it is to work correctly.
 
 Don't try to "hang on" to old styles / techniques merely for nostalgic reasons: there are plenty of *other* reasons why H4Plugins *doesn't* work that way. Embrace "The H4Plugins way" and don't try to fight it. Do it "The H4 way, not *your* way", you will thank me eventually but before that time comes, repeat after me: *"I am not in charge of the code. H4 runs it for me. I do not decide the order of events, the world does that and H4 feeds them to me in an orderly manner."*
 
